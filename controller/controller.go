@@ -21,10 +21,10 @@ type controller struct {
 }
 
 type Config struct {
-	KubernetesAPIServer    string
-	KubernetesCAFilePath   string
-	KubernetesCertFilePath string
-	KubernetesKeyFilePath  string
+	APIServer    string
+	CAFilePath   string
+	CertFilePath string
+	KeyFilePath  string
 
 	ListenAddress string
 }
@@ -32,11 +32,11 @@ type Config struct {
 func New(config Config) Controller {
 	clientset := kubernetes.NewForConfigOrDie(
 		&rest.Config{
-			Host: config.KubernetesAPIServer,
+			Host: config.APIServer,
 			TLSClientConfig: rest.TLSClientConfig{
-				CAFile:   config.KubernetesCAFilePath,
-				CertFile: config.KubernetesCertFilePath,
-				KeyFile:  config.KubernetesKeyFilePath,
+				CAFile:   config.CAFilePath,
+				CertFile: config.CertFilePath,
+				KeyFile:  config.KeyFilePath,
 			},
 		},
 	)
