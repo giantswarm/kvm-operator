@@ -1,13 +1,17 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
+
+	"github.com/giantswarm/cluster-controller/controller"
 )
+
+var listenAddress string
 
 func init() {
 	RootCmd.AddCommand(controllerCmd)
+
+	controllerCmd.Flags().StringVar(&listenAddress, "listen-address", "127.0.0.1:8000", "Listen address for server")
 }
 
 var controllerCmd = &cobra.Command{
@@ -17,5 +21,6 @@ var controllerCmd = &cobra.Command{
 }
 
 func controllerRun(cmd *cobra.Command, args []string) {
-	log.Println("Starting controller")
+	controller := controller.New(listenAddress)
+	controller.Start()
 }
