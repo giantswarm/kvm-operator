@@ -9,7 +9,7 @@ import (
 
 // startServer starts a server for metrics and health checking.
 func (c *controller) startServer() {
-	log.Println("Starting server on:", c.config.ListenAddress)
+	log.Println("starting server on:", c.config.ListenAddress)
 
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(c.config.ListenAddress, nil))

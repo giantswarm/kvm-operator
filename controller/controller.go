@@ -50,7 +50,7 @@ func New(config Config) Controller {
 // Start starts the server.
 func (c *controller) Start() {
 	if err := c.createClusterResource(); err != nil {
-		log.Fatalln("Could not create cluster resource:", err)
+		log.Fatalln("could not create cluster resource:", err)
 	}
 
 	c.startServer()

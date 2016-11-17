@@ -46,15 +46,15 @@ func (c *controller) createClusterResource() error {
 
 	start := time.Now()
 
-	log.Println("Creating cluster resource")
+	log.Println("creating cluster resource")
 	var err error
 	if _, err = tprClient.Create(&clusterTPR); err != nil && !errors.IsAlreadyExists(err) {
 		return err
 	}
 	if errors.IsAlreadyExists(err) {
-		log.Println("Cluster resource already exists")
+		log.Println("cluster resource already exists")
 	} else {
-		log.Println("Cluster resource created")
+		log.Println("cluster resource created")
 	}
 
 	clusterResourceCreation.Set(float64(time.Since(start) / time.Millisecond))
