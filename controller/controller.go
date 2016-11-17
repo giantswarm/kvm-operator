@@ -49,9 +49,14 @@ func New(config Config) Controller {
 
 // Start starts the server.
 func (c *controller) Start() {
+	go c.startServer()
+
 	if err := c.createClusterResource(); err != nil {
 		log.Fatalln("could not create cluster resource:", err)
 	}
 
-	c.startServer()
+	// dummy - the controller loops will replace this
+	for {
+		select {}
+	}
 }
