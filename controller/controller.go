@@ -162,12 +162,29 @@ func (c *controller) Start() {
 
 				cluster := obj.(*Cluster)
 				log.Printf("cluster '%v' added", cluster.Name)
-				// TODO: compute and submit the required resources
+
+				if err := c.createClusterNamespace(*cluster); err != nil {
+					log.Println("could not create cluster namespace:", err)
+				}
 
 				clusterEventHandleTime.WithLabelValues("added").Set(float64(time.Since(start) / time.Millisecond))
+			},
+			DeleteFunc: func(obj interface{}) {
+				start := time.Now()
+				clusterEventHandleTotal.WithLabelValues("deleted").Inc()
+
+				cluster := obj.(*Cluster)
+				log.Printf("cluster '%v' deleted", cluster.Name)
+
+				if err := c.deleteClusterNamespace(*cluster); err != nil {
+					log.Println("could not delete cluster namespace:", err)
+				}
+
+				clusterEventHandleTime.WithLabelValues("deleted").Set(float64(time.Since(start) / time.Millisecond))
 			},
 		},
 	)
 
+	log.Println("starting watch")
 	clusterInformer.Run(nil)
 }
