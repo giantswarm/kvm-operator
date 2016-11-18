@@ -14,8 +14,8 @@ import (
 
 var (
 	clusterResourceCreation = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "cluster_resource_creation_milliseconds",
-		Help: "Time taken to create cluster resource, in milliseconds",
+		Name: "cluster_third_party_resource_creation_milliseconds",
+		Help: "Time taken to create cluster third party resource, in milliseconds",
 	})
 )
 
