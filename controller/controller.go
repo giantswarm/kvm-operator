@@ -15,6 +15,11 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
+const (
+	ClusterListAPIEndpoint  = "/apis/giantswarm.io/v1/clusters"
+	ClusterWatchAPIEndpoint = "/apis/giantswarm.io/v1/watch/clusters"
+)
+
 type Controller interface {
 	Start()
 }
@@ -98,7 +103,7 @@ func (c *controller) newClusterListWatch() *cache.ListWatch {
 			start := time.Now()
 			clusterAPIActionTotal.WithLabelValues("list").Inc()
 
-			req := client.Get().AbsPath("/apis/giantswarm.io/v1/clusters")
+			req := client.Get().AbsPath(ClusterListAPIEndpoint)
 			b, err := req.DoRaw()
 			if err != nil {
 				return nil, err
@@ -118,7 +123,7 @@ func (c *controller) newClusterListWatch() *cache.ListWatch {
 			start := time.Now()
 			clusterAPIActionTotal.WithLabelValues("watch").Inc()
 
-			req := client.Get().AbsPath("/apis/giantswarm.io/v1/watch/clusters")
+			req := client.Get().AbsPath(ClusterWatchAPIEndpoint)
 			stream, err := req.Stream()
 			if err != nil {
 				return nil, err
