@@ -23,6 +23,7 @@ type Cluster struct {
 }
 
 type ClusterSpec struct {
+	Customer string `json:"customer"`
 }
 
 func (c *Cluster) GetObjectKind() unversioned.ObjectKind {

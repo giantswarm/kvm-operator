@@ -1,5 +1,6 @@
 apiVersion: "giantswarm.io/v1"
 kind: Cluster
 metadata:
-  name: test-cluster-1
+  name: test-1
 spec:
+  customer: "test-customer"
