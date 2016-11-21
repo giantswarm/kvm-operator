@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -34,7 +35,7 @@ func init() {
 }
 
 func getNamespaceNameForCluster(cluster Cluster) string {
-	return cluster.Name
+	return fmt.Sprintf("cluster-%v", cluster.Name)
 }
 
 func (c *controller) createClusterNamespace(cluster Cluster) error {
