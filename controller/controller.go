@@ -169,7 +169,7 @@ func (c *controller) Start() {
 
 				// Given a cluster, determine the desired state,
 				// in terms of resources that should exist in Kubernetes.
-				resources, err := c.computeResources(cluster)
+				resources, err := computeResources(cluster)
 				if err != nil {
 					log.Println("could not compute required resources for cluster:", err)
 				}

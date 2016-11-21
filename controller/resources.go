@@ -35,7 +35,7 @@ func init() {
 
 // computeResources returns a list of Kubernetes objects that define
 // the desired state of the given cluster.
-func (c *controller) computeResources(cluster *Cluster) ([]runtime.Object, error) {
+func computeResources(cluster *Cluster) ([]runtime.Object, error) {
 	start := time.Now()
 	computeResourcesTotal.WithLabelValues(cluster.Name).Inc()
 
