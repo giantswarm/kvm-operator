@@ -13,20 +13,7 @@ import (
 )
 
 var (
-	clusterResourceCreation = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "cluster_third_party_resource_creation_milliseconds",
-		Help: "Time taken to create cluster third party resource, in milliseconds",
-	})
-)
-
-func init() {
-	prometheus.MustRegister(clusterResourceCreation)
-}
-
-// createClusterResource creates the 'cluster' ThirdPartyResource,
-// if it does not exist already.
-func (c *controller) createClusterResource() error {
-	clusterTPR := v1beta1.ThirdPartyResource{
+	ClusterThirdPartyResource = v1beta1.ThirdPartyResource{
 		TypeMeta: unversioned.TypeMeta{
 			Kind:       "ThirdPartyResource",
 			APIVersion: "extensions/v1beta1",
@@ -42,13 +29,26 @@ func (c *controller) createClusterResource() error {
 		},
 	}
 
+	clusterResourceCreation = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "cluster_third_party_resource_creation_milliseconds",
+		Help: "Time taken to create cluster third party resource, in milliseconds",
+	})
+)
+
+func init() {
+	prometheus.MustRegister(clusterResourceCreation)
+}
+
+// createClusterResource creates the 'cluster' ThirdPartyResource,
+// if it does not exist already.
+func (c *controller) createClusterResource() error {
 	tprClient := c.clientset.Extensions().ThirdPartyResources()
 
 	start := time.Now()
 
 	log.Println("creating cluster resource")
 	var err error
-	if _, err = tprClient.Create(&clusterTPR); err != nil && !errors.IsAlreadyExists(err) {
+	if _, err = tprClient.Create(&ClusterThirdPartyResource); err != nil && !errors.IsAlreadyExists(err) {
 		return err
 	}
 	if errors.IsAlreadyExists(err) {
