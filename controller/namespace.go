@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -35,7 +34,7 @@ func init() {
 }
 
 func getNamespaceNameForCluster(cluster Cluster) string {
-	return fmt.Sprintf("cluster-%v", cluster.Name)
+	return cluster.Name
 }
 
 func (c *controller) createClusterNamespace(cluster Cluster) error {
@@ -52,7 +51,8 @@ func (c *controller) createClusterNamespace(cluster Cluster) error {
 		ObjectMeta: v1.ObjectMeta{
 			Name: getNamespaceNameForCluster(cluster),
 			Labels: map[string]string{
-				"cluster-id": cluster.Name,
+				"cluster":  cluster.Name,
+				"customer": cluster.Spec.Customer,
 			},
 		},
 	}

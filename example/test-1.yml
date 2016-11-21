@@ -3,3 +3,4 @@ kind: Cluster
 metadata:
   name: test-1
 spec:
+  customer: "test-customer"
