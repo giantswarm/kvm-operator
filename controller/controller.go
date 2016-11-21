@@ -167,6 +167,18 @@ func (c *controller) Start() {
 					log.Println("could not create cluster namespace:", err)
 				}
 
+				// Given a cluster, determine the desired state,
+				// in terms of resources that should exist in Kubernetes.
+				resources, err := c.computeResources(cluster)
+				if err != nil {
+					log.Println("could not compute required resources for cluster:", err)
+				}
+
+				// Reconcile the state of resources in Kubernetes with the desired state of resources we just computed.
+				if err := c.reconcileResourceState(getNamespaceNameForCluster(*cluster), resources); err != nil {
+					log.Println("could not reconcile resource state:", err)
+				}
+
 				clusterEventHandleTime.WithLabelValues("added").Set(float64(time.Since(start) / time.Millisecond))
 			},
 			DeleteFunc: func(obj interface{}) {
