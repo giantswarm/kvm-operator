@@ -29,7 +29,7 @@ func checkExistingResourcesMatchExpectedResources(clientset kubernetes.Interface
 				return []diff{}, err
 			}
 			if !reflect.DeepEqual(service, expectedResource) {
-				diffs = append(diffs, diff{existingResource: r, expectedResource: expectedResource})
+				diffs = append(diffs, diff{existingResource: service, expectedResource: expectedResource})
 			}
 
 		default:
@@ -50,7 +50,9 @@ func TestReconcileResourceState(t *testing.T) {
 	}{
 		// Test creating a single Service, with no pre-existing resources.
 		{
+			// There are no existing resources,
 			existingResources: []runtime.Object{},
+			// and we want to add this new Service.
 			newResources: []runtime.Object{
 				&v1.Service{
 					TypeMeta: unversioned.TypeMeta{
@@ -70,6 +72,7 @@ func TestReconcileResourceState(t *testing.T) {
 					},
 				},
 			},
+			// So, we would expect this Service to exist at the end.
 			expectedResources: []runtime.Object{
 				&v1.Service{
 					TypeMeta: unversioned.TypeMeta{
@@ -84,6 +87,70 @@ func TestReconcileResourceState(t *testing.T) {
 						Ports: []v1.ServicePort{
 							v1.ServicePort{
 								Port: int32(8000),
+							},
+						},
+					},
+				},
+			},
+		},
+
+		// Test updating a Service
+		{
+			// We have a Service already,
+			existingResources: []runtime.Object{
+				&v1.Service{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-service",
+						Namespace: namespaceName,
+					},
+					Spec: v1.ServiceSpec{
+						Ports: []v1.ServicePort{
+							v1.ServicePort{
+								Port: int32(8000),
+							},
+						},
+					},
+				},
+			},
+			// and want to update it with this version.
+			newResources: []runtime.Object{
+				&v1.Service{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-service",
+						Namespace: namespaceName,
+					},
+					Spec: v1.ServiceSpec{
+						Ports: []v1.ServicePort{
+							v1.ServicePort{
+								Port: int32(8080), // This port has changed
+							},
+						},
+					},
+				},
+			},
+			// So we'd expect this Service spec to exist at the end.
+			expectedResources: []runtime.Object{
+				&v1.Service{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-service",
+						Namespace: namespaceName,
+					},
+					Spec: v1.ServiceSpec{
+						Ports: []v1.ServicePort{
+							v1.ServicePort{
+								Port: int32(8080),
 							},
 						},
 					},
@@ -107,7 +174,7 @@ func TestReconcileResourceState(t *testing.T) {
 		}
 
 		if len(diffs) > 0 {
-			t.Logf("Existing resources did not match expected resources")
+			t.Logf("%v: Existing resources did not match expected resources", index)
 			for _, diff := range diffs {
 				t.Logf("Existing: \n %#v \n", diff.existingResource)
 				t.Logf("Expected: \n %#v \n", diff.expectedResource)

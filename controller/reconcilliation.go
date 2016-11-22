@@ -1,18 +1,22 @@
 package controller
 
 import (
+	golang_errors "errors"
 	"log"
+	"reflect"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
 )
 
 var (
+	unknownResourceTypeErr = golang_errors.New("Unknown resource type")
+
 	reconcilliationTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "reconcilliation_total",
@@ -44,11 +48,54 @@ var (
 	)
 )
 
+type action interface {
+	Run(kubernetes.Interface) error
+}
+
+type create struct {
+	resource runtime.Object
+}
+
+func (a *create) Run(clientset kubernetes.Interface) error {
+	switch res := a.resource.(type) {
+	case *v1.Service:
+		log.Printf("creating service %v/%v\n", res.Namespace, res.Name)
+		_, err := clientset.Core().Services(res.Namespace).Create(res)
+		return err
+	default:
+		return unknownResourceTypeErr
+	}
+}
+
+type update struct {
+	resource runtime.Object
+}
+
+func (a *update) Run(clientset kubernetes.Interface) error {
+	switch res := a.resource.(type) {
+	case *v1.Service:
+		log.Printf("updating service %v/%v\n", res.Namespace, res.Name)
+		_, err := clientset.Core().Services(res.Namespace).Update(res)
+		return err
+	default:
+		return unknownResourceTypeErr
+	}
+}
+
 func init() {
 	prometheus.MustRegister(reconcilliationTotal)
 	prometheus.MustRegister(reconicilliationTime)
 	prometheus.MustRegister(reconcilliationResourceModificationTotal)
 	prometheus.MustRegister(reconcilliationResourceModificationTime)
+}
+
+func (c *controller) getExistingResource(resource runtime.Object) (runtime.Object, error) {
+	switch res := resource.(type) {
+	case *v1.Service:
+		return c.clientset.Core().Services(res.Namespace).Get(res.Name)
+	default:
+		return nil, unknownResourceTypeErr
+	}
 }
 
 // reconcileResourceState takes a list of Kubernetes resources, and makes sure
@@ -59,55 +106,33 @@ func (c *controller) reconcileResourceState(namespaceName string, resources []ru
 
 	log.Println("starting reconcilliation for namespace:", namespaceName)
 
+	actions := []action{}
+
 	for _, resource := range resources {
-		switch r := resource.(type) {
-		case *v1.ConfigMap:
-			start := time.Now()
-			reconcilliationResourceModificationTotal.WithLabelValues(namespaceName, "configmap", "created").Inc()
-			log.Println("creating configmap:", r.Name)
-			if _, err := c.clientset.Core().ConfigMaps(namespaceName).Create(r); err != nil && !errors.IsAlreadyExists(err) {
-				return err
-			}
-			reconcilliationResourceModificationTime.WithLabelValues(namespaceName, "configmap", "created").Set(float64(time.Since(start) / time.Millisecond))
+		existingResource, err := c.getExistingResource(resource)
 
-		case *v1.Service:
-			start := time.Now()
-			reconcilliationResourceModificationTotal.WithLabelValues(namespaceName, "service", "created").Inc()
-			log.Println("creating service:", r.Name)
-			if _, err := c.clientset.Core().Services(namespaceName).Create(r); err != nil && !errors.IsAlreadyExists(err) {
-				return err
-			}
-			reconcilliationResourceModificationTime.WithLabelValues(namespaceName, "service", "created").Set(float64(time.Since(start) / time.Millisecond))
+		if errors.IsNotFound(err) {
+			createAction := &create{resource: resource}
+			actions = append(actions, createAction)
+			continue
+		}
 
-		case *v1beta1.Deployment:
-			start := time.Now()
-			reconcilliationResourceModificationTotal.WithLabelValues(namespaceName, "deployment", "created").Inc()
-			log.Println("creating deployment:", r.Name)
-			if _, err := c.clientset.Extensions().Deployments(namespaceName).Create(r); err != nil && !errors.IsAlreadyExists(err) {
-				return err
-			}
-			reconcilliationResourceModificationTime.WithLabelValues(namespaceName, "deployment", "created").Set(float64(time.Since(start) / time.Millisecond))
+		if err != nil {
+			return err
+		}
 
-		case *v1beta1.Ingress:
-			start := time.Now()
-			reconcilliationResourceModificationTotal.WithLabelValues(namespaceName, "ingress", "created").Inc()
-			log.Println("creating ingress:", r.Name)
-			if _, err := c.clientset.Extensions().Ingresses(namespaceName).Create(r); err != nil && !errors.IsAlreadyExists(err) {
-				return err
+		if !reflect.DeepEqual(existingResource, resource) {
+			updateAction := &update{
+				resource: resource,
 			}
-			reconcilliationResourceModificationTime.WithLabelValues(namespaceName, "ingress", "created").Set(float64(time.Since(start) / time.Millisecond))
+			actions = append(actions, updateAction)
+			continue
+		}
+	}
 
-		case *v1beta1.Job:
-			start := time.Now()
-			reconcilliationResourceModificationTotal.WithLabelValues(namespaceName, "job", "created").Inc()
-			log.Println("creating job:", r.Name)
-			if _, err := c.clientset.Extensions().Jobs(namespaceName).Create(r); err != nil && !errors.IsAlreadyExists(err) {
-				return err
-			}
-			reconcilliationResourceModificationTime.WithLabelValues(namespaceName, "job", "created").Set(float64(time.Since(start) / time.Millisecond))
-
-		default:
-			log.Println("unknown type")
+	for _, action := range actions {
+		if err := action.Run(c.clientset); err != nil {
+			return err
 		}
 	}
 
