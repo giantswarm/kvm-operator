@@ -9,7 +9,9 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
+	"k8s.io/client-go/pkg/util/intstr"
 )
 
 type diff struct {
@@ -21,19 +23,29 @@ func checkExistingResourcesMatchExpectedResources(clientset kubernetes.Interface
 	diffs := []diff{}
 
 	for _, expectedResource := range expectedResources {
-		switch r := expectedResource.(type) {
+		var existingResource runtime.Object
+		var err error
 
+		switch res := expectedResource.(type) {
+		case *v1.ConfigMap:
+			existingResource, err = clientset.Core().ConfigMaps(res.Namespace).Get(res.Name)
 		case *v1.Service:
-			service, err := clientset.Core().Services(r.Namespace).Get(r.Name)
-			if err != nil {
-				return []diff{}, err
-			}
-			if !reflect.DeepEqual(service, expectedResource) {
-				diffs = append(diffs, diff{existingResource: service, expectedResource: expectedResource})
-			}
-
+			existingResource, err = clientset.Core().Services(res.Namespace).Get(res.Name)
+		case *v1beta1.Deployment:
+			existingResource, err = clientset.Extensions().Deployments(res.Namespace).Get(res.Name)
+		case *v1beta1.Ingress:
+			existingResource, err = clientset.Extensions().Ingresses(res.Namespace).Get(res.Name)
+		case *v1beta1.Job:
+			existingResource, err = clientset.Extensions().Jobs(res.Namespace).Get(res.Name)
 		default:
 			return []diff{}, errors.New("expected resource was of unknown type")
+		}
+
+		if err != nil {
+			return []diff{}, err
+		}
+		if !reflect.DeepEqual(existingResource, expectedResource) {
+			diffs = append(diffs, diff{existingResource: existingResource, expectedResource: expectedResource})
 		}
 	}
 
@@ -154,6 +166,103 @@ func TestReconcileResourceState(t *testing.T) {
 							},
 						},
 					},
+				},
+			},
+		},
+
+		// Test updating an Ingress, without touching the existing ConfigMap.
+		{
+			// We have an Ingress and a configmap already
+			existingResources: []runtime.Object{
+				&v1beta1.Ingress{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "Ingress",
+						APIVersion: "extensions/v1beta1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-ingress",
+						Namespace: namespaceName,
+					},
+					Spec: v1beta1.IngressSpec{
+						Backend: &v1beta1.IngressBackend{
+							ServiceName: "test-service",
+							ServicePort: intstr.FromInt(8000),
+						},
+					},
+				},
+				&v1.ConfigMap{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "ConfigMap",
+						APIVersion: "v1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-configmap",
+						Namespace: namespaceName,
+					},
+					Data: map[string]string{},
+				},
+			},
+
+			// And we want to change the port for the ingress backend,
+			// without affecting the configmap.
+			newResources: []runtime.Object{
+				&v1beta1.Ingress{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "Ingress",
+						APIVersion: "extensions/v1beta1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-ingress",
+						Namespace: namespaceName,
+					},
+					Spec: v1beta1.IngressSpec{
+						Backend: &v1beta1.IngressBackend{
+							ServiceName: "test-service",
+							ServicePort: intstr.FromInt(8001),
+						},
+					},
+				},
+				&v1.ConfigMap{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "ConfigMap",
+						APIVersion: "v1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-configmap",
+						Namespace: namespaceName,
+					},
+					Data: map[string]string{},
+				},
+			},
+
+			// so we expect this to be the actual state
+			expectedResources: []runtime.Object{
+				&v1beta1.Ingress{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "Ingress",
+						APIVersion: "extensions/v1beta1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-ingress",
+						Namespace: namespaceName,
+					},
+					Spec: v1beta1.IngressSpec{
+						Backend: &v1beta1.IngressBackend{
+							ServiceName: "test-service",
+							ServicePort: intstr.FromInt(8001),
+						},
+					},
+				},
+				&v1.ConfigMap{
+					TypeMeta: unversioned.TypeMeta{
+						Kind:       "ConfigMap",
+						APIVersion: "v1",
+					},
+					ObjectMeta: v1.ObjectMeta{
+						Name:      "test-configmap",
+						Namespace: namespaceName,
+					},
+					Data: map[string]string{},
 				},
 			},
 		},
