@@ -41,6 +41,8 @@ func computeResources(cluster *Cluster) ([]runtime.Object, error) {
 
 	log.Println("started computing desired resources for cluster:", cluster.Name)
 
+	namespaceName := getNamespaceNameForCluster(*cluster)
+
 	objects := []runtime.Object{}
 
 	exampleService := &v1.Service{
@@ -49,7 +51,8 @@ func computeResources(cluster *Cluster) ([]runtime.Object, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name: "example-service",
+			Namespace: namespaceName,
+			Name:      "example-service",
 		},
 		Spec: v1.ServiceSpec{
 			Ports: []v1.ServicePort{

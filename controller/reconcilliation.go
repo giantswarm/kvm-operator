@@ -140,7 +140,7 @@ func (c *controller) reconcileResourceState(namespaceName string, resources []ru
 	start := time.Now()
 	reconcilliationTotal.WithLabelValues(namespaceName).Inc()
 
-	log.Println("starting reconcilliation for:", namespaceName)
+	log.Println("starting reconcilliation for namespace:", namespaceName)
 
 	for _, resource := range resources {
 		existingResource, err := c.getExistingResource(resource)
@@ -167,7 +167,6 @@ func (c *controller) reconcileResourceState(namespaceName string, resources []ru
 			continue
 		}
 
-		// If the actual state of the resource does not match the desired state, update it
 		if !reflect.DeepEqual(existingResource, resource) {
 			start := time.Now()
 			reconcilliationResourceModificationTotal.WithLabelValues(namespace, kind, "updated").Inc()
@@ -183,7 +182,7 @@ func (c *controller) reconcileResourceState(namespaceName string, resources []ru
 		}
 	}
 
-	log.Println("finished reconcilliation for:", namespaceName)
+	log.Println("finished reconcilliation for namespace:", namespaceName)
 
 	reconicilliationTime.WithLabelValues(namespaceName).Set(float64(time.Since(start) / time.Millisecond))
 
