@@ -8,9 +8,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
 )
 
@@ -48,40 +48,6 @@ var (
 	)
 )
 
-type action interface {
-	Run(kubernetes.Interface) error
-}
-
-type create struct {
-	resource runtime.Object
-}
-
-func (a *create) Run(clientset kubernetes.Interface) error {
-	switch res := a.resource.(type) {
-	case *v1.Service:
-		log.Printf("creating service %v/%v\n", res.Namespace, res.Name)
-		_, err := clientset.Core().Services(res.Namespace).Create(res)
-		return err
-	default:
-		return unknownResourceTypeErr
-	}
-}
-
-type update struct {
-	resource runtime.Object
-}
-
-func (a *update) Run(clientset kubernetes.Interface) error {
-	switch res := a.resource.(type) {
-	case *v1.Service:
-		log.Printf("updating service %v/%v\n", res.Namespace, res.Name)
-		_, err := clientset.Core().Services(res.Namespace).Update(res)
-		return err
-	default:
-		return unknownResourceTypeErr
-	}
-}
-
 func init() {
 	prometheus.MustRegister(reconcilliationTotal)
 	prometheus.MustRegister(reconicilliationTime)
@@ -89,54 +55,135 @@ func init() {
 	prometheus.MustRegister(reconcilliationResourceModificationTime)
 }
 
+func (c *controller) getInfoForResource(resource runtime.Object) (string, string, string, error) {
+	switch res := resource.(type) {
+	case *v1.ConfigMap:
+		return "configmap", res.Namespace, res.Name, nil
+	case *v1.Service:
+		return "service", res.Namespace, res.Name, nil
+	case *v1beta1.Deployment:
+		return "deployment", res.Namespace, res.Name, nil
+	case *v1beta1.Ingress:
+		return "ingress", res.Namespace, res.Name, nil
+	case *v1beta1.Job:
+		return "job", res.Namespace, res.Name, nil
+	default:
+		return "", "", "", unknownResourceTypeErr
+	}
+}
+
+// getExistingResource takes a resource, and returns the resource that Kubernetes has.
 func (c *controller) getExistingResource(resource runtime.Object) (runtime.Object, error) {
 	switch res := resource.(type) {
+	case *v1.ConfigMap:
+		return c.clientset.Core().ConfigMaps(res.Namespace).Get(res.Name)
 	case *v1.Service:
 		return c.clientset.Core().Services(res.Namespace).Get(res.Name)
+	case *v1beta1.Deployment:
+		return c.clientset.Extensions().Deployments(res.Namespace).Get(res.Name)
+	case *v1beta1.Ingress:
+		return c.clientset.Extensions().Ingresses(res.Namespace).Get(res.Name)
+	case *v1beta1.Job:
+		return c.clientset.Extensions().Jobs(res.Namespace).Get(res.Name)
 	default:
 		return nil, unknownResourceTypeErr
 	}
 }
 
-// reconcileResourceState takes a list of Kubernetes resources, and makes sure
-// that these resources exist.
+func (c *controller) createResource(resource runtime.Object) error {
+	var err error
+
+	switch res := resource.(type) {
+	case *v1.ConfigMap:
+		_, err = c.clientset.Core().ConfigMaps(res.Namespace).Create(res)
+	case *v1.Service:
+		_, err = c.clientset.Core().Services(res.Namespace).Create(res)
+	case *v1beta1.Deployment:
+		_, err = c.clientset.Extensions().Deployments(res.Namespace).Create(res)
+	case *v1beta1.Ingress:
+		_, err = c.clientset.Extensions().Ingresses(res.Namespace).Create(res)
+	case *v1beta1.Job:
+		_, err = c.clientset.Extensions().Jobs(res.Namespace).Create(res)
+	default:
+		err = unknownResourceTypeErr
+	}
+
+	return err
+}
+
+func (c *controller) updateResource(resource runtime.Object) error {
+	var err error
+
+	switch res := resource.(type) {
+	case *v1.ConfigMap:
+		_, err = c.clientset.Core().ConfigMaps(res.Namespace).Update(res)
+	case *v1.Service:
+		_, err = c.clientset.Core().Services(res.Namespace).Update(res)
+	case *v1beta1.Deployment:
+		_, err = c.clientset.Extensions().Deployments(res.Namespace).Update(res)
+	case *v1beta1.Ingress:
+		_, err = c.clientset.Extensions().Ingresses(res.Namespace).Update(res)
+	case *v1beta1.Job:
+		_, err = c.clientset.Extensions().Jobs(res.Namespace).Update(res)
+	default:
+		err = unknownResourceTypeErr
+	}
+
+	return err
+}
+
+// reconcileResourceState takes a list of resources, which represent the desired
+// state of the underlying cluster resources, and performs the necessary
+// actions to bring the actual state of the cluster resources closer to this
+// desired state.
 func (c *controller) reconcileResourceState(namespaceName string, resources []runtime.Object) error {
 	start := time.Now()
 	reconcilliationTotal.WithLabelValues(namespaceName).Inc()
 
-	log.Println("starting reconcilliation for namespace:", namespaceName)
-
-	actions := []action{}
+	log.Println("starting reconcilliation for:", namespaceName)
 
 	for _, resource := range resources {
 		existingResource, err := c.getExistingResource(resource)
+		if err != nil && !errors.IsNotFound(err) {
+			return err
+		}
+
+		kind, namespace, name, infoErr := c.getInfoForResource(resource)
+		if infoErr != nil {
+			return infoErr
+		}
 
 		if errors.IsNotFound(err) {
-			createAction := &create{resource: resource}
-			actions = append(actions, createAction)
-			continue
-		}
+			start := time.Now()
+			reconcilliationResourceModificationTotal.WithLabelValues(namespace, kind, "created").Inc()
 
-		if err != nil {
-			return err
-		}
-
-		if !reflect.DeepEqual(existingResource, resource) {
-			updateAction := &update{
-				resource: resource,
+			log.Printf("creating %v %v/%v\n", kind, namespace, name)
+			if err := c.createResource(resource); err != nil {
+				return err
 			}
-			actions = append(actions, updateAction)
+
+			reconcilliationResourceModificationTime.WithLabelValues(namespace, kind, "created").Set(float64(time.Since(start) / time.Millisecond))
+
+			continue
+		}
+
+		// If the actual state of the resource does not match the desired state, update it
+		if !reflect.DeepEqual(existingResource, resource) {
+			start := time.Now()
+			reconcilliationResourceModificationTotal.WithLabelValues(namespace, kind, "updated").Inc()
+
+			log.Printf("updating %v %v/%v\n", kind, namespace, name)
+			if err := c.updateResource(resource); err != nil {
+				return err
+			}
+
+			reconcilliationResourceModificationTime.WithLabelValues(namespace, kind, "updated").Set(float64(time.Since(start) / time.Millisecond))
+
 			continue
 		}
 	}
 
-	for _, action := range actions {
-		if err := action.Run(c.clientset); err != nil {
-			return err
-		}
-	}
-
-	log.Println("finished reconcilliation for namespace:", namespaceName)
+	log.Println("finished reconcilliation for:", namespaceName)
 
 	reconicilliationTime.WithLabelValues(namespaceName).Set(float64(time.Since(start) / time.Millisecond))
 
