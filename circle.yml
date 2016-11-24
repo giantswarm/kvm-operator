@@ -18,3 +18,10 @@ test:
         - go build -v
         - docker build --rm=false -t giantswarm/cluster-controller:$CIRCLE_SHA1 .
         - ./cluster-controller --help
+
+deployment:
+    master:
+        branch: master
+        commands:
+            - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            - docker push giantswarm/cluster-controller:$CIRCLE_SHA1
