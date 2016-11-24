@@ -3,15 +3,21 @@ package controller
 import (
 	golang_errors "errors"
 	"log"
-	"reflect"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
+	"k8s.io/client-go/pkg/runtime/serializer/json"
+	"k8s.io/client-go/pkg/util/strategicpatch"
+)
+
+const (
+	ClusterControllerConfigurationAnnotation = "cluster-controller.giantswarm.io/last-configuration"
 )
 
 var (
@@ -90,8 +96,68 @@ func (c *controller) getExistingResource(resource runtime.Object) (runtime.Objec
 	}
 }
 
+func (c *controller) addConfigurationAnnotation(resource runtime.Object) (runtime.Object, error) {
+	serializer := json.NewSerializer(json.DefaultMetaFactory, api.Scheme, api.Scheme, false)
+
+	encoded, err := runtime.Encode(serializer, resource)
+	if err != nil {
+		return nil, err
+	}
+
+	switch res := resource.(type) {
+	case *v1.ConfigMap:
+		res.Annotations = map[string]string{}
+		res.Annotations[ClusterControllerConfigurationAnnotation] = string(encoded)
+		return res, nil
+	case *v1.Service:
+		res.Annotations = map[string]string{}
+		res.Annotations[ClusterControllerConfigurationAnnotation] = string(encoded)
+		return res, nil
+	case *v1beta1.Deployment:
+		res.Annotations = map[string]string{}
+		res.Annotations[ClusterControllerConfigurationAnnotation] = string(encoded)
+		return res, nil
+	case *v1beta1.Ingress:
+		res.Annotations = map[string]string{}
+		res.Annotations[ClusterControllerConfigurationAnnotation] = string(encoded)
+		return res, nil
+	case *v1beta1.Job:
+		res.Annotations = map[string]string{}
+		res.Annotations[ClusterControllerConfigurationAnnotation] = string(encoded)
+		return res, nil
+	default:
+		return nil, unknownResourceTypeErr
+	}
+}
+
+func (c *controller) getConfigurationAnnotation(resource runtime.Object) (string, bool) {
+	log.Println("getting config annotation")
+	log.Println("getConfigurationAnnotation: resource:", resource)
+
+	switch res := resource.(type) {
+	case *v1.ConfigMap:
+		s, ok := res.Annotations[ClusterControllerConfigurationAnnotation]
+		return s, ok
+	case *v1.Service:
+		log.Println("annotations:", res.Annotations)
+		s, ok := res.Annotations[ClusterControllerConfigurationAnnotation]
+		return s, ok
+	case *v1beta1.Deployment:
+		s, ok := res.Annotations[ClusterControllerConfigurationAnnotation]
+		return s, ok
+	case *v1beta1.Ingress:
+		s, ok := res.Annotations[ClusterControllerConfigurationAnnotation]
+		return s, ok
+	case *v1beta1.Job:
+		s, ok := res.Annotations[ClusterControllerConfigurationAnnotation]
+		return s, ok
+	default:
+		return "", false
+	}
+}
+
 func (c *controller) createResource(resource runtime.Object) error {
-	var err error
+	var err error = nil
 
 	switch res := resource.(type) {
 	case *v1.ConfigMap:
@@ -111,25 +177,66 @@ func (c *controller) createResource(resource runtime.Object) error {
 	return err
 }
 
-func (c *controller) updateResource(resource runtime.Object) error {
-	var err error
+func (c *controller) resourceNeedsUpdate(old runtime.Object, new runtime.Object) bool {
+	oldConfiguration, _ := c.getConfigurationAnnotation(old)
+	newConfiguration, _ := c.getConfigurationAnnotation(new)
 
-	switch res := resource.(type) {
-	case *v1.ConfigMap:
-		_, err = c.clientset.Core().ConfigMaps(res.Namespace).Update(res)
-	case *v1.Service:
-		_, err = c.clientset.Core().Services(res.Namespace).Update(res)
-	case *v1beta1.Deployment:
-		_, err = c.clientset.Extensions().Deployments(res.Namespace).Update(res)
-	case *v1beta1.Ingress:
-		_, err = c.clientset.Extensions().Ingresses(res.Namespace).Update(res)
-	case *v1beta1.Job:
-		_, err = c.clientset.Extensions().Jobs(res.Namespace).Update(res)
-	default:
-		err = unknownResourceTypeErr
+	return !(oldConfiguration == newConfiguration)
+}
+
+func (c *controller) updateResource(old runtime.Object, new runtime.Object) error {
+	log.Println("update resource: old:", old)
+
+	serializer := json.NewSerializer(json.DefaultMetaFactory, api.Scheme, api.Scheme, false)
+
+	// Encode the old and new resources
+	oldEncoded, err := runtime.Encode(serializer, old)
+	if err != nil {
+		return err
+	}
+	newEncoded, err := runtime.Encode(serializer, new)
+	if err != nil {
+		return err
 	}
 
-	return err
+	configurationAnnotation, ok := c.getConfigurationAnnotation(old)
+	if !ok {
+		return golang_errors.New("Could not get annotation from resource")
+	}
+
+	patch, err := strategicpatch.CreateThreeWayMergePatch([]byte(configurationAnnotation), newEncoded, oldEncoded, old, false)
+	if err != nil {
+		return err
+	}
+	patchedResource, err := strategicpatch.StrategicMergePatch(oldEncoded, patch, old)
+	if err != nil {
+		return err
+	}
+
+	// Decode the resource into an Object
+	newObject, err := runtime.Decode(serializer, patchedResource)
+	if err != nil {
+		return err
+	}
+
+	// Update the object
+	var kerr error = nil
+	switch res := newObject.(type) {
+	case *v1.ConfigMap:
+		_, kerr = c.clientset.Core().ConfigMaps(res.Namespace).Update(res)
+	case *v1.Service:
+		_, kerr = c.clientset.Core().Services(res.Namespace).Update(res)
+	case *v1beta1.Deployment:
+		_, kerr = c.clientset.Extensions().Deployments(res.Namespace).Update(res)
+	case *v1beta1.Ingress:
+		_, kerr = c.clientset.Extensions().Ingresses(res.Namespace).Update(res)
+	case *v1beta1.Job:
+		_, kerr = c.clientset.Extensions().Jobs(res.Namespace).Update(res)
+	default:
+		kerr = unknownResourceTypeErr
+	}
+
+	return kerr
 }
 
 // reconcileResourceState takes a list of resources, which represent the desired
@@ -153,6 +260,11 @@ func (c *controller) reconcileResourceState(namespaceName string, resources []ru
 			return infoErr
 		}
 
+		resource, err := c.addConfigurationAnnotation(resource)
+		if err != nil {
+			return err
+		}
+
 		if errors.IsNotFound(err) {
 			start := time.Now()
 			reconcilliationResourceModificationTotal.WithLabelValues(namespace, kind, "created").Inc()
@@ -167,12 +279,12 @@ func (c *controller) reconcileResourceState(namespaceName string, resources []ru
 			continue
 		}
 
-		if !reflect.DeepEqual(existingResource, resource) {
+		if existingResource != nil && c.resourceNeedsUpdate(existingResource, resource) {
 			start := time.Now()
 			reconcilliationResourceModificationTotal.WithLabelValues(namespace, kind, "updated").Inc()
 
 			log.Printf("updating %v %v/%v\n", kind, namespace, name)
-			if err := c.updateResource(resource); err != nil {
+			if err := c.updateResource(existingResource, resource); err != nil {
 				return err
 			}
 

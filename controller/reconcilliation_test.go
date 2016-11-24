@@ -94,6 +94,9 @@ func TestReconcileResourceState(t *testing.T) {
 					ObjectMeta: v1.ObjectMeta{
 						Name:      "test-service",
 						Namespace: namespaceName,
+						Annotations: map[string]string{
+							"test": "{\"kind\":\"Service\",\"apiVersion\":\"v1\",\"metadata\":{\"name\":\"test-service\",\"namespace\":\"test-namespace\",\"creationTimestamp\":null},\"spec\":{\"ports\":[{\"port\":8000,\"targetPort\":0}]},\"status\":{\"loadBalancer\":{}}}\n",
+						},
 					},
 					Spec: v1.ServiceSpec{
 						Ports: []v1.ServicePort{
@@ -118,13 +121,18 @@ func TestReconcileResourceState(t *testing.T) {
 					ObjectMeta: v1.ObjectMeta{
 						Name:      "test-service",
 						Namespace: namespaceName,
+						Annotations: map[string]string{
+							"test": "{\"kind\":\"Service\",\"apiVersion\":\"v1\",\"metadata\":{\"name\":\"test-service\",\"namespace\":\"test-namespace\",\"creationTimestamp\":null},\"spec\":{\"ports\":[{\"port\":8080,\"targetPort\":0}],\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n",
+						},
 					},
 					Spec: v1.ServiceSpec{
+						Type: v1.ServiceTypeClusterIP,
 						Ports: []v1.ServicePort{
 							v1.ServicePort{
 								Port: int32(8000),
 							},
 						},
+						ClusterIP: "192.0.2.1", // ClusterIP created by Kubernetes
 					},
 				},
 			},
@@ -140,6 +148,7 @@ func TestReconcileResourceState(t *testing.T) {
 						Namespace: namespaceName,
 					},
 					Spec: v1.ServiceSpec{
+						Type: v1.ServiceTypeClusterIP,
 						Ports: []v1.ServicePort{
 							v1.ServicePort{
 								Port: int32(8080), // This port has changed
@@ -160,11 +169,13 @@ func TestReconcileResourceState(t *testing.T) {
 						Namespace: namespaceName,
 					},
 					Spec: v1.ServiceSpec{
+						Type: v1.ServiceTypeClusterIP,
 						Ports: []v1.ServicePort{
 							v1.ServicePort{
 								Port: int32(8080),
 							},
 						},
+						ClusterIP: "192.0.2.1", // ClusterIP preserved
 					},
 				},
 			},
