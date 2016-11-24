@@ -7,8 +7,8 @@ dependencies:
         - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
         - |
           echo 'export GOPATH=$GOPATH:$HOME/.go_project' >> ~/.circlerc
-        - go build -v
 
 test:
     override:
         - go test -v
+        - go build -v
