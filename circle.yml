@@ -15,7 +15,7 @@ dependencies:
 test:
     override:
         - go test -v
-        - go build -v
+        - CGO_ENABLED=0 GOOS=linux go build -a -tags netgo -ldflags '-w' -v
         - docker build --rm=false -t registry.giantswarm.io/giantswarm/cluster-controller:$CIRCLE_SHA1 .
         - docker run registry.giantswarm.io/giantswarm/cluster-controller:$CIRCLE_SHA1 --help
 
