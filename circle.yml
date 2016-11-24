@@ -23,5 +23,5 @@ deployment:
     master:
         branch: master
         commands:
-            - docker login registry.giantswarm.io -u $DOCKER_USERNAME -p "$DOCKER_PASSWORD"
+            - docker login --username=$DOCKER_USERNAME --password="$DOCKER_PASSWORD" registry.giantswarm.io
             - docker push registry.giantswarm.io/giantswarm/cluster-controller:$CIRCLE_SHA1
