@@ -1,3 +1,7 @@
+machine:
+    services:
+        - docker
+
 dependencies:
     override:
         # circleci normally does this behind the scenes,
@@ -12,4 +16,5 @@ test:
     override:
         - go test -v
         - go build -v
+        - docker build --rm=false -t giantswarm/cluster-controller:$CIRCLE_SHA1 .
         - ./cluster-controller --help
