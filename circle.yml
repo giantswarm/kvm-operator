@@ -12,3 +12,4 @@ test:
     override:
         - go test -v
         - go build -v
+        - ./cluster-controller --help
