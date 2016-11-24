@@ -1,0 +1,15 @@
+dependencies:
+    override:
+        # circleci normally does this behind the scenes,
+        # but as we need to override the inference to stop it running `go get`,
+        # we need to do this manually
+        - mkdir -p $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME
+        - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+        - |
+          echo 'export GOPATH=$GOPATH:$HOME/.go_project' >> ~/.circlerc
+
+test:
+    override:
+        - go test -v
+        - go build -v
+        - ./cluster-controller --help
