@@ -17,7 +17,7 @@ test:
         - go test -v
         - go build -v
         - docker build --rm=false -t registry.giantswarm.io/giantswarm/cluster-controller:$CIRCLE_SHA1 .
-        - ./cluster-controller --help
+        - docker run registry.giantswarm.io/giantswarm/cluster-controller:$CIRCLE_SHA1 --help
 
 deployment:
     master:
