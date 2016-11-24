@@ -1,0 +1,21 @@
+package: github.com/giantswarm/cluster-controller
+import:
+- package: github.com/prometheus/client_golang
+  version: ~0.8.0
+  subpackages:
+  - prometheus
+  - prometheus/promhttp
+- package: github.com/spf13/cobra
+- package: k8s.io/client-go
+  version: ~2.0.0-alpha.0
+  subpackages:
+  - kubernetes
+  - pkg/api
+  - pkg/api/errors
+  - pkg/api/unversioned
+  - pkg/api/v1
+  - pkg/apis/extensions/v1beta1
+  - pkg/runtime
+  - pkg/watch
+  - rest
+  - tools/cache
