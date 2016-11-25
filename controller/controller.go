@@ -89,6 +89,11 @@ func New(config Config) Controller {
 		if err != nil {
 			panic(fmt.Sprintf("Could not create in cluster config: %v\n", err.Error()))
 		}
+
+		log.Println("using explicit api server")
+		if config.APIServer != "" {
+			kubernetesConfig.Host = config.APIServer
+		}
 	} else {
 		log.Println("using external config")
 		kubernetesConfig = &rest.Config{
