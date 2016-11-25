@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cluster-controller
+  namespace: giantswarm
+  labels:
+    app: cluster-controller
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cluster-controller
+    spec:
+      containers:
+      - name: cluster-controller
+        # Note: image tag is set via CI - this is a known stable version, but may be outdated in future
+        image: registry.giantswarm.io/giantswarm/cluster-controller:e698f4823c921c74d3aa93df9fff6464b4e92c75
+        args:
+        - "controller"
+        - "--api-server=https://api.g8s.fra-1.giantswarm.io"
+        - "--listen-address=0.0.0.0:8000"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+      imagePullSecrets:
+      - name: circleci-giantswarm-registry
