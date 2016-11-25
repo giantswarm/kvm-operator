@@ -7,6 +7,8 @@ import (
 )
 
 var (
+	inCluster bool
+
 	apiServer    string
 	caFilePath   string
 	certFilePath string
@@ -17,6 +19,8 @@ var (
 
 func init() {
 	RootCmd.AddCommand(controllerCmd)
+
+	controllerCmd.Flags().BoolVar(&inCluster, "in-cluster", true, "Is the controller running in a cluster")
 
 	controllerCmd.Flags().StringVar(&apiServer, "api-server", "", "API server URL")
 	controllerCmd.Flags().StringVar(&caFilePath, "ca-file-path", "", "CA file path")
@@ -34,6 +38,8 @@ var controllerCmd = &cobra.Command{
 
 func controllerRun(cmd *cobra.Command, args []string) {
 	config := controller.Config{
+		InCluster: inCluster,
+
 		APIServer:    apiServer,
 		CAFilePath:   caFilePath,
 		CertFilePath: certFilePath,
