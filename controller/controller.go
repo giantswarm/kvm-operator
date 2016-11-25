@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -30,6 +31,8 @@ type controller struct {
 }
 
 type Config struct {
+	InCluster bool
+
 	APIServer    string
 	CAFilePath   string
 	CertFilePath string
@@ -78,16 +81,27 @@ func init() {
 }
 
 func New(config Config) Controller {
-	clientset := kubernetes.NewForConfigOrDie(
-		&rest.Config{
+	var kubernetesConfig *rest.Config
+	if config.InCluster {
+		log.Println("using in cluster config")
+		var err error
+		kubernetesConfig, err = rest.InClusterConfig()
+		if err != nil {
+			panic(fmt.Sprintf("Could not create in cluster config: %v\n", err.Error()))
+		}
+	} else {
+		log.Println("using external config")
+		kubernetesConfig = &rest.Config{
 			Host: config.APIServer,
 			TLSClientConfig: rest.TLSClientConfig{
 				CAFile:   config.CAFilePath,
 				CertFile: config.CertFilePath,
 				KeyFile:  config.KeyFilePath,
 			},
-		},
-	)
+		}
+	}
+
+	clientset := kubernetes.NewForConfigOrDie(kubernetesConfig)
 
 	return &controller{
 		clientset: clientset,
