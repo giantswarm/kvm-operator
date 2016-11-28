@@ -16,8 +16,7 @@ spec:
     spec:
       containers:
       - name: cluster-controller
-        # Note: image tag is set via CI - this is a known stable version, but may be outdated in future
-        image: registry.giantswarm.io/giantswarm/cluster-controller:e698f4823c921c74d3aa93df9fff6464b4e92c75
+        image: registry.giantswarm.io/giantswarm/cluster-controller:%%DOCKER_TAG%%
         args:
         - "controller"
         - "--api-server=https://api.g8s.fra-1.giantswarm.io"

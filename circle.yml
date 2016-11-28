@@ -23,5 +23,20 @@ deployment:
     master:
         branch: master
         commands:
+            # push the docker image
             - docker login --email=$DOCKER_EMAIL --username=$DOCKER_USERNAME --password="$DOCKER_PASSWORD" registry.giantswarm.io
             - docker push registry.giantswarm.io/giantswarm/cluster-controller:$CIRCLE_SHA1
+            # fetch and configure kubectl
+            - curl --silent --max-time 60 --remote-name https://storage.googleapis.com/kubernetes-release/release/v1.4.3/bin/linux/amd64/kubectl && chmod +x ./kubectl
+            - echo -n $G8S_CA | base64 --decode > ./ca.crt
+            - echo -n $G8S_CRT | base64 --decode > ./crt.pem
+            - echo -n $G8S_KEY | base64 --decode > ./key.pem
+            - ./kubectl config set-cluster g8s-cluster --server=https://api.g8s.fra-1.giantswarm.io --certificate-authority=./ca.crt
+            - ./kubectl config set-credentials g8s-admin --certificate-authority=./ca.crt --client-certificate=./crt.pem --client-key=./key.pem
+            - ./kubectl config set-context g8s-system --cluster=g8s-cluster --user=g8s-admin
+            - ./kubectl config use-context g8s-system
+            - ./kubectl cluster-info
+            # update the manifests with the tag, apply the new manifests, and watch the rollout
+            - sed -i "s/%%DOCKER_TAG%%/$CIRCLE_SHA1/g" ./kubernetes/*
+            - ./kubectl apply --namespace=giantswarm -f ./kubernetes/
+            - ./kubectl rollout --namespace=giantswarm status deployment/cluster-controller
