@@ -36,6 +36,7 @@ deployment:
             - ./kubectl config set-context g8s-system --cluster=g8s-cluster --user=g8s-admin
             - ./kubectl config use-context g8s-system
             - ./kubectl cluster-info
-            # update the deployment, and watch the rollout
-            - ./kubectl set --namespace=giantswarm image deployment/cluster-controller cluster-controller=registry.giantswarm.io/giantswarm/cluster-controller:$CIRCLE_SHA1
+            # update the manifests with the tag, apply the new manifests, and watch the rollout
+            - sed -i "s/%%DOCKER_TAG%%/$CIRCLE_SHA1/g" ./kubernetes/*
+            - ./kubectl apply --namespace=giantswarm -f ./kubernetes/
             - ./kubectl rollout --namespace=giantswarm status deployment/cluster-controller
