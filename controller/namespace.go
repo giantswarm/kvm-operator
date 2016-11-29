@@ -29,20 +29,29 @@ var (
 	)
 )
 
+type Namespace interface {
+	ClusterObj
+}
+
+type namespace struct {
+	ClusterConfig
+}
+
+
 func init() {
 	prometheus.MustRegister(namespaceActionTotal)
 	prometheus.MustRegister(namespaceActionTime)
 }
 
-func getNamespaceNameForCluster(cluster Cluster) string {
-	return fmt.Sprintf("cluster-%v", cluster.Name)
+func (c *namespace) GetNamespace() string {
+	return fmt.Sprintf("cluster-%v", c.ClusterID)
 }
 
-func (c *controller) createClusterNamespace(cluster Cluster) error {
+func (c *namespace) Create() error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("create").Inc()
 
-	log.Println("creating namespace for cluster:", cluster.Name)
+	log.Println("creating namespace for cluster:", c.ClusterID)
 
 	namespace := v1.Namespace{
 		TypeMeta: unversioned.TypeMeta{
@@ -50,17 +59,17 @@ func (c *controller) createClusterNamespace(cluster Cluster) error {
 			APIVersion: "v1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name: getNamespaceNameForCluster(cluster),
+			Name: c.GetNamespace(),
 			Labels: map[string]string{
-				"cluster":  cluster.Name,
-				"customer": cluster.Spec.Customer,
+				"cluster":  c.ClusterID,
+				"customer": c.ClusterID,
 			},
 		},
 	}
 
 	var err error
-	if _, err = c.clientset.Core().Namespaces().Create(&namespace); err != nil && !errors.IsAlreadyExists(err) {
-		return err
+	if _, err = c.KubernetesClient.Core().Namespaces().Create(&namespace); err != nil && !errors.IsAlreadyExists(err) {
+		return maskAny(err)
 	}
 	if errors.IsAlreadyExists(err) {
 		log.Println("namespace already exists")
@@ -73,17 +82,17 @@ func (c *controller) createClusterNamespace(cluster Cluster) error {
 	return nil
 }
 
-func (c *controller) deleteClusterNamespace(cluster Cluster) error {
+func (c *namespace) Delete() error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("delete").Inc()
 
-	log.Println("deleting namespace for cluster:", cluster.Name)
+	log.Println("deleting namespace for cluster:", c.ClusterID)
 
-	namespaceName := getNamespaceNameForCluster(cluster)
+	namespaceName := c.GetNamespace()
 
 	var err error
-	if err = c.clientset.Core().Namespaces().Delete(namespaceName, v1.NewDeleteOptions(0)); err != nil && !errors.IsNotFound(err) {
-		return err
+	if err = c.KubernetesClient.Core().Namespaces().Delete(namespaceName, v1.NewDeleteOptions(0)); err != nil && !errors.IsNotFound(err) {
+		return maskAny(err)
 	}
 	if errors.IsNotFound(err) {
 		log.Println("namespace already deleted")

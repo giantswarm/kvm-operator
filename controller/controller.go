@@ -41,6 +41,27 @@ type Config struct {
 	ListenAddress string
 }
 
+// Config represents the configuration used to create cluster objects.
+type ClusterConfig struct {
+	ClusterID        string
+	Namespace        string
+	KubernetesClient *kubernetes.Clientset
+	Replicas         int32
+}
+
+// DefaultConfig provides a default configuration to create a new worker object
+// by best effort.
+func DefaultClusterConfig() ClusterConfig {
+	newConfig := ClusterConfig{
+		ClusterID:        "test",
+		KubernetesClient: nil,
+		Namespace:        "test",
+		Replicas:         1,
+	}
+
+	return newConfig
+}
+
 var (
 	clusterAPIActionTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
@@ -182,7 +203,10 @@ func (c *controller) Start() {
 				cluster := obj.(*Cluster)
 				log.Printf("cluster '%v' added", cluster.Name)
 
-				if err := c.createClusterNamespace(*cluster); err != nil {
+				config := DefaultClusterConfig()
+				config.KubernetesClient = c.clientset
+				clusterObj, err := NewCluster(config)
+				if err := clusterObj.Create(); err != nil {
 					log.Println("could not create cluster namespace:", err)
 				}
 
@@ -194,7 +218,7 @@ func (c *controller) Start() {
 				}
 
 				// Reconcile the state of resources in Kubernetes with the desired state of resources we just computed.
-				if err := c.reconcileResourceState(getNamespaceNameForCluster(*cluster), resources); err != nil {
+				if err := c.reconcileResourceState(GetNamespaceNameForCluster(config), resources); err != nil {
 					log.Println("could not reconcile resource state:", err)
 				}
 
@@ -207,7 +231,10 @@ func (c *controller) Start() {
 				cluster := obj.(*Cluster)
 				log.Printf("cluster '%v' deleted", cluster.Name)
 
-				if err := c.deleteClusterNamespace(*cluster); err != nil {
+				config := DefaultClusterConfig()
+				config.KubernetesClient = c.clientset
+				clusterObj, _ := NewCluster(config)
+				if err := clusterObj.Delete(); err != nil {
 					log.Println("could not delete cluster namespace:", err)
 				}
 
