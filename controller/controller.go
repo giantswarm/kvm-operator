@@ -26,7 +26,7 @@ type Controller interface {
 }
 
 type controller struct {
-	clientset *kubernetes.Clientset
+	clientset kubernetes.Interface
 	config    Config
 }
 
