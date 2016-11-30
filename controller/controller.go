@@ -6,6 +6,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/giantswarm/cluster-controller/resources"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"k8s.io/client-go/kubernetes"
@@ -41,26 +43,6 @@ type Config struct {
 	ListenAddress string
 }
 
-// Config represents the configuration used to create cluster objects.
-type ClusterConfig struct {
-	ClusterID        string
-	Namespace        string
-	KubernetesClient *kubernetes.Clientset
-	Replicas         int32
-}
-
-// DefaultConfig provides a default configuration to create a new worker object
-// by best effort.
-func DefaultClusterConfig() ClusterConfig {
-	newConfig := ClusterConfig{
-		ClusterID:        "test",
-		KubernetesClient: nil,
-		Namespace:        "test",
-		Replicas:         1,
-	}
-
-	return newConfig
-}
 
 var (
 	clusterAPIActionTotal = prometheus.NewCounterVec(
@@ -149,7 +131,7 @@ func (c *controller) newClusterListWatch() *cache.ListWatch {
 				return nil, err
 			}
 
-			var c ClusterList
+			var c resources.ClusterList
 			if err := json.Unmarshal(b, &c); err != nil {
 				return nil, err
 			}
@@ -193,32 +175,29 @@ func (c *controller) Start() {
 
 	_, clusterInformer := cache.NewInformer(
 		c.newClusterListWatch(),
-		&Cluster{},
+		&resources.Cluster{},
 		0,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				start := time.Now()
 				clusterEventHandleTotal.WithLabelValues("added").Inc()
 
-				cluster := obj.(*Cluster)
+				cluster := obj.(*resources.Cluster)
 				log.Printf("cluster '%v' added", cluster.Name)
 
-				config := DefaultClusterConfig()
-				config.KubernetesClient = c.clientset
-				clusterObj, err := NewCluster(config)
-				if err := clusterObj.Create(); err != nil {
+				if err := c.createClusterNamespace(*cluster); err != nil {
 					log.Println("could not create cluster namespace:", err)
 				}
 
 				// Given a cluster, determine the desired state,
 				// in terms of resources that should exist in Kubernetes.
-				resources, err := computeResources(cluster)
+				resources, err := resources.ComputeResources(cluster)
 				if err != nil {
 					log.Println("could not compute required resources for cluster:", err)
 				}
 
 				// Reconcile the state of resources in Kubernetes with the desired state of resources we just computed.
-				if err := c.reconcileResourceState(GetNamespaceNameForCluster(config), resources); err != nil {
+				if err := c.reconcileResourceState(getNamespaceNameForCluster(*cluster), resources); err != nil {
 					log.Println("could not reconcile resource state:", err)
 				}
 
@@ -228,13 +207,10 @@ func (c *controller) Start() {
 				start := time.Now()
 				clusterEventHandleTotal.WithLabelValues("deleted").Inc()
 
-				cluster := obj.(*Cluster)
+				cluster := obj.(*resources.Cluster)
 				log.Printf("cluster '%v' deleted", cluster.Name)
 
-				config := DefaultClusterConfig()
-				config.KubernetesClient = c.clientset
-				clusterObj, _ := NewCluster(config)
-				if err := clusterObj.Delete(); err != nil {
+				if err := c.deleteClusterNamespace(*cluster); err != nil {
 					log.Println("could not delete cluster namespace:", err)
 				}
 

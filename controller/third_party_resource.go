@@ -35,6 +35,10 @@ var (
 	})
 )
 
+const (
+	ClusterThirdPartyResourceName = "cluster.giantswarm.io"
+)
+
 func init() {
 	prometheus.MustRegister(clusterResourceCreation)
 }

@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/giantswarm/cluster-controller/resources"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"k8s.io/client-go/pkg/api/errors"
@@ -29,29 +31,20 @@ var (
 	)
 )
 
-type Namespace interface {
-	ClusterObj
-}
-
-type namespace struct {
-	ClusterConfig
-}
-
-
 func init() {
 	prometheus.MustRegister(namespaceActionTotal)
 	prometheus.MustRegister(namespaceActionTime)
 }
 
-func (c *namespace) GetNamespace() string {
-	return fmt.Sprintf("cluster-%v", c.ClusterID)
+func getNamespaceNameForCluster(cluster resources.Cluster) string {
+	return fmt.Sprintf("cluster-%v", cluster.Name)
 }
 
-func (c *namespace) Create() error {
+func (c *controller) createClusterNamespace(cluster resources.Cluster) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("create").Inc()
 
-	log.Println("creating namespace for cluster:", c.ClusterID)
+	log.Println("creating namespace for cluster:", cluster.Name)
 
 	namespace := v1.Namespace{
 		TypeMeta: unversioned.TypeMeta{
@@ -59,17 +52,17 @@ func (c *namespace) Create() error {
 			APIVersion: "v1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name: c.GetNamespace(),
+			Name: getNamespaceNameForCluster(cluster),
 			Labels: map[string]string{
-				"cluster":  c.ClusterID,
-				"customer": c.ClusterID,
+				"cluster":  cluster.Name,
+				"customer": cluster.Spec.Customer,
 			},
 		},
 	}
 
 	var err error
-	if _, err = c.KubernetesClient.Core().Namespaces().Create(&namespace); err != nil && !errors.IsAlreadyExists(err) {
-		return maskAny(err)
+	if _, err = c.clientset.Core().Namespaces().Create(&namespace); err != nil && !errors.IsAlreadyExists(err) {
+		return err
 	}
 	if errors.IsAlreadyExists(err) {
 		log.Println("namespace already exists")
@@ -82,17 +75,17 @@ func (c *namespace) Create() error {
 	return nil
 }
 
-func (c *namespace) Delete() error {
+func (c *controller) deleteClusterNamespace(cluster resources.Cluster) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("delete").Inc()
 
-	log.Println("deleting namespace for cluster:", c.ClusterID)
+	log.Println("deleting namespace for cluster:", cluster.Name)
 
-	namespaceName := c.GetNamespace()
+	namespaceName := getNamespaceNameForCluster(cluster)
 
 	var err error
-	if err = c.KubernetesClient.Core().Namespaces().Delete(namespaceName, v1.NewDeleteOptions(0)); err != nil && !errors.IsNotFound(err) {
-		return maskAny(err)
+	if err = c.clientset.Core().Namespaces().Delete(namespaceName, v1.NewDeleteOptions(0)); err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	if errors.IsNotFound(err) {
 		log.Println("namespace already deleted")
