@@ -18,7 +18,7 @@ const podAffinityMaster string = `{
 							{
 								"key": "role",
 								"operator": "In",
-								"values": ["{{.ClusterID}}-flannel-client"]
+								"values": ["{{.Spec.ClusterID}}-flannel-client"]
 							}
 						]
 					},
@@ -34,7 +34,7 @@ const podAffinityMaster string = `{
 							{
 								"key": "role",
 								"operator": "In",
-								"values": ["{{.ClusterID}}-worker"]
+								"values": ["{{.Spec.ClusterID}}-worker"]
 							}
 						]
 					},
@@ -58,7 +58,7 @@ const initContainersMaster string = `[
 				"name": "CLUSTER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-id"
 					}
 				}
@@ -67,7 +67,7 @@ const initContainersMaster string = `[
 				"name": "ETCD_PORT",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "etcd-port"
 					}
 				}
@@ -105,7 +105,7 @@ const initContainersMaster string = `[
 				"name": "CLUSTER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-id"
 					}
 				}
@@ -114,7 +114,7 @@ const initContainersMaster string = `[
 				"name": "CUSTOMER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "customer-id"
 					}
 				}
@@ -187,7 +187,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_ADDR",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-addr"
 					}
 				}
@@ -196,7 +196,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_TOKEN",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-token"
 					}
 				}
@@ -205,7 +205,7 @@ const initContainersMaster string = `[
 				"name": "CLUSTER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-id"
 					}
 				}
@@ -214,7 +214,7 @@ const initContainersMaster string = `[
 				"name": "CUSTOMER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "customer-id"
 					}
 				}
@@ -223,7 +223,7 @@ const initContainersMaster string = `[
 				"name": "G8S_API_IP",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "g8s-api-ip"
 					}
 				}
@@ -232,7 +232,7 @@ const initContainersMaster string = `[
 				"name": "K8S_API_ALT_NAMES",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "k8s-api-alt-names"
 					}
 				}
@@ -266,7 +266,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_ADDR",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-addr"
 					}
 				}
@@ -275,7 +275,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_TOKEN",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-token"
 					}
 				}
@@ -284,7 +284,7 @@ const initContainersMaster string = `[
 				"name": "CLUSTER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-id"
 					}
 				}
@@ -293,7 +293,7 @@ const initContainersMaster string = `[
 				"name": "CUSTOMER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "customer-id"
 					}
 				}
@@ -302,7 +302,7 @@ const initContainersMaster string = `[
 				"name": "G8S_API_IP",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "g8s-api-ip"
 					}
 				}
@@ -311,7 +311,7 @@ const initContainersMaster string = `[
 				"name": "K8S_API_ALT_NAMES",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "k8s-api-alt-names"
 					}
 				}
@@ -320,7 +320,7 @@ const initContainersMaster string = `[
 				"name": "K8S_MASTER_SERVICE_NAME",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "k8s-master-service-name"
 					}
 				}
@@ -354,7 +354,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_ADDR",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-addr"
 					}
 				}
@@ -363,7 +363,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_TOKEN",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-token"
 					}
 				}
@@ -372,7 +372,7 @@ const initContainersMaster string = `[
 				"name": "CLUSTER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-id"
 					}
 				}
@@ -381,7 +381,7 @@ const initContainersMaster string = `[
 				"name": "CUSTOMER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "customer-id"
 					}
 				}
@@ -390,7 +390,7 @@ const initContainersMaster string = `[
 				"name": "K8S_MASTER_SERVICE_NAME",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "k8s-master-service-name"
 					}
 				}
@@ -424,7 +424,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_ADDR",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-addr"
 					}
 				}
@@ -433,7 +433,7 @@ const initContainersMaster string = `[
 				"name": "VAULT_TOKEN",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "vault-token"
 					}
 				}
@@ -442,7 +442,7 @@ const initContainersMaster string = `[
 				"name": "CLUSTER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-id"
 					}
 				}
@@ -451,7 +451,7 @@ const initContainersMaster string = `[
 				"name": "CUSTOMER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "customer-id"
 					}
 				}
@@ -460,7 +460,7 @@ const initContainersMaster string = `[
 				"name": "K8S_MASTER_SERVICE_NAME",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "k8s-master-service-name"
 					}
 				}
@@ -511,7 +511,6 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 				"role":       m.Spec.ClusterID + "-master",
 				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
-			Namespace: m.Namespace,
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
@@ -535,7 +534,6 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 				"role":       m.Spec.ClusterID + "-master",
 				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
-			Namespace: m.Namespace,
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
@@ -559,7 +557,6 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 				"role":       m.Spec.ClusterID + "-master",
 				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
-			Namespace: m.Namespace,
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
@@ -583,7 +580,6 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 				"role":       m.Spec.ClusterID + "-master",
 				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
-			Namespace: m.Namespace,
 		},
 		Spec: apiv1.ServiceSpec{
 			Type: apiv1.ServiceType("LoadBalancer"),
@@ -631,7 +627,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			GenerateName: "master-",
+			Name: m.Spec.ClusterID + "-master",
 			Labels: map[string]string{
 				"cluster-id": m.Spec.ClusterID,
 				"role":       m.Spec.ClusterID + "-master",
@@ -719,7 +715,23 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "ssl",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/ssl/certs/ca-certificates.crt",
+									Path: "/etc/ssl/certs",
+								},
+							},
+						},
+						{
+							Name: "certs",
+							VolumeSource: apiv1.VolumeSource{
+								HostPath: &apiv1.HostPathVolumeSource{
+									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/ssl/master/",
+								},
+							},
+						},
+						{
+							Name: "flannel",
+							VolumeSource: apiv1.VolumeSource{
+								HostPath: &apiv1.HostPathVolumeSource{
+									Path: "/run/flannel",
 								},
 							},
 						},
@@ -727,7 +739,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:  "vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.11",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.13",
 							Args: []string{
 								"master",
 							},
@@ -986,50 +998,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
-							Name:  "flannel",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/flannel:v0.6.2",
-							Command: []string{
-								"/bin/sh",
-								"-c",
-								"/opt/bin/flanneld --remote=$NODE_IP:8889 --public-ip=$NODE_IP --iface=$NODE_IP --networks=$CUSTOMER_ID -v=1",
-							},
-							Env: []apiv1.EnvVar{
-								{
-									Name: "CUSTOMER_ID",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "customer-id",
-										},
-									},
-								},
-								{
-									Name: "NODE_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										FieldRef: &apiv1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "spec.nodeName",
-										},
-									},
-								},
-							},
-							VolumeMounts: []apiv1.VolumeMount{
-								{
-									Name:      "flannel",
-									MountPath: "/run/flannel",
-								},
-								{
-									Name:      "ssl",
-									MountPath: "/etc/ssl/certs",
-								},
-							},
-							SecurityContext: &apiv1.SecurityContext{
-								Privileged: &privileged,
-							},
-						},
-						{
 							Name:  "watch-master-vm-service",
 							Image: "hectorj2f/watch-master-vm-service",
 							Command: []string{
@@ -1081,88 +1049,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									MountPath: "/tmp/",
 								},
 							},
-							SecurityContext: &apiv1.SecurityContext{
-								Privileged: &privileged,
-							},
-						},
-						{
-							Name:  "create-bridge",
-							Image: "hectorj2f/k8s-network-bridge", // TODO: Sort this image out (giantswarm, needs tag)
-							Command: []string{
-								"/bin/sh",
-								"-c",
-								"while [ ! -f /run/flannel/networks/${CUSTOMER_ID}.env ]; do echo 'Waiting for flannel network'; sleep 1; done; /tmp/k8s_network_bridge.sh create ${CUSTOMER_ID} br${CUSTOMER_ID} ${NETWORK_INTERFACE} ${HOST_SUBNET_RANGE}",
-							},
-							Env: []apiv1.EnvVar{
-								{
-									Name: "CUSTOMER_ID",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "customer-id",
-										},
-									},
-								},
-								{
-									Name: "HOST_SUBNET_RANGE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "host-subnet-range",
-										},
-									},
-								},
-								{
-									Name: "NETWORK_INTERFACE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "network-interface",
-										},
-									},
-								},
-							},
-							VolumeMounts: []apiv1.VolumeMount{
-								{
-									Name:      "cgroup",
-									MountPath: "/sys/fs/cgroup",
-								},
-								{
-									Name:      "dbus",
-									MountPath: "/var/run/dbus",
-								},
-								{
-									Name:      "environment",
-									MountPath: "/etc/environment",
-								},
-								{
-									Name:      "etc-systemd",
-									MountPath: "/etc/systemd/",
-								},
-								{
-									Name:      "flannel",
-									MountPath: "/run/flannel",
-								},
-								{
-									Name:      "systemctl",
-									MountPath: "/usr/bin/systemctl",
-								},
-								{
-									Name:      "systemd",
-									MountPath: "/run/systemd",
-								},
-								{
-									Name:      "sys-class-net",
-									MountPath: "/sys/class/net/",
-								},
-							},
-							ImagePullPolicy: apiv1.PullIfNotPresent,
 							SecurityContext: &apiv1.SecurityContext{
 								Privileged: &privileged,
 							},

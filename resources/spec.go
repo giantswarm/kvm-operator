@@ -21,7 +21,6 @@ type Cluster struct {
 type ClusterSpec struct {
 	Customer  string `json:"customer"`
 	ClusterID string `json:"clusterId"`
-	Namespace string `json:"namespace"`
 	Replicas  int32  `json:"replicas,omitempty"`
 }
 

@@ -18,7 +18,7 @@ const podAffinityWorker string = `
 						{
 							"key": "role",
 							"operator": "In",
-							"values": ["{{.ClusterID}}-flannel-client"]
+							"values": ["{{.Spec.ClusterID}}-flannel-client"]
 						}
 					]
 				},
@@ -34,7 +34,7 @@ const podAffinityWorker string = `
 						{
 							"key": "role",
 							"operator": "In",
-							"values": ["{{.ClusterID}}-master"]
+							"values": ["{{.Spec.ClusterID}}-master"]
 						}
 					]
 				},
@@ -63,7 +63,7 @@ const initContainersWorker string = `[
 						"name": "CLUSTER_ID",
 						"valueFrom": {
 							"configMapKeyRef": {
-								"name": "{{.ClusterID}}-configmap",
+								"name": "configmap",
 								"key": "cluster-id"
 							}
 						}
@@ -72,7 +72,7 @@ const initContainersWorker string = `[
 						"name": "CUSTOMER_ID",
 						"valueFrom": {
 							"configMapKeyRef": {
-								"name": "{{.ClusterID}}-configmap",
+								"name": "configmap",
 								"key": "customer-id"
 							}
 						}
@@ -145,7 +145,7 @@ const initContainersWorker string = `[
 					"name": "VAULT_ADDR",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "vault-addr"
 						}
 					}
@@ -154,7 +154,7 @@ const initContainersWorker string = `[
 					"name": "VAULT_TOKEN",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "vault-token"
 						}
 					}
@@ -163,7 +163,7 @@ const initContainersWorker string = `[
 					"name": "CLUSTER_ID",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "cluster-id"
 						}
 					}
@@ -172,7 +172,7 @@ const initContainersWorker string = `[
 					"name": "CUSTOMER_ID",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "customer-id"
 						}
 					}
@@ -181,7 +181,7 @@ const initContainersWorker string = `[
 					"name": "G8S_API_IP",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "g8s-api-ip"
 						}
 					}
@@ -190,7 +190,7 @@ const initContainersWorker string = `[
 					"name": "K8S_API_ALT_NAMES",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "k8s-api-alt-names"
 						}
 					}
@@ -199,7 +199,7 @@ const initContainersWorker string = `[
 					"name": "K8S_MASTER_SERVICE_NAME",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "k8s-master-service-name"
 						}
 					}
@@ -233,7 +233,7 @@ const initContainersWorker string = `[
 					"name": "VAULT_ADDR",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "vault-addr"
 						}
 					}
@@ -242,7 +242,7 @@ const initContainersWorker string = `[
 					"name": "VAULT_TOKEN",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "vault-token"
 						}
 					}
@@ -251,7 +251,7 @@ const initContainersWorker string = `[
 					"name": "CLUSTER_ID",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "cluster-id"
 						}
 					}
@@ -260,7 +260,7 @@ const initContainersWorker string = `[
 					"name": "CUSTOMER_ID",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "customer-id"
 						}
 					}
@@ -269,7 +269,7 @@ const initContainersWorker string = `[
 					"name": "K8S_MASTER_SERVICE_NAME",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "k8s-master-service-name"
 						}
 					}
@@ -303,7 +303,7 @@ const initContainersWorker string = `[
 					"name": "VAULT_ADDR",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "vault-addr"
 						}
 					}
@@ -312,7 +312,7 @@ const initContainersWorker string = `[
 					"name": "VAULT_TOKEN",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "vault-token"
 						}
 					}
@@ -321,7 +321,7 @@ const initContainersWorker string = `[
 					"name": "CLUSTER_ID",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "cluster-id"
 						}
 					}
@@ -330,7 +330,7 @@ const initContainersWorker string = `[
 					"name": "CUSTOMER_ID",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "customer-id"
 						}
 					}
@@ -339,7 +339,7 @@ const initContainersWorker string = `[
 					"name": "K8S_MASTER_SERVICE_NAME",
 					"valueFrom": {
 						"configMapKeyRef": {
-							"name": "{{.ClusterID}}-configmap",
+							"name": "configmap",
 							"key": "k8s-master-service-name"
 						}
 					}
@@ -385,7 +385,7 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			GenerateName: w.Spec.ClusterID + "-worker-vm",
 			Labels: map[string]string{
 				"cluster-id": w.Spec.ClusterID,
-				"role":       w.Spec.ClusterID + "worker",
+				"role":       w.Spec.ClusterID + "-worker",
 				"app":        w.Spec.ClusterID + "-k8s-cluster",
 			},
 		},
@@ -430,7 +430,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			GenerateName: "worker-",
 			Labels: map[string]string{
 				"cluster-id": w.Spec.ClusterID,
-				"role":       "worker",
+				"role":       w.Spec.ClusterID+"-worker",
 				"app":        "k8s-cluster",
 			},
 			Annotations: map[string]string{
@@ -448,7 +448,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					GenerateName: "worker-",
 					Labels: map[string]string{
 						"cluster-id": w.Spec.ClusterID,
-						"role":       w.Spec.ClusterID + "worker",
+						"role":       w.Spec.ClusterID + "-worker",
 						"app":        "k8s-cluster",
 					},
 				},
@@ -499,7 +499,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/vms/" + w.Spec.ClusterID + "-k8s-worker-vm/",
+									Path: "/home/core/vms/" + w.Spec.ClusterID + "-worker-1/",
 								},
 							},
 						},
@@ -512,26 +512,10 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
-							Name: "systemctl",
+							Name: "certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/usr/bin/systemctl",
-								},
-							},
-						},
-						{
-							Name: "systemd",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/run/systemd",
-								},
-							},
-						},
-						{
-							Name: "sys-class-net",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/sys/class/net/",
+									Path: "/etc/kubernetes/"+ w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/",
 								},
 							},
 						},
@@ -539,7 +523,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:  "vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.11",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.13",
 							Args: []string{
 								"worker",
 							},

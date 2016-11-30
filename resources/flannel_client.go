@@ -18,7 +18,7 @@ const podAffinityFlannelClient string = `
 						{
 							"key": "role",
 							"operator": "In",
-							"values": ["{{.ClusterID}}-flannel-client"]
+							"values": ["{{.Spec.ClusterID}}-flannel-client"]
 						}
 					]
 				},
@@ -38,7 +38,7 @@ const initContainerSetNetworkEnv string = `[
 				"name": "CLUSTER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-id"
 					}
 				}
@@ -47,7 +47,7 @@ const initContainerSetNetworkEnv string = `[
 				"name": "ETCD_PORT",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "etcd-port"
 					}
 				}
@@ -56,7 +56,7 @@ const initContainerSetNetworkEnv string = `[
 				"name": "CLUSTER_NETWORK",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-network"
 					}
 				}
@@ -65,7 +65,7 @@ const initContainerSetNetworkEnv string = `[
 				"name": "CLUSTER_VNI",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-vni"
 					}
 				}
@@ -74,7 +74,7 @@ const initContainerSetNetworkEnv string = `[
 				"name": "CLUSTER_BACKEND",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "cluster-backend"
 					}
 				}
@@ -91,7 +91,7 @@ const initContainerSetNetworkEnv string = `[
 				"name": "CUSTOMER_ID",
 				"valueFrom": {
 					"configMapKeyRef": {
-						"name": "{{.ClusterID}}-configmap",
+						"name": "configmap",
 						"key": "customer-id"
 					}
 				}

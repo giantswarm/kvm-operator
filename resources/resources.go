@@ -59,9 +59,6 @@ func ComputeResources(cluster *Cluster) ([]runtime.Object, error) {
 	if cluster.Spec.ClusterID == "" {
 		return nil, errors.New("cluster ID must not be empty")
 	}
-	if cluster.Spec.Namespace == "" {
-		return nil, errors.New("namespace must not be empty")
-	}
 	if cluster.Spec.Replicas == int32(0) {
 		return nil, errors.New("replicas must not be empty")
 	}
@@ -76,25 +73,41 @@ func ComputeResources(cluster *Cluster) ([]runtime.Object, error) {
 	configMap := &configMap{
 		Cluster: *cluster,
 	}
-	configMapComponents, _ := configMap.GenerateResources()
+	configMapComponents, err := configMap.GenerateResources()
 	objects = append(objects, configMapComponents...)
 
 	flannelClient := &flannelClient{
 		Cluster: *cluster,
 	}
-	flannelComponents, _ := flannelClient.GenerateResources()
+	flannelComponents, err := flannelClient.GenerateResources()
+	if err != nil {
+		log.Println("generate resource flannelComponents error %v", err)
+	}
 	objects = append(objects, flannelComponents...)
 
 	master := &master{
 		Cluster: *cluster,
 	}
-	masterComponents, _ := master.GenerateResources()
+	masterComponents, err := master.GenerateResources()
+	if err != nil {
+		log.Println("generate resource masterComponents error %v", err)
+	}
 	objects = append(objects, masterComponents...)
+
+	// FlannelClient for the worker
+	flannelComponents, err = flannelClient.GenerateResources()
+	if err != nil {
+		log.Println("generate resource flannelComponents error %v", err)
+	}
+	objects = append(objects, flannelComponents...)
 
 	worker := &worker{
 		Cluster: *cluster,
 	}
-	workerComponents, _ := worker.GenerateResources()
+	workerComponents, err := worker.GenerateResources()
+	if err != nil {
+		log.Println("generate resource workerComponents error %v", err)
+	}
 	objects = append(objects, workerComponents...)
 
 	log.Println("finished computing desired resources for cluster:", cluster.Name)
