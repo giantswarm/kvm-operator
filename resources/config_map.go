@@ -1,9 +1,10 @@
-package controller
+package resources
 
 import (
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/runtime"
 )
 
 type ConfigMap interface {
@@ -11,10 +12,10 @@ type ConfigMap interface {
 }
 
 type configMap struct {
-	ClusterConfig
+	Cluster
 }
 
-func (w *configMap) Create() error {
+func (c *configMap) GenerateResources() ([]runtime.Object, error) {
 	configMap := &apiv1.ConfigMap{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "configmap",
@@ -23,7 +24,7 @@ func (w *configMap) Create() error {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "configmap",
 			Labels: map[string]string{
-				"cluster-id": w.ClusterID,
+				"cluster-id": c.Spec.ClusterID,
 			},
 		},
 		Data: map[string]string{
@@ -79,14 +80,7 @@ func (w *configMap) Create() error {
 		},
 	}
 
-	_, err := w.KubernetesClient.Core().ConfigMaps(w.Namespace).Create(configMap)
-	if err != nil {
-		return maskAny(err)
-	}
+	objects := append([]runtime.Object{}, configMap)
 
-	return nil
-}
-
-func (f *configMap)  Delete() error {
-	return nil
+	return objects, nil
 }

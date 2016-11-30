@@ -1,10 +1,11 @@
-package controller
+package resources
 
 import (
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
+	"k8s.io/client-go/pkg/runtime"
 )
 
 const podAffinityWorker string = `
@@ -42,7 +43,6 @@ const podAffinityWorker string = `
 		]
 	 }
  }`
-
 
 const initContainersWorker string = `[
 			{
@@ -353,34 +353,40 @@ type Worker interface {
 }
 
 type worker struct {
-	ClusterConfig
+	Cluster
 }
 
+func (w *worker) GenerateResources() ([]runtime.Object, error) {
+	objects := []runtime.Object{}
 
-func (w *worker) Create() error {
-	if err := w.CreateKubernetesWorkerService(); err != nil {
-		return maskAny(err)
+	deployment, err := w.GenerateDeployment()
+	if err != nil {
+		return objects, maskAny(err)
 	}
 
-	if err := w.CreateKubernetesWorkerDeployment(); err != nil {
-		return maskAny(err)
+	service, err := w.GenerateService()
+	if err != nil {
+		return objects, maskAny(err)
 	}
 
-	return nil
+	objects = append(objects, deployment)
+	objects = append(objects, service)
+
+	return objects, nil
 }
 
-func (w *worker) CreateKubernetesWorkerService() error {
+func (w *worker) GenerateService() (*apiv1.Service, error) {
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			GenerateName: w.ClusterID+"-worker-vm",
+			GenerateName: w.Spec.ClusterID + "-worker-vm",
 			Labels: map[string]string{
-				"cluster-id": w.ClusterID,
-				"role": w.ClusterID+"worker",
-				"app": w.ClusterID+"-k8s-cluster",
+				"cluster-id": w.Spec.ClusterID,
+				"role":       w.Spec.ClusterID + "worker",
+				"app":        w.Spec.ClusterID + "-k8s-cluster",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -393,30 +399,26 @@ func (w *worker) CreateKubernetesWorkerService() error {
 				},
 			},
 			Selector: map[string]string{
-				"app": w.ClusterID+"-k8s-cluster",
+				"app":  w.Spec.ClusterID + "-k8s-cluster",
 				"role": "worker",
 			},
 		},
 	}
 
-	_, err := w.KubernetesClient.Core().Services(w.Namespace).Create(service)
-	if err != nil {
-		return maskAny(err)
-	}
+	return service, nil
 
-	return nil
 }
 
-func (w *worker) CreateKubernetesWorkerDeployment() error {
+func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	privileged := true
 
 	initContainers, err := ExecTemplate(initContainersWorker, w)
 	if err != nil {
-		return maskAny(err)
+		return nil, maskAny(err)
 	}
 	podAffinity, err := ExecTemplate(podAffinityWorker, w)
 	if err != nil {
-		return maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	deployment := &extensionsv1.Deployment{
@@ -427,9 +429,9 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 		ObjectMeta: apiv1.ObjectMeta{
 			GenerateName: "worker-",
 			Labels: map[string]string{
-				"cluster-id": w.ClusterID,
-				"role": "worker",
-				"app": "k8s-cluster",
+				"cluster-id": w.Spec.ClusterID,
+				"role":       "worker",
+				"app":        "k8s-cluster",
 			},
 			Annotations: map[string]string{
 				"pod.beta.kubernetes.io/init-containers": initContainers,
@@ -440,52 +442,52 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: "Recreate",
 			},
-			Replicas: &w.Replicas,
+			Replicas: &w.Spec.Replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "worker-",
 					Labels: map[string]string{
-						"cluster-id": w.ClusterID,
-						"role": w.ClusterID+"worker",
-						"app": "k8s-cluster",
+						"cluster-id": w.Spec.ClusterID,
+						"role":       w.Spec.ClusterID + "worker",
+						"app":        "k8s-cluster",
 					},
 				},
 				Spec: apiv1.PodSpec{
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
-						apiv1.Volume{
+						{
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+w.ClusterID+"/"+w.ClusterID+"/ssl/worker-1/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+w.ClusterID+"/"+w.ClusterID+"/ssl/worker-1/calico/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/calico/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+w.ClusterID+"/"+w.ClusterID+"/ssl/worker-1/etcd/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/etcd/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "bridge-ip-configmap",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+w.ClusterID+"/"+w.ClusterID+"/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "images",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -493,15 +495,15 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/vms/"+w.ClusterID+"-k8s-worker-vm/",
+									Path: "/home/core/vms/" + w.Spec.ClusterID + "-k8s-worker-vm/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "ssl",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -509,7 +511,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "systemctl",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -517,7 +519,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "systemd",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -525,7 +527,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "sys-class-net",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -535,14 +537,14 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 						},
 					},
 					Containers: []apiv1.Container{
-						apiv1.Container{
+						{
 							Name:  "vm",
 							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.11",
 							Args: []string{
 								"worker",
 							},
 							Env: []apiv1.EnvVar{
-								apiv1.EnvVar{
+								{
 									Name: "BRIDGE_NETWORK",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -553,7 +555,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "CUSTOMER_ID",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -564,11 +566,11 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "DOCKER_EXTRA_ARGS",
 									Value: "",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "G8S_DNS_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -579,7 +581,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "G8S_DOMAIN",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -590,11 +592,11 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "HOSTNAME",
-									Value: w.ClusterID+"-k8svm-worker-1",
+									Value: w.Spec.ClusterID + "-k8svm-worker-1",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "HOST_PUBLIC_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										FieldRef: &apiv1.ObjectFieldSelector{
@@ -603,11 +605,11 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "IP_BRIDGE",
 									Value: "",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_INSECURE_PORT",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -618,7 +620,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_CALICO_MTU",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -629,7 +631,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "MACHINE_CPU_CORES",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -640,7 +642,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_DNS_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -651,7 +653,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_DOMAIN",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -662,7 +664,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_ETCD_DOMAIN_NAME",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -673,7 +675,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_ETCD_PREFIX",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -684,7 +686,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_MASTER_DOMAIN_NAME",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -695,7 +697,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_MASTER_PORT",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -706,7 +708,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_MASTER_SERVICE_NAME",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -717,7 +719,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_NETWORK_SETUP_VERSION",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -728,11 +730,11 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "K8S_NODE_LABELS",
 									Value: "",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_SECURE_PORT",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -743,7 +745,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_VERSION",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -754,7 +756,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "MACHINE_MEM",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -765,7 +767,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "REGISTRY",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -776,7 +778,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "DOCKER_EXTRA_ARGS",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -787,7 +789,7 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_NODE_LABELS",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -800,15 +802,15 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
-								apiv1.VolumeMount{
+								{
 									Name:      "certs",
 									MountPath: "/etc/kubernetes/ssl/",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "images",
 									MountPath: "/usr/code/images/",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "rootfs",
 									MountPath: "/usr/code/rootfs/",
 								},
@@ -823,14 +825,5 @@ func (w *worker) CreateKubernetesWorkerDeployment() error {
 		},
 	}
 
-	_, err = w.KubernetesClient.Extensions().Deployments(w.Namespace).Create(deployment)
-	if err != nil {
-		return maskAny(err)
-	}
-
-	return nil
-}
-
-func (w *worker)  Delete() error {
-	return nil
+	return deployment, nil
 }

@@ -1,10 +1,11 @@
-package controller
+package resources
 
 import (
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
+	"k8s.io/client-go/pkg/runtime"
 	"k8s.io/client-go/pkg/util/intstr"
 )
 
@@ -472,24 +473,32 @@ type Master interface {
 	ClusterObj
 }
 
-type master struct{
-	ClusterConfig
+type master struct {
+	Cluster
 }
 
-// TODO retry operations in case they fail
-func (m *master) Create() error {
-	if err := m.CreateKubernetesMasterDeployment(); err != nil {
-		return maskAny(err)
+func (m *master) GenerateResources() ([]runtime.Object, error) {
+	objects := []runtime.Object{}
+
+	deployment, err := m.GenerateDeployment()
+	if err != nil {
+		return objects, maskAny(err)
 	}
 
-	if err := m.CreateKubernetesMasterService(); err != nil {
-		return maskAny(err)
+	serviceObjects, err := m.GenerateServiceResources()
+	if err != nil {
+		return objects, maskAny(err)
 	}
 
-	return nil
+	objects = append(objects, deployment)
+	objects = append(objects, serviceObjects...)
+
+	return objects, nil
 }
 
-func (m *master) CreateKubernetesMasterService() error {
+func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
+	objects := []runtime.Object{}
+
 	endpointMasterEtcd := &extensionsv1.Ingress{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "Ingress",
@@ -498,24 +507,21 @@ func (m *master) CreateKubernetesMasterService() error {
 		ObjectMeta: apiv1.ObjectMeta{
 			GenerateName: "etcd",
 			Labels: map[string]string{
-				"cluster-id": m.ClusterID,
-				"role": m.ClusterID+"-master",
-				"app": m.ClusterID+"-k8s-cluster",
+				"cluster-id": m.Spec.ClusterID,
+				"role":       m.Spec.ClusterID + "-master",
+				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
 			Namespace: m.Namespace,
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.ClusterID+"-master",
+				ServiceName: m.Spec.ClusterID + "-master",
 				ServicePort: intstr.FromInt(2379),
 			},
 		},
 	}
 
-	_, err := m.KubernetesClient.Extensions().Ingresses(m.Namespace).Create(endpointMasterEtcd)
-	if err != nil {
-		return maskAny(err)
-	}
+	objects = append(objects, endpointMasterEtcd)
 
 	endpointMasterAPIHTTP := &extensionsv1.Ingress{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -525,24 +531,21 @@ func (m *master) CreateKubernetesMasterService() error {
 		ObjectMeta: apiv1.ObjectMeta{
 			GenerateName: "api",
 			Labels: map[string]string{
-				"cluster-id": m.ClusterID,
-				"role": m.ClusterID+"-master",
-				"app": m.ClusterID+"-k8s-cluster",
+				"cluster-id": m.Spec.ClusterID,
+				"role":       m.Spec.ClusterID + "-master",
+				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
 			Namespace: m.Namespace,
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.ClusterID+"-master",
+				ServiceName: m.Spec.ClusterID + "-master",
 				ServicePort: intstr.FromInt(8080),
 			},
 		},
 	}
 
-	_, err = m.KubernetesClient.Extensions().Ingresses(m.Namespace).Create(endpointMasterAPIHTTP)
-	if err != nil {
-		return maskAny(err)
-	}
+	objects = append(objects, endpointMasterAPIHTTP)
 
 	endpointMasterAPIHTTPS := &extensionsv1.Ingress{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -552,24 +555,21 @@ func (m *master) CreateKubernetesMasterService() error {
 		ObjectMeta: apiv1.ObjectMeta{
 			GenerateName: "api-https",
 			Labels: map[string]string{
-				"cluster-id": m.ClusterID,
-				"role": m.ClusterID+"-master",
-				"app": m.ClusterID+"-k8s-cluster",
+				"cluster-id": m.Spec.ClusterID,
+				"role":       m.Spec.ClusterID + "-master",
+				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
 			Namespace: m.Namespace,
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.ClusterID+"-master",
+				ServiceName: m.Spec.ClusterID + "-master",
 				ServicePort: intstr.FromInt(6443),
 			},
 		},
 	}
 
-	_, err = m.KubernetesClient.Extensions().Ingresses(m.Namespace).Create(endpointMasterAPIHTTPS)
-	if err != nil {
-		return maskAny(err)
-	}
+	objects = append(objects, endpointMasterAPIHTTPS)
 
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -577,11 +577,11 @@ func (m *master) CreateKubernetesMasterService() error {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			GenerateName: m.ClusterID+"-k8s-master",
+			GenerateName: m.Spec.ClusterID + "-k8s-master",
 			Labels: map[string]string{
-				"cluster-id": m.ClusterID,
-				"role": m.ClusterID+"-master",
-				"app": m.ClusterID+"-k8s-cluster",
+				"cluster-id": m.Spec.ClusterID,
+				"role":       m.Spec.ClusterID + "-master",
+				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
 			Namespace: m.Namespace,
 		},
@@ -607,25 +607,22 @@ func (m *master) CreateKubernetesMasterService() error {
 		},
 	}
 
-	_, err = m.KubernetesClient.Core().Services(m.Namespace).Create(service)
-	if err != nil {
-		return maskAny(err)
-	}
+	objects = append(objects, service)
 
-	return nil
+	return objects, nil
 }
 
-func (m *master) CreateKubernetesMasterDeployment() error {
+func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	privileged := true
 
 	initContainers, err := ExecTemplate(initContainersMaster, m)
 	if err != nil {
-		return maskAny(err)
+		return &extensionsv1.Deployment{}, maskAny(err)
 	}
 
 	podAffinity, err := ExecTemplate(podAffinityMaster, m)
 	if err != nil {
-		return maskAny(err)
+		return &extensionsv1.Deployment{}, maskAny(err)
 	}
 
 	deployment := &extensionsv1.Deployment{
@@ -636,9 +633,9 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 		ObjectMeta: apiv1.ObjectMeta{
 			GenerateName: "master-",
 			Labels: map[string]string{
-				"cluster-id": m.ClusterID,
-				"role": m.ClusterID+"-master",
-				"app": m.ClusterID+"-k8s-cluster",
+				"cluster-id": m.Spec.ClusterID,
+				"role":       m.Spec.ClusterID + "-master",
+				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
 			Annotations: map[string]string{
 				"pod.beta.kubernetes.io/init-containers": initContainers,
@@ -649,60 +646,60 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: "Recreate",
 			},
-			Replicas: &m.Replicas,
+			Replicas: &m.Spec.Replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					GenerateName: m.ClusterID+"-master",
+					GenerateName: m.Spec.ClusterID + "-master",
 					Labels: map[string]string{
-						"cluster-id": m.ClusterID,
-						"role": m.ClusterID+"-master",
-						"app": m.ClusterID+"-k8s-cluster",
+						"cluster-id": m.Spec.ClusterID,
+						"role":       m.Spec.ClusterID + "-master",
+						"app":        m.Spec.ClusterID + "-k8s-cluster",
 					},
 				},
 				Spec: apiv1.PodSpec{
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
-						apiv1.Volume{
+						{
 							Name: "etcd-data",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/"+m.ClusterID+"-k8s-master-vm/",
+									Path: "/home/core/" + m.Spec.ClusterID + "-k8s-master-vm/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "customer-dir",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+m.ClusterID+"/"+m.ClusterID+"/",
+									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "api-secrets",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+m.ClusterID+"/"+m.ClusterID+"/secrets",
+									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/secrets",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+m.ClusterID+"/"+m.ClusterID+"/ssl/master/calico/",
+									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/ssl/master/calico/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+m.ClusterID+"/"+m.ClusterID+"/ssl/master/etcd/",
+									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/ssl/master/etcd/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "images",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -710,15 +707,15 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/vms/"+m.ClusterID+"-k8s-master-vm/",
+									Path: "/home/core/vms/" + m.Spec.ClusterID + "-k8s-master-vm/",
 								},
 							},
 						},
-						apiv1.Volume{
+						{
 							Name: "ssl",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -728,14 +725,14 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 						},
 					},
 					Containers: []apiv1.Container{
-						apiv1.Container{
+						{
 							Name:  "vm",
 							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.11",
 							Args: []string{
 								"master",
 							},
 							Env: []apiv1.EnvVar{
-								apiv1.EnvVar{
+								{
 									Name: "BRIDGE_NETWORK",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -746,7 +743,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "CUSTOMER_ID",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -757,11 +754,11 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "DOCKER_EXTRA_ARGS",
 									Value: "",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "G8S_DNS_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -772,7 +769,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "G8S_DOMAIN",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -783,11 +780,11 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "HOSTNAME",
-									Value: m.ClusterID+"-k8svm-master",
+									Value: m.Spec.ClusterID + "-k8svm-master",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "HOST_PUBLIC_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										FieldRef: &apiv1.ObjectFieldSelector{
@@ -796,11 +793,11 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "IP_BRIDGE",
 									Value: "",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_INSECURE_PORT",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -811,7 +808,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_CALICO_MTU",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -822,7 +819,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "MACHINE_CPU_CORES",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -833,7 +830,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_DNS_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -844,7 +841,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_DOMAIN",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -855,7 +852,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_ETCD_DOMAIN_NAME",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -866,7 +863,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_ETCD_PREFIX",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -877,7 +874,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_MASTER_DOMAIN_NAME",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -888,7 +885,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_MASTER_PORT",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -899,7 +896,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_MASTER_SERVICE_NAME",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -910,7 +907,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_NETWORK_SETUP_VERSION",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -921,11 +918,11 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name:  "K8S_NODE_LABELS",
 									Value: "",
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_SECURE_PORT",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -936,7 +933,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "K8S_VERSION",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -947,7 +944,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "MACHINE_MEM",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -958,7 +955,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "REGISTRY",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -971,15 +968,15 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
-								apiv1.VolumeMount{
+								{
 									Name:      "certs",
 									MountPath: "/etc/kubernetes/ssl/",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "images",
 									MountPath: "/usr/code/images/",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "rootfs",
 									MountPath: "/usr/code/rootfs/",
 								},
@@ -988,7 +985,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 								Privileged: &privileged,
 							},
 						},
-						apiv1.Container{
+						{
 							Name:  "flannel",
 							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/flannel:v0.6.2",
 							Command: []string{
@@ -997,7 +994,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 								"/opt/bin/flanneld --remote=$NODE_IP:8889 --public-ip=$NODE_IP --iface=$NODE_IP --networks=$CUSTOMER_ID -v=1",
 							},
 							Env: []apiv1.EnvVar{
-								apiv1.EnvVar{
+								{
 									Name: "CUSTOMER_ID",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -1008,7 +1005,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "NODE_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										FieldRef: &apiv1.ObjectFieldSelector{
@@ -1019,11 +1016,11 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
-								apiv1.VolumeMount{
+								{
 									Name:      "flannel",
 									MountPath: "/run/flannel",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "ssl",
 									MountPath: "/etc/ssl/certs",
 								},
@@ -1032,16 +1029,16 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 								Privileged: &privileged,
 							},
 						},
-						apiv1.Container{
-							Name:  "create-bridge",
-							Image: "hectorj2f/k8s-network-bridge", // TODO: Sort this image out (giantswarm, needs tag)
+						{
+							Name:  "watch-master-vm-service",
+							Image: "hectorj2f/watch-master-vm-service",
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f /run/flannel/networks/${CUSTOMER_ID}.env ]; do echo 'Waiting for flannel network'; sleep 1; done; /tmp/k8s_network_bridge.sh create ${CUSTOMER_ID} br${CUSTOMER_ID} ${NETWORK_INTERFACE} ${HOST_SUBNET_RANGE}",
+								"/run.sh",
 							},
 							Env: []apiv1.EnvVar{
-								apiv1.EnvVar{
+								{
 									Name: "CUSTOMER_ID",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -1052,7 +1049,63 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
+									Name:  "SERVICE_NAME",
+									Value: m.Spec.ClusterID + "-k8s-master",
+								},
+								{
+									Name: "NODE_IP",
+									ValueFrom: &apiv1.EnvVarSource{
+										FieldRef: &apiv1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "spec.nodeName",
+										},
+									},
+								},
+								{
+									Name:  "NODE_ETCD_PORT",
+									Value: "2379",
+								},
+								{
+									Name:  "G8S_MASTER_HOST",
+									Value: "127.0.0.1",
+								},
+								{
+									Name:  "G8S_MASTER_PORT",
+									Value: "8080",
+								},
+							},
+							VolumeMounts: []apiv1.VolumeMount{
+								{
+									Name:      "customer-dir",
+									MountPath: "/tmp/",
+								},
+							},
+							SecurityContext: &apiv1.SecurityContext{
+								Privileged: &privileged,
+							},
+						},
+						{
+							Name:  "create-bridge",
+							Image: "hectorj2f/k8s-network-bridge", // TODO: Sort this image out (giantswarm, needs tag)
+							Command: []string{
+								"/bin/sh",
+								"-c",
+								"while [ ! -f /run/flannel/networks/${CUSTOMER_ID}.env ]; do echo 'Waiting for flannel network'; sleep 1; done; /tmp/k8s_network_bridge.sh create ${CUSTOMER_ID} br${CUSTOMER_ID} ${NETWORK_INTERFACE} ${HOST_SUBNET_RANGE}",
+							},
+							Env: []apiv1.EnvVar{
+								{
+									Name: "CUSTOMER_ID",
+									ValueFrom: &apiv1.EnvVarSource{
+										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+											LocalObjectReference: apiv1.LocalObjectReference{
+												Name: "configmap",
+											},
+											Key: "customer-id",
+										},
+									},
+								},
+								{
 									Name: "HOST_SUBNET_RANGE",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -1063,7 +1116,7 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 										},
 									},
 								},
-								apiv1.EnvVar{
+								{
 									Name: "NETWORK_INTERFACE",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
@@ -1076,35 +1129,35 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
-								apiv1.VolumeMount{
+								{
 									Name:      "cgroup",
 									MountPath: "/sys/fs/cgroup",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "dbus",
 									MountPath: "/var/run/dbus",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "environment",
 									MountPath: "/etc/environment",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "etc-systemd",
 									MountPath: "/etc/systemd/",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "flannel",
 									MountPath: "/run/flannel",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "systemctl",
 									MountPath: "/usr/bin/systemctl",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "systemd",
 									MountPath: "/run/systemd",
 								},
-								apiv1.VolumeMount{
+								{
 									Name:      "sys-class-net",
 									MountPath: "/sys/class/net/",
 								},
@@ -1120,14 +1173,5 @@ func (m *master) CreateKubernetesMasterDeployment() error {
 		},
 	}
 
-	_, err = m.KubernetesClient.Extensions().Deployments(m.Namespace).Create(deployment)
-	if err != nil {
-		return maskAny(err)
-	}
-
-	return nil
-}
-
-func (m *master)  Delete() error {
-	return nil
+	return deployment, nil
 }
