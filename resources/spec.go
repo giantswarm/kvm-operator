@@ -22,6 +22,7 @@ type ClusterSpec struct {
 	Customer  string `json:"customer"`
 	ClusterID string `json:"clusterId"`
 	Replicas  int32  `json:"replicas,omitempty"`
+	NumNodes int32 `json:"numNodes,omitempty"`
 }
 
 func (c *Cluster) GetObjectKind() unversioned.ObjectKind {

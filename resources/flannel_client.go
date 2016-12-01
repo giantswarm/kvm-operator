@@ -1,8 +1,12 @@
 package resources
 
 import (
+	"encoding/json"
+
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 
+	"k8s.io/client-go/pkg/api"
+	"k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
@@ -28,83 +32,6 @@ const podAffinityFlannelClient string = `
 	 }
  }`
 
-const initContainerSetNetworkEnv string = `[
-	{
-		"name": "set-network-env",
-		"image": "hectorj2f/set-flannel-network-env",
-		"imagePullPolicy": "Always",
-		"env": [
-			{
-				"name": "CLUSTER_ID",
-				"valueFrom": {
-					"configMapKeyRef": {
-						"name": "configmap",
-						"key": "cluster-id"
-					}
-				}
-			},
-			{
-				"name": "ETCD_PORT",
-				"valueFrom": {
-					"configMapKeyRef": {
-						"name": "configmap",
-						"key": "etcd-port"
-					}
-				}
-			},
-			{
-				"name": "CLUSTER_NETWORK",
-				"valueFrom": {
-					"configMapKeyRef": {
-						"name": "configmap",
-						"key": "cluster-network"
-					}
-				}
-			},
-			{
-				"name": "CLUSTER_VNI",
-				"valueFrom": {
-					"configMapKeyRef": {
-						"name": "configmap",
-						"key": "cluster-vni"
-					}
-				}
-			},
-			{
-				"name": "CLUSTER_BACKEND",
-				"valueFrom": {
-					"configMapKeyRef": {
-						"name": "configmap",
-						"key": "cluster-backend"
-					}
-				}
-			},
-			{
-				"name": "ETCD_ENDPOINT",
-				"valueFrom": {
-					"fieldRef": {
-						"fieldPath": "spec.nodeName"
-					}
-				}
-			},
-			{
-				"name": "CUSTOMER_ID",
-				"valueFrom": {
-					"configMapKeyRef": {
-						"name": "configmap",
-						"key": "customer-id"
-					}
-				}
-			}
-		],
-		"command": [
-			"/bin/bash",
-			"-c",
-			"/run.sh"
-		]
-	}
-]`
-
 type FlannelClient interface {
 	ClusterObj
 }
@@ -113,12 +40,142 @@ type flannelClient struct {
 	Cluster
 }
 
+func generateInitFlannelContainers() (string, error) {
+	initContainers := []apiv1.Container{
+		{
+			Name:  "set-network-env",
+			Image: "hectorj2f/set-flannel-network-env",
+			Command: []string{
+				"/bin/bash",
+				"-c",
+				"/run.sh",
+			},
+			Env: []apiv1.EnvVar{
+				{
+					Name: "CLUSTER_VNI",
+					ValueFrom: &apiv1.EnvVarSource{
+						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+							LocalObjectReference: apiv1.LocalObjectReference{
+								Name: "configmap",
+							},
+							Key: "cluster-vni",
+						},
+					},
+				},
+				{
+					Name: "CLUSTER_NETWORK",
+					ValueFrom: &apiv1.EnvVarSource{
+						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+							LocalObjectReference: apiv1.LocalObjectReference{
+								Name: "configmap",
+							},
+							Key: "cluster-network",
+						},
+					},
+				},
+				{
+					Name: "CUSTOMER_ID",
+					ValueFrom: &apiv1.EnvVarSource{
+						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+							LocalObjectReference: apiv1.LocalObjectReference{
+								Name: "configmap",
+							},
+							Key: "customer-id",
+						},
+					},
+				},
+				{
+					Name: "ETCD_PORT",
+					ValueFrom: &apiv1.EnvVarSource{
+						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+							LocalObjectReference: apiv1.LocalObjectReference{
+								Name: "configmap",
+							},
+							Key: "etcd-port",
+						},
+					},
+				},
+				{
+					Name: "CLUSTER_ID",
+					ValueFrom: &apiv1.EnvVarSource{
+						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+							LocalObjectReference: apiv1.LocalObjectReference{
+								Name: "configmap",
+							},
+							Key: "cluster-id",
+						},
+					},
+				},
+				{
+					Name: "ETCD_ENDPOINT",
+					ValueFrom: &apiv1.EnvVarSource{
+						FieldRef: &apiv1.ObjectFieldSelector{
+							APIVersion: "v1",
+							FieldPath:  "spec.nodeName",
+						},
+					},
+				},
+				{
+					Name:  "CLUSTER_BACKEND",
+					ValueFrom: &apiv1.EnvVarSource{
+						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+							LocalObjectReference: apiv1.LocalObjectReference{
+								Name: "configmap",
+							},
+							Key: "cluster-backend",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	bytesInitContainers, err := json.Marshal(initContainers)
+	if err != nil {
+		return "", maskAny(err)
+	}
+	return string(bytesInitContainers), nil
+}
+
+func generateFlannelPodAffinity(clusterId string) (string, error) {
+	podAntiAffinity := &api.Affinity{
+		PodAntiAffinity: &api.PodAntiAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
+				{
+					LabelSelector: &unversioned.LabelSelector{
+						MatchExpressions: []unversioned.LabelSelectorRequirement{
+							{
+								Key: "role",
+								Operator: unversioned.LabelSelectorOpIn,
+								Values: []string{clusterId+"-flannel-client"},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+			},
+		},
+	}
+
+	bytesPodAffinity, err := json.Marshal(podAntiAffinity)
+  if err != nil {
+      return "", maskAny(err)
+  }
+
+	return string(bytesPodAffinity), nil
+}
+
 func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 	privileged := true
 
-	initContainers, err := ExecTemplate(initContainerSetNetworkEnv, f)
+	initContainers, err := generateInitFlannelContainers()
 	if err != nil {
-		return []runtime.Object{}, maskAny(err)
+      return []runtime.Object{}, maskAny(err)
+  }
+
+	podAffinity, err := generateFlannelPodAffinity(f.Spec.ClusterID)
+	if err != nil {
+			return []runtime.Object{}, maskAny(err)
 	}
 
 	deployment := &extensionsv1.Deployment{
@@ -127,7 +184,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			GenerateName: f.Spec.ClusterID + "-flannel-client",
+			Name: f.Spec.ClusterID + "-flannel-client",
 			Labels: map[string]string{
 				"cluster-id": f.Spec.ClusterID,
 				"role":       f.Spec.ClusterID + "-flannel-client",
@@ -138,7 +195,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: "Recreate",
 			},
-			Replicas: &f.Spec.Replicas,
+			Replicas: &f.Spec.NumNodes,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: f.Spec.ClusterID + "flannel-client",
@@ -149,8 +206,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					},
 					Annotations: map[string]string{
 						"seccomp.security.alpha.kubernetes.io/pod": "unconfined",
-						"pod.beta.kubernetes.io/init-containers":   initContainers,
-						"scheduler.alpha.kubernetes.io/affinity":   podAffinityFlannelClient,
+						"pod.beta.kubernetes.io/init-containers":   string(initContainers),
+						"scheduler.alpha.kubernetes.io/affinity":   string(podAffinity),
 					},
 				},
 				Spec: apiv1.PodSpec{

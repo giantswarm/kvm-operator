@@ -94,13 +94,6 @@ func ComputeResources(cluster *Cluster) ([]runtime.Object, error) {
 	}
 	objects = append(objects, masterComponents...)
 
-	// FlannelClient for the worker
-	flannelComponents, err = flannelClient.GenerateResources()
-	if err != nil {
-		log.Println("generate resource flannelComponents error %v", err)
-	}
-	objects = append(objects, flannelComponents...)
-
 	worker := &worker{
 		Cluster: *cluster,
 	}

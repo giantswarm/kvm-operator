@@ -4,3 +4,6 @@ metadata:
   name: test-1
 spec:
   customer: "test-customer"
+  clusterId: "test-id"
+  numNodes: 2
+  replicas: 1
