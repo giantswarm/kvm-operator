@@ -3,10 +3,9 @@ package resources
 import (
 	"encoding/json"
 
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 
 	"k8s.io/client-go/pkg/api"
-	"k8s.io/client-go/pkg/api/unversioned"
+	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
@@ -26,11 +25,11 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 		PodAntiAffinity: &api.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{
-					LabelSelector: &unversioned.LabelSelector{
-						MatchExpressions: []unversioned.LabelSelectorRequirement{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
 								Key: "role",
-								Operator: unversioned.LabelSelectorOpIn,
+								Operator: apiunversioned.LabelSelectorOpIn,
 								Values: []string{clusterId+"-master"},
 							},
 						},
@@ -42,11 +41,11 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{
-					LabelSelector: &unversioned.LabelSelector{
-						MatchExpressions: []unversioned.LabelSelectorRequirement{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
 								Key: "role",
-								Operator: unversioned.LabelSelectorOpIn,
+								Operator: apiunversioned.LabelSelectorOpIn,
 								Values: []string{clusterId+"-flannel-client"},
 							},
 						},
@@ -65,7 +64,7 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 	return string(bytesPodAffinity), nil
 }
 
-func generateInitWorkerContainers() (string, error){
+func generateInitWorkerContainers(namespace string) (string, error){
 	privileged := true
 
 	initContainers := []apiv1.Container{
@@ -112,6 +111,10 @@ func generateInitWorkerContainers() (string, error){
 							Key: "cluster-id",
 						},
 					},
+				},
+				{
+					Name: "NAMESPACE",
+					Value: namespace,
 				},
 			},
 		},
@@ -176,7 +179,7 @@ func generateInitWorkerContainers() (string, error){
 							LocalObjectReference: apiv1.LocalObjectReference{
 								Name: "configmap",
 							},
-							Key: "k8s-worker-service-name",
+							Key: "k8s-master-service-name",
 						},
 					},
 				},
@@ -277,7 +280,7 @@ func generateInitWorkerContainers() (string, error){
 							LocalObjectReference: apiv1.LocalObjectReference{
 								Name: "configmap",
 							},
-							Key: "k8s-worker-service-name",
+							Key: "k8s-master-service-name",
 						},
 					},
 				},
@@ -356,7 +359,7 @@ func generateInitWorkerContainers() (string, error){
 							LocalObjectReference: apiv1.LocalObjectReference{
 								Name: "configmap",
 							},
-							Key: "k8s-worker-service-name",
+							Key: "k8s-master-service-name",
 						},
 					},
 				},
@@ -473,7 +476,7 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	privileged := true
 
-	initContainers, err := generateInitWorkerContainers()
+	initContainers, err := generateInitWorkerContainers(w.Name)
 	if err != nil {
 		return nil, maskAny(err)
 	}
@@ -495,10 +498,6 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 				"role":       w.Spec.ClusterID+"-worker",
 				"app":        "k8s-cluster",
 			},
-			Annotations: map[string]string{
-				"pod.beta.kubernetes.io/init-containers": initContainers,
-				"scheduler.alpha.kubernetes.io/affinity": podAffinity,
-			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
 			Strategy: extensionsv1.DeploymentStrategy{
@@ -513,10 +512,22 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						"role":       w.Spec.ClusterID + "-worker",
 						"app":        "k8s-cluster",
 					},
+					Annotations: map[string]string{
+						"pod.beta.kubernetes.io/init-containers": initContainers,
+						"scheduler.alpha.kubernetes.io/affinity": podAffinity,
+					},
 				},
 				Spec: apiv1.PodSpec{
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
+						{
+							Name: "customer-dir",
+							VolumeSource: apiv1.VolumeSource{
+								HostPath: &apiv1.HostPathVolumeSource{
+									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/",
+								},
+							},
+						},
 						{
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
@@ -569,7 +580,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "ssl",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/ssl/certs",
+									Path: "/etc/ssl/certs/ca-certificates.crt",
 								},
 							},
 						},
@@ -849,8 +860,8 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
-									Name:      "certs",
-									MountPath: "/etc/kubernetes/ssl/",
+									Name:      "ssl",
+									MountPath: "/etc/ssl/certs/ca-certificates.crt",
 								},
 								{
 									Name:      "images",
@@ -859,6 +870,10 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:      "rootfs",
 									MountPath: "/usr/code/rootfs/",
+								},
+								{
+									Name:      "certs",
+									MountPath: "/etc/kubernetes/ssl/",
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{

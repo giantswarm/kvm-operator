@@ -3,34 +3,12 @@ package resources
 import (
 	"encoding/json"
 
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
-
 	"k8s.io/client-go/pkg/api"
-	"k8s.io/client-go/pkg/api/unversioned"
+	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
 )
-
-const podAffinityFlannelClient string = `
-{
-	"podAntiAffinity": {
-		"requiredDuringSchedulingIgnoredDuringExecution": [
-			{
-				"labelSelector": {
-					"matchExpressions": [
-						{
-							"key": "role",
-							"operator": "In",
-							"values": ["{{.Spec.ClusterID}}-flannel-client"]
-						}
-					]
-				},
-				"topologyKey": "kubernetes.io/hostname"
-		 }
-		]
-	 }
- }`
 
 type FlannelClient interface {
 	ClusterObj
@@ -142,11 +120,11 @@ func generateFlannelPodAffinity(clusterId string) (string, error) {
 		PodAntiAffinity: &api.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{
-					LabelSelector: &unversioned.LabelSelector{
-						MatchExpressions: []unversioned.LabelSelectorRequirement{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
 								Key: "role",
-								Operator: unversioned.LabelSelectorOpIn,
+								Operator: apiunversioned.LabelSelectorOpIn,
 								Values: []string{clusterId+"-flannel-client"},
 							},
 						},

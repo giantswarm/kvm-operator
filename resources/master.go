@@ -3,11 +3,9 @@ package resources
 import (
 	"encoding/json"
 
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
-
 	"k8s.io/client-go/pkg/api"
-	"k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
 	"k8s.io/client-go/pkg/util/intstr"
@@ -26,11 +24,11 @@ func generateMasterPodAffinity(clusterId string) (string, error) {
 		PodAntiAffinity: &api.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{
-					LabelSelector: &unversioned.LabelSelector{
-						MatchExpressions: []unversioned.LabelSelectorRequirement{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
 								Key: "role",
-								Operator: unversioned.LabelSelectorOpIn,
+								Operator: apiunversioned.LabelSelectorOpIn,
 								Values: []string{clusterId+"-worker"},
 							},
 						},
@@ -42,11 +40,11 @@ func generateMasterPodAffinity(clusterId string) (string, error) {
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{
-					LabelSelector: &unversioned.LabelSelector{
-						MatchExpressions: []unversioned.LabelSelectorRequirement{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
 								Key: "role",
-								Operator: unversioned.LabelSelectorOpIn,
+								Operator: apiunversioned.LabelSelectorOpIn,
 								Values: []string{clusterId+"-flannel-client"},
 							},
 						},
@@ -65,7 +63,7 @@ func generateMasterPodAffinity(clusterId string) (string, error) {
 	return string(bytesPodAffinity), nil
 }
 
-func generateInitMasterContainers() (string, error){
+func generateInitMasterContainers(namespace string) (string, error){
 	privileged := true
 
 	initContainers := []apiv1.Container{
@@ -158,6 +156,10 @@ func generateInitMasterContainers() (string, error){
 						},
 					},
 				},
+				{
+					Name: "NAMESPACE",
+					Value: namespace,
+				},
 			},
 		},
 		{
@@ -196,9 +198,9 @@ func generateInitMasterContainers() (string, error){
 			Name:  "k8s-master-api-token",
 			Image: "hectorj2f/alpine-openssl",
 			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/usr/bin/test ! -f /etc/kubernetes/secrets/token_sign_key.pem  && /usr/bin/openssl genrsa -out /etc/kubernetes/secrets/token_sign_key.pem 2048 && /bin/echo \"Generated new token sign key.\" || /bin/echo \"Token sign key already exists, skipping.\"",
+					"/bin/sh",
+					"-c",
+					"/usr/bin/test ! -f /etc/kubernetes/secrets/token_sign_key.pem  && /usr/bin/openssl genrsa -out /etc/kubernetes/secrets/token_sign_key.pem 2048 && /bin/echo 'Generated new token sign key.' || /bin/echo 'Token sign key already exists, skipping.'",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -212,74 +214,6 @@ func generateInitMasterContainers() (string, error){
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name: "K8S_API_ALT_NAMES",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-api-alt-names",
-						},
-					},
-				},
-				{
-					Name: "G8S_API_IP",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "g8s-api-ip",
-						},
-					},
-				},
-				{
-					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
-				},
-				{
-					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
-				},
-				{
-					Name: "VAULT_TOKEN",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-token",
-						},
-					},
-				},
-				{
-					Name: "VAULT_ADDR",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-addr",
-						},
-					},
-				},
 			},
 		},
 		{
@@ -685,7 +619,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	privileged := true
 
-	initContainers, err := generateInitMasterContainers()
+	initContainers, err := generateInitMasterContainers(m.Name)
 	if err != nil {
 		return &extensionsv1.Deployment{}, maskAny(err)
 	}
@@ -707,10 +641,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 				"role":       m.Spec.ClusterID + "-master",
 				"app":        m.Spec.ClusterID + "-k8s-cluster",
 			},
-			Annotations: map[string]string{
-				"pod.beta.kubernetes.io/init-containers": initContainers,
-				"scheduler.alpha.kubernetes.io/affinity": podAffinity,
-			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
 			Strategy: extensionsv1.DeploymentStrategy{
@@ -725,18 +655,14 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						"role":       m.Spec.ClusterID + "-master",
 						"app":        m.Spec.ClusterID + "-k8s-cluster",
 					},
+					Annotations: map[string]string{
+						"pod.beta.kubernetes.io/init-containers": initContainers,
+						"scheduler.alpha.kubernetes.io/affinity": podAffinity,
+					},
 				},
 				Spec: apiv1.PodSpec{
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
-						{
-							Name: "etcd-data",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/" + m.Spec.ClusterID + "-k8s-master-vm/",
-								},
-							},
-						},
 						{
 							Name: "customer-dir",
 							VolumeSource: apiv1.VolumeSource{
@@ -746,10 +672,18 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
+							Name: "etcd-data",
+							VolumeSource: apiv1.VolumeSource{
+								HostPath: &apiv1.HostPathVolumeSource{
+									Path: "/home/core/" + m.Spec.ClusterID + "-k8s-master-vm/",
+								},
+							},
+						},
+						{
 							Name: "api-secrets",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/secrets",
+									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/master/secrets",
 								},
 							},
 						},
@@ -789,12 +723,12 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "ssl",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/ssl/certs",
+									Path: "/etc/ssl/certs/ca-certificates.crt",
 								},
 							},
 						},
 						{
-							Name: "certs",
+							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
 									Path: "/etc/kubernetes/" + m.Spec.ClusterID + "/" + m.Spec.ClusterID + "/ssl/master/",
@@ -931,6 +865,39 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 												Name: "configmap",
 											},
 											Key: "k8s-calico-mtu",
+										},
+									},
+								},
+								{
+									Name: "K8S_CALICO_MTU",
+									ValueFrom: &apiv1.EnvVarSource{
+										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+											LocalObjectReference: apiv1.LocalObjectReference{
+												Name: "configmap",
+											},
+											Key: "k8s-calico-mtu",
+										},
+									},
+								},
+								{
+									Name: "CALICO_SUBNET",
+									ValueFrom: &apiv1.EnvVarSource{
+										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+											LocalObjectReference: apiv1.LocalObjectReference{
+												Name: "configmap",
+											},
+											Key: "calico-subnet",
+										},
+									},
+								},
+								{
+									Name: "CALICO_CIDR",
+									ValueFrom: &apiv1.EnvVarSource{
+										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+											LocalObjectReference: apiv1.LocalObjectReference{
+												Name: "configmap",
+											},
+											Key: "calico-cidr",
 										},
 									},
 								},
@@ -1081,11 +1048,24 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 										},
 									},
 								},
+								{
+									Name: "K8S_ETCD_IP",
+									ValueFrom: &apiv1.EnvVarSource{
+										FieldRef: &apiv1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "spec.nodeName",
+										},
+									},
+								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
-									Name:      "certs",
+									Name:      "api-certs",
 									MountPath: "/etc/kubernetes/ssl/",
+								},
+								{
+									Name:      "api-secrets",
+									MountPath: "/etc/kubernetes/secrets/",
 								},
 								{
 									Name:      "images",
@@ -1094,6 +1074,10 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:      "rootfs",
 									MountPath: "/usr/code/rootfs/",
+								},
+								{
+									Name:      "etcd-data",
+									MountPath: "/etc/kubernetes/data/etcd/",
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{
