@@ -22,7 +22,7 @@ func generateInitFlannelContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:  "set-network-env",
-			Image: "hectorj2f/set-flannel-network-env",
+			Image: "registry.giantswarm.io/giantswarm/set-flannel-network-env",
 			Command: []string{
 				"/bin/bash",
 				"-c",
@@ -311,7 +311,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 						},
 						{
 							Name:            "create-bridge",
-							Image:           "hectorj2f/k8s-network-bridge", // TODO: Sort this image out (giantswarm, needs tag)
+							Image:           "registry.giantswarm.io/giantswarm/k8s-network-bridge", // TODO: Sort this image out (giantswarm, needs tag)
 							ImagePullPolicy: apiv1.PullAlways,
 							SecurityContext: &apiv1.SecurityContext{
 								Privileged: &privileged,

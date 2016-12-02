@@ -70,7 +70,7 @@ func generateInitWorkerContainers(namespace string) (string, error){
 	initContainers := []apiv1.Container{
 		{
 			Name:  "generate-bridgeip-configmap",
-			Image: "hectorj2f/generate-bridge-ip-configmap",
+			Image: "registry.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -120,7 +120,7 @@ func generateInitWorkerContainers(namespace string) (string, error){
 		},
 		{
 			Name:  "kubectl-bridgeip-configmap",
-			Image: "hectorj2f/kubectl:1.4.0",
+			Image: "registry.giantswarm.io/giantswarm/kubectl:1.4.0",
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
