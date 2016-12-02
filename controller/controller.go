@@ -43,7 +43,6 @@ type Config struct {
 	ListenAddress string
 }
 
-
 var (
 	clusterAPIActionTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{

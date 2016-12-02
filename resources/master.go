@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"k8s.io/client-go/pkg/api"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
 	"k8s.io/client-go/pkg/util/intstr"
@@ -27,9 +27,9 @@ func generateMasterPodAffinity(clusterId string) (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key: "role",
+								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values: []string{clusterId+"-worker"},
+								Values:   []string{clusterId + "-worker"},
 							},
 						},
 					},
@@ -43,9 +43,9 @@ func generateMasterPodAffinity(clusterId string) (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key: "role",
+								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values: []string{clusterId+"-flannel-client"},
+								Values:   []string{clusterId + "-flannel-client"},
 							},
 						},
 					},
@@ -57,13 +57,13 @@ func generateMasterPodAffinity(clusterId string) (string, error) {
 
 	bytesPodAffinity, err := json.Marshal(podAffinity)
 	if err != nil {
-			return "", maskAny(err)
+		return "", maskAny(err)
 	}
 
 	return string(bytesPodAffinity), nil
 }
 
-func generateInitMasterContainers(namespace string) (string, error){
+func generateInitMasterContainers(namespace string) (string, error) {
 	privileged := true
 
 	initContainers := []apiv1.Container{
@@ -131,7 +131,7 @@ func generateInitMasterContainers(namespace string) (string, error){
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "SUFFIX_CONFIGMAP",
+					Name:  "SUFFIX_CONFIGMAP",
 					Value: "master-vm",
 				},
 				{
@@ -157,7 +157,7 @@ func generateInitMasterContainers(namespace string) (string, error){
 					},
 				},
 				{
-					Name: "NAMESPACE",
+					Name:  "NAMESPACE",
 					Value: namespace,
 				},
 			},
@@ -181,15 +181,15 @@ func generateInitMasterContainers(namespace string) (string, error){
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "G8S_MASTER_PORT",
+					Name:  "G8S_MASTER_PORT",
 					Value: "8080",
 				},
 				{
-					Name: "G8S_MASTER_HOST",
+					Name:  "G8S_MASTER_HOST",
 					Value: "127.0.0.1",
 				},
 				{
-					Name: "BRIDGE_IP_CONFIGMAP_PATH",
+					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
 					Value: "/tmp/bridge-ip-configmap-master-vm.json",
 				},
 			},
@@ -198,9 +198,9 @@ func generateInitMasterContainers(namespace string) (string, error){
 			Name:  "k8s-master-api-token",
 			Image: "registry.giantswarm.io/giantswarm/alpine-openssl",
 			Command: []string{
-					"/bin/sh",
-					"-c",
-					"/usr/bin/test ! -f /etc/kubernetes/secrets/token_sign_key.pem  && /usr/bin/openssl genrsa -out /etc/kubernetes/secrets/token_sign_key.pem 2048 && /bin/echo 'Generated new token sign key.' || /bin/echo 'Token sign key already exists, skipping.'",
+				"/bin/sh",
+				"-c",
+				"/usr/bin/test ! -f /etc/kubernetes/secrets/token_sign_key.pem  && /usr/bin/openssl genrsa -out /etc/kubernetes/secrets/token_sign_key.pem 2048 && /bin/echo 'Generated new token sign key.' || /bin/echo 'Token sign key already exists, skipping.'",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -836,7 +836,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									},
 								},
 								{
-									Name:  "IP_BRIDGE",
+									Name: "IP_BRIDGE",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{

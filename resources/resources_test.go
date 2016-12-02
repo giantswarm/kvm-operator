@@ -2,8 +2,8 @@ package resources
 
 import (
 	//"reflect"
-	"testing"
 	"log"
+	"testing"
 )
 
 func TestComponent_Creation(t *testing.T) {
@@ -15,9 +15,9 @@ func TestComponent_Creation(t *testing.T) {
 
 	cluster := &Cluster{
 		Spec: ClusterSpec{
-			Customer: "test",
+			Customer:  "test",
 			ClusterID: "test",
-			Replicas: int32(1),
+			Replicas:  int32(1),
 		},
 	}
 	objects, err := ComputeResources(cluster)
@@ -29,7 +29,7 @@ func TestComponent_Creation(t *testing.T) {
 		log.Println("obj desired resources for cluster: %v", obj)
 	}
 
-	if  len(objects) != expectedObjects {
+	if len(objects) != expectedObjects {
 		t.Fatalf("Number of objects in expected output differed from received units: %d != %d", len(objects), expectedObjects)
 	}
 }

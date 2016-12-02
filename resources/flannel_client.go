@@ -94,7 +94,7 @@ func generateInitFlannelContainers() (string, error) {
 					},
 				},
 				{
-					Name:  "CLUSTER_BACKEND",
+					Name: "CLUSTER_BACKEND",
 					ValueFrom: &apiv1.EnvVarSource{
 						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 							LocalObjectReference: apiv1.LocalObjectReference{
@@ -123,9 +123,9 @@ func generateFlannelPodAffinity(clusterId string) (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key: "role",
+								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values: []string{clusterId+"-flannel-client"},
+								Values:   []string{clusterId + "-flannel-client"},
 							},
 						},
 					},
@@ -136,9 +136,9 @@ func generateFlannelPodAffinity(clusterId string) (string, error) {
 	}
 
 	bytesPodAffinity, err := json.Marshal(podAntiAffinity)
-  if err != nil {
-      return "", maskAny(err)
-  }
+	if err != nil {
+		return "", maskAny(err)
+	}
 
 	return string(bytesPodAffinity), nil
 }
@@ -148,12 +148,12 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 
 	initContainers, err := generateInitFlannelContainers()
 	if err != nil {
-      return []runtime.Object{}, maskAny(err)
-  }
+		return []runtime.Object{}, maskAny(err)
+	}
 
 	podAffinity, err := generateFlannelPodAffinity(f.Spec.ClusterID)
 	if err != nil {
-			return []runtime.Object{}, maskAny(err)
+		return []runtime.Object{}, maskAny(err)
 	}
 
 	deployment := &extensionsv1.Deployment{

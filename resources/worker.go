@@ -3,14 +3,12 @@ package resources
 import (
 	"encoding/json"
 
-
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
 )
-
 
 type Worker interface {
 	ClusterObj
@@ -28,9 +26,9 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key: "role",
+								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values: []string{clusterId+"-master"},
+								Values:   []string{clusterId + "-master"},
 							},
 						},
 					},
@@ -44,9 +42,9 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key: "role",
+								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values: []string{clusterId+"-flannel-client"},
+								Values:   []string{clusterId + "-flannel-client"},
 							},
 						},
 					},
@@ -58,13 +56,13 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 
 	bytesPodAffinity, err := json.Marshal(podAffinity)
 	if err != nil {
-			return "", maskAny(err)
+		return "", maskAny(err)
 	}
 
 	return string(bytesPodAffinity), nil
 }
 
-func generateInitWorkerContainers(namespace string) (string, error){
+func generateInitWorkerContainers(namespace string) (string, error) {
 	privileged := true
 
 	initContainers := []apiv1.Container{
@@ -87,7 +85,7 @@ func generateInitWorkerContainers(namespace string) (string, error){
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "SUFFIX_CONFIGMAP",
+					Name:  "SUFFIX_CONFIGMAP",
 					Value: "worker-vm",
 				},
 				{
@@ -113,7 +111,7 @@ func generateInitWorkerContainers(namespace string) (string, error){
 					},
 				},
 				{
-					Name: "NAMESPACE",
+					Name:  "NAMESPACE",
 					Value: namespace,
 				},
 			},
@@ -137,15 +135,15 @@ func generateInitWorkerContainers(namespace string) (string, error){
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "G8S_MASTER_PORT",
+					Name:  "G8S_MASTER_PORT",
 					Value: "8080",
 				},
 				{
-					Name: "G8S_MASTER_HOST",
+					Name:  "G8S_MASTER_HOST",
 					Value: "127.0.0.1",
 				},
 				{
-					Name: "BRIDGE_IP_CONFIGMAP_PATH",
+					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
 					Value: "/tmp/bridge-ip-configmap-worker-vm.json",
 				},
 			},
@@ -419,7 +417,6 @@ func generateInitWorkerContainers(namespace string) (string, error){
 	return string(bytes), nil
 }
 
-
 func (w *worker) GenerateResources() ([]runtime.Object, error) {
 	objects := []runtime.Object{}
 
@@ -492,10 +489,10 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterID+"-worker",
+			Name: w.Spec.ClusterID + "-worker",
 			Labels: map[string]string{
 				"cluster-id": w.Spec.ClusterID,
-				"role":       w.Spec.ClusterID+"-worker",
+				"role":       w.Spec.ClusterID + "-worker",
 				"app":        "k8s-cluster",
 			},
 		},
@@ -506,7 +503,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			Replicas: &w.Spec.Replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					Name: w.Spec.ClusterID+"-worker",
+					Name: w.Spec.ClusterID + "-worker",
 					Labels: map[string]string{
 						"cluster-id": w.Spec.ClusterID,
 						"role":       w.Spec.ClusterID + "-worker",
@@ -588,7 +585,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/"+ w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/",
 								},
 							},
 						},
