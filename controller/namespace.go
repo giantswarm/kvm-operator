@@ -37,7 +37,10 @@ func init() {
 }
 
 func getNamespaceNameForCluster(cluster resources.Cluster) string {
-	return fmt.Sprintf("cluster-%v", cluster.Name)
+	// FIXME: I removed the prefix to make work our first version
+	//return fmt.Sprintf("cluster-%v", cluster.Name)
+
+	return fmt.Sprintf("%v", cluster.Name)
 }
 
 func (c *controller) createClusterNamespace(cluster resources.Cluster) error {
