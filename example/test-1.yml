@@ -7,3 +7,18 @@ spec:
   clusterId: "test-id"
   numNodes: 2
   replicas: 1
+  clusterVNI: 2
+  clusterBackend: "vxlan"
+  clusterNetwork: "10.2.0.0/16"
+  dockerExtraArgs: ""
+  machineMem: "512"
+  machineCPUcores: 2
+  registry: ""
+  vaultToken: ""
+  k8sAPIaltNames: "kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.test.g8s.giantswarm.fra-1"
+  k8sVersion: "1.4.0"
+  k8sDomain: "test.giantswarm.fra-1"
+  k8sETCDdomainName: "etcd.test.g8s.fra-1.giantswarm.io"
+  k8sMasterDomainName:    "api.test.g8s.fra-1.giantswarm.io"
+  k8sMasterServiceName: "test-k8s-master-vm"
+  K8sNodeLabels: ""

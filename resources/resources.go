@@ -12,6 +12,8 @@ import (
 	"k8s.io/client-go/pkg/runtime"
 )
 
+const GiantnetesConfigMapName = "g8s-configmap"
+
 var (
 	computeResourcesTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{

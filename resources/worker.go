@@ -2,6 +2,7 @@ package resources
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
@@ -18,7 +19,7 @@ type worker struct {
 	Cluster
 }
 
-func generateWorkerPodAffinity(clusterId string) (string, error) {
+func (w *worker) generateWorkerPodAffinity() (string, error) {
 	podAffinity := &api.Affinity{
 		PodAntiAffinity: &api.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
@@ -28,7 +29,7 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 							{
 								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{clusterId + "-master"},
+								Values:   []string{w.Name + "-master"},
 							},
 						},
 					},
@@ -44,7 +45,7 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 							{
 								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{clusterId + "-flannel-client"},
+								Values:   []string{w.Name + "-flannel-client"},
 							},
 						},
 					},
@@ -62,7 +63,7 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 	return string(bytesPodAffinity), nil
 }
 
-func generateInitWorkerContainers(namespace string) (string, error) {
+func (w *worker) generateInitWorkerContainers() (string, error) {
 	privileged := true
 
 	initContainers := []apiv1.Container{
@@ -90,29 +91,15 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 				},
 				{
 					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Value: w.Spec.Customer,
 				},
 				{
 					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Value: w.Spec.ClusterID,
 				},
 				{
 					Name:  "NAMESPACE",
-					Value: namespace,
+					Value: w.Name,
 				},
 			},
 		},
@@ -172,32 +159,18 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name: "K8S_MASTER_SERVICE_NAME",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-master-service-name",
-						},
-					},
+					Value: w.Spec.K8sMasterServiceName,
 				},
 				{
 					Name: "K8S_API_ALT_NAMES",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-api-alt-names",
-						},
-					},
+					Value: w.Spec.K8sAPIaltNames,
 				},
 				{
 					Name: "G8S_API_IP",
 					ValueFrom: &apiv1.EnvVarSource{
 						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
+								Name: GiantnetesConfigMapName,
 							},
 							Key: "g8s-api-ip",
 						},
@@ -205,43 +178,22 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 				},
 				{
 					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Value: w.Spec.Customer,
 				},
 				{
 					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Value: w.Spec.ClusterID,
 				},
 				{
 					Name: "VAULT_TOKEN",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-token",
-						},
-					},
+					Value: w.Spec.VaultToken,
 				},
 				{
 					Name: "VAULT_ADDR",
 					ValueFrom: &apiv1.EnvVarSource{
 						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
+								Name: GiantnetesConfigMapName,
 							},
 							Key: "vault-addr",
 						},
@@ -273,54 +225,26 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name: "K8S_MASTER_SERVICE_NAME",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-master-service-name",
-						},
-					},
+					Value: w.Spec.K8sMasterServiceName,
 				},
 				{
 					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Value: w.Spec.Customer,
 				},
 				{
 					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Value: w.Spec.ClusterID,
 				},
 				{
 					Name: "VAULT_TOKEN",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-token",
-						},
-					},
+					Value: w.Spec.VaultToken,
 				},
 				{
 					Name: "VAULT_ADDR",
 					ValueFrom: &apiv1.EnvVarSource{
 						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
+								Name: GiantnetesConfigMapName,
 							},
 							Key: "vault-addr",
 						},
@@ -352,54 +276,26 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name: "K8S_MASTER_SERVICE_NAME",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-master-service-name",
-						},
-					},
+					Value: w.Spec.K8sMasterServiceName,
 				},
 				{
 					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Value: w.Spec.Customer,
 				},
 				{
 					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Value: w.Spec.ClusterID,
 				},
 				{
 					Name: "VAULT_TOKEN",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-token",
-						},
-					},
+					Value: w.Spec.VaultToken,
 				},
 				{
 					Name: "VAULT_ADDR",
 					ValueFrom: &apiv1.EnvVarSource{
 						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
+								Name: GiantnetesConfigMapName,
 							},
 							Key: "vault-addr",
 						},
@@ -473,12 +369,12 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	privileged := true
 
-	initContainers, err := generateInitWorkerContainers(w.Name)
+	initContainers, err := w.generateInitWorkerContainers()
 	if err != nil {
 		return nil, maskAny(err)
 	}
 
-	podAffinity, err := generateWorkerPodAffinity(w.Spec.ClusterID)
+	podAffinity, err := w.generateWorkerPodAffinity()
 	if err != nil {
 		return nil, maskAny(err)
 	}
@@ -600,36 +496,22 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name: "BRIDGE_NETWORK",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "bridge-network",
-										},
-									},
+									Value: "br"+w.Spec.ClusterID,
 								},
 								{
 									Name: "CUSTOMER_ID",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "customer-id",
-										},
-									},
+									Value: w.Spec.Customer,
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",
-									Value: "",
+									Value: w.Spec.DockerExtraArgs,
 								},
 								{
 									Name: "G8S_DNS_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
+												Name: GiantnetesConfigMapName,
 											},
 											Key: "g8s-dns-ip",
 										},
@@ -640,7 +522,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
+												Name: GiantnetesConfigMapName,
 											},
 											Key: "g8s-domain",
 										},
@@ -665,21 +547,14 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name: "K8S_INSECURE_PORT",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-insecure-port",
-										},
-									},
+									Value: "8080",
 								},
 								{
 									Name: "K8S_CALICO_MTU",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
+												Name: GiantnetesConfigMapName,
 											},
 											Key: "k8s-calico-mtu",
 										},
@@ -687,21 +562,14 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name: "MACHINE_CPU_CORES",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "machine-cpu-cores",
-										},
-									},
+									Value: fmt.Sprintf("%d", w.Spec.MachineCPUcores),
 								},
 								{
 									Name: "K8S_DNS_IP",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
+												Name: GiantnetesConfigMapName,
 											},
 											Key: "k8s-dns-ip",
 										},
@@ -709,76 +577,34 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name: "K8S_DOMAIN",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-domain",
-										},
-									},
+									Value: w.Spec.K8sDomain,
 								},
 								{
 									Name: "K8S_ETCD_DOMAIN_NAME",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-etcd-domain-name",
-										},
-									},
+									Value: w.Spec.K8sETCDdomainName,
 								},
 								{
 									Name: "K8S_ETCD_PREFIX",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-etcd-prefix",
-										},
-									},
+									Value: w.Spec.ClusterID,
 								},
 								{
 									Name: "K8S_MASTER_DOMAIN_NAME",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-master-domain-name",
-										},
-									},
+									Value: w.Spec.K8sMasterDomainName,
 								},
 								{
 									Name: "K8S_MASTER_PORT",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-master-port",
-										},
-									},
+									Value: "6443",
 								},
 								{
 									Name: "K8S_MASTER_SERVICE_NAME",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-master-service-name",
-										},
-									},
+									Value: w.Spec.K8sMasterServiceName,
 								},
 								{
 									Name: "K8S_NETWORK_SETUP_VERSION",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
+												Name: GiantnetesConfigMapName,
 											},
 											Key: "k8s-network-setup-version",
 										},
@@ -786,73 +612,31 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_NODE_LABELS",
-									Value: "",
+									Value: w.Spec.K8sNodeLabels,
 								},
 								{
 									Name: "K8S_SECURE_PORT",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-secure-port",
-										},
-									},
+									Value: "6443",
 								},
 								{
 									Name: "K8S_VERSION",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-version",
-										},
-									},
+									Value: w.Spec.K8sVersion,
 								},
 								{
 									Name: "MACHINE_MEM",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "machine-mem",
-										},
-									},
+									Value: w.Spec.MachineMem,
 								},
 								{
 									Name: "REGISTRY",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "registry",
-										},
-									},
+									Value: w.Spec.Registry,
 								},
 								{
 									Name: "DOCKER_EXTRA_ARGS",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "docker-extra-args",
-										},
-									},
+									Value: w.Spec.DockerExtraArgs,
 								},
 								{
 									Name: "K8S_NODE_LABELS",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-node-labels",
-										},
-									},
+									Value: w.Spec.K8sNodeLabels,
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
