@@ -1,5 +1,5 @@
-hash: b17aaac93084ea74dfb6ae370125d697d67f5be796900a0f264e87d90bbccf56
-updated: 2016-11-24T10:28:47.415627626Z
+hash: 5ceade22136ed885b83f4214b151f5e9d14e0739bdb745317538c1acb9763f19
+updated: 2016-12-04T19:10:36.707573286+01:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -67,6 +67,8 @@ imports:
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jonboulle/clockwork
   version: 72f9bd7c4e0c2a40055ab3d0f09654f730cce982
+- name: github.com/juju/errgo
+  version: 08cceb5d0b5331634b9826762a8fd53b29b86ad8
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/mailru/easyjson
@@ -110,6 +112,8 @@ imports:
   version: f1f1a805ed361a0e078bb537e4ea78cd37dcf065
   subpackages:
   - codec
+- name: github.com/ventu-io/go-shortid
+  version: 6c56cef5189ca1b3d5ef01dc07f4d611dfc0bb33
 - name: golang.org/x/net
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
@@ -155,8 +159,6 @@ imports:
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
-- name: github.com/juju/errgo
-  version: 08cceb5d0b5331634b9826762a8fd53b29b86ad8
 - name: k8s.io/client-go
   version: b22087a53becae45931ed72d5e0f12e0031d771a
   subpackages:

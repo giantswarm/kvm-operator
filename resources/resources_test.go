@@ -7,11 +7,10 @@ import (
 )
 
 func TestComponent_Creation(t *testing.T) {
-	// ConfigMap
 	// Master: Service, Ingress8080, Ingress2379, Ingress6443, Deployment
 	// Flannel-client: Deployment
 	// Worker: Deployment, service
-	expectedObjects := 9
+	expectedObjects := 8
 
 	cluster := &Cluster{
 		Spec: ClusterSpec{

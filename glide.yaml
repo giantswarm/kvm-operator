@@ -19,3 +19,5 @@ import:
   - pkg/watch
   - rest
   - tools/cache
+- package: github.com/ventu-io/go-shortid
+  version: ^1.0.0

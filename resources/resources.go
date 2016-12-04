@@ -1,10 +1,8 @@
 package resources
 
 import (
-	"bytes"
 	"errors"
 	"log"
-	"text/template"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -12,7 +10,10 @@ import (
 	"k8s.io/client-go/pkg/runtime"
 )
 
-const GiantnetesConfigMapName = "g8s-configmap"
+const (
+	GiantnetesConfigMapName string = "g8s-configmap"
+	MasterReplicas          int32  = 1
+)
 
 var (
 	computeResourcesTotal = prometheus.NewCounterVec(
@@ -40,29 +41,14 @@ type ClusterObj interface {
 	GenerateResources() ([]runtime.Object, error)
 }
 
-func ExecTemplate(t string, obj interface{}) (string, error) {
-	var result bytes.Buffer
-
-	tmpl, err := template.New("component").Parse(t)
-	if err != nil {
-		return "", err
-	}
-	err = tmpl.Execute(&result, obj)
-	if err != nil {
-		return "", err
-	}
-
-	return result.String(), nil
-}
-
 // computeResources returns a list of Kubernetes objects that define
 // the desired state of the given cluster.
 func ComputeResources(cluster *Cluster) ([]runtime.Object, error) {
 	if cluster.Spec.ClusterID == "" {
 		return nil, errors.New("cluster ID must not be empty")
 	}
-	if cluster.Spec.Replicas == int32(0) {
-		return nil, errors.New("replicas must not be empty")
+	if cluster.Spec.WorkerReplicas == int32(0) {
+		return nil, errors.New("worker replicas must not be empty")
 	}
 
 	start := time.Now()
@@ -71,12 +57,6 @@ func ComputeResources(cluster *Cluster) ([]runtime.Object, error) {
 	log.Println("started computing desired resources for cluster:", cluster.Name)
 
 	objects := []runtime.Object{}
-
-	configMap := &configMap{
-		Cluster: *cluster,
-	}
-	configMapComponents, err := configMap.GenerateResources()
-	objects = append(objects, configMapComponents...)
 
 	flannelClient := &flannelClient{
 		Cluster: *cluster,

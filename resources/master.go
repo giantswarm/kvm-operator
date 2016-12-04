@@ -3,6 +3,7 @@ package resources
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
@@ -92,7 +93,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 					},
 				},
 				{
-					Name: "CLUSTER_ID",
+					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterID,
 				},
 				{
@@ -129,11 +130,11 @@ func (m *master) generateInitMasterContainers() (string, error) {
 					Value: "master-vm",
 				},
 				{
-					Name: "CUSTOMER_ID",
+					Name:  "CUSTOMER_ID",
 					Value: m.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
+					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterID,
 				},
 				{
@@ -219,11 +220,11 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "K8S_MASTER_SERVICE_NAME",
+					Name:  "K8S_MASTER_SERVICE_NAME",
 					Value: m.Spec.K8sMasterServiceName,
 				},
 				{
-					Name: "K8S_API_ALT_NAMES",
+					Name:  "K8S_API_ALT_NAMES",
 					Value: m.Spec.K8sAPIaltNames,
 				},
 				{
@@ -238,15 +239,15 @@ func (m *master) generateInitMasterContainers() (string, error) {
 					},
 				},
 				{
-					Name: "CUSTOMER_ID",
+					Name:  "CUSTOMER_ID",
 					Value: m.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
+					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterID,
 				},
 				{
-					Name: "VAULT_TOKEN",
+					Name:  "VAULT_TOKEN",
 					Value: m.Spec.VaultToken,
 				},
 				{
@@ -285,19 +286,19 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "K8S_MASTER_SERVICE_NAME",
+					Name:  "K8S_MASTER_SERVICE_NAME",
 					Value: m.Spec.K8sMasterServiceName,
 				},
 				{
-					Name: "CUSTOMER_ID",
+					Name:  "CUSTOMER_ID",
 					Value: m.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
+					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterID,
 				},
 				{
-					Name: "VAULT_TOKEN",
+					Name:  "VAULT_TOKEN",
 					Value: m.Spec.VaultToken,
 				},
 				{
@@ -336,19 +337,19 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "K8S_MASTER_SERVICE_NAME",
+					Name:  "K8S_MASTER_SERVICE_NAME",
 					Value: m.Spec.K8sMasterServiceName,
 				},
 				{
-					Name: "CUSTOMER_ID",
+					Name:  "CUSTOMER_ID",
 					Value: m.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
+					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterID,
 				},
 				{
-					Name: "VAULT_TOKEN",
+					Name:  "VAULT_TOKEN",
 					Value: m.Spec.VaultToken,
 				},
 				{
@@ -435,7 +436,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
 				ServiceName: m.Spec.ClusterID + "-master",
-				ServicePort: intstr.FromInt(8080),
+				ServicePort: intstr.FromString(m.Spec.K8sInsecurePort),
 			},
 		},
 	}
@@ -458,12 +459,22 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
 				ServiceName: m.Spec.ClusterID + "-master",
-				ServicePort: intstr.FromInt(6443),
+				ServicePort: intstr.FromString(m.Spec.K8sMasterPort),
 			},
 		},
 	}
 
 	objects = append(objects, endpointMasterAPIHTTPS)
+
+	masterPort, err := strconv.ParseInt(m.Spec.K8sMasterPort, 10, 32)
+	if err != nil {
+		return []runtime.Object{}, maskAny(err)
+	}
+
+	insecurePort, err := strconv.ParseInt(m.Spec.K8sInsecurePort, 10, 32)
+	if err != nil {
+		return []runtime.Object{}, maskAny(err)
+	}
 
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -483,7 +494,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "api",
-					Port:     int32(8080),
+					Port:     int32(insecurePort),
 					Protocol: "TCP",
 				},
 				{
@@ -493,7 +504,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 				},
 				{
 					Name:     "api-https",
-					Port:     int32(6443),
+					Port:     int32(masterPort),
 					Protocol: "TCP",
 				},
 			},
@@ -518,6 +529,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 		return &extensionsv1.Deployment{}, maskAny(err)
 	}
 
+	masterReplicas := int32(MasterReplicas)
+
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "deployment",
@@ -535,7 +548,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: "Recreate",
 			},
-			Replicas: &m.Spec.Replicas,
+			Replicas: &masterReplicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: m.Spec.ClusterID + "-master",
@@ -636,17 +649,17 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:  "k8s-vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.13",
+							Image: fmt.Sprintf("leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:%s", m.Spec.K8sVmVersion),
 							Args: []string{
 								"master",
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name: "BRIDGE_NETWORK",
-									Value: "br"+m.Spec.ClusterID,
+									Name:  "BRIDGE_NETWORK",
+									Value: "br" + m.Spec.ClusterID,
 								},
 								{
-									Name: "CUSTOMER_ID",
+									Name:  "CUSTOMER_ID",
 									Value: m.Spec.Customer,
 								},
 								{
@@ -689,26 +702,12 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									},
 								},
 								{
-									Name: "K8S_CLUSTER_IP_RANGE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "k8s-cluster-ip-range",
-										},
-									},
+									Name:  "K8S_CLUSTER_IP_RANGE",
+									Value: m.Spec.K8sClusterIpRange,
 								},
 								{
-									Name: "K8S_CLUSTER_IP_SUBNET",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "k8s-cluster-ip-subnet",
-										},
-									},
+									Name:  "K8S_CLUSTER_IP_SUBNET",
+									Value: m.Spec.K8sClusterIpSubnet,
 								},
 								{
 									Name: "IP_BRIDGE",
@@ -722,121 +721,75 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									},
 								},
 								{
-									Name: "K8S_INSECURE_PORT",
-									Value: "8080",
+									Name:  "K8S_INSECURE_PORT",
+									Value: m.Spec.K8sInsecurePort,
 								},
 								{
-									Name: "K8S_CALICO_MTU",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "k8s-calico-mtu",
-										},
-									},
+									Name:  "K8S_CALICO_MTU",
+									Value: m.Spec.K8sCalicoMtu,
 								},
 								{
-									Name: "K8S_CALICO_MTU",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "k8s-calico-mtu",
-										},
-									},
+									Name:  "CALICO_SUBNET",
+									Value: m.Spec.CalicoSubnet,
 								},
 								{
-									Name: "CALICO_SUBNET",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "calico-subnet",
-										},
-									},
+									Name:  "CALICO_CIDR",
+									Value: m.Spec.CalicoCidr,
 								},
 								{
-									Name: "CALICO_CIDR",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "calico-cidr",
-										},
-									},
-								},
-								{
-									Name: "MACHINE_CPU_CORES",
+									Name:  "MACHINE_CPU_CORES",
 									Value: fmt.Sprintf("%d", m.Spec.MachineCPUcores),
 								},
 								{
-									Name: "K8S_DNS_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "k8s-dns-ip",
-										},
-									},
+									Name:  "K8S_DNS_IP",
+									Value: m.Spec.K8sDnsIp,
 								},
 								{
-									Name: "K8S_DOMAIN",
+									Name:  "K8S_DOMAIN",
 									Value: m.Spec.K8sDomain,
 								},
 								{
-									Name: "K8S_ETCD_DOMAIN_NAME",
+									Name:  "K8S_ETCD_DOMAIN_NAME",
 									Value: m.Spec.K8sETCDdomainName,
 								},
 								{
-									Name: "K8S_ETCD_PREFIX",
+									Name:  "K8S_ETCD_PREFIX",
 									Value: m.Spec.ClusterID,
 								},
 								{
-									Name: "K8S_MASTER_DOMAIN_NAME",
+									Name:  "K8S_MASTER_DOMAIN_NAME",
 									Value: m.Spec.K8sMasterDomainName,
 								},
 								{
-									Name: "K8S_MASTER_PORT",
-									Value: "6443",
+									Name:  "K8S_MASTER_PORT",
+									Value: m.Spec.K8sMasterPort,
 								},
 								{
-									Name: "K8S_MASTER_SERVICE_NAME",
+									Name:  "K8S_MASTER_SERVICE_NAME",
 									Value: m.Spec.K8sMasterServiceName,
 								},
 								{
-									Name: "K8S_NETWORK_SETUP_VERSION",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "k8s-network-setup-version",
-										},
-									},
+									Name:  "K8S_NETWORK_SETUP_VERSION",
+									Value: m.Spec.K8sNetworkSetupVersion,
 								},
 								{
 									Name:  "K8S_NODE_LABELS",
 									Value: m.Spec.K8sNodeLabels,
 								},
 								{
-									Name: "K8S_SECURE_PORT",
-									Value: "6443",
+									Name:  "K8S_SECURE_PORT",
+									Value: m.Spec.K8sSecurePort,
 								},
 								{
-									Name: "K8S_VERSION",
+									Name:  "K8S_VERSION",
 									Value: m.Spec.K8sVersion,
 								},
 								{
-									Name: "MACHINE_MEM",
+									Name:  "MACHINE_MEM",
 									Value: m.Spec.MachineMem,
 								},
 								{
-									Name: "REGISTRY",
+									Name:  "REGISTRY",
 									Value: m.Spec.Registry,
 								},
 								{
@@ -885,7 +838,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name: "CUSTOMER_ID",
+									Name:  "CUSTOMER_ID",
 									Value: m.Spec.Customer,
 								},
 								{

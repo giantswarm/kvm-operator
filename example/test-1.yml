@@ -5,20 +5,49 @@ metadata:
 spec:
   customer: "test-customer"
   clusterId: "test-id"
-  numNodes: 2
-  replicas: 1
+  workerReplicas: 2
+
+  k8sVmVersion: "0.9.13"
+  flannelClientVersion: "v0.6.2"
+  k8sNetworkSetupVersion: "0.1"
+
+  machineMem: "512"
+  machineCPUcores: 2
+
+  ## Networking configuration for flannel client and calico
   clusterVNI: 2
   clusterBackend: "vxlan"
   clusterNetwork: "10.2.0.0/16"
+  calicoSubnet: "192.168.0.0"
+  calicoCidr: "16"
+  k8sCalicoMtu: "1430"
+
   dockerExtraArgs: ""
-  machineMem: "512"
-  machineCPUcores: 2
   registry: ""
   vaultToken: ""
+
+  ## Kubernetes configuration properties
+  k8sClusterIpRange: "172.29.0.0"
+  k8sClusterIpSubnet: "16"
+  k8sMasterPort: "6443"
+  k8sSecurePort: "6443"
+  k8sInsecurePort: "8080"
+  k8sDnsIp: "172.29.0.10"
   k8sAPIaltNames: "kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.test.g8s.giantswarm.fra-1"
   k8sVersion: "1.4.0"
   k8sDomain: "test.giantswarm.fra-1"
   k8sETCDdomainName: "etcd.test.g8s.fra-1.giantswarm.io"
-  k8sMasterDomainName:    "api.test.g8s.fra-1.giantswarm.io"
+  k8sMasterDomainName: "api.test.g8s.fra-1.giantswarm.io"
   k8sMasterServiceName: "test-k8s-master-vm"
-  K8sNodeLabels: ""
+  k8sNodeLabels: ""
+  k8sWorkerServicePort: "4194"
+
+  ## Ingress controller configuration properties
+  kempVsIp: "178.162.217.237"
+  kempVsName: "ingress-controller-test-k8s-gigantic-io"
+  kempVsPorts:  "80"
+  kempVsSslAcceleration: "false"
+  kempRsPort: "30011"
+  kempVsCheckPort: "30010"
+  cloudflareIp: "178.162.217.237"
+  cloudflareDomain: "gigantic.io"

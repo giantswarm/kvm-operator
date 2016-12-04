@@ -31,15 +31,15 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "CLUSTER_VNI",
+					Name:  "CLUSTER_VNI",
 					Value: fmt.Sprintf("%d", f.Spec.ClusterVNI),
 				},
 				{
-					Name: "CLUSTER_NETWORK",
+					Name:  "CLUSTER_NETWORK",
 					Value: f.Spec.ClusterNetwork,
 				},
 				{
-					Name: "CUSTOMER_ID",
+					Name:  "CUSTOMER_ID",
 					Value: f.Spec.Customer,
 				},
 				{
@@ -54,7 +54,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 					},
 				},
 				{
-					Name: "CLUSTER_ID",
+					Name:  "CLUSTER_ID",
 					Value: f.Spec.ClusterID,
 				},
 				{
@@ -67,7 +67,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 					},
 				},
 				{
-					Name: "CLUSTER_BACKEND",
+					Name:  "CLUSTER_BACKEND",
 					Value: f.Spec.ClusterBackend,
 				},
 			},
@@ -122,6 +122,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 		return []runtime.Object{}, maskAny(err)
 	}
 
+	flannelClientReplicas := int32(MasterReplicas) + f.Spec.WorkerReplicas
+
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "deployment",
@@ -139,7 +141,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: "Recreate",
 			},
-			Replicas: &f.Spec.NumNodes,
+			Replicas: &flannelClientReplicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: f.Spec.ClusterID + "flannel-client",
@@ -233,7 +235,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:  "flannel-client",
-							Image: "giantswarm/flannel:v0.6.2",
+							Image: fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelClientVersion),
 							Command: []string{
 								"/bin/sh",
 								"-c",
@@ -241,7 +243,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name: "CUSTOMER_ID",
+									Name:  "CUSTOMER_ID",
 									Value: f.Spec.Customer,
 								},
 								{
@@ -282,7 +284,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name: "CUSTOMER_ID",
+									Name:  "CUSTOMER_ID",
 									Value: f.Spec.Customer,
 								},
 								{
