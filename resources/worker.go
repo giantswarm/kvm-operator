@@ -68,7 +68,7 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:  "generate-bridgeip-configmap",
-			Image: "registry.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -118,7 +118,7 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "kubectl-bridgeip-configmap",
-			Image: "registry.giantswarm.io/giantswarm/kubectl:1.4.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -150,7 +150,7 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "k8s-worker-api-certs",
-			Image: "giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -251,7 +251,7 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "k8s-worker-calico-certs",
-			Image: "giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -330,7 +330,7 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "k8s-worker-etcd-certs",
-			Image: "giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
 			Command: []string{
 				"/bin/sh",
 				"-c",

@@ -69,7 +69,7 @@ func generateInitMasterContainers(namespace string) (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:  "set-iptables",
-			Image: "registry.giantswarm.io/giantswarm/alpine-bash-iptables",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -114,7 +114,7 @@ func generateInitMasterContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "generate-bridgeip-configmap",
-			Image: "registry.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -164,7 +164,7 @@ func generateInitMasterContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "kubectl-bridgeip-configmap",
-			Image: "registry.giantswarm.io/giantswarm/kubectl:1.4.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -196,7 +196,7 @@ func generateInitMasterContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "k8s-master-api-token",
-			Image: "registry.giantswarm.io/giantswarm/alpine-openssl",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-openssl",
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -218,7 +218,7 @@ func generateInitMasterContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "k8s-master-api-certs",
-			Image: "giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -319,7 +319,7 @@ func generateInitMasterContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "k8s-master-calico-certs",
-			Image: "giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -398,7 +398,7 @@ func generateInitMasterContainers(namespace string) (string, error) {
 		},
 		{
 			Name:  "k8s-master-etcd-certs",
-			Image: "giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -1086,7 +1086,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						},
 						{
 							Name:  "watch-master-vm-service",
-							Image: "registry.giantswarm.io/giantswarm/watch-master-vm-service",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/watch-master-vm-service",
 							Command: []string{
 								"/bin/sh",
 								"-c",
