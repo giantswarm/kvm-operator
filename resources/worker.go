@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/giantswarm/clusterspec"
+
 	"github.com/ventu-io/go-shortid"
 
 	"k8s.io/client-go/pkg/api"
@@ -19,7 +21,7 @@ type Worker interface {
 }
 
 type worker struct {
-	Cluster
+	clusterspec.Cluster
 }
 
 func (w *worker) generateWorkerPodAffinity() (string, error) {
@@ -98,7 +100,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "CLUSTER_ID",
-					Value: w.Spec.ClusterID,
+					Value: w.Spec.ClusterId,
 				},
 				{
 					Name:  "NAMESPACE",
@@ -162,22 +164,15 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: w.Spec.K8sMasterServiceName,
+					Value: w.Spec.Certificates.MasterServiceName,
 				},
 				{
 					Name:  "K8S_API_ALT_NAMES",
-					Value: w.Spec.K8sAPIaltNames,
+					Value: w.Spec.Certificates.ApiAltNames,
 				},
 				{
-					Name: "G8S_API_IP",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: GiantnetesConfigMapName,
-							},
-							Key: "g8s-api-ip",
-						},
-					},
+					Name:  "G8S_API_IP",
+					Value: w.Spec.GiantnetesConfiguration.ApiIp,
 				},
 				{
 					Name:  "CUSTOMER_ID",
@@ -185,22 +180,15 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "CLUSTER_ID",
-					Value: w.Spec.ClusterID,
+					Value: w.Spec.ClusterId,
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: w.Spec.VaultToken,
+					Value: w.Spec.Certificates.VaultToken,
 				},
 				{
-					Name: "VAULT_ADDR",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: GiantnetesConfigMapName,
-							},
-							Key: "vault-addr",
-						},
-					},
+					Name:  "VAULT_ADDR",
+					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
 				},
 			},
 		},
@@ -228,7 +216,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: w.Spec.K8sMasterServiceName,
+					Value: w.Spec.Certificates.MasterServiceName,
 				},
 				{
 					Name:  "CUSTOMER_ID",
@@ -236,22 +224,15 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "CLUSTER_ID",
-					Value: w.Spec.ClusterID,
+					Value: w.Spec.ClusterId,
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: w.Spec.VaultToken,
+					Value: w.Spec.Certificates.VaultToken,
 				},
 				{
-					Name: "VAULT_ADDR",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: GiantnetesConfigMapName,
-							},
-							Key: "vault-addr",
-						},
-					},
+					Name:  "VAULT_ADDR",
+					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
 				},
 			},
 		},
@@ -279,7 +260,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: w.Spec.K8sMasterServiceName,
+					Value: w.Spec.Certificates.MasterServiceName,
 				},
 				{
 					Name:  "CUSTOMER_ID",
@@ -287,22 +268,15 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "CLUSTER_ID",
-					Value: w.Spec.ClusterID,
+					Value: w.Spec.ClusterId,
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: w.Spec.VaultToken,
+					Value: w.Spec.Certificates.VaultToken,
 				},
 				{
-					Name: "VAULT_ADDR",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: GiantnetesConfigMapName,
-							},
-							Key: "vault-addr",
-						},
-					},
+					Name:  "VAULT_ADDR",
+					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
 				},
 			},
 		},
@@ -341,7 +315,7 @@ func (w *worker) GenerateResources() ([]runtime.Object, error) {
 }
 
 func (w *worker) GenerateService() (*apiv1.Service, error) {
-	servicePort, err := strconv.ParseInt(w.Spec.K8sWorkerServicePort, 10, 32)
+	servicePort, err := strconv.ParseInt(w.Spec.Worker.WorkerServicePort, 10, 32)
 	if err != nil {
 		return nil, maskAny(err)
 	}
@@ -352,11 +326,11 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterID + "-worker",
+			Name: w.Spec.ClusterId + "-worker",
 			Labels: map[string]string{
-				"cluster-id": w.Spec.ClusterID,
-				"role":       w.Spec.ClusterID + "-worker",
-				"app":        w.Spec.ClusterID + "-k8s-cluster",
+				"cluster-id": w.Spec.ClusterId,
+				"role":       w.Spec.ClusterId + "-worker",
+				"app":        w.Spec.ClusterId + "-k8s-cluster",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -369,7 +343,7 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 				},
 			},
 			Selector: map[string]string{
-				"app":  w.Spec.ClusterID + "-k8s-cluster",
+				"app":  w.Spec.ClusterId + "-k8s-cluster",
 				"role": "worker",
 			},
 		},
@@ -398,10 +372,10 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterID + "-worker",
+			Name: w.Spec.ClusterId + "-worker",
 			Labels: map[string]string{
-				"cluster-id": w.Spec.ClusterID,
-				"role":       w.Spec.ClusterID + "-worker",
+				"cluster-id": w.Spec.ClusterId,
+				"role":       w.Spec.ClusterId + "-worker",
 				"app":        "k8s-cluster",
 			},
 		},
@@ -409,13 +383,13 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: "Recreate",
 			},
-			Replicas: &w.Spec.WorkerReplicas,
+			Replicas: &w.Spec.Worker.Replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					Name: w.Spec.ClusterID + "-worker",
+					Name: w.Spec.ClusterId + "-worker",
 					Labels: map[string]string{
-						"cluster-id": w.Spec.ClusterID,
-						"role":       w.Spec.ClusterID + "-worker",
+						"cluster-id": w.Spec.ClusterId,
+						"role":       w.Spec.ClusterId + "-worker",
 						"app":        "k8s-cluster",
 					},
 					Annotations: map[string]string{
@@ -430,7 +404,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "customer-dir",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/",
 								},
 							},
 						},
@@ -438,7 +412,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/" + workerId + "/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/",
 								},
 							},
 						},
@@ -446,7 +420,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/" + workerId + "/calico/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/calico/",
 								},
 							},
 						},
@@ -454,7 +428,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/" + workerId + "/etcd/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/etcd/",
 								},
 							},
 						},
@@ -462,7 +436,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "bridge-ip-configmap",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/",
 								},
 							},
 						},
@@ -478,7 +452,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/vms/" + w.Spec.ClusterID + "-" + workerId + "/",
+									Path: "/home/core/vms/" + w.Spec.ClusterId + "-" + workerId + "/",
 								},
 							},
 						},
@@ -494,7 +468,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/" + workerId + "/",
+									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/",
 								},
 							},
 						},
@@ -509,7 +483,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "BRIDGE_NETWORK",
-									Value: "br" + w.Spec.ClusterID,
+									Value: "br" + w.Spec.ClusterId,
 								},
 								{
 									Name:  "CUSTOMER_ID",
@@ -517,33 +491,19 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",
-									Value: w.Spec.DockerExtraArgs,
+									Value: w.Spec.Worker.DockerExtraArgs,
 								},
 								{
-									Name: "G8S_DNS_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "g8s-dns-ip",
-										},
-									},
+									Name:  "G8S_DNS_IP",
+									Value: w.Spec.GiantnetesConfiguration.DnsIp,
 								},
 								{
-									Name: "G8S_DOMAIN",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "g8s-domain",
-										},
-									},
+									Name:  "G8S_DOMAIN",
+									Value: w.Spec.GiantnetesConfiguration.Domain,
 								},
 								{
 									Name:  "HOSTNAME",
-									Value: w.Spec.ClusterID + "-k8svm-" + workerId,
+									Value: w.Spec.ClusterId + "-k8svm-" + workerId,
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
@@ -555,80 +515,71 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									},
 								},
 								{
-									Name:  "IP_BRIDGE",
-									Value: "",
+									Name: "IP_BRIDGE",
+									ValueFrom: &apiv1.EnvVarSource{
+										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
+											LocalObjectReference: apiv1.LocalObjectReference{
+												Name: "bridge-ip-configmap-worker-vm",
+											},
+											Key: "bridge-ip",
+										},
+									},
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
-									Value: w.Spec.K8sInsecurePort,
+									Value: w.Spec.Worker.InsecurePort,
 								},
 								{
 									Name:  "K8S_CALICO_MTU",
-									Value: w.Spec.K8sCalicoMtu,
+									Value: w.Spec.Worker.K8sCalicoMtu,
 								},
 								{
 									Name:  "MACHINE_CPU_CORES",
-									Value: fmt.Sprintf("%d", w.Spec.MachineCPUcores),
+									Value: fmt.Sprintf("%d", w.Spec.Worker.Capabilities.CpuCores),
 								},
 								{
 									Name:  "K8S_DNS_IP",
-									Value: w.Spec.K8sDnsIp,
+									Value: w.Spec.Worker.DnsIp,
 								},
 								{
 									Name:  "K8S_DOMAIN",
-									Value: w.Spec.K8sDomain,
+									Value: w.Spec.Worker.Domain,
 								},
 								{
 									Name:  "K8S_ETCD_DOMAIN_NAME",
-									Value: w.Spec.K8sETCDdomainName,
-								},
-								{
-									Name:  "K8S_ETCD_PREFIX",
-									Value: w.Spec.ClusterID,
+									Value: w.Spec.Worker.EtcdDomainName,
 								},
 								{
 									Name:  "K8S_MASTER_DOMAIN_NAME",
-									Value: w.Spec.K8sMasterDomainName,
+									Value: w.Spec.Worker.MasterDomainName,
 								},
 								{
 									Name:  "K8S_MASTER_PORT",
-									Value: w.Spec.K8sMasterPort,
+									Value: w.Spec.Worker.MasterPort,
 								},
 								{
 									Name:  "K8S_MASTER_SERVICE_NAME",
-									Value: w.Spec.K8sMasterServiceName,
+									Value: w.Spec.Certificates.MasterServiceName,
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_VERSION",
-									Value: w.Spec.K8sNetworkSetupVersion,
-								},
-								{
-									Name:  "K8S_NODE_LABELS",
-									Value: w.Spec.K8sNodeLabels,
+									Value: w.Spec.Worker.NetworkSetupVersion,
 								},
 								{
 									Name:  "K8S_SECURE_PORT",
-									Value: w.Spec.K8sSecurePort,
-								},
-								{
-									Name:  "K8S_VERSION",
-									Value: w.Spec.K8sVersion,
+									Value: w.Spec.Worker.SecurePort,
 								},
 								{
 									Name:  "MACHINE_MEM",
-									Value: w.Spec.MachineMem,
+									Value: w.Spec.Worker.Capabilities.Memory,
 								},
 								{
 									Name:  "REGISTRY",
-									Value: w.Spec.Registry,
-								},
-								{
-									Name:  "DOCKER_EXTRA_ARGS",
-									Value: w.Spec.DockerExtraArgs,
+									Value: w.Spec.Worker.Registry,
 								},
 								{
 									Name:  "K8S_NODE_LABELS",
-									Value: w.Spec.K8sNodeLabels,
+									Value: w.Spec.Worker.NodeLabels,
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{

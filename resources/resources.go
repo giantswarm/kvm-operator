@@ -5,14 +5,15 @@ import (
 	"log"
 	"time"
 
+	"github.com/giantswarm/clusterspec"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"k8s.io/client-go/pkg/runtime"
 )
 
 const (
-	GiantnetesConfigMapName string = "g8s-configmap"
-	MasterReplicas          int32  = 1
+	MasterReplicas int32 = 1
 )
 
 var (
@@ -43,11 +44,11 @@ type ClusterObj interface {
 
 // computeResources returns a list of Kubernetes objects that define
 // the desired state of the given cluster.
-func ComputeResources(cluster *Cluster) ([]runtime.Object, error) {
-	if cluster.Spec.ClusterID == "" {
+func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
+	if cluster.Spec.ClusterId == "" {
 		return nil, errors.New("cluster ID must not be empty")
 	}
-	if cluster.Spec.WorkerReplicas == int32(0) {
+	if cluster.Spec.Worker.Replicas == int32(0) {
 		return nil, errors.New("worker replicas must not be empty")
 	}
 

@@ -4,6 +4,8 @@ import (
 	//"reflect"
 	"log"
 	"testing"
+
+	"github.com/giantswarm/clusterspec"
 )
 
 func TestComponent_Creation(t *testing.T) {
@@ -12,8 +14,8 @@ func TestComponent_Creation(t *testing.T) {
 	// Worker: Deployment, service
 	expectedObjects := 8
 
-	cluster := &Cluster{
-		Spec: ClusterSpec{
+	cluster := &clusterspec.Cluster{
+		Spec: clusterspec.ClusterSpec{
 			Customer:  "test",
 			ClusterID: "test",
 			Replicas:  int32(1),

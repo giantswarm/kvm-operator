@@ -1,5 +1,5 @@
 hash: 5ceade22136ed885b83f4214b151f5e9d14e0739bdb745317538c1acb9763f19
-updated: 2016-12-04T19:10:36.707573286+01:00
+updated: 2016-12-06T16:48:17.598171973+01:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -42,6 +42,8 @@ imports:
   - swagger
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/giantswarm/clusterspec
+  version: c659a01016484ecb17637e85a01a1988e9d5440f
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference

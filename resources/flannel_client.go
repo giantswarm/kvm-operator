@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/giantswarm/clusterspec"
+
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -16,7 +18,7 @@ type FlannelClient interface {
 }
 
 type flannelClient struct {
-	Cluster
+	clusterspec.Cluster
 }
 
 func (f *flannelClient) generateInitFlannelContainers() (string, error) {
@@ -32,30 +34,23 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "CLUSTER_VNI",
-					Value: fmt.Sprintf("%d", f.Spec.ClusterVNI),
+					Value: fmt.Sprintf("%d", f.Spec.FlannelConfiguration.ClusterVni),
 				},
 				{
 					Name:  "CLUSTER_NETWORK",
-					Value: f.Spec.ClusterNetwork,
+					Value: f.Spec.FlannelConfiguration.ClusterNetwork,
 				},
 				{
 					Name:  "CUSTOMER_ID",
 					Value: f.Spec.Customer,
 				},
 				{
-					Name: "ETCD_PORT",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: GiantnetesConfigMapName,
-							},
-							Key: "etcd-port",
-						},
-					},
+					Name:  "ETCD_PORT",
+					Value: f.Spec.GiantnetesConfiguration.EtcdPort,
 				},
 				{
 					Name:  "CLUSTER_ID",
-					Value: f.Spec.ClusterID,
+					Value: f.Spec.ClusterId,
 				},
 				{
 					Name: "ETCD_ENDPOINT",
@@ -68,7 +63,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 				},
 				{
 					Name:  "CLUSTER_BACKEND",
-					Value: f.Spec.ClusterBackend,
+					Value: f.Spec.FlannelConfiguration.ClusterBackend,
 				},
 			},
 		},
@@ -91,7 +86,7 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 							{
 								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{f.Spec.ClusterID + "-flannel-client"},
+								Values:   []string{f.Spec.ClusterId + "-flannel-client"},
 							},
 						},
 					},
@@ -122,7 +117,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 		return []runtime.Object{}, maskAny(err)
 	}
 
-	flannelClientReplicas := int32(MasterReplicas) + f.Spec.WorkerReplicas
+	flannelClientReplicas := int32(MasterReplicas) + f.Spec.Worker.Replicas
 
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -130,11 +125,11 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: f.Spec.ClusterID + "-flannel-client",
+			Name: f.Spec.ClusterId + "-flannel-client",
 			Labels: map[string]string{
-				"cluster-id": f.Spec.ClusterID,
-				"role":       f.Spec.ClusterID + "-flannel-client",
-				"app":        f.Spec.ClusterID + "-k8s-cluster",
+				"cluster-id": f.Spec.ClusterId,
+				"role":       f.Spec.ClusterId + "-flannel-client",
+				"app":        f.Spec.ClusterId + "-k8s-cluster",
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -144,11 +139,11 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			Replicas: &flannelClientReplicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					GenerateName: f.Spec.ClusterID + "flannel-client",
+					GenerateName: f.Spec.ClusterId + "flannel-client",
 					Labels: map[string]string{
-						"cluster-id": f.Spec.ClusterID,
-						"role":       f.Spec.ClusterID + "-flannel-client",
-						"app":        f.Spec.ClusterID + "-k8s-cluster",
+						"cluster-id": f.Spec.ClusterId,
+						"role":       f.Spec.ClusterId + "-flannel-client",
+						"app":        f.Spec.ClusterId + "-k8s-cluster",
 					},
 					Annotations: map[string]string{
 						"seccomp.security.alpha.kubernetes.io/pod": "unconfined",
@@ -235,7 +230,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:  "flannel-client",
-							Image: fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelClientVersion),
+							Image: fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
 							Command: []string{
 								"/bin/sh",
 								"-c",
@@ -288,26 +283,12 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 									Value: f.Spec.Customer,
 								},
 								{
-									Name: "HOST_SUBNET_RANGE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "host-subnet-range",
-										},
-									},
+									Name:  "HOST_SUBNET_RANGE",
+									Value: f.Spec.GiantnetesConfiguration.HostSubnetRange,
 								},
 								{
-									Name: "NETWORK_INTERFACE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: GiantnetesConfigMapName,
-											},
-											Key: "network-interface",
-										},
-									},
+									Name:  "NETWORK_INTERFACE",
+									Value: f.Spec.GiantnetesConfiguration.NetworkInterface,
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
