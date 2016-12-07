@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/cluster-controller/resources"
+	"github.com/giantswarm/clusterspec"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -130,7 +131,7 @@ func (c *controller) newClusterListWatch() *cache.ListWatch {
 				return nil, err
 			}
 
-			var c resources.ClusterList
+			var c clusterspec.ClusterList
 			if err := json.Unmarshal(b, &c); err != nil {
 				return nil, err
 			}
@@ -174,14 +175,14 @@ func (c *controller) Start() {
 
 	_, clusterInformer := cache.NewInformer(
 		c.newClusterListWatch(),
-		&resources.Cluster{},
+		&clusterspec.Cluster{},
 		0,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				start := time.Now()
 				clusterEventHandleTotal.WithLabelValues("added").Inc()
 
-				cluster := obj.(*resources.Cluster)
+				cluster := obj.(*clusterspec.Cluster)
 				log.Printf("cluster '%v' added", cluster.Name)
 
 				if err := c.createClusterNamespace(*cluster); err != nil {
@@ -206,7 +207,7 @@ func (c *controller) Start() {
 				start := time.Now()
 				clusterEventHandleTotal.WithLabelValues("deleted").Inc()
 
-				cluster := obj.(*resources.Cluster)
+				cluster := obj.(*clusterspec.Cluster)
 				log.Printf("cluster '%v' deleted", cluster.Name)
 
 				if err := c.deleteClusterNamespace(*cluster); err != nil {

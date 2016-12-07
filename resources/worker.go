@@ -2,6 +2,13 @@ package resources
 
 import (
 	"encoding/json"
+	"fmt"
+	"path/filepath"
+	"strconv"
+
+	"github.com/giantswarm/clusterspec"
+
+	"github.com/ventu-io/go-shortid"
 
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
@@ -15,10 +22,10 @@ type Worker interface {
 }
 
 type worker struct {
-	Cluster
+	clusterspec.Cluster
 }
 
-func generateWorkerPodAffinity(clusterId string) (string, error) {
+func (w *worker) generateWorkerPodAffinity() (string, error) {
 	podAffinity := &api.Affinity{
 		PodAntiAffinity: &api.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
@@ -28,7 +35,7 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 							{
 								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{clusterId + "-master"},
+								Values:   []string{w.Name + "-master"},
 							},
 						},
 					},
@@ -44,7 +51,7 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 							{
 								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{clusterId + "-flannel-client"},
+								Values:   []string{w.Name + "-flannel-client"},
 							},
 						},
 					},
@@ -62,7 +69,7 @@ func generateWorkerPodAffinity(clusterId string) (string, error) {
 	return string(bytesPodAffinity), nil
 }
 
-func generateInitWorkerContainers(namespace string) (string, error) {
+func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 	privileged := true
 
 	initContainers := []apiv1.Container{
@@ -89,30 +96,16 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 					Value: "worker-vm",
 				},
 				{
-					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Name:  "CUSTOMER_ID",
+					Value: w.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Name:  "CLUSTER_ID",
+					Value: w.Spec.ClusterId,
 				},
 				{
 					Name:  "NAMESPACE",
-					Value: namespace,
+					Value: w.Name,
 				},
 			},
 		},
@@ -154,7 +147,7 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/worker-1/worker.pem --key-file=/etc/kubernetes/ssl/worker-1/worker-key.pem --ca-file=/etc/kubernetes/ssl/worker-1/worker-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME,$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/" + workerId + "/worker.pem --key-file=/etc/kubernetes/ssl/" + workerId + "/worker-key.pem --ca-file=/etc/kubernetes/ssl/" + workerId + "/worker-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME,$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -163,7 +156,7 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 				},
 				{
 					Name:      "api-certs",
-					MountPath: "/etc/kubernetes/ssl/worker-1/",
+					MountPath: filepath.Join("/etc/kubernetes/ssl/", workerId, "/"),
 				},
 			},
 			SecurityContext: &apiv1.SecurityContext{
@@ -171,81 +164,32 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "K8S_MASTER_SERVICE_NAME",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-master-service-name",
-						},
-					},
+					Name:  "K8S_MASTER_SERVICE_NAME",
+					Value: w.Spec.Certificates.MasterServiceName,
 				},
 				{
-					Name: "K8S_API_ALT_NAMES",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-api-alt-names",
-						},
-					},
+					Name:  "K8S_API_ALT_NAMES",
+					Value: w.Spec.Certificates.ApiAltNames,
 				},
 				{
-					Name: "G8S_API_IP",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "g8s-api-ip",
-						},
-					},
+					Name:  "G8S_API_IP",
+					Value: w.Spec.GiantnetesConfiguration.ApiIp,
 				},
 				{
-					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Name:  "CUSTOMER_ID",
+					Value: w.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Name:  "CLUSTER_ID",
+					Value: w.Spec.ClusterId,
 				},
 				{
-					Name: "VAULT_TOKEN",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-token",
-						},
-					},
+					Name:  "VAULT_TOKEN",
+					Value: w.Spec.Certificates.VaultToken,
 				},
 				{
-					Name: "VAULT_ADDR",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-addr",
-						},
-					},
+					Name:  "VAULT_ADDR",
+					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
 				},
 			},
 		},
@@ -272,59 +216,24 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "K8S_MASTER_SERVICE_NAME",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-master-service-name",
-						},
-					},
+					Name:  "K8S_MASTER_SERVICE_NAME",
+					Value: w.Spec.Certificates.MasterServiceName,
 				},
 				{
-					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Name:  "CUSTOMER_ID",
+					Value: w.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Name:  "CLUSTER_ID",
+					Value: w.Spec.ClusterId,
 				},
 				{
-					Name: "VAULT_TOKEN",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-token",
-						},
-					},
+					Name:  "VAULT_TOKEN",
+					Value: w.Spec.Certificates.VaultToken,
 				},
 				{
-					Name: "VAULT_ADDR",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-addr",
-						},
-					},
+					Name:  "VAULT_ADDR",
+					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
 				},
 			},
 		},
@@ -351,59 +260,24 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name: "K8S_MASTER_SERVICE_NAME",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "k8s-master-service-name",
-						},
-					},
+					Name:  "K8S_MASTER_SERVICE_NAME",
+					Value: w.Spec.Certificates.MasterServiceName,
 				},
 				{
-					Name: "CUSTOMER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "customer-id",
-						},
-					},
+					Name:  "CUSTOMER_ID",
+					Value: w.Spec.Customer,
 				},
 				{
-					Name: "CLUSTER_ID",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "cluster-id",
-						},
-					},
+					Name:  "CLUSTER_ID",
+					Value: w.Spec.ClusterId,
 				},
 				{
-					Name: "VAULT_TOKEN",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-token",
-						},
-					},
+					Name:  "VAULT_TOKEN",
+					Value: w.Spec.Certificates.VaultToken,
 				},
 				{
-					Name: "VAULT_ADDR",
-					ValueFrom: &apiv1.EnvVarSource{
-						ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-							LocalObjectReference: apiv1.LocalObjectReference{
-								Name: "configmap",
-							},
-							Key: "vault-addr",
-						},
-					},
+					Name:  "VAULT_ADDR",
+					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
 				},
 			},
 		},
@@ -420,14 +294,19 @@ func generateInitWorkerContainers(namespace string) (string, error) {
 func (w *worker) GenerateResources() ([]runtime.Object, error) {
 	objects := []runtime.Object{}
 
-	deployment, err := w.GenerateDeployment()
+	workerId, err := generateWorkerId()
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
+	}
+
+	deployment, err := w.GenerateDeployment(workerId)
+	if err != nil {
+		return nil, maskAny(err)
 	}
 
 	service, err := w.GenerateService()
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	objects = append(objects, deployment)
@@ -437,17 +316,22 @@ func (w *worker) GenerateResources() ([]runtime.Object, error) {
 }
 
 func (w *worker) GenerateService() (*apiv1.Service, error) {
+	servicePort, err := strconv.ParseInt(w.Spec.Worker.WorkerServicePort, 10, 32)
+	if err != nil {
+		return nil, maskAny(err)
+	}
+
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterID + "-worker",
+			Name: w.Spec.ClusterId + "-worker",
 			Labels: map[string]string{
-				"cluster-id": w.Spec.ClusterID,
-				"role":       w.Spec.ClusterID + "-worker",
-				"app":        w.Spec.ClusterID + "-k8s-cluster",
+				"cluster-id": w.Spec.ClusterId,
+				"role":       w.Spec.ClusterId + "-worker",
+				"app":        w.Spec.ClusterId + "-k8s-cluster",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -455,12 +339,12 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "http",
-					Port:     int32(4194), // TODO why not port 80?
+					Port:     int32(servicePort),
 					Protocol: "TCP",
 				},
 			},
 			Selector: map[string]string{
-				"app":  w.Spec.ClusterID + "-k8s-cluster",
+				"app":  w.Spec.ClusterId + "-k8s-cluster",
 				"role": "worker",
 			},
 		},
@@ -470,15 +354,15 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 
 }
 
-func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
+func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, error) {
 	privileged := true
 
-	initContainers, err := generateInitWorkerContainers(w.Name)
+	initContainers, err := w.generateInitWorkerContainers(workerId)
 	if err != nil {
 		return nil, maskAny(err)
 	}
 
-	podAffinity, err := generateWorkerPodAffinity(w.Spec.ClusterID)
+	podAffinity, err := w.generateWorkerPodAffinity()
 	if err != nil {
 		return nil, maskAny(err)
 	}
@@ -489,10 +373,10 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterID + "-worker",
+			Name: w.Spec.ClusterId + "-worker",
 			Labels: map[string]string{
-				"cluster-id": w.Spec.ClusterID,
-				"role":       w.Spec.ClusterID + "-worker",
+				"cluster-id": w.Spec.ClusterId,
+				"role":       w.Spec.ClusterId + "-worker",
 				"app":        "k8s-cluster",
 			},
 		},
@@ -500,13 +384,13 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: "Recreate",
 			},
-			Replicas: &w.Spec.Replicas,
+			Replicas: &w.Spec.Worker.Replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					Name: w.Spec.ClusterID + "-worker",
+					Name: w.Spec.ClusterId + "-worker",
 					Labels: map[string]string{
-						"cluster-id": w.Spec.ClusterID,
-						"role":       w.Spec.ClusterID + "-worker",
+						"cluster-id": w.Spec.ClusterId,
+						"role":       w.Spec.ClusterId + "-worker",
 						"app":        "k8s-cluster",
 					},
 					Annotations: map[string]string{
@@ -521,7 +405,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "customer-dir",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
 								},
 							},
 						},
@@ -529,7 +413,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/"),
 								},
 							},
 						},
@@ -537,7 +421,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/calico/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/calico/"),
 								},
 							},
 						},
@@ -545,7 +429,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/etcd/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/etcd/"),
 								},
 							},
 						},
@@ -553,7 +437,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "bridge-ip-configmap",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
 								},
 							},
 						},
@@ -569,7 +453,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/vms/" + w.Spec.ClusterID + "-worker-1/",
+									Path: filepath.Join("/home/core/vms/", w.Spec.ClusterId, "-", workerId, "/"),
 								},
 							},
 						},
@@ -585,7 +469,7 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterID + "/" + w.Spec.ClusterID + "/ssl/worker-1/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/"),
 								},
 							},
 						},
@@ -593,62 +477,34 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:  "vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.13",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:" + w.Spec.K8sVmVersion,
 							Args: []string{
 								"worker",
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name: "BRIDGE_NETWORK",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "bridge-network",
-										},
-									},
+									Name:  "BRIDGE_NETWORK",
+									Value: "br" + w.Spec.ClusterId,
 								},
 								{
-									Name: "CUSTOMER_ID",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "customer-id",
-										},
-									},
+									Name:  "CUSTOMER_ID",
+									Value: w.Spec.Customer,
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",
-									Value: "",
+									Value: w.Spec.Worker.DockerExtraArgs,
 								},
 								{
-									Name: "G8S_DNS_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "g8s-dns-ip",
-										},
-									},
+									Name:  "G8S_DNS_IP",
+									Value: w.Spec.GiantnetesConfiguration.DnsIp,
 								},
 								{
-									Name: "G8S_DOMAIN",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "g8s-domain",
-										},
-									},
+									Name:  "G8S_DOMAIN",
+									Value: w.Spec.GiantnetesConfiguration.Domain,
 								},
 								{
 									Name:  "HOSTNAME",
-									Value: w.Spec.ClusterID + "-k8svm-worker-1",
+									Value: w.Spec.ClusterId + "-k8svm-" + workerId,
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
@@ -660,199 +516,71 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									},
 								},
 								{
-									Name:  "IP_BRIDGE",
-									Value: "",
-								},
-								{
-									Name: "K8S_INSECURE_PORT",
+									Name: "IP_BRIDGE",
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
+												Name: "bridge-ip-configmap-worker-vm",
 											},
-											Key: "k8s-insecure-port",
+											Key: "bridge-ip",
 										},
 									},
 								},
 								{
-									Name: "K8S_CALICO_MTU",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-calico-mtu",
-										},
-									},
+									Name:  "K8S_INSECURE_PORT",
+									Value: w.Spec.Worker.InsecurePort,
 								},
 								{
-									Name: "MACHINE_CPU_CORES",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "machine-cpu-cores",
-										},
-									},
+									Name:  "K8S_CALICO_MTU",
+									Value: w.Spec.Worker.K8sCalicoMtu,
 								},
 								{
-									Name: "K8S_DNS_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-dns-ip",
-										},
-									},
+									Name:  "MACHINE_CPU_CORES",
+									Value: fmt.Sprintf("%d", w.Spec.Worker.Capabilities.CpuCores),
 								},
 								{
-									Name: "K8S_DOMAIN",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-domain",
-										},
-									},
+									Name:  "K8S_DNS_IP",
+									Value: w.Spec.Worker.DnsIp,
 								},
 								{
-									Name: "K8S_ETCD_DOMAIN_NAME",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-etcd-domain-name",
-										},
-									},
+									Name:  "K8S_DOMAIN",
+									Value: w.Spec.Worker.Domain,
 								},
 								{
-									Name: "K8S_ETCD_PREFIX",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-etcd-prefix",
-										},
-									},
+									Name:  "K8S_ETCD_DOMAIN_NAME",
+									Value: w.Spec.Worker.EtcdDomainName,
 								},
 								{
-									Name: "K8S_MASTER_DOMAIN_NAME",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-master-domain-name",
-										},
-									},
+									Name:  "K8S_MASTER_DOMAIN_NAME",
+									Value: w.Spec.Worker.MasterDomainName,
 								},
 								{
-									Name: "K8S_MASTER_PORT",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-master-port",
-										},
-									},
+									Name:  "K8S_MASTER_PORT",
+									Value: w.Spec.Worker.MasterPort,
 								},
 								{
-									Name: "K8S_MASTER_SERVICE_NAME",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-master-service-name",
-										},
-									},
+									Name:  "K8S_MASTER_SERVICE_NAME",
+									Value: w.Spec.Certificates.MasterServiceName,
 								},
 								{
-									Name: "K8S_NETWORK_SETUP_VERSION",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-network-setup-version",
-										},
-									},
+									Name:  "K8S_NETWORK_SETUP_VERSION",
+									Value: w.Spec.Worker.NetworkSetupVersion,
+								},
+								{
+									Name:  "K8S_SECURE_PORT",
+									Value: w.Spec.Worker.SecurePort,
+								},
+								{
+									Name:  "MACHINE_MEM",
+									Value: w.Spec.Worker.Capabilities.Memory,
+								},
+								{
+									Name:  "REGISTRY",
+									Value: w.Spec.Worker.Registry,
 								},
 								{
 									Name:  "K8S_NODE_LABELS",
-									Value: "",
-								},
-								{
-									Name: "K8S_SECURE_PORT",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-secure-port",
-										},
-									},
-								},
-								{
-									Name: "K8S_VERSION",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-version",
-										},
-									},
-								},
-								{
-									Name: "MACHINE_MEM",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "machine-mem",
-										},
-									},
-								},
-								{
-									Name: "REGISTRY",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "registry",
-										},
-									},
-								},
-								{
-									Name: "DOCKER_EXTRA_ARGS",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "docker-extra-args",
-										},
-									},
-								},
-								{
-									Name: "K8S_NODE_LABELS",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "configmap",
-											},
-											Key: "k8s-node-labels",
-										},
-									},
+									Value: w.Spec.Worker.NodeLabels,
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
@@ -884,4 +612,12 @@ func (w *worker) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	}
 
 	return deployment, nil
+}
+
+func generateWorkerId() (string, error) {
+	sid := shortid.GetDefault()
+
+	id, err := sid.Generate()
+
+	return "worker-" + id, err
 }
