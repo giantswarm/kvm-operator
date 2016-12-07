@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/giantswarm/cluster-controller/resources"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"k8s.io/client-go/pkg/api/errors"
@@ -34,11 +36,14 @@ func init() {
 	prometheus.MustRegister(namespaceActionTime)
 }
 
-func getNamespaceNameForCluster(cluster Cluster) string {
-	return fmt.Sprintf("cluster-%v", cluster.Name)
+func getNamespaceNameForCluster(cluster resources.Cluster) string {
+	// FIXME: I removed the prefix to make work our first version
+	//return fmt.Sprintf("cluster-%v", cluster.Name)
+
+	return fmt.Sprintf("%v", cluster.Name)
 }
 
-func (c *controller) createClusterNamespace(cluster Cluster) error {
+func (c *controller) createClusterNamespace(cluster resources.Cluster) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("create").Inc()
 
@@ -73,7 +78,7 @@ func (c *controller) createClusterNamespace(cluster Cluster) error {
 	return nil
 }
 
-func (c *controller) deleteClusterNamespace(cluster Cluster) error {
+func (c *controller) deleteClusterNamespace(cluster resources.Cluster) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("delete").Inc()
 

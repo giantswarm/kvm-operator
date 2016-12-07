@@ -3,6 +3,8 @@ package controller
 import (
 	"encoding/json"
 
+	"github.com/giantswarm/cluster-controller/resources"
+
 	"k8s.io/client-go/pkg/runtime"
 	"k8s.io/client-go/pkg/watch"
 )
@@ -19,7 +21,7 @@ func (d *clusterDecoder) Close() {
 func (d *clusterDecoder) Decode() (action watch.EventType, object runtime.Object, err error) {
 	var e struct {
 		Type   watch.EventType
-		Object Cluster
+		Object resources.Cluster
 	}
 	if err := d.decoder.Decode(&e); err != nil {
 		return watch.Error, nil, err

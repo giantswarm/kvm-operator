@@ -1,12 +1,8 @@
-package controller
+package resources
 
 import (
 	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/api/v1"
-)
-
-const (
-	ClusterThirdPartyResourceName = "cluster.giantswarm.io"
 )
 
 type ClusterList struct {
@@ -23,7 +19,10 @@ type Cluster struct {
 }
 
 type ClusterSpec struct {
-	Customer string `json:"customer"`
+	Customer  string `json:"customer"`
+	ClusterID string `json:"clusterId"`
+	Replicas  int32  `json:"replicas,omitempty"`
+	NumNodes  int32  `json:"numNodes,omitempty"`
 }
 
 func (c *Cluster) GetObjectKind() unversioned.ObjectKind {
