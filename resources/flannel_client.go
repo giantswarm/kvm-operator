@@ -109,12 +109,12 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 
 	initContainers, err := f.generateInitFlannelContainers()
 	if err != nil {
-		return []runtime.Object{}, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	podAffinity, err := f.generateFlannelPodAffinity()
 	if err != nil {
-		return []runtime.Object{}, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	flannelClientReplicas := int32(MasterReplicas) + f.Spec.Worker.Replicas

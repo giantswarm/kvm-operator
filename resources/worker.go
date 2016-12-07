@@ -296,17 +296,17 @@ func (w *worker) GenerateResources() ([]runtime.Object, error) {
 
 	workerId, err := generateWorkerId()
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	deployment, err := w.GenerateDeployment(workerId)
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	service, err := w.GenerateService()
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	objects = append(objects, deployment)

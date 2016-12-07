@@ -348,12 +348,12 @@ func (m *master) GenerateResources() ([]runtime.Object, error) {
 
 	deployment, err := m.GenerateDeployment()
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	serviceObjects, err := m.GenerateServiceResources()
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	objects = append(objects, deployment)
@@ -380,7 +380,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-master",
+				ServiceName: m.Spec.ClusterId + "-k8s-master",
 				ServicePort: intstr.FromInt(2379),
 			},
 		},
@@ -389,7 +389,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 	objects = append(objects, endpointMasterEtcd)
 	insecurePort, err := strconv.Atoi(m.Spec.Master.InsecurePort)
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	endpointMasterAPIHTTP := &extensionsv1.Ingress{
@@ -407,7 +407,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-master",
+				ServiceName: m.Spec.ClusterId + "-k8s-master",
 				ServicePort: intstr.FromInt(insecurePort),
 			},
 		},
@@ -416,7 +416,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 	objects = append(objects, endpointMasterAPIHTTP)
 	securePort, err := strconv.Atoi(m.Spec.Master.SecurePort)
 	if err != nil {
-		return objects, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	endpointMasterAPIHTTPS := &extensionsv1.Ingress{
@@ -434,7 +434,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-master",
+				ServiceName: m.Spec.ClusterId + "-k8s-master",
 				ServicePort: intstr.FromInt(securePort),
 			},
 		},
