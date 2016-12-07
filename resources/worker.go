@@ -3,6 +3,7 @@ package resources
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"strconv"
 
 	"github.com/giantswarm/clusterspec"
@@ -155,7 +156,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:      "api-certs",
-					MountPath: "/etc/kubernetes/ssl/" + workerId + "/",
+					MountPath: filepath.Join("/etc/kubernetes/ssl/", workerId, "/"),
 				},
 			},
 			SecurityContext: &apiv1.SecurityContext{
@@ -404,7 +405,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "customer-dir",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
 								},
 							},
 						},
@@ -412,7 +413,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/"),
 								},
 							},
 						},
@@ -420,7 +421,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/calico/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/calico/"),
 								},
 							},
 						},
@@ -428,7 +429,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/etcd/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/etcd/"),
 								},
 							},
 						},
@@ -436,7 +437,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "bridge-ip-configmap",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
 								},
 							},
 						},
@@ -452,7 +453,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/vms/" + w.Spec.ClusterId + "-" + workerId + "/",
+									Path: filepath.Join("/home/core/vms/", w.Spec.ClusterId, "-", workerId, "/"),
 								},
 							},
 						},
@@ -468,7 +469,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + w.Spec.ClusterId + "/" + w.Spec.ClusterId + "/ssl/" + workerId + "/",
+									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/"),
 								},
 							},
 						},
@@ -476,7 +477,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					Containers: []apiv1.Container{
 						{
 							Name:  "vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0.9.13",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:" + w.Spec.K8sVmVersion,
 							Args: []string{
 								"worker",
 							},

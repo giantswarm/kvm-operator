@@ -3,6 +3,7 @@ package resources
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"strconv"
 
 	"github.com/giantswarm/clusterspec"
@@ -534,7 +535,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "customer-dir",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + m.Spec.ClusterId + "/" + m.Spec.ClusterId + "/",
+									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/"),
 								},
 							},
 						},
@@ -542,7 +543,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "etcd-data",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/" + m.Spec.ClusterId + "-k8s-master-vm/",
+									Path: filepath.Join("/home/core/", m.Spec.ClusterId, "-k8s-master-vm/"),
 								},
 							},
 						},
@@ -550,7 +551,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "api-secrets",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + m.Spec.ClusterId + "/" + m.Spec.ClusterId + "/master/secrets",
+									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/master/secrets"),
 								},
 							},
 						},
@@ -558,7 +559,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + m.Spec.ClusterId + "/" + m.Spec.ClusterId + "/ssl/master/calico/",
+									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/ssl/master/calico/"),
 								},
 							},
 						},
@@ -566,7 +567,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + m.Spec.ClusterId + "/" + m.Spec.ClusterId + "/ssl/master/etcd/",
+									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/ssl/master/etcd/"),
 								},
 							},
 						},
@@ -582,7 +583,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/home/core/vms/" + m.Spec.ClusterId + "-k8s-master-vm/",
+									Path: filepath.Join("/home/core/vms/", m.Spec.ClusterId, "-k8s-master-vm/"),
 								},
 							},
 						},
@@ -598,7 +599,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/kubernetes/" + m.Spec.ClusterId + "/" + m.Spec.ClusterId + "/ssl/master/",
+									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/ssl/master/"),
 								},
 							},
 						},

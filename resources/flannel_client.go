@@ -267,7 +267,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 						},
 						{
 							Name:            "create-bridge",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge", // TODO: Sort this image out (giantswarm, needs tag)
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge",
 							ImagePullPolicy: apiv1.PullAlways,
 							SecurityContext: &apiv1.SecurityContext{
 								Privileged: &privileged,
