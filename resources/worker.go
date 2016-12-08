@@ -111,7 +111,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:  "kubectl-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + w.Spec.KubectlVersion,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -143,7 +143,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:  "k8s-worker-api-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -195,7 +195,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:  "k8s-worker-calico-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -239,7 +239,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:  "k8s-worker-etcd-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
 			Command: []string{
 				"/bin/sh",
 				"-c",

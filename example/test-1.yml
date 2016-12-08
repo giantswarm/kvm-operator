@@ -6,7 +6,11 @@ spec:
   customer: "test"
   clusterId: "test"
 
-  k8sVmVersion: "0.9.14"
+  k8sVmVersion: "master-2016-12-07-16-20-30"
+  certctlVersion: "0.5.0"
+  kubectlVersion: "1.4.0"
+  pingVersion: "3.3.6"
+  ingressControllerVersion: "0.13.1"
 
   ## Networking configuration for flannel client and calico
   flannelConfiguration:
@@ -23,9 +27,10 @@ spec:
     domain: "g8s.giantswarm.fra-1"
     dnsIp: "172.31.0.10"
     apiIp: "172.31.0.1"
+    cloudflareDomain: "fra-1.giantswarm.io"
 
   certificates:
-    vaultToken: "b59da92b-e162-4cb8-8743-2df528d98c96"
+    vaultToken: "xxxxxxx"
     masterServiceName: "test-k8s-master-vm"
     apiAltNames: "kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.test.g8s.giantswarm.fra-1"
 
@@ -67,11 +72,16 @@ spec:
 
   ingressController:
     ## Ingress controller configuration properties
-    kempVsIp: "178.162.217.237"
-    kempVsName: "ingress-controller-test-k8s-gigantic-io"
+    kempVsIp: "178.162.217.219"
+    kempVsName: "ingress-controller-test-k8s-giantswarm-io"
     kempVsPorts:  "80"
     kempVsSslAcceleration: "false"
-    kempRsPort: "30011"
-    kempVsCheckPort: "30010"
-    cloudflareIp: "178.162.217.237"
+    kempRsPort: "30101"
+    kempVsCheckPort: "30100"
+    kempUser: "ddmmadmin"
+    kempPassword: "xxxxx"
+    kempEndpoint: "https://178.162.217.249:8443/access/"
+    cloudflareIp: "178.162.217.219"
     cloudflareDomain: "gigantic.io"
+    cloudflareToken: "xxxxxxx"
+    cloudflareEmail: "accounts@giantswarm.io"

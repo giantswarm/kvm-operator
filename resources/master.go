@@ -73,37 +73,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:  "set-iptables",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/sbin/iptables -I INPUT -p tcp --match multiport --dports $ETCD_PORT -d ${NODE_IP} -i br${CLUSTER_ID} -j ACCEPT",
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "ETCD_PORT",
-					Value: m.Spec.GiantnetesConfiguration.EtcdPort,
-				},
-				{
-					Name:  "CLUSTER_ID",
-					Value: m.Spec.ClusterId,
-				},
-				{
-					Name: "NODE_IP",
-					ValueFrom: &apiv1.EnvVarSource{
-						FieldRef: &apiv1.ObjectFieldSelector{
-							APIVersion: "v1",
-							FieldPath:  "spec.nodeName",
-						},
-					},
-				},
-			},
-		},
-		{
 			Name:  "generate-bridgeip-configmap",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
 			VolumeMounts: []apiv1.VolumeMount{
@@ -141,7 +110,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:  "kubectl-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -195,7 +164,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:  "k8s-master-api-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -247,7 +216,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:  "k8s-master-calico-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -291,7 +260,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:  "k8s-master-etcd-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:0.5.0",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -330,6 +299,37 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				{
 					Name:  "VAULT_ADDR",
 					Value: m.Spec.GiantnetesConfiguration.VaultAddr,
+				},
+			},
+		},
+		{
+			Name:  "set-iptables",
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
+			Command: []string{
+				"/bin/sh",
+				"-c",
+				"/sbin/iptables -I INPUT -p tcp --match multiport --dports $ETCD_PORT -d ${NODE_IP} -i br${CLUSTER_ID} -j ACCEPT",
+			},
+			SecurityContext: &apiv1.SecurityContext{
+				Privileged: &privileged,
+			},
+			Env: []apiv1.EnvVar{
+				{
+					Name:  "ETCD_PORT",
+					Value: m.Spec.GiantnetesConfiguration.EtcdPort,
+				},
+				{
+					Name:  "CLUSTER_ID",
+					Value: m.Spec.ClusterId,
+				},
+				{
+					Name: "NODE_IP",
+					ValueFrom: &apiv1.EnvVarSource{
+						FieldRef: &apiv1.ObjectFieldSelector{
+							APIVersion: "v1",
+							FieldPath:  "spec.nodeName",
+						},
+					},
 				},
 			},
 		},
