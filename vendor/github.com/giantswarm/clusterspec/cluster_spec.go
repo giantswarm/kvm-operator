@@ -4,7 +4,12 @@ type ClusterSpec struct {
 	Customer  string `json:"customer"`
 	ClusterId string `json:"clusterId"`
 
-	K8sVmVersion string `json:"k8sVmVersion"`
+	K8sVmVersion             string `json:"k8sVmVersion"`
+	CertctlVersion           string `json:"certctlVersion"`
+	PingVersion              string `json:"pingVersion"`
+	IngressControllerVersion string `json:"ingressControllerVersion"`
+	// Kubectl is used in the master/worker to allow dynamic updates creating configmaps
+	KubectlVersion string `json:"kubectlVersion"`
 
 	FlannelConfiguration FlannelConfiguration `json::"flannelConfiguration"`
 
@@ -16,8 +21,6 @@ type ClusterSpec struct {
 	IngressController IngressController `json:"ingressController"`
 
 	GiantnetesConfiguration GiantnetesConfiguration `json:"giantnetesConfiguration"`
-
-	KubernetesConfig Kubernetes `json:"kubernetesConfiguration"`
 }
 
 type GiantnetesConfiguration struct {
@@ -43,9 +46,14 @@ type IngressController struct {
 	KempVsPorts           string `json:"kempVsPorts"`
 	KempVsSslAcceleration string `json:"kempVsSslAcceleration"`
 	KempRsPort            string `json:"kempRsPort"`
+	KempUser              string `json:"kempUser"`
+	KempEndpoint          string `json:"kempEndpoint"`
+	KempPassword          string `json:"kempPassword"`
 	KempVsCheckPort       string `json:"kempVsCheckPort"`
 	CloudflareIp          string `json:"cloudflareIp"`
 	CloudflareDomain      string `json:"cloudflareDomain"`
+	CloudflareToken       string `json:"cloudflareToken"`
+	CloudflareEmail       string `json:"cloudflareEmail"`
 }
 
 type Certificates struct {
