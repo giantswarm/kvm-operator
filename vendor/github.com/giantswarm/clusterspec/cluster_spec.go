@@ -31,6 +31,7 @@ type GiantnetesConfiguration struct {
 	ApiIp            string `json:"apiIp"`
 	Domain           string `json:"domain"`
 	VaultAddr        string `json:"vaultAddr"`
+	CloudflareDomain string `json:"cloudflareDomain"`
 }
 
 type FlannelConfiguration struct {

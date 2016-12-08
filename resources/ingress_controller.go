@@ -123,15 +123,8 @@ func (i *ingressController) generateInitIngressControllerContainers() (string, e
 }
 
 func (i *ingressController) GenerateService() (*apiv1.Service, error) {
-	ingressPort, err := strconv.ParseInt(3080, 10, 32)
-	if err != nil {
-		return nil, maskAny(err)
-	}
-
-  pingPort, err := strconv.ParseInt(80, 10, 32)
-  if err != nil {
-    return nil, maskAny(err)
-  }
+	ingressPort := 3080
+	pingPort := 80
 
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -139,33 +132,34 @@ func (i *ingressController) GenerateService() (*apiv1.Service, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterId + "-ingress-controller",
+			Name: i.Spec.ClusterId + "-ingress-controller",
 			Labels: map[string]string{
-				"cluster-id": w.Spec.ClusterId,
-				"app":        w.Spec.ClusterId + "-k8s-cluster",
+				"cluster-id": i.Spec.ClusterId,
+				"app":        "k8s-cluster",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
 			Type: apiv1.ServiceType("NodePort"),
 			Ports: []apiv1.ServicePort{
 				{
-					Name:     "http-health",
-					Port:     int32(pingPort),
-          NodePort: int32(30100),
-					Protocol: "TCP",
+					Name:       "http-health",
+					Port:       int32(pingPort),
+					NodePort:   int32(30100),
+					Protocol:   "TCP",
 					TargetPort: intstr.FromInt(80),
 				},
-        {
-          Name:     "http-haproxy",
-          Port:     int32(ingressPort),
-          Protocol: "TCP",
+				{
+					Name:       "http-haproxy",
+					Port:       int32(ingressPort),
+					Protocol:   "TCP",
 					TargetPort: intstr.FromInt(3080),
-          NodePort: int32(30101),
-        },
+					NodePort:   int32(30101),
+				},
 			},
 			Selector: map[string]string{
-				"app":  w.Spec.ClusterId + "-k8s-cluster",
-				"role": "worker",
+				"cluster-id": i.Spec.ClusterId,
+				"app":        "k8s-cluster",
+				"role":       "ingress-controller",
 			},
 		},
 	}
@@ -212,6 +206,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 			Labels: map[string]string{
 				"cluster-id": i.Spec.ClusterId,
 				"app":        "k8s-cluster",
+				"role":       "ingress-controller",
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -225,6 +220,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 					Labels: map[string]string{
 						"cluster-id": i.Spec.ClusterId,
 						"app":        "k8s-cluster",
+						"role":       "ingress-controller",
 					},
 					Annotations: map[string]string{
 						"pod.beta.kubernetes.io/init-containers": initContainers,
@@ -375,7 +371,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "KUBERNETES_BASE_DOMAIN",
-									Value: "fra-1.giantswarm.io",
+									Value: i.Spec.GiantnetesConfiguration.CloudflareDomain,
 								},
 								{
 									Name:  "K8S_MASTER_DOMAIN_NAME",
