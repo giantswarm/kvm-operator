@@ -211,7 +211,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 		},
 		Spec: extensionsv1.DeploymentSpec{
 			Strategy: extensionsv1.DeploymentStrategy{
-				Type: "Recreate",
+				Type: "RollingUpdate",
 			},
 			Replicas: &replicas,
 			Template: apiv1.PodTemplateSpec{

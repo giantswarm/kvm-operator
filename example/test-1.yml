@@ -10,7 +10,7 @@ spec:
   certctlVersion: "0.5.0"
   kubectlVersion: "1.4.0"
   pingVersion: "3.3.6"
-  ingressControllerVersion: "0.13.0"
+  ingressControllerVersion: "0.13.1"
 
   ## Networking configuration for flannel client and calico
   flannelConfiguration:
