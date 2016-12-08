@@ -30,7 +30,7 @@ spec:
     cloudflareDomain: "fra-1.giantswarm.io"
 
   certificates:
-    vaultToken: "b59da92b-e162-4cb8-8743-2df528d98c96"
+    vaultToken: "xxxxxxx"
     masterServiceName: "test-k8s-master-vm"
     apiAltNames: "kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.test.g8s.giantswarm.fra-1"
 
