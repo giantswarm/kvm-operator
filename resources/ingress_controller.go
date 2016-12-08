@@ -176,7 +176,13 @@ func (i *ingressController) GenerateResources() ([]runtime.Object, error) {
 		return nil, maskAny(err)
 	}
 
+	service, err := i.GenerateService()
+	if err != nil {
+		return nil, maskAny(err)
+	}
+
 	objects = append(objects, deployment)
+	objects = append(objects, service)
 
 	return objects, nil
 }
@@ -309,6 +315,14 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 								{
 									Name:  "KEMP_VS_NAME",
 									Value: i.Spec.IngressController.KempVsName,
+								},
+								{
+									Name:  "KEMP_RS_PORT",
+									Value: i.Spec.IngressController.KempRsPort,
+								},
+								{
+									Name:  "KEMP_VS_CHECK_PORT",
+									Value: i.Spec.IngressController.KempVsCheckPort,
 								},
 								{
 									Name:  "KEMP_VS_SSL_ACCELERATION",
