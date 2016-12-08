@@ -72,16 +72,16 @@ spec:
 
   ingressController:
     ## Ingress controller configuration properties
-    kempVsIp: "178.162.217.237"
-    kempVsName: "ingress-controller-test-k8s-gigantic-io"
+    kempVsIp: "178.162.217.219"
+    kempVsName: "ingress-controller-test-k8s-giantswarm-io"
     kempVsPorts:  "80"
     kempVsSslAcceleration: "false"
-    kempRsPort: "30011"
-    kempVsCheckPort: "30010"
+    kempRsPort: "30101"
+    kempVsCheckPort: "30100"
     kempUser: "ddmmadmin"
     kempPassword: "xxxxx"
     kempEndpoint: "https://178.162.217.249:8443/access/"
-    cloudflareIp: "178.162.217.237"
+    cloudflareIp: "178.162.217.219"
     cloudflareDomain: "gigantic.io"
     cloudflareToken: "xxxxxxx"
     cloudflareEmail: "accounts@giantswarm.io"
