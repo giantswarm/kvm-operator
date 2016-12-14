@@ -721,6 +721,10 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Master.SecurePort,
 								},
 								{
+									Name:  "K8S_VERSION",
+									Value: m.Spec.k8sVersion,
+								},
+								{
 									Name:  "MACHINE_MEM",
 									Value: m.Spec.Master.Capabilities.Memory,
 								},
