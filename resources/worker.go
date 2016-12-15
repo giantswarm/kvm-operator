@@ -571,6 +571,10 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.SecurePort,
 								},
 								{
+									Name:  "K8S_VERSION",
+									Value: w.Spec.K8sVersion,
+								},
+								{
 									Name:  "MACHINE_MEM",
 									Value: w.Spec.Worker.Capabilities.Memory,
 								},

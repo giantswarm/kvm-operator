@@ -6,6 +6,7 @@ spec:
   customer: "test"
   clusterId: "test"
 
+  k8sVersion: "v1.5.1_coreos.0"
   k8sVmVersion: "master-2016-12-07-16-20-30"
   certctlVersion: "0.5.0"
   kubectlVersion: "1.4.0"
