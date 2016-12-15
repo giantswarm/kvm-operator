@@ -722,7 +722,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_VERSION",
-									Value: m.Spec.k8sVersion,
+									Value: m.Spec.K8sVersion,
 								},
 								{
 									Name:  "MACHINE_MEM",

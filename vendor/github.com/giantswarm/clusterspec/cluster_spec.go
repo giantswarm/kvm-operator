@@ -4,6 +4,7 @@ type ClusterSpec struct {
 	Customer  string `json:"customer"`
 	ClusterId string `json:"clusterId"`
 
+	K8sVersion               string `json:"k8sVersion"`
 	K8sVmVersion             string `json:"k8sVmVersion"`
 	CertctlVersion           string `json:"certctlVersion"`
 	PingVersion              string `json:"pingVersion"`
