@@ -1,7 +1,6 @@
 package resources
 
 import (
-	//"reflect"
 	"log"
 	"testing"
 
@@ -9,21 +8,26 @@ import (
 )
 
 func TestComponent_Creation(t *testing.T) {
-	// Master: Service, Ingress8080, Ingress2379, Ingress6443, Deployment
+	// Master: Service, Ingress2379, Ingress6443, Deployment
 	// Flannel-client: Deployment
-	// Worker: Deployment, service
-	expectedObjects := 8
+	// Worker: Deployment, Service
+	// Ingress controller: Deployment, Service
+	expectedObjects := 9
 
 	cluster := &clusterspec.Cluster{
 		Spec: clusterspec.ClusterSpec{
 			Customer:  "test",
-			ClusterID: "test",
-			Replicas:  int32(1),
+			ClusterId: "test",
 		},
 	}
+
+	cluster.Spec.Worker.Replicas = int32(1)
+	cluster.Spec.Worker.WorkerServicePort = "4194"
+	cluster.Spec.Master.SecurePort = "6443"
+
 	objects, err := ComputeResources(cluster)
 	if err != nil {
-		t.Fatalf("Error when computing cluster resources")
+		t.Fatalf("Error when computing cluster resources %v", err)
 	}
 
 	for _, obj := range objects {
