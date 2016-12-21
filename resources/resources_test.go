@@ -12,7 +12,7 @@ func TestComponent_Creation(t *testing.T) {
 	// Flannel-client: Deployment
 	// Worker: Deployment, Service
 	// Ingress controller: Deployment, Service
-	expectedObjects := 9
+	expectedObjects := 10
 
 	cluster := &clusterspec.Cluster{
 		Spec: clusterspec.ClusterSpec{
@@ -24,6 +24,7 @@ func TestComponent_Creation(t *testing.T) {
 	cluster.Spec.Worker.Replicas = int32(1)
 	cluster.Spec.Worker.WorkerServicePort = "4194"
 	cluster.Spec.Master.SecurePort = "6443"
+	cluster.Spec.Master.InsecurePort = "8080"
 
 	objects, err := ComputeResources(cluster)
 	if err != nil {
