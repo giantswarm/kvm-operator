@@ -75,6 +75,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:  "generate-bridgeip-configmap",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
+			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -111,6 +112,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:  "kubectl-bridgeip-configmap",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
+			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -143,6 +145,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:  "k8s-master-api-token",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-openssl",
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -217,6 +220,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:  "k8s-master-calico-certs",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -261,6 +265,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:  "k8s-master-etcd-certs",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -305,6 +310,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:  "set-iptables",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -616,6 +622,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						{
 							Name:  "k8s-vm",
 							Image: fmt.Sprintf("leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:%s", m.Spec.K8sVmVersion),
+							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
 							},
@@ -771,6 +778,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						{
 							Name:  "watch-master-vm-service",
 							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/watch-master-vm-service",
+							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
 								"-c",
