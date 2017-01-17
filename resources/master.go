@@ -385,6 +385,11 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			},
 		},
 		Spec: extensionsv1.IngressSpec{
+			TLS: []extensionsv1.IngressTLS{
+				{
+					Hosts: []string{m.Spec.Master.EtcdDomainName},
+				},
+			},
 			Backend: &extensionsv1.IngressBackend{
 				ServiceName: m.Spec.ClusterId + "-k8s-master",
 				ServicePort: intstr.FromInt(2379),
@@ -393,7 +398,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 	}
 
 	objects = append(objects, endpointMasterEtcd)
-	insecurePort, err := strconv.Atoi(m.Spec.Master.InsecurePort)
+	/*insecurePort, err := strconv.Atoi(m.Spec.Master.InsecurePort)
 	if err != nil {
 		return nil, maskAny(err)
 	}
@@ -419,7 +424,8 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 	}
 
-	objects = append(objects, endpointMasterAPIHTTP)
+	objects = append(objects, endpointMasterAPIHTTP)*/
+
 	securePort, err := strconv.Atoi(m.Spec.Master.SecurePort)
 	if err != nil {
 		return nil, maskAny(err)
@@ -431,7 +437,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: "api-https",
+			Name: "api",
 			Labels: map[string]string{
 				"cluster-id": m.Spec.ClusterId,
 				"role":       m.Spec.ClusterId + "-master",
@@ -439,6 +445,11 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			},
 		},
 		Spec: extensionsv1.IngressSpec{
+			TLS: []extensionsv1.IngressTLS{
+				{
+					Hosts: []string{m.Spec.Master.MasterDomainName},
+				},
+			},
 			Backend: &extensionsv1.IngressBackend{
 				ServiceName: m.Spec.ClusterId + "-k8s-master",
 				ServicePort: intstr.FromInt(securePort),
@@ -464,18 +475,18 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		Spec: apiv1.ServiceSpec{
 			Type: apiv1.ServiceType("LoadBalancer"),
 			Ports: []apiv1.ServicePort{
-				{
+				/*{
 					Name:     "api",
-					Port:     int32(insecurePort),
+					Port:     int32(8080),
 					Protocol: "TCP",
-				},
+				},*/
 				{
 					Name:     "etcd",
 					Port:     int32(2379),
 					Protocol: "TCP",
 				},
 				{
-					Name:     "api-https",
+					Name:     "api",
 					Port:     int32(securePort),
 					Protocol: "TCP",
 				},
