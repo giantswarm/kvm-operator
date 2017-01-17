@@ -75,6 +75,7 @@ func (i *ingressController) generateInitIngressControllerContainers() (string, e
 		{
 			Name:  "ingress-controller-api-certs",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + i.Spec.CertctlVersion,
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -265,6 +266,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 						{
 							Name:  "ingress-controller-health",
 							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/ping:" + i.Spec.PingVersion,
+							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"--healthcheck",
 								"--cloudflare",
@@ -362,6 +364,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 						{
 							Name:  "ingress-controller-haproxy",
 							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/haproxy-etcd-lb:" + i.Spec.IngressControllerVersion,
+							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"--backend-store=kubernetes-ingress",
 								"--chained-proxies=false",
