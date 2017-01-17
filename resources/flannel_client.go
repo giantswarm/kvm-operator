@@ -26,6 +26,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 		{
 			Name:  "set-network-env",
 			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/set-flannel-network-env",
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/bash",
 				"-c",
@@ -231,6 +232,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 						{
 							Name:  "flannel-client",
 							Image: fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
+							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
 								"-c",
