@@ -73,8 +73,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:  "generate-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
+			Name:            "generate-bridgeip-configmap",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -110,8 +110,9 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "kubectl-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
+			Name: "kubectl-bridgeip-configmap",
+			// Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -143,8 +144,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-api-token",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-openssl",
+			Name:            "k8s-master-api-token",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-openssl",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -166,12 +167,13 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-api-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Name:            "k8s-master-api-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/master/apiserver.pem --key-file=/etc/kubernetes/ssl/master/apiserver-key.pem --ca-file=/etc/kubernetes/ssl/master/apiserver-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME,$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/master/apiserver.pem --key-file=/etc/kubernetes/ssl/master/apiserver-key.pem --ca-file=/etc/kubernetes/ssl/master/apiserver-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -218,13 +220,13 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-calico-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Name:            "k8s-master-calico-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=calico.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=calico.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -263,13 +265,13 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-etcd-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Name:            "k8s-master-etcd-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=etcd.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=etcd.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -308,8 +310,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "set-iptables",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
+			Name:            "set-iptables",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -393,6 +395,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 	}
 
 	objects = append(objects, endpointMasterEtcd)
+
 	insecurePort, err := strconv.Atoi(m.Spec.Master.InsecurePort)
 	if err != nil {
 		return nil, maskAny(err)
@@ -620,8 +623,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:  "k8s-vm",
-							Image: fmt.Sprintf("leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:%s", m.Spec.K8sVmVersion),
+							Name:            "k8s-vm",
+							Image:           fmt.Sprintf("leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:%s", m.Spec.K8sVmVersion),
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
@@ -629,7 +632,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "BRIDGE_NETWORK",
-									Value: "br" + m.Spec.ClusterId,
+									Value: "br" + m.Spec.Customer,
 								},
 								{
 									Name:  "CUSTOMER_ID",
@@ -776,8 +779,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
-							Name:  "watch-master-vm-service",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/watch-master-vm-service",
+							Name:            "watch-master-vm-service",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/watch-master-vm-service",
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
