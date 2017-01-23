@@ -73,8 +73,8 @@ func (i *ingressController) generateInitIngressControllerContainers() (string, e
 
 	initContainers := []apiv1.Container{
 		{
-			Name:  "ingress-controller-api-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + i.Spec.CertctlVersion,
+			Name:            "ingress-controller-api-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + i.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -133,7 +133,7 @@ func (i *ingressController) GenerateService() (*apiv1.Service, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: i.Spec.ClusterId + "-ingress-controller",
+			Name: "ingress-controller",
 			Labels: map[string]string{
 				"cluster-id": i.Spec.ClusterId,
 				"app":        "k8s-cluster",
@@ -209,7 +209,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: i.Spec.ClusterId + "-ingress-controller",
+			Name: "ingress-controller",
 			Labels: map[string]string{
 				"cluster-id": i.Spec.ClusterId,
 				"app":        "k8s-cluster",
@@ -223,7 +223,7 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 			Replicas: &replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					Name: i.Spec.ClusterId + "-ingress-controller",
+					Name: "ingress-controller",
 					Labels: map[string]string{
 						"cluster-id": i.Spec.ClusterId,
 						"app":        "k8s-cluster",
@@ -264,8 +264,8 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:  "ingress-controller-health",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/ping:" + i.Spec.PingVersion,
+							Name:            "ingress-controller-health",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/ping:" + i.Spec.PingVersion,
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"--healthcheck",
@@ -362,8 +362,8 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 							},
 						},
 						{
-							Name:  "ingress-controller-haproxy",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/haproxy-etcd-lb:" + i.Spec.IngressControllerVersion,
+							Name:            "ingress-controller-haproxy",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/haproxy-etcd-lb:" + i.Spec.IngressControllerVersion,
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"--backend-store=kubernetes-ingress",

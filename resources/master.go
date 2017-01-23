@@ -73,8 +73,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:  "generate-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
+			Name:            "generate-bridgeip-configmap",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -110,8 +110,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "kubectl-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
+			Name:            "kubectl-bridgeip-configmap",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -143,8 +143,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-api-token",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-openssl",
+			Name:            "k8s-master-api-token",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-openssl",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -218,8 +218,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-calico-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Name:            "k8s-master-calico-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -263,8 +263,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-etcd-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Name:            "k8s-master-etcd-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -308,8 +308,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "set-iptables",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
+			Name:            "set-iptables",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -386,7 +386,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-k8s-master",
+				ServiceName: "master",
 				ServicePort: intstr.FromInt(2379),
 			},
 		},
@@ -413,7 +413,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-k8s-master",
+				ServiceName: "master",
 				ServicePort: intstr.FromInt(insecurePort),
 			},
 		},
@@ -440,7 +440,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-k8s-master",
+				ServiceName: "master",
 				ServicePort: intstr.FromInt(securePort),
 			},
 		},
@@ -454,7 +454,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: m.Spec.ClusterId + "-k8s-master",
+			Name: "master",
 			Labels: map[string]string{
 				"cluster-id": m.Spec.ClusterId,
 				"role":       m.Spec.ClusterId + "-master",
@@ -509,7 +509,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: m.Spec.ClusterId + "-master",
+			Name: "master",
 			Labels: map[string]string{
 				"cluster-id": m.Spec.ClusterId,
 				"role":       m.Spec.ClusterId + "-master",
@@ -523,7 +523,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			Replicas: &masterReplicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					GenerateName: m.Spec.ClusterId + "-master",
+					GenerateName: "master",
 					Labels: map[string]string{
 						"cluster-id": m.Spec.ClusterId,
 						"role":       m.Spec.ClusterId + "-master",
@@ -620,8 +620,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:  "k8s-vm",
-							Image: fmt.Sprintf("leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:%s", m.Spec.K8sVmVersion),
+							Name:            "k8s-vm",
+							Image:           fmt.Sprintf("leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:%s", m.Spec.K8sVmVersion),
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
@@ -776,8 +776,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
-							Name:  "watch-master-vm-service",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/watch-master-vm-service",
+							Name:            "watch-master-vm-service",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/watch-master-vm-service",
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
@@ -791,7 +791,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "SERVICE_NAME",
-									Value: m.Spec.ClusterId + "-k8s-master",
+									Value: "master",
 								},
 								{
 									Name: "NODE_IP",
