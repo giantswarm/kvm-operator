@@ -24,8 +24,8 @@ type flannelClient struct {
 func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
-			Name:  "set-network-env",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/set-flannel-network-env",
+			Name:            "set-network-env",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/set-flannel-network-env",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/bash",
@@ -230,8 +230,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:  "flannel-client",
-							Image: fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
+							Name:            "flannel-client",
+							Image:           fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
