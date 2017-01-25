@@ -73,8 +73,8 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:            "generate-bridgeip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
+			Name:            "k8s-bridge-ip-configmap",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:6d24a36be4d63259b67a1f46e3ff2d04a789e51c",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -82,35 +82,30 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 					MountPath: "/tmp/",
 				},
 			},
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/run.sh",
-			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "SUFFIX_CONFIGMAP",
-					Value: "worker-vm",
+					Name:  "BRIDGE_IP_CONFIGMAP_NAME",
+					Value: bridgeIPConfigmapName("worker"),
 				},
 				{
-					Name:  "CUSTOMER_ID",
-					Value: w.Spec.Customer,
+					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
+					Value: bridgeIPConfigmapPath("worker"),
 				},
 				{
-					Name:  "CLUSTER_ID",
+					Name:  "K8S_NAMESPACE",
 					Value: w.Spec.ClusterId,
 				},
 				{
-					Name:  "NAMESPACE",
-					Value: w.Name,
+					Name:  "NETWORK_BRIDGE_NAME",
+					Value: networkBridgeName(w.Spec.ClusterId),
 				},
 			},
 		},
 		{
-			Name:            "kubectl-bridgeip-configmap",
+			Name:            "kubectl-bridge-ip-configmap",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + w.Spec.KubectlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
@@ -122,7 +117,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"while [ ! -f /tmp/bridge-ip-configmap-worker-vm.json ]; do echo -; sleep 1; done; /usr/bin/kubectl --server=${G8S_MASTER_HOST}:${G8S_MASTER_PORT} replace --force -f ${BRIDGE_IP_CONFIGMAP_PATH}",
+				"while [ ! -f ${BRIDGE_IP_CONFIGMAP_PATH} ]; do echo -; sleep 1; done; /usr/bin/kubectl --server=${G8S_MASTER_HOST}:${G8S_MASTER_PORT} replace --force -f ${BRIDGE_IP_CONFIGMAP_PATH}",
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
@@ -138,7 +133,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: "/tmp/bridge-ip-configmap-worker-vm.json",
+					Value: bridgeIPConfigmapPath("worker"),
 				},
 			},
 		},
