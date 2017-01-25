@@ -15,3 +15,7 @@ func bridgeIPConfigmapPath(node string) string {
 func networkBridgeName(ID string) string {
 	return fmt.Sprintf("br-%s", ID)
 }
+
+func networkEnvFilePath(ID string) string {
+	return fmt.Sprintf("/run/flannel/networks/%s.env", ID)
+}
