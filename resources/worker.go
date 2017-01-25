@@ -74,8 +74,8 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:  "generate-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
+			Name:            "generate-bridgeip-configmap",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/generate-bridge-ip-configmap",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -111,8 +111,8 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 		},
 		{
-			Name:  "kubectl-bridgeip-configmap",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + w.Spec.KubectlVersion,
+			Name:            "kubectl-bridgeip-configmap",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + w.Spec.KubectlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -144,8 +144,8 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-worker-api-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
+			Name:            "k8s-worker-api-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -197,8 +197,8 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-worker-calico-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
+			Name:            "k8s-worker-calico-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -242,8 +242,8 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-worker-etcd-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
+			Name:            "k8s-worker-etcd-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -488,10 +488,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "BRIDGE_NETWORK",
-									Value: "br" + w.Spec.ClusterId,
-								},
-								{
 									Name:  "CUSTOMER_ID",
 									Value: w.Spec.Customer,
 								},
@@ -542,6 +538,10 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								{
 									Name:  "MACHINE_CPU_CORES",
 									Value: fmt.Sprintf("%d", w.Spec.Worker.Capabilities.CpuCores),
+								},
+								{
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: networkBridgeName(w.Spec.ClusterId),
 								},
 								{
 									Name:  "K8S_DNS_IP",

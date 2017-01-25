@@ -24,8 +24,8 @@ type flannelClient struct {
 func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
-			Name:  "set-network-env",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/set-flannel-network-env",
+			Name:            "set-network-env",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/set-flannel-network-env",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/bash",
@@ -230,8 +230,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:  "flannel-client",
-							Image: fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
+							Name:            "flannel-client",
+							Image:           fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
@@ -277,16 +277,20 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f /run/flannel/networks/${CUSTOMER_ID}.env ]; do echo 'Waiting for flannel network'; sleep 1; done; /tmp/k8s_network_bridge.sh create ${CUSTOMER_ID} br${CUSTOMER_ID} ${NETWORK_INTERFACE} ${HOST_SUBNET_RANGE}",
+								"while [ ! -f /run/flannel/networks/${CLUSTER_ID}.env ]; do echo 'Waiting for flannel network'; sleep 1; done; /tmp/k8s_network_bridge.sh create ${CLUSTER_ID} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE} ${HOST_SUBNET_RANGE}",
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "CUSTOMER_ID",
-									Value: f.Spec.Customer,
+									Name:  "CLUSTER_ID",
+									Value: f.Spec.ClusterId,
 								},
 								{
 									Name:  "HOST_SUBNET_RANGE",
 									Value: f.Spec.GiantnetesConfiguration.HostSubnetRange,
+								},
+								{
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: networkBridgeName(f.Spec.ClusterId),
 								},
 								{
 									Name:  "NETWORK_INTERFACE",

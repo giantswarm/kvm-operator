@@ -316,7 +316,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/sbin/iptables -I INPUT -p tcp --match multiport --dports $ETCD_PORT -d ${NODE_IP} -i br${CLUSTER_ID} -j ACCEPT",
+				"/sbin/iptables -I INPUT -p tcp --match multiport --dports $ETCD_PORT -d ${NODE_IP} -i ${NETWORK_BRIDGE_NAME} -j ACCEPT",
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
@@ -329,6 +329,10 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				{
 					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterId,
+				},
+				{
+					Name:  "NETWORK_BRIDGE_NAME",
+					Value: networkBridgeName(m.Spec.ClusterId),
 				},
 				{
 					Name: "NODE_IP",
@@ -631,8 +635,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "BRIDGE_NETWORK",
-									Value: "br" + m.Spec.Customer,
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: networkBridgeName(m.Spec.ClusterId),
 								},
 								{
 									Name:  "CUSTOMER_ID",
