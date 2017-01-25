@@ -801,15 +801,14 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
-							Name:            "watch-master-vm-service",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/watch-master-vm-service",
-							ImagePullPolicy: apiv1.PullAlways,
-							Command: []string{
-								"/bin/sh",
-								"-c",
-								"/run.sh",
-							},
+							Name:            "k8s-watch-master-vm",
+							Image:           "registry.giantswarm.io/giantswarm/k8s-watch-master-vm:4a226de00c16035f8bb38d43d32b211e5e7d4345",
+							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Env: []apiv1.EnvVar{
+								{
+									Name:  "CLUSTER_ID",
+									Value: m.Spec.ClusterId,
+								},
 								{
 									Name:  "CUSTOMER_ID",
 									Value: m.Spec.Customer,
