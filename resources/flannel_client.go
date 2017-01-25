@@ -280,21 +280,18 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							},
 						},
 						{
-							Name:            "create-bridge",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge",
+							Name:            "k8s-network-bridge",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge:b066eaf8768a253031d58242dbf13aa30e16630e",
 							ImagePullPolicy: apiv1.PullAlways,
-							SecurityContext: &apiv1.SecurityContext{
-								Privileged: &privileged,
-							},
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f /run/flannel/networks/${CLUSTER_ID}.env ]; do echo 'Waiting for flannel network'; sleep 1; done; /tmp/k8s_network_bridge.sh create ${CLUSTER_ID} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE} ${HOST_SUBNET_RANGE}",
+								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo 'Waiting for flannel network'; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${HOST_SUBNET_RANGE}",
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "CLUSTER_ID",
-									Value: f.Spec.ClusterId,
+									Name:  "NETWORK_ENV_FILE_PATH",
+									Value: networkEnvFilePath(f.Spec.ClusterId),
 								},
 								{
 									Name:  "HOST_SUBNET_RANGE",
@@ -305,9 +302,12 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 									Value: networkBridgeName(f.Spec.ClusterId),
 								},
 								{
-									Name:  "NETWORK_INTERFACE",
+									Name:  "NETWORK_INTERFACE_NAME",
 									Value: f.Spec.GiantnetesConfiguration.NetworkInterface,
 								},
+							},
+							SecurityContext: &apiv1.SecurityContext{
+								Privileged: &privileged,
 							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
