@@ -87,7 +87,7 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 							{
 								Key:      "role",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{f.Spec.ClusterId + "-flannel-client"},
+								Values:   []string{"flannel-client"},
 							},
 						},
 					},
@@ -126,7 +126,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: f.Spec.ClusterId + "-flannel-client",
+			Name: "flannel-client",
 			Labels: map[string]string{
 				"cluster-id": f.Spec.ClusterId,
 				"role":       f.Spec.ClusterId + "-flannel-client",
@@ -140,7 +140,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			Replicas: &flannelClientReplicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					GenerateName: f.Spec.ClusterId + "flannel-client",
+					GenerateName: "flannel-client",
 					Labels: map[string]string{
 						"cluster-id": f.Spec.ClusterId,
 						"role":       f.Spec.ClusterId + "-flannel-client",

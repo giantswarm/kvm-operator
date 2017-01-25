@@ -392,7 +392,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-k8s-master",
+				ServiceName: "master",
 				ServicePort: intstr.FromInt(2379),
 			},
 		},
@@ -420,7 +420,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-k8s-master",
+				ServiceName: "master",
 				ServicePort: intstr.FromInt(insecurePort),
 			},
 		},
@@ -447,7 +447,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		},
 		Spec: extensionsv1.IngressSpec{
 			Backend: &extensionsv1.IngressBackend{
-				ServiceName: m.Spec.ClusterId + "-k8s-master",
+				ServiceName: "master",
 				ServicePort: intstr.FromInt(securePort),
 			},
 		},
@@ -461,7 +461,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: m.Spec.ClusterId + "-k8s-master",
+			Name: "master",
 			Labels: map[string]string{
 				"cluster-id": m.Spec.ClusterId,
 				"role":       m.Spec.ClusterId + "-master",
@@ -516,7 +516,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: m.Spec.ClusterId + "-master",
+			Name: "master",
 			Labels: map[string]string{
 				"cluster-id": m.Spec.ClusterId,
 				"role":       m.Spec.ClusterId + "-master",
@@ -530,7 +530,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			Replicas: &masterReplicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					GenerateName: m.Spec.ClusterId + "-master",
+					GenerateName: "master",
 					Labels: map[string]string{
 						"cluster-id": m.Spec.ClusterId,
 						"role":       m.Spec.ClusterId + "-master",
@@ -798,7 +798,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "SERVICE_NAME",
-									Value: m.Spec.ClusterId + "-k8s-master",
+									Value: "master",
 								},
 								{
 									Name: "NODE_IP",

@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/giantswarm/clusterspec"
-
 	"github.com/ventu-io/go-shortid"
 
 	"k8s.io/client-go/pkg/api"
@@ -332,7 +331,7 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterId + "-worker",
+			Name: "worker",
 			Labels: map[string]string{
 				"cluster-id": w.Spec.ClusterId,
 				"role":       w.Spec.ClusterId + "-worker",
@@ -378,7 +377,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: w.Spec.ClusterId + "-worker",
+			Name: "worker",
 			Labels: map[string]string{
 				"cluster-id": w.Spec.ClusterId,
 				"role":       w.Spec.ClusterId + "-worker",
@@ -392,7 +391,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 			Replicas: &w.Spec.Worker.Replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					Name: w.Spec.ClusterId + "-worker",
+					Name: "worker",
 					Labels: map[string]string{
 						"cluster-id": w.Spec.ClusterId,
 						"role":       w.Spec.ClusterId + "-worker",

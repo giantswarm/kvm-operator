@@ -53,9 +53,9 @@ func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
 	}
 
 	start := time.Now()
-	computeResourcesTotal.WithLabelValues(cluster.Name).Inc()
+	computeResourcesTotal.WithLabelValues(cluster.Spec.ClusterId).Inc()
 
-	log.Println("started computing desired resources for cluster:", cluster.Name)
+	log.Println("started computing desired resources for cluster:", cluster.Spec.ClusterId)
 
 	objects := []runtime.Object{}
 
@@ -95,9 +95,9 @@ func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
 	}
 	objects = append(objects, ingressComponents...)
 
-	log.Println("finished computing desired resources for cluster:", cluster.Name)
+	log.Println("finished computing desired resources for cluster:", cluster.Spec.ClusterId)
 
-	computeResourceTime.WithLabelValues(cluster.Name).Set(float64(time.Since(start) / time.Millisecond))
+	computeResourceTime.WithLabelValues(cluster.Spec.ClusterId).Set(float64(time.Since(start) / time.Millisecond))
 
 	return objects, nil
 }
