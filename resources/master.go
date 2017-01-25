@@ -110,8 +110,9 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:            "kubectl-bridgeip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
+			Name: "kubectl-bridgeip-configmap",
+			// Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -166,12 +167,13 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name:  "k8s-master-api-certs",
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Name:            "k8s-master-api-certs",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/master/apiserver.pem --key-file=/etc/kubernetes/ssl/master/apiserver-key.pem --ca-file=/etc/kubernetes/ssl/master/apiserver-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME,$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/master/apiserver.pem --key-file=/etc/kubernetes/ssl/master/apiserver-key.pem --ca-file=/etc/kubernetes/ssl/master/apiserver-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -224,7 +226,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=calico.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=calico.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -269,7 +271,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=etcd.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=etcd.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -314,7 +316,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/sbin/iptables -I INPUT -p tcp --match multiport --dports $ETCD_PORT -d ${NODE_IP} -i br${CLUSTER_ID} -j ACCEPT",
+				"/sbin/iptables -I INPUT -p tcp --match multiport --dports $ETCD_PORT -d ${NODE_IP} -i ${NETWORK_BRIDGE_NAME} -j ACCEPT",
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
@@ -327,6 +329,10 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				{
 					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterId,
+				},
+				{
+					Name:  "NETWORK_BRIDGE_NAME",
+					Value: networkBridgeName(m.Spec.ClusterId),
 				},
 				{
 					Name: "NODE_IP",
@@ -393,6 +399,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 	}
 
 	objects = append(objects, endpointMasterEtcd)
+
 	insecurePort, err := strconv.Atoi(m.Spec.Master.InsecurePort)
 	if err != nil {
 		return nil, maskAny(err)
@@ -628,8 +635,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "BRIDGE_NETWORK",
-									Value: "br" + m.Spec.ClusterId,
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: networkBridgeName(m.Spec.ClusterId),
 								},
 								{
 									Name:  "CUSTOMER_ID",

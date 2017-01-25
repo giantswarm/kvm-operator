@@ -487,10 +487,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "BRIDGE_NETWORK",
-									Value: "br" + w.Spec.ClusterId,
-								},
-								{
 									Name:  "CUSTOMER_ID",
 									Value: w.Spec.Customer,
 								},
@@ -541,6 +537,10 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								{
 									Name:  "MACHINE_CPU_CORES",
 									Value: fmt.Sprintf("%d", w.Spec.Worker.Capabilities.CpuCores),
+								},
+								{
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: networkBridgeName(w.Spec.ClusterId),
 								},
 								{
 									Name:  "K8S_DNS_IP",
