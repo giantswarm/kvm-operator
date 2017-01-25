@@ -86,3 +86,69 @@ func TestResourcesDontHaveClusterIdAsPrefix(t *testing.T) {
 		}
 	}
 }
+
+func TestResourcesHaveCorrectLabelScheme(t *testing.T) {
+	clusterId := "cluster-test"
+	customerId := "customer-test"
+
+	cluster := &clusterspec.Cluster{
+		Spec: clusterspec.ClusterSpec{
+			ClusterId: clusterId,
+			Customer:  customerId,
+		},
+	}
+
+	cluster.Spec.Worker.Replicas = int32(1)
+	cluster.Spec.Worker.WorkerServicePort = "4194"
+	cluster.Spec.Master.SecurePort = "6443"
+	cluster.Spec.Master.InsecurePort = "8080"
+
+	resources, err := ComputeResources(cluster)
+	if err != nil {
+		t.Fatalf("Error when computing cluster resources: %v", err)
+	}
+
+	failIfWrongLabelScheme := func(name string, labels map[string]string) {
+		cluster, ok := labels["cluster"]
+		if !ok {
+			t.Fatalf(fmt.Sprintf("Could not find 'cluster' label for resource: %v\n", name))
+		}
+		if cluster != clusterId {
+			t.Fatalf(fmt.Sprintf("Resource did not have correct 'cluster' label: %v, %v", name, cluster))
+		}
+
+		customer, ok := labels["customer"]
+		if !ok {
+			t.Fatalf(fmt.Sprintf("Could not find 'customer' label for resource: %v\n", name))
+		}
+		if customer != customerId {
+			t.Fatalf(fmt.Sprintf("Resource did not have correct 'customer' label: %v, %v", name, customer))
+		}
+
+		app, ok := labels["app"]
+		if !ok {
+			t.Fatalf(fmt.Sprintf("Could not find 'app' label for resource: %v\n", name))
+		}
+		// App will be different for each kind of resource (master, worker, etc.)
+		// Checking existence is good enough
+		if app == "" {
+			t.Fatalf(fmt.Sprintf("Resourcer had empty 'app' label: %v", name))
+		}
+	}
+
+	for _, resource := range resources {
+		switch r := resource.(type) {
+		case *v1.ConfigMap:
+			failIfWrongLabelScheme(r.Name, r.Labels)
+		case *v1.Service:
+			failIfWrongLabelScheme(r.Name, r.Labels)
+		case *v1beta1.Deployment:
+			failIfWrongLabelScheme(r.Name, r.Labels)
+			failIfWrongLabelScheme(r.Name, r.Spec.Template.Labels)
+		case *v1beta1.Ingress:
+			failIfWrongLabelScheme(r.Name, r.Labels)
+		default:
+			t.Fatalf("Could not determine resource type\n")
+		}
+	}
+}

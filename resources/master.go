@@ -32,9 +32,21 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "role",
+								Key:      "cluster",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{m.Spec.ClusterId + "-worker"},
+								Values:   []string{m.Spec.ClusterId},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"worker"},
 							},
 						},
 					},
@@ -48,9 +60,21 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "role",
+								Key:      "cluster",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{m.Spec.ClusterId + "-flannel-client"},
+								Values:   []string{m.Spec.ClusterId},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"flannel-client"},
 							},
 						},
 					},
@@ -385,9 +409,9 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "etcd",
 			Labels: map[string]string{
-				"cluster-id": m.Spec.ClusterId,
-				"role":       m.Spec.ClusterId + "-master",
-				"app":        m.Spec.ClusterId + "-k8s-cluster",
+				"cluster":  m.Spec.ClusterId,
+				"customer": m.Spec.Customer,
+				"app":      "master",
 			},
 		},
 		Spec: extensionsv1.IngressSpec{
@@ -413,9 +437,9 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "api",
 			Labels: map[string]string{
-				"cluster-id": m.Spec.ClusterId,
-				"role":       m.Spec.ClusterId + "-master",
-				"app":        m.Spec.ClusterId + "-k8s-cluster",
+				"cluster":  m.Spec.ClusterId,
+				"customer": m.Spec.Customer,
+				"app":      "master",
 			},
 		},
 		Spec: extensionsv1.IngressSpec{
@@ -440,9 +464,9 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "api-https",
 			Labels: map[string]string{
-				"cluster-id": m.Spec.ClusterId,
-				"role":       m.Spec.ClusterId + "-master",
-				"app":        m.Spec.ClusterId + "-k8s-cluster",
+				"cluster":  m.Spec.ClusterId,
+				"customer": m.Spec.Customer,
+				"app":      "master",
 			},
 		},
 		Spec: extensionsv1.IngressSpec{
@@ -463,9 +487,9 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
-				"cluster-id": m.Spec.ClusterId,
-				"role":       m.Spec.ClusterId + "-master",
-				"app":        m.Spec.ClusterId + "-k8s-cluster",
+				"cluster":  m.Spec.ClusterId,
+				"customer": m.Spec.Customer,
+				"app":      "master",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -518,9 +542,9 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
-				"cluster-id": m.Spec.ClusterId,
-				"role":       m.Spec.ClusterId + "-master",
-				"app":        m.Spec.ClusterId + "-k8s-cluster",
+				"cluster":  m.Spec.ClusterId,
+				"customer": m.Spec.Customer,
+				"app":      "master",
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -532,9 +556,9 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "master",
 					Labels: map[string]string{
-						"cluster-id": m.Spec.ClusterId,
-						"role":       m.Spec.ClusterId + "-master",
-						"app":        m.Spec.ClusterId + "-k8s-cluster",
+						"cluster":  m.Spec.ClusterId,
+						"customer": m.Spec.Customer,
+						"app":      "master",
 					},
 					Annotations: map[string]string{
 						"pod.beta.kubernetes.io/init-containers": initContainers,

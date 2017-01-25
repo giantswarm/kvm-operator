@@ -32,9 +32,21 @@ func (i *ingressController) generateIngressControllerPodAffinity() (string, erro
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "role",
+								Key:      "cluster",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{i.Name + "-ingress-controller"},
+								Values:   []string{i.Spec.ClusterId},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"ingress-controller"},
 							},
 						},
 					},
@@ -48,9 +60,21 @@ func (i *ingressController) generateIngressControllerPodAffinity() (string, erro
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "role",
+								Key:      "cluster",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{i.Name + "-flannel-client"},
+								Values:   []string{i.Spec.ClusterId},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"flannel-client"},
 							},
 						},
 					},
@@ -135,8 +159,9 @@ func (i *ingressController) GenerateService() (*apiv1.Service, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "ingress-controller",
 			Labels: map[string]string{
-				"cluster-id": i.Spec.ClusterId,
-				"app":        "k8s-cluster",
+				"cluster":  i.Spec.ClusterId,
+				"customer": i.Spec.Customer,
+				"app":      "ingress-controller",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -158,9 +183,9 @@ func (i *ingressController) GenerateService() (*apiv1.Service, error) {
 				},
 			},
 			Selector: map[string]string{
-				"cluster-id": i.Spec.ClusterId,
-				"app":        "k8s-cluster",
-				"role":       "ingress-controller",
+				"cluster":  i.Spec.ClusterId,
+				"customer": i.Spec.Customer,
+				"app":      "ingress-controller",
 			},
 		},
 	}
@@ -211,9 +236,9 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "ingress-controller",
 			Labels: map[string]string{
-				"cluster-id": i.Spec.ClusterId,
-				"app":        "k8s-cluster",
-				"role":       "ingress-controller",
+				"cluster":  i.Spec.ClusterId,
+				"customer": i.Spec.Customer,
+				"app":      "ingress-controller",
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -225,9 +250,9 @@ func (i *ingressController) GenerateDeployment() (*extensionsv1.Deployment, erro
 				ObjectMeta: apiv1.ObjectMeta{
 					Name: "ingress-controller",
 					Labels: map[string]string{
-						"cluster-id": i.Spec.ClusterId,
-						"app":        "k8s-cluster",
-						"role":       "ingress-controller",
+						"cluster":  i.Spec.ClusterId,
+						"customer": i.Spec.Customer,
+						"app":      "ingress-controller",
 					},
 					Annotations: map[string]string{
 						"pod.beta.kubernetes.io/init-containers": initContainers,
