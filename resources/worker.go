@@ -96,11 +96,11 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "K8S_NAMESPACE",
-					Value: m.Spec.ClusterId,
+					Value: w.Spec.ClusterId,
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME",
-					Value: networkBridgeName(m.Spec.ClusterId),
+					Value: networkBridgeName(w.Spec.ClusterId),
 				},
 			},
 		},
