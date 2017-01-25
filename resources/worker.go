@@ -32,9 +32,21 @@ func (w *worker) generateWorkerPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "role",
+								Key:      "cluster",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{w.Name + "-master"},
+								Values:   []string{w.Spec.ClusterId},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"master"},
 							},
 						},
 					},
@@ -48,9 +60,21 @@ func (w *worker) generateWorkerPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "role",
+								Key:      "cluster",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{w.Name + "-flannel-client"},
+								Values:   []string{w.Spec.ClusterId},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"flannel-client"},
 							},
 						},
 					},
@@ -328,9 +352,9 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "worker",
 			Labels: map[string]string{
-				"cluster-id": w.Spec.ClusterId,
-				"role":       w.Spec.ClusterId + "-worker",
-				"app":        w.Spec.ClusterId + "-k8s-cluster",
+				"cluster":  w.Spec.ClusterId,
+				"customer": w.Spec.Customer,
+				"app":      "worker",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -343,8 +367,9 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 				},
 			},
 			Selector: map[string]string{
-				"app":  w.Spec.ClusterId + "-k8s-cluster",
-				"role": "worker",
+				"cluster":  w.Spec.ClusterId,
+				"customer": w.Spec.Customer,
+				"app":      "worker",
 			},
 		},
 	}
@@ -374,9 +399,9 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "worker",
 			Labels: map[string]string{
-				"cluster-id": w.Spec.ClusterId,
-				"role":       w.Spec.ClusterId + "-worker",
-				"app":        "k8s-cluster",
+				"cluster":  w.Spec.ClusterId,
+				"customer": w.Spec.Customer,
+				"app":      "worker",
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -388,9 +413,9 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 				ObjectMeta: apiv1.ObjectMeta{
 					Name: "worker",
 					Labels: map[string]string{
-						"cluster-id": w.Spec.ClusterId,
-						"role":       w.Spec.ClusterId + "-worker",
-						"app":        "k8s-cluster",
+						"cluster":  w.Spec.ClusterId,
+						"customer": w.Spec.Customer,
+						"app":      "worker",
 					},
 					Annotations: map[string]string{
 						"pod.beta.kubernetes.io/init-containers": initContainers,

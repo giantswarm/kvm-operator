@@ -85,7 +85,19 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "role",
+								Key:      "cluster",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{f.Spec.ClusterId},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+				},
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
 								Operator: apiunversioned.LabelSelectorOpIn,
 								Values:   []string{"flannel-client"},
 							},
@@ -128,9 +140,9 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "flannel-client",
 			Labels: map[string]string{
-				"cluster-id": f.Spec.ClusterId,
-				"role":       f.Spec.ClusterId + "-flannel-client",
-				"app":        f.Spec.ClusterId + "-k8s-cluster",
+				"cluster":  f.Spec.ClusterId,
+				"customer": f.Spec.Customer,
+				"app":      "flannel-client",
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -142,9 +154,9 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "flannel-client",
 					Labels: map[string]string{
-						"cluster-id": f.Spec.ClusterId,
-						"role":       f.Spec.ClusterId + "-flannel-client",
-						"app":        f.Spec.ClusterId + "-k8s-cluster",
+						"cluster":  f.Spec.ClusterId,
+						"customer": f.Spec.Customer,
+						"app":      "flannel-client",
 					},
 					Annotations: map[string]string{
 						"seccomp.security.alpha.kubernetes.io/pod": "unconfined",
