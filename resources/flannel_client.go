@@ -37,7 +37,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 					Value: fmt.Sprintf("%d", f.Spec.FlannelConfiguration.ClusterVni),
 				},
 				{
-					Name: "ETCD_HOST",
+					Name: "ETCD_ENDPOINT",
 					ValueFrom: &apiv1.EnvVarSource{
 						FieldRef: &apiv1.ObjectFieldSelector{
 							APIVersion: "v1",
