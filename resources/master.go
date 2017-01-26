@@ -781,7 +781,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						},
 						{
 							Name:            "k8s-watch-master-vm",
-							Image:           "registry.giantswarm.io/giantswarm/k8s-watch-master-vm:4a226de00c16035f8bb38d43d32b211e5e7d4345",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-watch-master-vm:4a226de00c16035f8bb38d43d32b211e5e7d4345",
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Env: []apiv1.EnvVar{
 								{
