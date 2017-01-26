@@ -26,48 +26,8 @@ const ingressControllerReplicas int32 = 2
 
 func (i *ingressController) generateIngressControllerPodAffinity() (string, error) {
 	podAffinity := &api.Affinity{
-		PodAntiAffinity: &api.PodAntiAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{i.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
-								Key:      "app",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{"ingress-controller"},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
-			},
-		},
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{i.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
 				{
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
