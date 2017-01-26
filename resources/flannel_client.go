@@ -43,7 +43,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 				},
 				{
 					Name:  "CUSTOMER_ID",
-					Value: f.Spec.Customer,
+					Value: f.Spec.ClusterId,
 				},
 				{
 					Name:  "ETCD_PORT",
