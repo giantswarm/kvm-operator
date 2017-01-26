@@ -673,7 +673,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "bridge-ip-configmap-master-vm",
+												Name: bridgeIPConfigmapName("master"),
 											},
 											Key: "bridge-ip",
 										},

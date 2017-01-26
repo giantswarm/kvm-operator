@@ -109,7 +109,8 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		{
 			Name: "kubectl-bridge-ip-configmap",
 			// Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
-			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
+			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
@@ -518,7 +519,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "bridge-ip-configmap-worker-vm",
+												Name: bridgeIPConfigmapName("worker"),
 											},
 											Key: "bridge-ip",
 										},
