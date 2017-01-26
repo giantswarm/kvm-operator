@@ -24,38 +24,20 @@ type flannelClient struct {
 func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
-			Name:            "set-network-env",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/set-flannel-network-env",
+			Name:            "k8s-network-config",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-config:7e6b155f78ce00b2193c3015863e1994e97ed4b5",
 			ImagePullPolicy: apiv1.PullAlways,
-			Command: []string{
-				"/bin/bash",
-				"-c",
-				"/run.sh",
-			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "CLUSTER_VNI",
+					Name:  "BACKEND_TYPE", // e.g. vxlan
+					Value: f.Spec.FlannelConfiguration.ClusterBackend,
+				},
+				{
+					Name:  "BACKEND_VNI", // e.g. 9
 					Value: fmt.Sprintf("%d", f.Spec.FlannelConfiguration.ClusterVni),
 				},
 				{
-					Name:  "CLUSTER_NETWORK",
-					Value: f.Spec.FlannelConfiguration.ClusterNetwork,
-				},
-				{
-					// TODO: This is a hack - we need to remove the customer id from this container
-					Name:  "CUSTOMER_ID",
-					Value: networkBridgeName(f.Spec.ClusterId),
-				},
-				{
-					Name:  "ETCD_PORT",
-					Value: f.Spec.GiantnetesConfiguration.EtcdPort,
-				},
-				{
-					Name:  "CLUSTER_ID",
-					Value: f.Spec.ClusterId,
-				},
-				{
-					Name: "ETCD_ENDPOINT",
+					Name: "ETCD_HOST",
 					ValueFrom: &apiv1.EnvVarSource{
 						FieldRef: &apiv1.ObjectFieldSelector{
 							APIVersion: "v1",
@@ -64,8 +46,16 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 					},
 				},
 				{
-					Name:  "CLUSTER_BACKEND",
-					Value: f.Spec.FlannelConfiguration.ClusterBackend,
+					Name:  "ETCD_PORT",
+					Value: f.Spec.GiantnetesConfiguration.EtcdPort,
+				},
+				{
+					Name:  "NETWORK", // e.g. 10.9.0.0/16
+					Value: f.Spec.FlannelConfiguration.ClusterNetwork,
+				},
+				{
+					Name:  "NETWORK_BRIDGE_NAME", // e.g. br-h8s2l
+					Value: networkBridgeName(f.Spec.ClusterId),
 				},
 			},
 		},
