@@ -42,8 +42,9 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 					Value: f.Spec.FlannelConfiguration.ClusterNetwork,
 				},
 				{
+					// TODO: This is a hack - we need to remove the customer id from this container
 					Name:  "CUSTOMER_ID",
-					Value: f.Spec.ClusterId,
+					Value: networkBridgeName(f.Spec.ClusterId),
 				},
 				{
 					Name:  "ETCD_PORT",
