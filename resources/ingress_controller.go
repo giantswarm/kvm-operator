@@ -26,6 +26,23 @@ const ingressControllerReplicas int32 = 2
 
 func (i *ingressController) generateIngressControllerPodAffinity() (string, error) {
 	podAffinity := &api.Affinity{
+		PodAntiAffinity: &api.PodAntiAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"ingress-controller"},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{i.Spec.ClusterId},
+				},
+			},
+		},
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{

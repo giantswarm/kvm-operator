@@ -85,19 +85,6 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{f.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{f.Spec.ClusterId},
-				},
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
 								Key:      "app",
 								Operator: apiunversioned.LabelSelectorOpIn,
 								Values:   []string{"flannel-client"},

@@ -26,6 +26,23 @@ type worker struct {
 
 func (w *worker) generateWorkerPodAffinity() (string, error) {
 	podAffinity := &api.Affinity{
+		PodAntiAffinity: &api.PodAntiAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
+				{
+					LabelSelector: &apiunversioned.LabelSelector{
+						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+							{
+								Key:      "app",
+								Operator: apiunversioned.LabelSelectorOpIn,
+								Values:   []string{"worker"},
+							},
+						},
+					},
+					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{w.Spec.ClusterId},
+				},
+			},
+		},
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{
