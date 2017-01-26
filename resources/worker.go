@@ -107,9 +107,9 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 		},
 		{
-			Name:            "kubectl-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + w.Spec.KubectlVersion,
-			ImagePullPolicy: apiv1.PullAlways,
+			Name: "kubectl-bridge-ip-configmap",
+			// Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
+			Image: "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
 			VolumeMounts: []apiv1.VolumeMount{
 				{
 					Name:      "customer-dir",
