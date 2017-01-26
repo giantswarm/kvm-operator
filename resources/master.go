@@ -39,6 +39,7 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{m.Spec.ClusterId},
 				},
 			},
 		},

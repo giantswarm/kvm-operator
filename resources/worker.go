@@ -39,6 +39,7 @@ func (w *worker) generateWorkerPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{w.Spec.ClusterId},
 				},
 			},
 		},

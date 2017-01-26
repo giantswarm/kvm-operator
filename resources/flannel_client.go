@@ -92,6 +92,7 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{f.Spec.ClusterId},
 				},
 				{
 					LabelSelector: &apiunversioned.LabelSelector{
@@ -104,6 +105,7 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{f.Spec.ClusterId},
 				},
 			},
 		},

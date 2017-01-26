@@ -39,6 +39,7 @@ func (i *ingressController) generateIngressControllerPodAffinity() (string, erro
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{i.Spec.ClusterId},
 				},
 			},
 		},
