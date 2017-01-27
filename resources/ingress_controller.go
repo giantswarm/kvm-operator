@@ -32,18 +32,6 @@ func (i *ingressController) generateIngressControllerPodAffinity() (string, erro
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{i.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
 								Key:      "app",
 								Operator: apiunversioned.LabelSelectorOpIn,
 								Values:   []string{"ingress-controller"},
@@ -51,23 +39,12 @@ func (i *ingressController) generateIngressControllerPodAffinity() (string, erro
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{i.Spec.ClusterId},
 				},
 			},
 		},
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{i.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
 				{
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
@@ -79,6 +56,7 @@ func (i *ingressController) generateIngressControllerPodAffinity() (string, erro
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{i.Spec.ClusterId},
 				},
 			},
 		},

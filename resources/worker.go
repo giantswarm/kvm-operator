@@ -32,42 +32,19 @@ func (w *worker) generateWorkerPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{w.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
 								Key:      "app",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{"master"},
+								Values:   []string{"worker"},
 							},
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{w.Spec.ClusterId},
 				},
 			},
 		},
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{w.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
 				{
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
@@ -79,6 +56,7 @@ func (w *worker) generateWorkerPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{w.Spec.ClusterId},
 				},
 			},
 		},
@@ -501,7 +479,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					Containers: []apiv1.Container{
 						{
 							Name:  "vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:" + w.Spec.K8sVmVersion,
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0868cdd0b0c7bf3b01fc108d7b50436bbdc4a65e",
 							Args: []string{
 								"worker",
 							},
@@ -540,7 +518,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "bridge-ip-configmap-worker-vm",
+												Name: bridgeIPConfigmapName("worker"),
 											},
 											Key: "bridge-ip",
 										},

@@ -32,18 +32,6 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
 							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{m.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
 								Key:      "app",
 								Operator: apiunversioned.LabelSelectorOpIn,
 								Values:   []string{"worker"},
@@ -51,23 +39,12 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{m.Spec.ClusterId},
 				},
 			},
 		},
 		PodAffinity: &api.PodAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
-								Key:      "cluster",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{m.Spec.ClusterId},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-				},
 				{
 					LabelSelector: &apiunversioned.LabelSelector{
 						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
@@ -79,6 +56,7 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
+					Namespaces:  []string{m.Spec.ClusterId},
 				},
 			},
 		},
@@ -646,7 +624,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "k8s-vm",
-							Image:           fmt.Sprintf("leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:%s", m.Spec.K8sVmVersion),
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0868cdd0b0c7bf3b01fc108d7b50436bbdc4a65e",
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
@@ -694,7 +672,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: "bridge-ip-configmap-master-vm",
+												Name: bridgeIPConfigmapName("master"),
 											},
 											Key: "bridge-ip",
 										},
@@ -802,7 +780,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						},
 						{
 							Name:            "k8s-watch-master-vm",
-							Image:           "registry.giantswarm.io/giantswarm/k8s-watch-master-vm:4a226de00c16035f8bb38d43d32b211e5e7d4345",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-watch-master-vm:4a226de00c16035f8bb38d43d32b211e5e7d4345",
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Env: []apiv1.EnvVar{
 								{
