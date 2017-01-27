@@ -22,24 +22,6 @@ test:
         - cd $GS_WD && go build -a -v -tags netgo -ldflags "-w -X main.gitCommit=$(git rev-parse --short HEAD) -X main.goVersion=$(go version | cut -d ' ' -f 3) -X main.osArch=$GOOS/$GOARCH -X main.projectVersion=$(cat VERSION)"
         - cd $GS_WD && docker build --rm=false -t registry.giantswarm.io/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1 .
         - cd $GS_WD && docker run registry.giantswarm.io/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1 --help
-        # TODO remove before merge
-        # push the docker image
-        - docker login --email=$DOCKER_EMAIL --username=$DOCKER_USERNAME --password="$DOCKER_PASSWORD" registry.giantswarm.io
-        - docker push registry.giantswarm.io/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$CIRCLE_SHA1
-        # fetch and configure kubectl
-        - curl --silent --max-time 60 --remote-name https://storage.googleapis.com/kubernetes-release/release/v1.4.3/bin/linux/amd64/kubectl && chmod +x ./kubectl
-        - echo -n $G8S_CA | base64 --decode > ./ca.pem
-        - echo -n $G8S_CRT | base64 --decode > ./crt.pem
-        - echo -n $G8S_KEY | base64 --decode > ./key.pem
-        - ./kubectl config set-cluster g8s-cluster --server=https://api.g8s.fra-1.giantswarm.io --certificate-authority=./ca.pem
-        - ./kubectl config set-credentials g8s-admin --certificate-authority=./ca.pem --client-certificate=./crt.pem --client-key=./key.pem
-        - ./kubectl config set-context g8s-system --cluster=g8s-cluster --user=g8s-admin
-        - ./kubectl config use-context g8s-system
-        - ./kubectl cluster-info
-        # update the manifests with the tag, apply the new manifests, and watch the rollout
-        - sed -i "s/%%DOCKER_TAG%%/$CIRCLE_SHA1/g" ./kubernetes/*
-        - ./kubectl apply --namespace=$CIRCLE_PROJECT_USERNAME -f ./kubernetes/
-        - ./kubectl rollout --namespace=$CIRCLE_PROJECT_USERNAME status deployment/$CIRCLE_PROJECT_REPONAME
 
 deployment:
     master:
