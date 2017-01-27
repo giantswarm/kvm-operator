@@ -107,9 +107,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 		},
 		{
-			Name: "kubectl-bridge-ip-configmap",
-			// Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:1.4.0",
+			Name:            "kubectl-bridge-ip-configmap",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
