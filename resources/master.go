@@ -141,7 +141,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-api-token",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-openssl:TODO",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-openssl:410c14100b89ffad9d84f0a5fbd9bdb398cdc2fd",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
