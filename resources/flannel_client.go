@@ -223,7 +223,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "flannel-client",
-							Image:           fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
+							Image:           fmt.Sprintf("quay.io/coreos/flannel:%s", f.Spec.FlannelConfiguration.Version),
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
