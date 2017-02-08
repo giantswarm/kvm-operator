@@ -76,7 +76,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:test-move-1",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:test-move-2",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
