@@ -17,5 +17,5 @@ func networkBridgeName(ID string) string {
 }
 
 func networkEnvFilePath(ID string) string {
-	return fmt.Sprintf("/run/flannel/networks/%s.env", ID)
+	return fmt.Sprintf("/run/flannel/networks/%s.env", networkBridgeName(ID))
 }
