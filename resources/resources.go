@@ -86,15 +86,6 @@ func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
 	}
 	objects = append(objects, workerComponents...)
 
-	ingressController := &ingressController{
-		Cluster: *cluster,
-	}
-	ingressComponents, err := ingressController.GenerateResources()
-	if err != nil {
-		log.Println("generate resource ingressComponents error %v", err)
-	}
-	objects = append(objects, ingressComponents...)
-
 	log.Println("finished computing desired resources for cluster:", cluster.Spec.ClusterId)
 
 	computeResourceTime.WithLabelValues(cluster.Spec.ClusterId).Set(float64(time.Since(start) / time.Millisecond))
