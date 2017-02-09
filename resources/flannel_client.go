@@ -223,17 +223,17 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "flannel-client",
-							Image:           fmt.Sprintf("giantswarm/flannel:%s", f.Spec.FlannelConfiguration.Version),
+							Image:           fmt.Sprintf("quay.io/coreos/flannel:%s", f.Spec.FlannelConfiguration.Version),
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"/opt/bin/flanneld --remote=$NODE_IP:8889 --public-ip=$NODE_IP --iface=$NODE_IP --networks=$CUSTOMER_ID -v=1",
+								"/opt/bin/flanneld --remote=$NODE_IP:8889 --public-ip=$NODE_IP --iface=$NODE_IP --networks=$NETWORK_BRIDGE_NAME -v=1",
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "CUSTOMER_ID",
-									Value: f.Spec.Customer,
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: networkBridgeName(f.Spec.ClusterId),
 								},
 								{
 									Name: "NODE_IP",
@@ -261,12 +261,12 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 						},
 						{
 							Name:            "k8s-network-bridge",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge:8b03718e5a2fccae97b663625fd0d7c013775b35",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge:f79c7dbefd349b95e875c1c5d5ae545ff09b64f6",
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo 'Waiting for flannel network'; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${HOST_SUBNET_RANGE}",
+								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo 'Waiting for ${NETWORK_ENV_FILE_PATH} to be created'; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${HOST_SUBNET_RANGE}",
 							},
 							Env: []apiv1.EnvVar{
 								{
