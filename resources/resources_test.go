@@ -12,11 +12,11 @@ import (
 )
 
 func TestResourceComputation(t *testing.T) {
-	// Master: Service, Ingress2379, Ingress6443, Deployment
+	// Master: Service, Deployment
 	// Flannel-client: Deployment
 	// Worker: Deployment, Service
 	// Ingress controller: Deployment, Service
-	expectedObjects := 10
+	expectedObjects := 8
 
 	cluster := &clusterspec.Cluster{
 		Spec: clusterspec.ClusterSpec{
