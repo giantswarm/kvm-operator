@@ -261,7 +261,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 						},
 						{
 							Name:            "k8s-network-bridge",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge:test-move-2",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge:test-iptables-1",
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
