@@ -537,8 +537,8 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.DnsIp,
 								},
 								{
-									Name:  "K8S_DOMAIN",
-									Value: w.Spec.Worker.Domain,
+									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
+									Value: m.Spec.ClusterId + ".giantswarm.local.",
 								},
 								{
 									Name:  "K8S_ETCD_DOMAIN_NAME",

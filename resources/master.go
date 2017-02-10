@@ -687,8 +687,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Master.DnsIp,
 								},
 								{
-									Name:  "K8S_DOMAIN",
-									Value: m.Spec.Master.Domain,
+									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
+									Value: m.Spec.ClusterId + ".giantswarm.local.",
 								},
 								{
 									Name:  "K8S_ETCD_DOMAIN_NAME",
