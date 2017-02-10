@@ -195,7 +195,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$ALT_NAMES",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -212,20 +212,12 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "ALT_NAMES",
-					Value: w.Spec.Certificates.MasterServiceName,
-				},
-				{
 					Name:  "CLUSTER_ID",
 					Value: w.Spec.ClusterId,
 				},
 				{
 					Name:  "COMMON_NAME",
 					Value: clusterDomain("calico", w.Spec.ClusterId, w.Spec.Worker.Domain),
-				},
-				{
-					Name:  "IP_SANS",
-					Value: w.Spec.GiantnetesConfiguration.ApiIp,
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -244,7 +236,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/client.pem --key-file=/etc/kubernetes/ssl/etcd/client-key.pem --ca-file=/etc/kubernetes/ssl/etcd/client-ca.pem --alt-names=$ALT_NAMES",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/client.pem --key-file=/etc/kubernetes/ssl/etcd/client-key.pem --ca-file=/etc/kubernetes/ssl/etcd/client-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -260,10 +252,6 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				Privileged: &privileged,
 			},
 			Env: []apiv1.EnvVar{
-				{
-					Name:  "ALT_NAMES",
-					Value: w.Spec.Certificates.MasterServiceName,
-				},
 				{
 					Name:  "CLUSTER_ID",
 					Value: w.Spec.ClusterId,

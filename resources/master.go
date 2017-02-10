@@ -218,7 +218,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$ALT_NAMES",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -234,10 +234,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				Privileged: &privileged,
 			},
 			Env: []apiv1.EnvVar{
-				{
-					Name:  "ALT_NAMES",
-					Value: m.Spec.Certificates.MasterServiceName,
-				},
 				{
 					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterId,
@@ -263,7 +259,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem --alt-names=$ALT_NAMES",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -279,10 +275,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				Privileged: &privileged,
 			},
 			Env: []apiv1.EnvVar{
-				{
-					Name:  "ALT_NAMES",
-					Value: m.Spec.Certificates.MasterServiceName,
-				},
 				{
 					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterId,
