@@ -1,10 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cluster-controller
+  name: kvm-operator
   namespace: giantswarm
   labels:
-    app: cluster-controller
+    app: kvm-operator
 spec:
   replicas: 1
   strategy:
@@ -12,11 +12,11 @@ spec:
   template:
     metadata:
       labels:
-        app: cluster-controller
+        app: kvm-operator
     spec:
       containers:
-      - name: cluster-controller
-        image: registry.giantswarm.io/giantswarm/cluster-controller:%%DOCKER_TAG%%
+      - name: kvm-operator
+        image: registry.giantswarm.io/giantswarm/kvm-operator:%%DOCKER_TAG%%
         args:
         - "controller"
         - "--api-server=https://api.g8s.fra-1.giantswarm.io"

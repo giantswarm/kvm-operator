@@ -3,6 +3,6 @@ FROM alpine:3.4
 RUN apk add --update ca-certificates \
     && rm -rf /var/cache/apk/*
 
-ADD ./cluster-controller /cluster-controller
+ADD ./kvm-operator /kvm-operator
 
-ENTRYPOINT ["/cluster-controller"]
+ENTRYPOINT ["/kvm-operator"]

@@ -5,6 +5,6 @@ import (
 )
 
 var RootCmd = &cobra.Command{
-	Use:   "cluster-controller",
-	Short: "cluster-controller handles Kubernetes clusters running on a Kubernetes cluster",
+	Use:   "kvm-operator",
+	Short: "kvm-operator handles Kubernetes clusters running on a Kubernetes cluster",
 }

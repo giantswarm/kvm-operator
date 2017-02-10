@@ -1,4 +1,4 @@
-package: github.com/giantswarm/cluster-controller
+package: github.com/giantswarm/kvm-operator
 import:
 - package: github.com/prometheus/client_golang
   version: ~0.8.0
