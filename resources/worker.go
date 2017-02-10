@@ -493,14 +493,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.DockerExtraArgs,
 								},
 								{
-									Name:  "G8S_DNS_IP",
-									Value: w.Spec.GiantnetesConfiguration.DnsIp,
-								},
-								{
-									Name:  "G8S_DOMAIN",
-									Value: w.Spec.GiantnetesConfiguration.Domain,
-								},
-								{
 									Name:  "HOSTNAME",
 									Value: w.Spec.ClusterId + "-k8svm-" + workerId,
 								},

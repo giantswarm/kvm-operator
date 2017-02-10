@@ -635,14 +635,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Customer,
 								},
 								{
-									Name:  "G8S_DNS_IP",
-									Value: m.Spec.GiantnetesConfiguration.DnsIp,
-								},
-								{
-									Name:  "G8S_DOMAIN",
-									Value: m.Spec.GiantnetesConfiguration.Domain,
-								},
-								{
 									Name:  "HOSTNAME",
 									Value: m.Spec.ClusterId + "-master.g8s.fra-1.giantswarm.io",
 								},
