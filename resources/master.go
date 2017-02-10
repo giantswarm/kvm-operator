@@ -636,7 +636,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "HOSTNAME",
-									Value: m.Spec.ClusterId + "-master.g8s.fra-1.giantswarm.io",
+									Value: clusterDomain("master", m.Spec.ClusterId, m.Spec.Master.Domain),
 								},
 								{
 									Name: "HOST_PUBLIC_IP",

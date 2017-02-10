@@ -494,7 +494,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "HOSTNAME",
-									Value: w.Spec.ClusterId + "-k8svm-" + workerId,
+									Value: clusterDomain(workerId, w.Spec.ClusterId, w.Spec.Worker.Domain), // NOTE worker ID already has "worker-" prefix
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
