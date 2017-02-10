@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/giantswarm/cluster-controller/controller"
+	"github.com/giantswarm/kvm-operator/controller"
 )
 
 var (

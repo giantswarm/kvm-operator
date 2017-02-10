@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/giantswarm/cluster-controller/resources"
+	"github.com/giantswarm/kvm-operator/resources"
 	"github.com/giantswarm/clusterspec"
 
 	"github.com/prometheus/client_golang/prometheus"

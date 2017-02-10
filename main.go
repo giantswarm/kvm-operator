@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/giantswarm/cluster-controller/cmd"
+	"github.com/giantswarm/kvm-operator/cmd"
 )
 
 func main() {
