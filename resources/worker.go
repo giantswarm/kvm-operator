@@ -146,7 +146,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/" + workerId + "/worker.pem --key-file=/etc/kubernetes/ssl/" + workerId + "/worker-key.pem --ca-file=/etc/kubernetes/ssl/" + workerId + "/worker-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME,$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/" + workerId + "/worker.pem --key-file=/etc/kubernetes/ssl/" + workerId + "/worker-key.pem --ca-file=/etc/kubernetes/ssl/" + workerId + "/worker-ca.pem --alt-names=$ALT_NAMES --ip-sans=$IP_SANS",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -163,24 +163,20 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: w.Spec.Certificates.MasterServiceName,
-				},
-				{
-					Name:  "K8S_API_ALT_NAMES",
-					Value: w.Spec.Certificates.ApiAltNames,
-				},
-				{
-					Name:  "G8S_API_IP",
-					Value: w.Spec.GiantnetesConfiguration.ApiIp,
-				},
-				{
-					Name:  "CUSTOMER_ID",
-					Value: w.Spec.Customer,
+					Name:  "ALT_NAMES",
+					Value: w.Spec.Certificates.ApiAltNames + "," + w.Spec.Certificates.MasterServiceName,
 				},
 				{
 					Name:  "CLUSTER_ID",
 					Value: w.Spec.ClusterId,
+				},
+				{
+					Name:  "COMMON_NAME",
+					Value: clusterDomain("api", w.Spec.ClusterId, w.Spec.Worker.Domain),
+				},
+				{
+					Name:  "IP_SANS",
+					Value: w.Spec.GiantnetesConfiguration.ApiIp,
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -199,7 +195,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=calico.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -216,16 +212,12 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: w.Spec.Certificates.MasterServiceName,
-				},
-				{
-					Name:  "CUSTOMER_ID",
-					Value: w.Spec.Customer,
-				},
-				{
 					Name:  "CLUSTER_ID",
 					Value: w.Spec.ClusterId,
+				},
+				{
+					Name:  "COMMON_NAME",
+					Value: clusterDomain("calico", w.Spec.ClusterId, w.Spec.Worker.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -244,7 +236,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=etcd.$CUSTOMER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/client.pem --key-file=/etc/kubernetes/ssl/etcd/client-key.pem --ca-file=/etc/kubernetes/ssl/etcd/client-ca.pem --alt-names=$K8S_MASTER_SERVICE_NAME",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/client.pem --key-file=/etc/kubernetes/ssl/etcd/client-key.pem --ca-file=/etc/kubernetes/ssl/etcd/client-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -261,16 +253,12 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: w.Spec.Certificates.MasterServiceName,
-				},
-				{
-					Name:  "CUSTOMER_ID",
-					Value: w.Spec.Customer,
-				},
-				{
 					Name:  "CLUSTER_ID",
 					Value: w.Spec.ClusterId,
+				},
+				{
+					Name:  "COMMON_NAME",
+					Value: clusterDomain("etcd", w.Spec.ClusterId, w.Spec.Worker.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -478,7 +466,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:  "vm",
+							Name:  "k8s-vm",
 							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0868cdd0b0c7bf3b01fc108d7b50436bbdc4a65e",
 							Args: []string{
 								"worker",
@@ -493,16 +481,8 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.DockerExtraArgs,
 								},
 								{
-									Name:  "G8S_DNS_IP",
-									Value: w.Spec.GiantnetesConfiguration.DnsIp,
-								},
-								{
-									Name:  "G8S_DOMAIN",
-									Value: w.Spec.GiantnetesConfiguration.Domain,
-								},
-								{
 									Name:  "HOSTNAME",
-									Value: w.Spec.ClusterId + "-k8svm-" + workerId,
+									Value: clusterDomain(workerId, w.Spec.ClusterId, w.Spec.Worker.Domain), // NOTE worker ID already has "worker-" prefix
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
@@ -545,8 +525,8 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.DnsIp,
 								},
 								{
-									Name:  "K8S_DOMAIN",
-									Value: w.Spec.Worker.Domain,
+									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
+									Value: w.Spec.ClusterId + ".giantswarm.local.",
 								},
 								{
 									Name:  "K8S_ETCD_DOMAIN_NAME",

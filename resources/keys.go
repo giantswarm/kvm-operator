@@ -12,6 +12,10 @@ func bridgeIPConfigmapPath(node string) string {
 	return fmt.Sprintf("/tmp/%s.json", bridgeIPConfigmapName(node))
 }
 
+func clusterDomain(sub, clusterID, domain string) string {
+	return fmt.Sprintf("%s.%s.%s", sub, clusterID, domain)
+}
+
 func networkBridgeName(ID string) string {
 	return fmt.Sprintf("br-%s", ID)
 }

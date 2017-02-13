@@ -169,7 +169,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=api.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/master/apiserver.pem --key-file=/etc/kubernetes/ssl/master/apiserver-key.pem --ca-file=/etc/kubernetes/ssl/master/apiserver-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/master/apiserver.pem --key-file=/etc/kubernetes/ssl/master/apiserver-key.pem --ca-file=/etc/kubernetes/ssl/master/apiserver-ca.pem --alt-names=$ALT_NAMES --ip-sans=$IP_SANS",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -186,24 +186,20 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: m.Spec.Certificates.MasterServiceName,
-				},
-				{
-					Name:  "K8S_API_ALT_NAMES",
+					Name:  "ALT_NAMES",
 					Value: m.Spec.Certificates.ApiAltNames,
 				},
 				{
-					Name:  "G8S_API_IP",
-					Value: m.Spec.GiantnetesConfiguration.ApiIp,
-				},
-				{
-					Name:  "CUSTOMER_ID",
-					Value: m.Spec.Customer,
+					Name:  "COMMON_NAME",
+					Value: clusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
 				},
 				{
 					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterId,
+				},
+				{
+					Name:  "IP_SANS",
+					Value: m.Spec.GiantnetesConfiguration.ApiIp,
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -222,7 +218,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=calico.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -239,16 +235,12 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: m.Spec.Certificates.MasterServiceName,
-				},
-				{
-					Name:  "CUSTOMER_ID",
-					Value: m.Spec.Customer,
-				},
-				{
 					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterId,
+				},
+				{
+					Name:  "COMMON_NAME",
+					Value: clusterDomain("calico", m.Spec.ClusterId, m.Spec.Master.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -267,7 +259,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=etcd.$CLUSTER_ID.g8s.fra-1.giantswarm.io --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem --alt-names=$K8S_API_ALT_NAMES --ip-sans=$G8S_API_IP",
+				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem",
 			},
 			VolumeMounts: []apiv1.VolumeMount{
 				{
@@ -284,16 +276,12 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			},
 			Env: []apiv1.EnvVar{
 				{
-					Name:  "K8S_MASTER_SERVICE_NAME",
-					Value: m.Spec.Certificates.MasterServiceName,
-				},
-				{
-					Name:  "CUSTOMER_ID",
-					Value: m.Spec.Customer,
-				},
-				{
 					Name:  "CLUSTER_ID",
 					Value: m.Spec.ClusterId,
+				},
+				{
+					Name:  "COMMON_NAME",
+					Value: clusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -639,16 +627,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Customer,
 								},
 								{
-									Name:  "G8S_DNS_IP",
-									Value: m.Spec.GiantnetesConfiguration.DnsIp,
-								},
-								{
-									Name:  "G8S_DOMAIN",
-									Value: m.Spec.GiantnetesConfiguration.Domain,
-								},
-								{
 									Name:  "HOSTNAME",
-									Value: m.Spec.ClusterId + "-master.g8s.fra-1.giantswarm.io",
+									Value: clusterDomain("master", m.Spec.ClusterId, m.Spec.Master.Domain),
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
@@ -699,8 +679,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Master.DnsIp,
 								},
 								{
-									Name:  "K8S_DOMAIN",
-									Value: m.Spec.Master.Domain,
+									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
+									Value: m.Spec.ClusterId + ".giantswarm.local.",
 								},
 								{
 									Name:  "K8S_ETCD_DOMAIN_NAME",
