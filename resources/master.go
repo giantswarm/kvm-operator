@@ -311,10 +311,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 					Value: m.Spec.GiantnetesConfiguration.EtcdPort,
 				},
 				{
-					Name:  "CLUSTER_ID",
-					Value: m.Spec.ClusterId,
-				},
-				{
 					Name:  "NETWORK_BRIDGE_NAME",
 					Value: networkBridgeName(m.Spec.ClusterId),
 				},
@@ -709,10 +705,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:  "K8S_MASTER_DOMAIN_NAME",
 									Value: m.Spec.Master.MasterDomainName,
-								},
-								{
-									Name:  "K8S_MASTER_SERVICE_NAME",
-									Value: m.Spec.Certificates.MasterServiceName,
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_VERSION",
