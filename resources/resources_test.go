@@ -15,7 +15,7 @@ func TestResourceComputation(t *testing.T) {
 	// Master: Service, Ingress2379, Ingress6443, Deployment
 	// Flannel-client: Deployment
 	// Worker: Deployment, Service
-	expectedObjects := 8
+	expectedObjects := 7
 
 	cluster := &clusterspec.Cluster{
 		Spec: clusterspec.ClusterSpec{
