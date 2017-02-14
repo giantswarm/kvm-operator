@@ -373,44 +373,41 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 				"customer": m.Spec.Customer,
 				"app":      "master",
 			},
+			Annotations: map[string]string{
+				"ingress.kubernetes.io/ssl-passthrough": "true",
+			},
 		},
 		Spec: extensionsv1.IngressSpec{
-			Backend: &extensionsv1.IngressBackend{
-				ServiceName: "master",
-				ServicePort: intstr.FromInt(2379),
+			TLS: []extensionsv1.IngressTLS{
+				extensionsv1.IngressTLS{
+					Hosts: []string{
+						clusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+					},
+				},
+			},
+			Rules: []extensionsv1.IngressRule{
+				extensionsv1.IngressRule{
+					Host: clusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+					IngressRuleValue: extensionsv1.IngressRuleValue{
+						HTTP: &extensionsv1.HTTPIngressRuleValue{
+							Paths: []extensionsv1.HTTPIngressPath{
+								extensionsv1.HTTPIngressPath{
+									Path: "/",
+									Backend: extensionsv1.IngressBackend{
+										ServiceName: "master",
+										ServicePort: intstr.FromInt(2379),
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
 
 	objects = append(objects, endpointMasterEtcd)
 
-	insecurePort, err := strconv.Atoi(m.Spec.Master.InsecurePort)
-	if err != nil {
-		return nil, maskAny(err)
-	}
-
-	endpointMasterAPIHTTP := &extensionsv1.Ingress{
-		TypeMeta: apiunversioned.TypeMeta{
-			Kind:       "Ingress",
-			APIVersion: "extensions/v1beta",
-		},
-		ObjectMeta: apiv1.ObjectMeta{
-			Name: "api",
-			Labels: map[string]string{
-				"cluster":  m.Spec.ClusterId,
-				"customer": m.Spec.Customer,
-				"app":      "master",
-			},
-		},
-		Spec: extensionsv1.IngressSpec{
-			Backend: &extensionsv1.IngressBackend{
-				ServiceName: "master",
-				ServicePort: intstr.FromInt(insecurePort),
-			},
-		},
-	}
-
-	objects = append(objects, endpointMasterAPIHTTP)
 	securePort, err := strconv.Atoi(m.Spec.Master.SecurePort)
 	if err != nil {
 		return nil, maskAny(err)
@@ -422,17 +419,41 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: "api-https",
+			Name: "api",
 			Labels: map[string]string{
 				"cluster":  m.Spec.ClusterId,
 				"customer": m.Spec.Customer,
 				"app":      "master",
 			},
+			Annotations: map[string]string{
+				"ingress.kubernetes.io/ssl-passthrough": "true",
+			},
 		},
 		Spec: extensionsv1.IngressSpec{
-			Backend: &extensionsv1.IngressBackend{
-				ServiceName: "master",
-				ServicePort: intstr.FromInt(securePort),
+			TLS: []extensionsv1.IngressTLS{
+				extensionsv1.IngressTLS{
+					Hosts: []string{
+						clusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+					},
+				},
+			},
+			Rules: []extensionsv1.IngressRule{
+				extensionsv1.IngressRule{
+					Host: clusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+					IngressRuleValue: extensionsv1.IngressRuleValue{
+						HTTP: &extensionsv1.HTTPIngressRuleValue{
+							Paths: []extensionsv1.HTTPIngressPath{
+								extensionsv1.HTTPIngressPath{
+									Path: "/",
+									Backend: extensionsv1.IngressBackend{
+										ServiceName: "master",
+										ServicePort: intstr.FromInt(securePort),
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -456,17 +477,12 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			Type: apiv1.ServiceType("LoadBalancer"),
 			Ports: []apiv1.ServicePort{
 				{
-					Name:     "api",
-					Port:     int32(insecurePort),
-					Protocol: "TCP",
-				},
-				{
 					Name:     "etcd",
 					Port:     int32(2379),
 					Protocol: "TCP",
 				},
 				{
-					Name:     "api-https",
+					Name:     "api",
 					Port:     int32(securePort),
 					Protocol: "TCP",
 				},
