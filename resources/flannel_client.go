@@ -274,7 +274,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 									Value: networkEnvFilePath(f.Spec.ClusterId),
 								},
 								{
-									Name:  "HOST_SUBNET_RANGE",
+									Name:  "HOST_SUBNET_RANGE", // TODO rename to NETWORK_SUBNET_RANGE (from f.Spec.Flannel.Network)
 									Value: f.Spec.GiantnetesConfiguration.HostSubnetRange,
 								},
 								{
