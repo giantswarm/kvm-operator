@@ -467,7 +467,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					Containers: []apiv1.Container{
 						{
 							Name:  "k8s-vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0868cdd0b0c7bf3b01fc108d7b50436bbdc4a65e",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:38f9daaa181aa1d9e6122559b85537e604773d2a",
 							Args: []string{
 								"worker",
 							},
