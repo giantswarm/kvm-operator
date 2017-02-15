@@ -501,7 +501,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									ValueFrom: &apiv1.EnvVarSource{
 										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
 											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: bridgeIPConfigmapName("worker"),
+												Name: bridgeIPConfigmapName(workerId),
 											},
 											Key: "bridge-ip",
 										},
