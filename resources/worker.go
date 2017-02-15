@@ -372,7 +372,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 		},
 		Spec: extensionsv1.DeploymentSpec{
 			Strategy: extensionsv1.DeploymentStrategy{
-				Type: "Recreate",
+				Type: extensionsv1.RecreateDeploymentStrategyType,
 			},
 			Replicas: &w.Spec.Worker.Replicas,
 			Template: apiv1.PodTemplateSpec{

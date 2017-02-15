@@ -519,7 +519,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 		},
 		Spec: extensionsv1.DeploymentSpec{
 			Strategy: extensionsv1.DeploymentStrategy{
-				Type: "Recreate",
+				Type: extensionsv1.RecreateDeploymentStrategyType,
 			},
 			Replicas: &masterReplicas,
 			Template: apiv1.PodTemplateSpec{
