@@ -297,8 +297,8 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Name:            "set-iptables",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-iptables:4625e26b128c0ce637774ab0a3051fb6df07d0be",
 			ImagePullPolicy: apiv1.PullAlways,
-			Command: []string{
-				"-I INPUT -p tcp --match multiport --dports ${ETCD_PORT} -d ${NODE_IP} -i ${NETWORK_BRIDGE_NAME} -j ACCEPT",
+			Args: []string{
+				"-I", "INPUT", "-p", "tcp", "--match", "multiport", "--dports", "${ETCD_PORT}", "-d", "${NODE_IP}", "-i", "${NETWORK_BRIDGE_NAME}", "-j", "ACCEPT",
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
