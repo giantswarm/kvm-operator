@@ -295,12 +295,10 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "set-iptables",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/alpine-bash-iptables",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-iptables:4625e26b128c0ce637774ab0a3051fb6df07d0be",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/sbin/iptables -I INPUT -p tcp --match multiport --dports $ETCD_PORT -d ${NODE_IP} -i ${NETWORK_BRIDGE_NAME} -j ACCEPT",
+				"-I INPUT -p tcp --match multiport --dports ${ETCD_PORT} -d ${NODE_IP} -i ${NETWORK_BRIDGE_NAME} -j ACCEPT",
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
@@ -309,10 +307,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				{
 					Name:  "ETCD_PORT",
 					Value: m.Spec.GiantnetesConfiguration.EtcdPort,
-				},
-				{
-					Name:  "CLUSTER_ID",
-					Value: m.Spec.ClusterId,
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME",
@@ -709,10 +703,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:  "K8S_MASTER_DOMAIN_NAME",
 									Value: m.Spec.Master.MasterDomainName,
-								},
-								{
-									Name:  "K8S_MASTER_SERVICE_NAME",
-									Value: m.Spec.Certificates.MasterServiceName,
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_VERSION",

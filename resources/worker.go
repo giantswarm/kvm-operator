@@ -537,14 +537,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.MasterDomainName,
 								},
 								{
-									Name:  "K8S_MASTER_PORT",
-									Value: w.Spec.Worker.MasterPort,
-								},
-								{
-									Name:  "K8S_MASTER_SERVICE_NAME",
-									Value: w.Spec.Certificates.MasterServiceName,
-								},
-								{
 									Name:  "K8S_NETWORK_SETUP_VERSION",
 									Value: w.Spec.Worker.NetworkSetupVersion,
 								},
