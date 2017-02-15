@@ -164,7 +164,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "ALT_NAMES",
-					Value: w.Spec.Certificates.ApiAltNames + "," + w.Spec.Certificates.MasterServiceName,
+					Value: w.Spec.Certificates.ApiAltNames, // + "," + w.Spec.Certificates.MasterServiceName,
 				},
 				{
 					Name:  "CLUSTER_ID",
