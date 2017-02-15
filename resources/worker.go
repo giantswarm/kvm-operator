@@ -74,9 +74,12 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 	privileged := true
 
 	initContainers := []apiv1.Container{
+		// TODO this crap seems to be the same for workers and masters. So this
+		// should be part of the general network setup for each node, like the
+		// flannel client. It would be good to put it into there.
 		{
 			Name:            "k8s-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:6d24a36be4d63259b67a1f46e3ff2d04a789e51c",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:bf69d1dd17c78f83eccd4e5149cfa05032bd14a3",
 			ImagePullPolicy: apiv1.PullAlways,
 			VolumeMounts: []apiv1.VolumeMount{
 				{
