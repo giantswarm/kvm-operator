@@ -624,7 +624,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "k8s-vm",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:930fa523e06083f2f304839b47ba7f9004463fa7",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:8c83b29c13bda874801a4679592028cf135f75a0",
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
