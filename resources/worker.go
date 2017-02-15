@@ -93,11 +93,11 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "BRIDGE_IP_CONFIGMAP_NAME",
-					Value: bridgeIPConfigmapName("worker"),
+					Value: bridgeIPConfigmapName(workerId),
 				},
 				{
 					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("worker"),
+					Value: bridgeIPConfigmapPath(workerId),
 				},
 				{
 					Name:  "K8S_NAMESPACE",
@@ -138,7 +138,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("worker"),
+					Value: bridgeIPConfigmapPath(workerId),
 				},
 			},
 		},
