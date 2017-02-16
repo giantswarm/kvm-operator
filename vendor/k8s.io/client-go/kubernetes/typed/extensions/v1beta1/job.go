@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ type jobs struct {
 }
 
 // newJobs returns a Jobs
-func newJobs(c *ExtensionsClient, namespace string) *jobs {
+func newJobs(c *ExtensionsV1beta1Client, namespace string) *jobs {
 	return &jobs{
 		client: c.RESTClient(),
 		ns:     namespace,

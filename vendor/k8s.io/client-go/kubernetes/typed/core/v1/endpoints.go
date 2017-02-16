@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ type endpoints struct {
 }
 
 // newEndpoints returns a Endpoints
-func newEndpoints(c *CoreClient, namespace string) *endpoints {
+func newEndpoints(c *CoreV1Client, namespace string) *endpoints {
 	return &endpoints{
 		client: c.RESTClient(),
 		ns:     namespace,

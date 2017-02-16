@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ type thirdPartyResources struct {
 }
 
 // newThirdPartyResources returns a ThirdPartyResources
-func newThirdPartyResources(c *ExtensionsClient) *thirdPartyResources {
+func newThirdPartyResources(c *ExtensionsV1beta1Client) *thirdPartyResources {
 	return &thirdPartyResources{
 		client: c.RESTClient(),
 	}

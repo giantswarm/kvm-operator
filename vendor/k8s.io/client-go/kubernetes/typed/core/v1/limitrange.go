@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ type limitRanges struct {
 }
 
 // newLimitRanges returns a LimitRanges
-func newLimitRanges(c *CoreClient, namespace string) *limitRanges {
+func newLimitRanges(c *CoreV1Client, namespace string) *limitRanges {
 	return &limitRanges{
 		client: c.RESTClient(),
 		ns:     namespace,

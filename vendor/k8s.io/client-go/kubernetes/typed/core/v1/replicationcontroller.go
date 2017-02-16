@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ type replicationControllers struct {
 }
 
 // newReplicationControllers returns a ReplicationControllers
-func newReplicationControllers(c *CoreClient, namespace string) *replicationControllers {
+func newReplicationControllers(c *CoreV1Client, namespace string) *replicationControllers {
 	return &replicationControllers{
 		client: c.RESTClient(),
 		ns:     namespace,

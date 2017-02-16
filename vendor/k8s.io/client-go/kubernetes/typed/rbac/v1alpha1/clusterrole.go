@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ type clusterRoles struct {
 }
 
 // newClusterRoles returns a ClusterRoles
-func newClusterRoles(c *RbacClient) *clusterRoles {
+func newClusterRoles(c *RbacV1alpha1Client) *clusterRoles {
 	return &clusterRoles{
 		client: c.RESTClient(),
 	}

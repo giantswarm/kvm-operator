@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ type configMaps struct {
 }
 
 // newConfigMaps returns a ConfigMaps
-func newConfigMaps(c *CoreClient, namespace string) *configMaps {
+func newConfigMaps(c *CoreV1Client, namespace string) *configMaps {
 	return &configMaps{
 		client: c.RESTClient(),
 		ns:     namespace,

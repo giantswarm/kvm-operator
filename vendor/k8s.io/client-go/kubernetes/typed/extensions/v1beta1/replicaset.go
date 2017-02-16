@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ type replicaSets struct {
 }
 
 // newReplicaSets returns a ReplicaSets
-func newReplicaSets(c *ExtensionsClient, namespace string) *replicaSets {
+func newReplicaSets(c *ExtensionsV1beta1Client, namespace string) *replicaSets {
 	return &replicaSets{
 		client: c.RESTClient(),
 		ns:     namespace,
