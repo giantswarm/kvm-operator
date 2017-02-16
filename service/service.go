@@ -104,6 +104,11 @@ func New(config Config) (*Service, error) {
 				},
 			}
 		}
+
+		kubernetesClient, err = kubernetes.NewForConfig(restConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
 	}
 
 	var healthzService *healthz.Service
