@@ -23,7 +23,7 @@ const (
 	Path = "/healthz"
 )
 
-// Config represents the configuration used to create a version endpoint.
+// Config represents the configuration used to create a healthz endpoint.
 type Config struct {
 	// Dependencies.
 	Logger     micrologger.Logger
@@ -31,7 +31,7 @@ type Config struct {
 	Service    *service.Service
 }
 
-// DefaultConfig provides a default configuration to create a new version
+// DefaultConfig provides a default configuration to create a new healthz
 // endpoint by best effort.
 func DefaultConfig() Config {
 	return Config{
@@ -42,7 +42,7 @@ func DefaultConfig() Config {
 	}
 }
 
-// New creates a new configured version endpoint.
+// New creates a new configured healthz endpoint.
 func New(config Config) (*Endpoint, error) {
 	// Dependencies.
 	if config.Logger == nil {

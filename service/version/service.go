@@ -16,8 +16,8 @@ type Config struct {
 	Source      string
 }
 
-// DefaultConfig provides a default configuration to create a new version service
-// by best effort.
+// DefaultConfig provides a default configuration to create a new version
+// service by best effort.
 func DefaultConfig() Config {
 	return Config{
 		// Settings.

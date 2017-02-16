@@ -33,15 +33,15 @@ func init() {
 	prometheus.MustRegister(healthCheckRequestTime)
 }
 
-// Config represents the configuration used to create a version service.
+// Config represents the configuration used to create a healthz service.
 type Config struct {
 	// Dependencies.
 	KubernetesClient *kubernetes.Clientset
 	Logger           micrologger.Logger
 }
 
-// DefaultConfig provides a default configuration to create a new version service
-// by best effort.
+// DefaultConfig provides a default configuration to create a new healthz
+// service by best effort.
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
@@ -50,7 +50,7 @@ func DefaultConfig() Config {
 	}
 }
 
-// New creates a new configured version service.
+// New creates a new configured healthz service.
 func New(config Config) (*Service, error) {
 	// Dependencies.
 	if config.KubernetesClient == nil {
@@ -72,7 +72,7 @@ func New(config Config) (*Service, error) {
 	return newService, nil
 }
 
-// Service implements the version service interface.
+// Service implements the healthz service interface.
 type Service struct {
 	// Dependencies.
 	kubernetesClient *kubernetes.Clientset
