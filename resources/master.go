@@ -75,71 +75,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:            "k8s-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:bf69d1dd17c78f83eccd4e5149cfa05032bd14a3",
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_NAME",
-					Value: bridgeIPConfigmapName("master"),
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("master"),
-				},
-				{
-					Name:  "K8S_NAMESPACE",
-					Value: m.Spec.ClusterId,
-				},
-				{
-					Name:  "NETWORK_BRIDGE_NAME",
-					Value: networkBridgeName(m.Spec.ClusterId),
-				},
-			},
-		},
-		{
-			Name:            "kubectl-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"while [ ! -f ${BRIDGE_IP_CONFIGMAP_PATH} ]; do echo -; sleep 1; done; /usr/bin/kubectl --server=${G8S_MASTER_HOST}:${G8S_MASTER_PORT} replace --force -f ${BRIDGE_IP_CONFIGMAP_PATH}",
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "G8S_MASTER_PORT",
-					Value: "8080",
-				},
-				{
-					Name:  "G8S_MASTER_HOST",
-					Value: "127.0.0.1",
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("master"),
-				},
-			},
-		},
-		{
 			Name:            "k8s-master-api-token",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-openssl:410c14100b89ffad9d84f0a5fbd9bdb398cdc2fd",
 			ImagePullPolicy: apiv1.PullAlways,
@@ -298,7 +233,9 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-iptables:4625e26b128c0ce637774ab0a3051fb6df07d0be",
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
-				"-I INPUT -p tcp --match multiport --dports ${ETCD_PORT} -d ${NODE_IP} -i ${NETWORK_BRIDGE_NAME} -j ACCEPT",
+				"/bin/sh",
+				"-c",
+				"/sbin/iptables -I INPUT -p tcp --match multiport --dports ${ETCD_PORT} -d ${NODE_IP} -i ${NETWORK_BRIDGE_NAME} -j ACCEPT",
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
@@ -519,7 +456,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 		},
 		Spec: extensionsv1.DeploymentSpec{
 			Strategy: extensionsv1.DeploymentStrategy{
-				Type: "Recreate",
+				Type: extensionsv1.RecreateDeploymentStrategyType,
 			},
 			Replicas: &masterReplicas,
 			Template: apiv1.PodTemplateSpec{
@@ -538,14 +475,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 				Spec: apiv1.PodSpec{
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
-						{
-							Name: "customer-dir",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/"),
-								},
-							},
-						},
 						{
 							Name: "etcd-data",
 							VolumeSource: apiv1.VolumeSource{
@@ -622,7 +551,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "k8s-vm",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0868cdd0b0c7bf3b01fc108d7b50436bbdc4a65e",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0f135bdbd732bb78e83abca0bc678e1119ecde99",
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
@@ -637,8 +566,13 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Customer,
 								},
 								{
-									Name:  "HOSTNAME",
-									Value: clusterDomain("master", m.Spec.ClusterId, m.Spec.Master.Domain),
+									Name: "HOSTNAME",
+									ValueFrom: &apiv1.EnvVarSource{
+										FieldRef: &apiv1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.name",
+										},
+									},
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
@@ -656,17 +590,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:  "K8S_CLUSTER_IP_SUBNET",
 									Value: m.Spec.Master.ClusterIpSubnet,
-								},
-								{
-									Name: "IP_BRIDGE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: bridgeIPConfigmapName("master"),
-											},
-											Key: "bridge-ip",
-										},
-									},
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
@@ -801,12 +724,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:  "G8S_MASTER_PORT",
 									Value: "8080",
-								},
-							},
-							VolumeMounts: []apiv1.VolumeMount{
-								{
-									Name:      "customer-dir",
-									MountPath: "/tmp/",
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{

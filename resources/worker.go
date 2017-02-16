@@ -75,71 +75,6 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:            "k8s-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:6d24a36be4d63259b67a1f46e3ff2d04a789e51c",
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_NAME",
-					Value: bridgeIPConfigmapName("worker"),
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("worker"),
-				},
-				{
-					Name:  "K8S_NAMESPACE",
-					Value: w.Spec.ClusterId,
-				},
-				{
-					Name:  "NETWORK_BRIDGE_NAME",
-					Value: networkBridgeName(w.Spec.ClusterId),
-				},
-			},
-		},
-		{
-			Name:            "kubectl-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + w.Spec.KubectlVersion,
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"while [ ! -f ${BRIDGE_IP_CONFIGMAP_PATH} ]; do echo -; sleep 1; done; /usr/bin/kubectl --server=${G8S_MASTER_HOST}:${G8S_MASTER_PORT} replace --force -f ${BRIDGE_IP_CONFIGMAP_PATH}",
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "G8S_MASTER_PORT",
-					Value: "8080",
-				},
-				{
-					Name:  "G8S_MASTER_HOST",
-					Value: "127.0.0.1",
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("worker"),
-				},
-			},
-		},
-		{
 			Name:            "k8s-worker-api-certs",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
@@ -164,7 +99,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "ALT_NAMES",
-					Value: w.Spec.Certificates.ApiAltNames + "," + w.Spec.Certificates.MasterServiceName,
+					Value: w.Spec.Certificates.ApiAltNames,
 				},
 				{
 					Name:  "CLUSTER_ID",
@@ -372,7 +307,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 		},
 		Spec: extensionsv1.DeploymentSpec{
 			Strategy: extensionsv1.DeploymentStrategy{
-				Type: "Recreate",
+				Type: extensionsv1.RecreateDeploymentStrategyType,
 			},
 			Replicas: &w.Spec.Worker.Replicas,
 			Template: apiv1.PodTemplateSpec{
@@ -391,14 +326,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 				Spec: apiv1.PodSpec{
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
-						{
-							Name: "customer-dir",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
-								},
-							},
-						},
 						{
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
@@ -420,14 +347,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
 									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/etcd/"),
-								},
-							},
-						},
-						{
-							Name: "bridge-ip-configmap",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
 								},
 							},
 						},
@@ -467,7 +386,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					Containers: []apiv1.Container{
 						{
 							Name:  "k8s-vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0868cdd0b0c7bf3b01fc108d7b50436bbdc4a65e",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0f135bdbd732bb78e83abca0bc678e1119ecde99",
 							Args: []string{
 								"worker",
 							},
@@ -481,8 +400,13 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.DockerExtraArgs,
 								},
 								{
-									Name:  "HOSTNAME",
-									Value: clusterDomain(workerId, w.Spec.ClusterId, w.Spec.Worker.Domain), // NOTE worker ID already has "worker-" prefix
+									Name: "HOSTNAME",
+									ValueFrom: &apiv1.EnvVarSource{
+										FieldRef: &apiv1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.name",
+										},
+									},
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
@@ -490,17 +414,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 										FieldRef: &apiv1.ObjectFieldSelector{
 											APIVersion: "v1",
 											FieldPath:  "spec.nodeName",
-										},
-									},
-								},
-								{
-									Name: "IP_BRIDGE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: bridgeIPConfigmapName("worker"),
-											},
-											Key: "bridge-ip",
 										},
 									},
 								},
