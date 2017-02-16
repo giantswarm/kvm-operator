@@ -74,74 +74,6 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 	privileged := true
 
 	initContainers := []apiv1.Container{
-		// TODO this crap seems to be the same for workers and masters. So this
-		// should be part of the general network setup for each node, like the
-		// flannel client. It would be good to put it into there.
-		{
-			Name:            "k8s-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:bf69d1dd17c78f83eccd4e5149cfa05032bd14a3",
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_NAME",
-					Value: bridgeIPConfigmapName(workerId),
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath(workerId),
-				},
-				{
-					Name:  "K8S_NAMESPACE",
-					Value: w.Spec.ClusterId,
-				},
-				{
-					Name:  "NETWORK_BRIDGE_NAME",
-					Value: networkBridgeName(w.Spec.ClusterId),
-				},
-			},
-		},
-		{
-			Name:            "kubectl-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + w.Spec.KubectlVersion,
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"while [ ! -f ${BRIDGE_IP_CONFIGMAP_PATH} ]; do echo -; sleep 1; done; /usr/bin/kubectl --server=${G8S_MASTER_HOST}:${G8S_MASTER_PORT} replace --force -f ${BRIDGE_IP_CONFIGMAP_PATH}",
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "G8S_MASTER_PORT",
-					Value: "8080",
-				},
-				{
-					Name:  "G8S_MASTER_HOST",
-					Value: "127.0.0.1",
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath(workerId),
-				},
-			},
-		},
 		{
 			Name:            "k8s-worker-api-certs",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
@@ -395,14 +327,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
 						{
-							Name: "customer-dir",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
-								},
-							},
-						},
-						{
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -423,14 +347,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
 									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/etcd/"),
-								},
-							},
-						},
-						{
-							Name: "bridge-ip-configmap",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/"),
 								},
 							},
 						},
@@ -470,7 +386,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					Containers: []apiv1.Container{
 						{
 							Name:  "k8s-vm",
-							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:8c83b29c13bda874801a4679592028cf135f75a0",
+							Image: "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:fdbfb0a0f57fe316f97f4ab9f58fed7b684955b8",
 							Args: []string{
 								"worker",
 							},
@@ -485,7 +401,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "HOSTNAME",
-									Value: clusterDomain(workerId, w.Spec.ClusterId, w.Spec.Worker.Domain), // NOTE worker ID already has "worker-" prefix
+									Value: clusterDomain("worker", w.Spec.ClusterId, w.Spec.Worker.Domain), // NOTE worker ID already has "worker-" prefix
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
@@ -493,17 +409,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 										FieldRef: &apiv1.ObjectFieldSelector{
 											APIVersion: "v1",
 											FieldPath:  "spec.nodeName",
-										},
-									},
-								},
-								{
-									Name: "IP_BRIDGE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: bridgeIPConfigmapName(workerId),
-											},
-											Key: "bridge-ip",
 										},
 									},
 								},

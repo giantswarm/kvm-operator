@@ -75,71 +75,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:            "k8s-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-bridge-ip-configmap:bf69d1dd17c78f83eccd4e5149cfa05032bd14a3",
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_NAME",
-					Value: bridgeIPConfigmapName("master"),
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("master"),
-				},
-				{
-					Name:  "K8S_NAMESPACE",
-					Value: m.Spec.ClusterId,
-				},
-				{
-					Name:  "NETWORK_BRIDGE_NAME",
-					Value: networkBridgeName(m.Spec.ClusterId),
-				},
-			},
-		},
-		{
-			Name:            "kubectl-bridge-ip-configmap",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/kubectl:" + m.Spec.KubectlVersion,
-			ImagePullPolicy: apiv1.PullAlways,
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "customer-dir",
-					MountPath: "/tmp/",
-				},
-			},
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"while [ ! -f ${BRIDGE_IP_CONFIGMAP_PATH} ]; do echo -; sleep 1; done; /usr/bin/kubectl --server=${G8S_MASTER_HOST}:${G8S_MASTER_PORT} replace --force -f ${BRIDGE_IP_CONFIGMAP_PATH}",
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "G8S_MASTER_PORT",
-					Value: "8080",
-				},
-				{
-					Name:  "G8S_MASTER_HOST",
-					Value: "127.0.0.1",
-				},
-				{
-					Name:  "BRIDGE_IP_CONFIGMAP_PATH",
-					Value: bridgeIPConfigmapPath("master"),
-				},
-			},
-		},
-		{
 			Name:            "k8s-master-api-token",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-openssl:410c14100b89ffad9d84f0a5fbd9bdb398cdc2fd",
 			ImagePullPolicy: apiv1.PullAlways,
@@ -541,14 +476,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
 						{
-							Name: "customer-dir",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/"),
-								},
-							},
-						},
-						{
 							Name: "etcd-data",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -624,7 +551,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "k8s-vm",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:8c83b29c13bda874801a4679592028cf135f75a0",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:fdbfb0a0f57fe316f97f4ab9f58fed7b684955b8",
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
@@ -658,17 +585,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:  "K8S_CLUSTER_IP_SUBNET",
 									Value: m.Spec.Master.ClusterIpSubnet,
-								},
-								{
-									Name: "IP_BRIDGE",
-									ValueFrom: &apiv1.EnvVarSource{
-										ConfigMapKeyRef: &apiv1.ConfigMapKeySelector{
-											LocalObjectReference: apiv1.LocalObjectReference{
-												Name: bridgeIPConfigmapName("master"),
-											},
-											Key: "bridge-ip",
-										},
-									},
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
@@ -803,12 +719,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:  "G8S_MASTER_PORT",
 									Value: "8080",
-								},
-							},
-							VolumeMounts: []apiv1.VolumeMount{
-								{
-									Name:      "customer-dir",
-									MountPath: "/tmp/",
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{
