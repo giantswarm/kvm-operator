@@ -566,8 +566,13 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Customer,
 								},
 								{
-									Name:  "HOSTNAME",
-									Value: clusterDomain("master", m.Spec.ClusterId, m.Spec.Master.Domain),
+									Name: "HOSTNAME",
+									ValueFrom: &apiv1.EnvVarSource{
+										FieldRef: &apiv1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.name",
+										},
+									},
 								},
 								{
 									Name: "HOST_PUBLIC_IP",

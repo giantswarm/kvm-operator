@@ -400,8 +400,13 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Worker.DockerExtraArgs,
 								},
 								{
-									Name:  "HOSTNAME",
-									Value: clusterDomain("worker", w.Spec.ClusterId, w.Spec.Worker.Domain), // NOTE worker ID already has "worker-" prefix
+									Name: "HOSTNAME",
+									ValueFrom: &apiv1.EnvVarSource{
+										FieldRef: &apiv1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.name",
+										},
+									},
 								},
 								{
 									Name: "HOST_PUBLIC_IP",
