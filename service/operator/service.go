@@ -3,7 +3,6 @@ package operator
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -129,22 +128,24 @@ func (s *Service) Boot() {
 					clusterEventHandleTotal.WithLabelValues("added").Inc()
 
 					cluster := obj.(*clusterspec.Cluster)
-					log.Printf("cluster '%v' added", cluster.Name)
+					s.logger.Log("debug", fmt.Sprintf("cluster created '%s'", cluster.Name))
 
-					if err := s.createClusterNamespace(*cluster); err != nil {
-						s.logger.Log("debug", "could not create cluster namespace:", err)
+					err := s.createClusterNamespace(*cluster)
+					if err != nil {
+						s.logger.Log("error", fmt.Sprintf("could not create cluster namespace '%#v'", err))
 					}
 
 					// Given a cluster, determine the desired state,
 					// in terms of resources that should exist in Kubernetes.
 					resources, err := resources.ComputeResources(cluster)
 					if err != nil {
-						s.logger.Log("debug", "could not compute required resources for cluster:", err)
+						s.logger.Log("error", fmt.Sprintf("could not compute required resources for cluster '%#v'", err))
 					}
 
 					// Reconcile the state of resources in Kubernetes with the desired state of resources we just computed.
-					if err := s.reconcileResourceState(getNamespaceNameForCluster(*cluster), resources); err != nil {
-						s.logger.Log("debug", "could not reconcile resource state:", err)
+					err = s.reconcileResourceState(getNamespaceNameForCluster(*cluster), resources)
+					if err != nil {
+						s.logger.Log("error", fmt.Sprintf("could not reconcile resource state '%#v'", err))
 					}
 
 					clusterEventHandleTime.WithLabelValues("added").Set(float64(time.Since(start) / time.Millisecond))
@@ -154,10 +155,11 @@ func (s *Service) Boot() {
 					clusterEventHandleTotal.WithLabelValues("deleted").Inc()
 
 					cluster := obj.(*clusterspec.Cluster)
-					log.Printf("cluster '%v' deleted", cluster.Name)
+					s.logger.Log("debug", fmt.Sprintf("cluster deleted '%s'", cluster.Name))
 
-					if err := s.deleteClusterNamespace(*cluster); err != nil {
-						s.logger.Log("debug", "could not delete cluster namespace:", err)
+					err := s.deleteClusterNamespace(*cluster)
+					if err != nil {
+						s.logger.Log("error", fmt.Sprintf("could not delete cluster namespace '%#v'", err))
 					}
 
 					clusterEventHandleTime.WithLabelValues("deleted").Set(float64(time.Since(start) / time.Millisecond))
