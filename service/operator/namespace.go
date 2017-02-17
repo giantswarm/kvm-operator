@@ -36,7 +36,7 @@ func init() {
 }
 
 func getNamespaceNameForCluster(cluster clusterspec.Cluster) string {
-	return cluster.ClusterId
+	return cluster.Spec.ClusterId
 }
 
 func (s *Service) createClusterNamespace(cluster clusterspec.Cluster) error {
