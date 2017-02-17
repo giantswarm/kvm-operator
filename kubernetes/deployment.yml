@@ -14,13 +14,23 @@ spec:
       labels:
         app: kvm-operator
     spec:
+      volumes:
+      - name: kvm-operator-configmap
+        configMap:
+          name: kvm-operator-configmap
+          items:
+          - key: config.yml
+            path: config.yml
       containers:
       - name: kvm-operator
         image: registry.giantswarm.io/giantswarm/kvm-operator:%%DOCKER_TAG%%
         args:
-        - "controller"
-        - "--api-server=https://api.g8s.fra-1.giantswarm.io"
-        - "--listen-address=0.0.0.0:8000"
+        - daemon
+        - --config.dirs=/var/run/kvm-operator/configmap/,/var/run/kvm-operator/secret/
+        - --config.files=config,secret
+        volumeMounts:
+        - name: kvm-operator-configmap
+          mountPath: /var/run/kvm-operator/configmap/
         livenessProbe:
           httpGet:
             path: /healthz

@@ -4,7 +4,6 @@ import:
   version: ~0.8.0
   subpackages:
   - prometheus
-  - prometheus/promhttp
 - package: github.com/spf13/cobra
 - package: k8s.io/client-go
   version: ~2.0.0-alpha.0
@@ -19,5 +18,20 @@ import:
   - pkg/watch
   - rest
   - tools/cache
+- package: github.com/golang/protobuf
+  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+- package: google.golang.org/grpc
+  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
+  subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - metadata
+  - naming
+  - peer
+  - transport
 - package: github.com/ventu-io/go-shortid
   version: ^1.0.0
+- package: github.com/giantswarm/microkit
+- package: github.com/spf13/viper

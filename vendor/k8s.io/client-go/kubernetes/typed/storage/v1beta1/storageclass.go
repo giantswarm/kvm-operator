@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ type storageClasses struct {
 }
 
 // newStorageClasses returns a StorageClasses
-func newStorageClasses(c *StorageClient) *storageClasses {
+func newStorageClasses(c *StorageV1beta1Client) *storageClasses {
 	return &storageClasses{
 		client: c.RESTClient(),
 	}

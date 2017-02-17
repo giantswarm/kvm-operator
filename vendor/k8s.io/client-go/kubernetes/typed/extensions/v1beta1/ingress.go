@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ type ingresses struct {
 }
 
 // newIngresses returns a Ingresses
-func newIngresses(c *ExtensionsClient, namespace string) *ingresses {
+func newIngresses(c *ExtensionsV1beta1Client, namespace string) *ingresses {
 	return &ingresses{
 		client: c.RESTClient(),
 		ns:     namespace,

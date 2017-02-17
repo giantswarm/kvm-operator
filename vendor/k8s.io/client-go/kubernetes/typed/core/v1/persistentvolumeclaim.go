@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2017 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ type persistentVolumeClaims struct {
 }
 
 // newPersistentVolumeClaims returns a PersistentVolumeClaims
-func newPersistentVolumeClaims(c *CoreClient, namespace string) *persistentVolumeClaims {
+func newPersistentVolumeClaims(c *CoreV1Client, namespace string) *persistentVolumeClaims {
 	return &persistentVolumeClaims{
 		client: c.RESTClient(),
 		ns:     namespace,

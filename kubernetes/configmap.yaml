@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kvm-operator-configmap
+  namespace: giantswarm
+data:
+  config.yml: |
+    server:
+      listen:
+        address: 'http://0.0.0.0:8000'
