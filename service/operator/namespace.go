@@ -36,10 +36,7 @@ func init() {
 }
 
 func getNamespaceNameForCluster(cluster clusterspec.Cluster) string {
-	// FIXME: I removed the prefix to make work our first version
-	//return fmt.Sprintf("cluster-%v", cluster.Name)
-
-	return fmt.Sprintf("%v", cluster.Name)
+	return cluster.ClusterId
 }
 
 func (s *Service) createClusterNamespace(cluster clusterspec.Cluster) error {
