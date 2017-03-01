@@ -126,7 +126,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: clusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Value: ClusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
 				},
 				{
 					Name:  "CLUSTER_ID",
@@ -175,7 +175,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: clusterDomain("calico", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Value: ClusterDomain("calico", m.Spec.ClusterId, m.Spec.Master.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -216,7 +216,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: clusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Value: ClusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -247,7 +247,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME",
-					Value: networkBridgeName(m.Spec.ClusterId),
+					Value: NetworkBridgeName(m.Spec.ClusterId),
 				},
 				{
 					Name: "NODE_IP",
@@ -312,13 +312,13 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			TLS: []extensionsv1.IngressTLS{
 				extensionsv1.IngressTLS{
 					Hosts: []string{
-						clusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+						ClusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
 					},
 				},
 			},
 			Rules: []extensionsv1.IngressRule{
 				extensionsv1.IngressRule{
-					Host: clusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Host: ClusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
 					IngressRuleValue: extensionsv1.IngressRuleValue{
 						HTTP: &extensionsv1.HTTPIngressRuleValue{
 							Paths: []extensionsv1.HTTPIngressPath{
@@ -364,13 +364,13 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			TLS: []extensionsv1.IngressTLS{
 				extensionsv1.IngressTLS{
 					Hosts: []string{
-						clusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+						ClusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
 					},
 				},
 			},
 			Rules: []extensionsv1.IngressRule{
 				extensionsv1.IngressRule{
-					Host: clusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Host: ClusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
 					IngressRuleValue: extensionsv1.IngressRuleValue{
 						HTTP: &extensionsv1.HTTPIngressRuleValue{
 							Paths: []extensionsv1.HTTPIngressPath{
@@ -559,7 +559,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: networkBridgeName(m.Spec.ClusterId),
+									Value: NetworkBridgeName(m.Spec.ClusterId),
 								},
 								{
 									Name:  "CUSTOMER_ID",

@@ -6,17 +6,17 @@ import (
 	"sync"
 	"time"
 
+	"github.com/giantswarm/clusterspec"
+	microerror "github.com/giantswarm/microkit/error"
+	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/pkg/runtime"
 	"k8s.io/client-go/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/giantswarm/clusterspec"
 	"github.com/giantswarm/kvm-operator/resources"
-	microerror "github.com/giantswarm/microkit/error"
-	micrologger "github.com/giantswarm/microkit/logger"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -125,43 +125,54 @@ func (s *Service) Boot() {
 			cache.ResourceEventHandlerFuncs{
 				AddFunc: func(obj interface{}) {
 					start := time.Now()
-					clusterEventHandleTotal.WithLabelValues("added").Inc()
+					clusterEventHandleTotal.WithLabelValues("created").Inc()
 
-					cluster := obj.(*clusterspec.Cluster)
-					s.logger.Log("debug", fmt.Sprintf("cluster created '%s'", cluster.Name))
+					customObject, ok := obj.(*clusterspec.Cluster)
+					if !ok {
+						s.logger.Log("debug", "ignoring none KVM TPR", "event", "create")
+						return
+					}
+					name := resources.ClusterName(*customObject)
+					namespace := resources.ClusterNamespace(*customObject)
 
-					err := s.createClusterNamespace(*cluster)
+					err := s.createNamespace(*customObject)
 					if err != nil {
-						s.logger.Log("error", fmt.Sprintf("could not create cluster namespace '%#v'", err))
+						s.logger.Log("error", fmt.Sprintf("could not create cluster namespace '%#v'", err), "event", "create")
 					}
 
 					// Given a cluster, determine the desired state,
 					// in terms of resources that should exist in Kubernetes.
-					resources, err := resources.ComputeResources(cluster)
+					resources, err := resources.ComputeResources(*customObject)
 					if err != nil {
-						s.logger.Log("error", fmt.Sprintf("could not compute required resources for cluster '%#v'", err))
+						s.logger.Log("error", fmt.Sprintf("could not compute required resources for cluster '%#v'", err), "event", "create")
 					}
 
 					// Reconcile the state of resources in Kubernetes with the desired state of resources we just computed.
-					err = s.reconcileResourceState(getNamespaceNameForCluster(*cluster), resources)
+					err = s.reconcileResourceState(namespace, resources)
 					if err != nil {
-						s.logger.Log("error", fmt.Sprintf("could not reconcile resource state '%#v'", err))
+						s.logger.Log("error", fmt.Sprintf("could not reconcile resource state '%#v'", err), "event", "create")
 					}
 
-					clusterEventHandleTime.WithLabelValues("added").Set(float64(time.Since(start) / time.Millisecond))
+					s.logger.Log("debug", fmt.Sprintf("cluster created '%s'", name), "event", "create")
+					clusterEventHandleTime.WithLabelValues("created").Set(float64(time.Since(start) / time.Millisecond))
 				},
 				DeleteFunc: func(obj interface{}) {
 					start := time.Now()
 					clusterEventHandleTotal.WithLabelValues("deleted").Inc()
 
-					cluster := obj.(*clusterspec.Cluster)
-					s.logger.Log("debug", fmt.Sprintf("cluster deleted '%s'", cluster.Name))
+					customObject, ok := obj.(*clusterspec.Cluster)
+					if !ok {
+						s.logger.Log("debug", "ignoring none KVM TPR", "event", "delete")
+						return
+					}
+					name := resources.ClusterName(*customObject)
 
-					err := s.deleteClusterNamespace(*cluster)
+					err := s.deleteNamespace(*customObject)
 					if err != nil {
-						s.logger.Log("error", fmt.Sprintf("could not delete cluster namespace '%#v'", err))
+						s.logger.Log("error", fmt.Sprintf("could not delete cluster namespace '%#v'", err), "event", "delete")
 					}
 
+					s.logger.Log("debug", fmt.Sprintf("cluster deleted '%s'", name), "event", "delete")
 					clusterEventHandleTime.WithLabelValues("deleted").Set(float64(time.Since(start) / time.Millisecond))
 				},
 			},

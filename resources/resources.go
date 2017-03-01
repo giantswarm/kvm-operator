@@ -44,23 +44,25 @@ type ClusterObj interface {
 
 // computeResources returns a list of Kubernetes objects that define
 // the desired state of the given cluster.
-func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
-	if cluster.Spec.ClusterId == "" {
+func ComputeResources(customObject clusterspec.Cluster) ([]runtime.Object, error) {
+	clusterID := ClusterID(customObject)
+
+	if clusterID == "" {
 		return nil, errors.New("cluster ID must not be empty")
 	}
-	if cluster.Spec.Worker.Replicas == int32(0) {
+	if customObject.Spec.Worker.Replicas == int32(0) {
 		return nil, errors.New("worker replicas must not be empty")
 	}
 
 	start := time.Now()
-	computeResourcesTotal.WithLabelValues(cluster.Spec.ClusterId).Inc()
+	computeResourcesTotal.WithLabelValues(clusterID).Inc()
 
-	log.Println("started computing desired resources for cluster:", cluster.Spec.ClusterId)
+	log.Println("started computing desired resources for cluster:", clusterID)
 
 	objects := []runtime.Object{}
 
 	flannelClient := &flannelClient{
-		Cluster: *cluster,
+		Cluster: customObject,
 	}
 	flannelComponents, err := flannelClient.GenerateResources()
 	if err != nil {
@@ -69,7 +71,7 @@ func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
 	objects = append(objects, flannelComponents...)
 
 	master := &master{
-		Cluster: *cluster,
+		Cluster: customObject,
 	}
 	masterComponents, err := master.GenerateResources()
 	if err != nil {
@@ -78,7 +80,7 @@ func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
 	objects = append(objects, masterComponents...)
 
 	worker := &worker{
-		Cluster: *cluster,
+		Cluster: customObject,
 	}
 	workerComponents, err := worker.GenerateResources()
 	if err != nil {
@@ -86,9 +88,9 @@ func ComputeResources(cluster *clusterspec.Cluster) ([]runtime.Object, error) {
 	}
 	objects = append(objects, workerComponents...)
 
-	log.Println("finished computing desired resources for cluster:", cluster.Spec.ClusterId)
+	log.Println("finished computing desired resources for cluster:", clusterID)
 
-	computeResourceTime.WithLabelValues(cluster.Spec.ClusterId).Set(float64(time.Since(start) / time.Millisecond))
+	computeResourceTime.WithLabelValues(clusterID).Set(float64(time.Since(start) / time.Millisecond))
 
 	return objects, nil
 }

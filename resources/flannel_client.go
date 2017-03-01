@@ -55,7 +55,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME", // e.g. br-h8s2l
-					Value: networkBridgeName(f.Spec.ClusterId),
+					Value: NetworkBridgeName(f.Spec.ClusterId),
 				},
 			},
 		},
@@ -233,7 +233,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: networkBridgeName(f.Spec.ClusterId),
+									Value: NetworkBridgeName(f.Spec.ClusterId),
 								},
 								{
 									Name: "NODE_IP",
@@ -271,7 +271,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_ENV_FILE_PATH",
-									Value: networkEnvFilePath(f.Spec.ClusterId),
+									Value: NetworkEnvFilePath(f.Spec.ClusterId),
 								},
 								{
 									Name:  "HOST_SUBNET_RANGE", // TODO rename to NETWORK_SUBNET_RANGE (from f.Spec.Flannel.Network)
@@ -279,7 +279,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: networkBridgeName(f.Spec.ClusterId),
+									Value: NetworkBridgeName(f.Spec.ClusterId),
 								},
 								{
 									Name:  "NETWORK_INTERFACE_NAME",
