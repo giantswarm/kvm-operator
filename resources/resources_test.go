@@ -17,7 +17,7 @@ func TestResourceComputation(t *testing.T) {
 	// Worker: Deployment, Service
 	expectedObjects := 7
 
-	cluster := &clusterspec.Cluster{
+	cluster := clusterspec.Cluster{
 		Spec: clusterspec.ClusterSpec{
 			ClusterId: "test",
 			Customer:  "test",
@@ -39,13 +39,13 @@ func TestResourceComputation(t *testing.T) {
 	}
 }
 
-// TestResourcesDontHaveClusterIdAsPrefix tests that resources do not have the
+// TestResourcesDontHaveClusterIDAsPrefix tests that resources do not have the
 // cluster id as a prefix. This is due to IDs being alphanumeric, and Kubernetes
 // not allowing resource names to begin with an integer.
-func TestResourcesDontHaveClusterIdAsPrefix(t *testing.T) {
+func TestResourcesDontHaveClusterIDAsPrefix(t *testing.T) {
 	id := "test"
 
-	cluster := &clusterspec.Cluster{
+	cluster := clusterspec.Cluster{
 		Spec: clusterspec.ClusterSpec{
 			ClusterId: id,
 			Customer:  id,
@@ -87,13 +87,13 @@ func TestResourcesDontHaveClusterIdAsPrefix(t *testing.T) {
 }
 
 func TestResourcesHaveCorrectLabelScheme(t *testing.T) {
-	clusterId := "cluster-test"
-	customerId := "customer-test"
+	clusterID := "cluster-test"
+	customerID := "customer-test"
 
-	cluster := &clusterspec.Cluster{
+	cluster := clusterspec.Cluster{
 		Spec: clusterspec.ClusterSpec{
-			ClusterId: clusterId,
-			Customer:  customerId,
+			ClusterId: clusterID,
+			Customer:  customerID,
 		},
 	}
 
@@ -112,7 +112,7 @@ func TestResourcesHaveCorrectLabelScheme(t *testing.T) {
 		if !ok {
 			t.Fatalf(fmt.Sprintf("Could not find 'cluster' label for resource: %v\n", name))
 		}
-		if cluster != clusterId {
+		if cluster != clusterID {
 			t.Fatalf(fmt.Sprintf("Resource did not have correct 'cluster' label: %v, %v", name, cluster))
 		}
 
@@ -120,7 +120,7 @@ func TestResourcesHaveCorrectLabelScheme(t *testing.T) {
 		if !ok {
 			t.Fatalf(fmt.Sprintf("Could not find 'customer' label for resource: %v\n", name))
 		}
-		if customer != customerId {
+		if customer != customerID {
 			t.Fatalf(fmt.Sprintf("Resource did not have correct 'customer' label: %v, %v", name, customer))
 		}
 

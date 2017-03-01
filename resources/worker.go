@@ -107,7 +107,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: clusterDomain("api", w.Spec.ClusterId, w.Spec.Worker.Domain),
+					Value: ClusterDomain("api", w.Spec.ClusterId, w.Spec.Worker.Domain),
 				},
 				{
 					Name:  "IP_SANS",
@@ -152,7 +152,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: clusterDomain("calico", w.Spec.ClusterId, w.Spec.Worker.Domain),
+					Value: ClusterDomain("calico", w.Spec.ClusterId, w.Spec.Worker.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -193,7 +193,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: clusterDomain("etcd", w.Spec.ClusterId, w.Spec.Worker.Domain),
+					Value: ClusterDomain("etcd", w.Spec.ClusterId, w.Spec.Worker.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -431,7 +431,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: networkBridgeName(w.Spec.ClusterId),
+									Value: NetworkBridgeName(w.Spec.ClusterId),
 								},
 								{
 									Name:  "K8S_DNS_IP",

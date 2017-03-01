@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"github.com/giantswarm/clusterspec"
-
+	"github.com/giantswarm/kvm-operator/resources"
 	"github.com/prometheus/client_golang/prometheus"
-
 	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/api/v1"
@@ -35,15 +34,15 @@ func init() {
 	prometheus.MustRegister(namespaceActionTime)
 }
 
-func getNamespaceNameForCluster(cluster clusterspec.Cluster) string {
-	return cluster.Spec.ClusterId
-}
-
-func (s *Service) createClusterNamespace(cluster clusterspec.Cluster) error {
+func (s *Service) createNamespace(customObject clusterspec.Cluster) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("create").Inc()
 
-	s.logger.Log("debug", fmt.Sprintf("creating namespace for cluster '%s'", cluster.Name))
+	clusterCustomer := resources.ClusterCustomer(customObject)
+	clusterID := resources.ClusterID(customObject)
+	clusterNamespace := resources.ClusterNamespace(customObject)
+
+	s.logger.Log("debug", fmt.Sprintf("creating namespace '%s' for cluster '%s'", clusterNamespace, clusterID))
 
 	namespace := v1.Namespace{
 		TypeMeta: unversioned.TypeMeta{
@@ -51,10 +50,10 @@ func (s *Service) createClusterNamespace(cluster clusterspec.Cluster) error {
 			APIVersion: "v1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name: getNamespaceNameForCluster(cluster),
+			Name: clusterNamespace,
 			Labels: map[string]string{
-				"cluster":  cluster.Name,
-				"customer": cluster.Spec.Customer,
+				"cluster":  clusterID,
+				"customer": clusterCustomer,
 			},
 		},
 	}
@@ -74,24 +73,23 @@ func (s *Service) createClusterNamespace(cluster clusterspec.Cluster) error {
 	return nil
 }
 
-func (s *Service) deleteClusterNamespace(cluster clusterspec.Cluster) error {
+func (s *Service) deleteNamespace(customObject clusterspec.Cluster) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("delete").Inc()
 
-	s.logger.Log("debug", fmt.Sprintf("deleting namespace for cluster '%s'", cluster.Name))
+	clusterID := resources.ClusterID(customObject)
+	clusterNamespace := resources.ClusterNamespace(customObject)
 
-	namespaceName := getNamespaceNameForCluster(cluster)
+	s.logger.Log("debug", fmt.Sprintf("deleting namespace '%s' for cluster '%s'", clusterNamespace, clusterID))
 
-	var err error
-	if err = s.kubernetesClient.Core().Namespaces().Delete(namespaceName, v1.NewDeleteOptions(0)); err != nil && !errors.IsNotFound(err) {
+	err := s.kubernetesClient.Core().Namespaces().Delete(clusterNamespace, v1.NewDeleteOptions(0))
+	if errors.IsNotFound(err) {
+		s.logger.Log("debug", "namespace does not exist")
+	} else if err != nil {
 		return err
 	}
-	if errors.IsNotFound(err) {
-		s.logger.Log("debug", "namespace already deleted")
-	} else {
-		s.logger.Log("debug", "namespace deleted")
-	}
 
+	s.logger.Log("debug", "namespace deleted")
 	namespaceActionTime.WithLabelValues("delete").Set(float64(time.Since(start) / time.Millisecond))
 
 	return nil
