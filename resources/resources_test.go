@@ -39,7 +39,7 @@ func TestResourceComputation(t *testing.T) {
 	}
 }
 
-// TestResourcesDontHaveClusterIdAsPrefix tests that resources do not have the
+// TestResourcesDontHaveClusterIDAsPrefix tests that resources do not have the
 // cluster id as a prefix. This is due to IDs being alphanumeric, and Kubernetes
 // not allowing resource names to begin with an integer.
 func TestResourcesDontHaveClusterIDAsPrefix(t *testing.T) {
