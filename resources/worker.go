@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"strconv"
 
-	"github.com/giantswarm/clusterspec"
+	"github.com/giantswarm/kvmtpr"
 	"github.com/ventu-io/go-shortid"
 
 	"k8s.io/client-go/pkg/api"
@@ -21,7 +20,7 @@ type Worker interface {
 }
 
 type worker struct {
-	clusterspec.Cluster
+	kvmtpr.CustomObject
 }
 
 func (w *worker) generateWorkerPodAffinity() (string, error) {
@@ -39,7 +38,7 @@ func (w *worker) generateWorkerPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{w.Spec.ClusterId},
+					Namespaces:  []string{ClusterID(w.CustomObject)},
 				},
 			},
 		},
@@ -56,7 +55,7 @@ func (w *worker) generateWorkerPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{w.Spec.ClusterId},
+					Namespaces:  []string{ClusterID(w.CustomObject)},
 				},
 			},
 		},
@@ -76,7 +75,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-worker-api-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.Cluster.Operator.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -99,33 +98,33 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "ALT_NAMES",
-					Value: w.Spec.Certificates.ApiAltNames,
+					Value: w.Spec.Cluster.Kubernetes.API.AltNames,
 				},
 				{
 					Name:  "CLUSTER_ID",
-					Value: w.Spec.ClusterId,
+					Value: ClusterID(w.CustomObject),
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("api", w.Spec.ClusterId, w.Spec.Worker.Domain),
+					Value: ClusterDomain("api", ClusterID(w.CustomObject), w.Spec.Cluster.Kubernetes.Domain),
 				},
 				{
 					Name:  "IP_SANS",
-					Value: w.Spec.GiantnetesConfiguration.ApiIp,
+					Value: w.Spec.Cluster.Kubernetes.API.IP.String(),
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: w.Spec.Certificates.VaultToken,
+					Value: w.Spec.Cluster.Vault.Token,
 				},
 				{
 					Name:  "VAULT_ADDR",
-					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
+					Value: w.Spec.Cluster.Vault.Address,
 				},
 			},
 		},
 		{
 			Name:            "k8s-worker-calico-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.Cluster.Operator.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -148,25 +147,25 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "CLUSTER_ID",
-					Value: w.Spec.ClusterId,
+					Value: ClusterID(w.CustomObject),
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("calico", w.Spec.ClusterId, w.Spec.Worker.Domain),
+					Value: ClusterDomain("calico", ClusterID(w.CustomObject), w.Spec.Cluster.Kubernetes.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: w.Spec.Certificates.VaultToken,
+					Value: w.Spec.Cluster.Vault.Token,
 				},
 				{
 					Name:  "VAULT_ADDR",
-					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
+					Value: w.Spec.Cluster.Vault.Address,
 				},
 			},
 		},
 		{
 			Name:            "k8s-worker-etcd-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.CertctlVersion,
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.Cluster.Operator.CertctlVersion,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -189,19 +188,19 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "CLUSTER_ID",
-					Value: w.Spec.ClusterId,
+					Value: ClusterID(w.CustomObject),
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("etcd", w.Spec.ClusterId, w.Spec.Worker.Domain),
+					Value: ClusterDomain("etcd", ClusterID(w.CustomObject), w.Spec.Cluster.Kubernetes.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: w.Spec.Certificates.VaultToken,
+					Value: w.Spec.Cluster.Vault.Token,
 				},
 				{
 					Name:  "VAULT_ADDR",
-					Value: w.Spec.GiantnetesConfiguration.VaultAddr,
+					Value: w.Spec.Cluster.Vault.Address,
 				},
 			},
 		},
@@ -240,11 +239,6 @@ func (w *worker) GenerateResources() ([]runtime.Object, error) {
 }
 
 func (w *worker) GenerateService() (*apiv1.Service, error) {
-	servicePort, err := strconv.ParseInt(w.Spec.Worker.WorkerServicePort, 10, 32)
-	if err != nil {
-		return nil, maskAny(err)
-	}
-
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "service",
@@ -253,8 +247,8 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "worker",
 			Labels: map[string]string{
-				"cluster":  w.Spec.ClusterId,
-				"customer": w.Spec.Customer,
+				"cluster":  ClusterID(w.CustomObject),
+				"customer": CustomerID(w.CustomObject),
 				"app":      "worker",
 			},
 		},
@@ -263,13 +257,13 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "http",
-					Port:     int32(servicePort),
+					Port:     int32(w.Spec.Cluster.Kubernetes.Kubelet.Port),
 					Protocol: "TCP",
 				},
 			},
 			Selector: map[string]string{
-				"cluster":  w.Spec.ClusterId,
-				"customer": w.Spec.Customer,
+				"cluster":  ClusterID(w.CustomObject),
+				"customer": CustomerID(w.CustomObject),
 				"app":      "worker",
 			},
 		},
@@ -292,6 +286,9 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 		return nil, maskAny(err)
 	}
 
+	workerReplicas := int32(len(w.Spec.Cluster.Workers))
+	workerNode := w.Spec.Cluster.Workers[0]
+
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "deployment",
@@ -300,8 +297,8 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "worker",
 			Labels: map[string]string{
-				"cluster":  w.Spec.ClusterId,
-				"customer": w.Spec.Customer,
+				"cluster":  ClusterID(w.CustomObject),
+				"customer": CustomerID(w.CustomObject),
 				"app":      "worker",
 			},
 		},
@@ -309,13 +306,13 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 			Strategy: extensionsv1.DeploymentStrategy{
 				Type: extensionsv1.RecreateDeploymentStrategyType,
 			},
-			Replicas: &w.Spec.Worker.Replicas,
+			Replicas: &workerReplicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
 					Name: "worker",
 					Labels: map[string]string{
-						"cluster":  w.Spec.ClusterId,
-						"customer": w.Spec.Customer,
+						"cluster":  ClusterID(w.CustomObject),
+						"customer": CustomerID(w.CustomObject),
 						"app":      "worker",
 					},
 					Annotations: map[string]string{
@@ -330,7 +327,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/"),
 								},
 							},
 						},
@@ -338,7 +335,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/calico/"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/calico/"),
 								},
 							},
 						},
@@ -346,7 +343,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/etcd/"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/etcd/"),
 								},
 							},
 						},
@@ -362,7 +359,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/vms/", w.Spec.ClusterId, "-", workerId, "/"),
+									Path: filepath.Join("/home/core/vms/", ClusterID(w.CustomObject), "-", workerId, "/"),
 								},
 							},
 						},
@@ -378,7 +375,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Name: "certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", w.Spec.ClusterId, "/", w.Spec.ClusterId, "/ssl/", workerId, "/"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/"),
 								},
 							},
 						},
@@ -393,11 +390,11 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "CUSTOMER_ID",
-									Value: w.Spec.Customer,
+									Value: CustomerID(w.CustomObject),
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",
-									Value: w.Spec.Worker.DockerExtraArgs,
+									Value: w.Spec.Cluster.Docker.Daemon.ExtraArgs,
 								},
 								{
 									Name: "HOSTNAME",
@@ -419,59 +416,59 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
-									Value: w.Spec.Worker.InsecurePort,
+									Value: fmt.Sprintf("%s", w.Spec.Cluster.Kubernetes.API.InsecurePort),
 								},
 								{
 									Name:  "K8S_CALICO_MTU",
-									Value: w.Spec.Worker.K8sCalicoMtu,
+									Value: w.Spec.Cluster.Calico.MTU,
 								},
 								{
 									Name:  "MACHINE_CPU_CORES",
-									Value: fmt.Sprintf("%d", w.Spec.Worker.Capabilities.CpuCores),
+									Value: fmt.Sprintf("%d", workerNode.CPUs),
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(w.Spec.ClusterId),
+									Value: NetworkBridgeName(ClusterID(w.CustomObject)),
 								},
 								{
 									Name:  "K8S_DNS_IP",
-									Value: w.Spec.Worker.DnsIp,
+									Value: w.Spec.Cluster.Kubernetes.DNS.IP.String(),
 								},
 								{
 									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
-									Value: w.Spec.ClusterId + ".giantswarm.local.",
+									Value: ClusterID(w.CustomObject) + ".giantswarm.local.",
 								},
 								{
 									Name:  "K8S_ETCD_DOMAIN_NAME",
-									Value: w.Spec.Worker.EtcdDomainName,
+									Value: w.Spec.Cluster.Etcd.Domain,
 								},
 								{
 									Name:  "K8S_MASTER_DOMAIN_NAME",
-									Value: w.Spec.Worker.MasterDomainName,
+									Value: w.Spec.Cluster.Kubernetes.API.Domain,
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_VERSION",
-									Value: w.Spec.Worker.NetworkSetupVersion,
+									Value: w.Spec.Cluster.Operator.NetworkSetupVersion,
 								},
 								{
 									Name:  "K8S_SECURE_PORT",
-									Value: w.Spec.Worker.SecurePort,
+									Value: fmt.Sprintf("%d", w.Spec.Cluster.Kubernetes.API.SecurePort),
 								},
 								{
 									Name:  "K8S_VERSION",
-									Value: w.Spec.K8sVersion,
+									Value: w.Spec.Cluster.Kubernetes.Hyperkube.Version,
 								},
 								{
 									Name:  "MACHINE_MEM",
-									Value: w.Spec.Worker.Capabilities.Memory,
+									Value: workerNode.Memory,
 								},
 								{
 									Name:  "REGISTRY",
-									Value: w.Spec.Worker.Registry,
+									Value: w.Spec.Cluster.Docker.Registry.Endpoint,
 								},
 								{
 									Name:  "K8S_NODE_LABELS",
-									Value: w.Spec.Worker.NodeLabels,
+									Value: w.Spec.Cluster.Kubernetes.Kubelet.Labels,
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
