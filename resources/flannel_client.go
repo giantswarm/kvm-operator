@@ -55,7 +55,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME", // e.g. br-h8s2l
-					Value: NetworkBridgeName(f.Spec.Cluster.Cluster.ID),
+					Value: NetworkBridgeName(ClusterID(f.CustomObject)),
 				},
 			},
 		},
@@ -83,7 +83,7 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{f.Spec.Cluster.Cluster.ID},
+					Namespaces:  []string{ClusterID(f.CustomObject)},
 				},
 			},
 		},
@@ -121,8 +121,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "flannel-client",
 			Labels: map[string]string{
-				"cluster":  f.Spec.Cluster.Cluster.ID,
-				"customer": f.Spec.Cluster.Customer.ID,
+				"cluster":  ClusterID(f.CustomObject),
+				"customer": CustomerID(f.CustomObject),
 				"app":      "flannel-client",
 			},
 		},
@@ -135,8 +135,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "flannel-client",
 					Labels: map[string]string{
-						"cluster":  f.Spec.Cluster.Cluster.ID,
-						"customer": f.Spec.Cluster.Customer.ID,
+						"cluster":  ClusterID(f.CustomObject),
+						"customer": CustomerID(f.CustomObject),
 						"app":      "flannel-client",
 					},
 					Annotations: map[string]string{
@@ -234,7 +234,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(f.Spec.Cluster.Cluster.ID),
+									Value: NetworkBridgeName(ClusterID(f.CustomObject)),
 								},
 								{
 									Name: "NODE_IP",
@@ -272,7 +272,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_ENV_FILE_PATH",
-									Value: NetworkEnvFilePath(f.Spec.Cluster.Cluster.ID),
+									Value: NetworkEnvFilePath(ClusterID(f.CustomObject)),
 								},
 								{
 									Name:  "HOST_SUBNET_RANGE", // TODO rename to NETWORK_SUBNET_RANGE (from f.Spec.Flannel.Network)
@@ -280,7 +280,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(f.Spec.Cluster.Cluster.ID),
+									Value: NetworkBridgeName(ClusterID(f.CustomObject)),
 								},
 								{
 									Name:  "NETWORK_INTERFACE_NAME",

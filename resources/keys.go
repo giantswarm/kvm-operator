@@ -33,3 +33,7 @@ func NetworkBridgeName(ID string) string {
 func NetworkEnvFilePath(ID string) string {
 	return fmt.Sprintf("/run/flannel/networks/%s.env", NetworkBridgeName(ID))
 }
+
+func CustomerID(customObject kvmtpr.CustomObject) string {
+	return customObject.Spec.Cluster.Customer.ID
+}
