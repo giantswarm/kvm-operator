@@ -3,7 +3,7 @@ package operator
 import (
 	"encoding/json"
 
-	"github.com/giantswarm/clusterspec"
+	"github.com/giantswarm/kvmtpr"
 
 	"k8s.io/client-go/pkg/runtime"
 	"k8s.io/client-go/pkg/watch"
@@ -21,7 +21,7 @@ func (d *clusterDecoder) Close() {
 func (d *clusterDecoder) Decode() (action watch.EventType, object runtime.Object, err error) {
 	var e struct {
 		Type   watch.EventType
-		Object clusterspec.Cluster
+		Object kvmtpr.CustomObject
 	}
 	if err := d.decoder.Decode(&e); err != nil {
 		return watch.Error, nil, err

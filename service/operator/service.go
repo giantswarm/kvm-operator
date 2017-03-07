@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/giantswarm/clusterspec"
+	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	"github.com/prometheus/client_golang/prometheus"
@@ -120,14 +120,14 @@ func (s *Service) Boot() {
 
 		_, clusterInformer := cache.NewInformer(
 			s.newClusterListWatch(),
-			&clusterspec.Cluster{},
+			&kvmtpr.CustomObject{},
 			0,
 			cache.ResourceEventHandlerFuncs{
 				AddFunc: func(obj interface{}) {
 					start := time.Now()
 					clusterEventHandleTotal.WithLabelValues("created").Inc()
 
-					customObject, ok := obj.(*clusterspec.Cluster)
+					customObject, ok := obj.(*kvmtpr.CustomObject)
 					if !ok {
 						s.logger.Log("debug", "ignoring none KVM TPR", "event", "create")
 						return
@@ -160,7 +160,7 @@ func (s *Service) Boot() {
 					start := time.Now()
 					clusterEventHandleTotal.WithLabelValues("deleted").Inc()
 
-					customObject, ok := obj.(*clusterspec.Cluster)
+					customObject, ok := obj.(*kvmtpr.CustomObject)
 					if !ok {
 						s.logger.Log("debug", "ignoring none KVM TPR", "event", "delete")
 						return
@@ -197,7 +197,7 @@ func (s *Service) newClusterListWatch() *cache.ListWatch {
 				return nil, err
 			}
 
-			var s clusterspec.ClusterList
+			var s kvmtpr.List
 			if err := json.Unmarshal(b, &s); err != nil {
 				return nil, err
 			}
