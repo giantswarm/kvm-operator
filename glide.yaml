@@ -35,5 +35,3 @@ import:
   version: ^1.0.0
 - package: github.com/giantswarm/microkit
 - package: github.com/spf13/viper
-- package: github.com/giantswarm/clustertpr
-- package: github.com/giantswarm/kvmtpr
