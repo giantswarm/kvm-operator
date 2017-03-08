@@ -1,5 +1,5 @@
-hash: 166c64f13aece0c3a93affd3a10ecc1068a189ed4e086a089212a3cd573d8e60
-updated: 2017-02-16T17:17:43.380381113+01:00
+hash: e4f7898dce7c7104de35c174f2336e70289686768414ae13fde29cd2be8a9f60
+updated: 2017-03-08T08:52:48.616481265+01:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -60,8 +60,24 @@ imports:
   version: a904159b9206978bb6d53fcc7a769e5cd726c737
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
-- name: github.com/giantswarm/clusterspec
-  version: 4a7fa9b99732e39dd094ad0602405e2cf09cb964
+- name: github.com/giantswarm/clustertpr
+  version: 16f7b5230a6850c1b7b62bad4f6002607f8ad3c2
+  subpackages:
+  - calico
+  - cloudflare
+  - cluster
+  - customer
+  - docker
+  - etcd
+  - flannel
+  - kubernetes
+  - node
+  - operator
+  - vault
+- name: github.com/giantswarm/kvmtpr
+  version: ab8452c41ad9ec17e1393f1eeabc37d5abed5e61
+  subpackages:
+  - kvm
 - name: github.com/giantswarm/microkit
   version: eddd72801c08a534e31a6d987497317c720583b0
   subpackages:
