@@ -110,8 +110,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 		return nil, maskAny(err)
 	}
 
-	workerReplicas := len(f.Spec.Cluster.Workers)
-	flannelClientReplicas := int32(MasterReplicas) + int32(workerReplicas)
+	replicas := MasterReplicas + len(f.Spec.Cluster.Workers)
+	flannelClientReplicas := int32(replicas)
 
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{

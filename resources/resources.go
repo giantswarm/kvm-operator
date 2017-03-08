@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	MasterReplicas int32 = 1
+	MasterReplicas int = 1
 )
 
 var (
