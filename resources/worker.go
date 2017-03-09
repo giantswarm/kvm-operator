@@ -416,7 +416,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
-									Value: fmt.Sprintf("%s", w.Spec.Cluster.Kubernetes.API.InsecurePort),
+									Value: fmt.Sprintf("%d", w.Spec.Cluster.Kubernetes.API.InsecurePort),
 								},
 								{
 									Name:  "K8S_CALICO_MTU",

@@ -276,7 +276,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 								},
 								{
 									Name:  "HOST_SUBNET_RANGE", // TODO rename to NETWORK_SUBNET_RANGE (from f.Spec.Flannel.Network)
-									Value: f.Spec.Cluster.Flannel.Network,
+									Value: f.Spec.Cluster.Kubernetes.API.ClusterIPRange,
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
