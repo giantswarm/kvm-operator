@@ -248,7 +248,7 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			Name: "worker",
 			Labels: map[string]string{
 				"cluster":  ClusterID(w.CustomObject),
-				"customer": CustomerID(w.CustomObject),
+				"customer": ClusterCustomer(w.CustomObject),
 				"app":      "worker",
 			},
 		},
@@ -263,7 +263,7 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			},
 			Selector: map[string]string{
 				"cluster":  ClusterID(w.CustomObject),
-				"customer": CustomerID(w.CustomObject),
+				"customer": ClusterCustomer(w.CustomObject),
 				"app":      "worker",
 			},
 		},
@@ -298,7 +298,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 			Name: "worker",
 			Labels: map[string]string{
 				"cluster":  ClusterID(w.CustomObject),
-				"customer": CustomerID(w.CustomObject),
+				"customer": ClusterCustomer(w.CustomObject),
 				"app":      "worker",
 			},
 		},
@@ -312,7 +312,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					Name: "worker",
 					Labels: map[string]string{
 						"cluster":  ClusterID(w.CustomObject),
-						"customer": CustomerID(w.CustomObject),
+						"customer": ClusterCustomer(w.CustomObject),
 						"app":      "worker",
 					},
 					Annotations: map[string]string{
@@ -390,7 +390,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "CUSTOMER_ID",
-									Value: CustomerID(w.CustomObject),
+									Value: ClusterCustomer(w.CustomObject),
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",

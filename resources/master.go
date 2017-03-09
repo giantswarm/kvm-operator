@@ -300,7 +300,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			Name: "etcd",
 			Labels: map[string]string{
 				"cluster":  ClusterID(m.CustomObject),
-				"customer": CustomerID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 			Annotations: map[string]string{
@@ -348,7 +348,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			Name: "api",
 			Labels: map[string]string{
 				"cluster":  ClusterID(m.CustomObject),
-				"customer": CustomerID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 			Annotations: map[string]string{
@@ -395,7 +395,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			Name: "master",
 			Labels: map[string]string{
 				"cluster":  ClusterID(m.CustomObject),
-				"customer": CustomerID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 		},
@@ -446,7 +446,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 			Name: "master",
 			Labels: map[string]string{
 				"cluster":  ClusterID(m.CustomObject),
-				"customer": CustomerID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 		},
@@ -460,7 +460,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					GenerateName: "master",
 					Labels: map[string]string{
 						"cluster":  ClusterID(m.CustomObject),
-						"customer": CustomerID(m.CustomObject),
+						"customer": ClusterCustomer(m.CustomObject),
 						"app":      "master",
 					},
 					Annotations: map[string]string{
@@ -559,7 +559,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "CUSTOMER_ID",
-									Value: CustomerID(m.CustomObject),
+									Value: ClusterCustomer(m.CustomObject),
 								},
 								{
 									Name: "HOSTNAME",
@@ -694,7 +694,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "CUSTOMER_ID",
-									Value: CustomerID(m.CustomObject),
+									Value: ClusterCustomer(m.CustomObject),
 								},
 								{
 									Name:  "SERVICE_NAME",

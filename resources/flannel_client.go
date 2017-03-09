@@ -122,7 +122,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 			Name: "flannel-client",
 			Labels: map[string]string{
 				"cluster":  ClusterID(f.CustomObject),
-				"customer": CustomerID(f.CustomObject),
+				"customer": ClusterCustomer(f.CustomObject),
 				"app":      "flannel-client",
 			},
 		},
@@ -136,7 +136,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					GenerateName: "flannel-client",
 					Labels: map[string]string{
 						"cluster":  ClusterID(f.CustomObject),
-						"customer": CustomerID(f.CustomObject),
+						"customer": ClusterCustomer(f.CustomObject),
 						"app":      "flannel-client",
 					},
 					Annotations: map[string]string{

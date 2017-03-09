@@ -14,7 +14,7 @@ func TestClusterID(t *testing.T) {
 
 	cluster := clustertpr.Cluster{
 		Cluster: cluster.Cluster{
-			ID: "test-cluster",
+			ID: expectedID,
 		},
 		Customer: customer.Customer{
 			ID: "test-customer",
@@ -32,7 +32,7 @@ func TestClusterID(t *testing.T) {
 	}
 }
 
-func TestCustomerID(t *testing.T) {
+func TestClusterCustomer(t *testing.T) {
 	expectedID := "test-customer"
 
 	cluster := clustertpr.Cluster{
@@ -40,7 +40,7 @@ func TestCustomerID(t *testing.T) {
 			ID: "test-cluster",
 		},
 		Customer: customer.Customer{
-			ID: "test-customer",
+			ID: expectedID,
 		},
 	}
 
@@ -50,7 +50,7 @@ func TestCustomerID(t *testing.T) {
 		},
 	}
 
-	if CustomerID(customObject) != expectedID {
-		t.Fatalf("Expected customer ID %s but was %s", expectedID, CustomerID(customObject))
+	if ClusterCustomer(customObject) != expectedID {
+		t.Fatalf("Expected customer ID %s but was %s", expectedID, ClusterCustomer(customObject))
 	}
 }
