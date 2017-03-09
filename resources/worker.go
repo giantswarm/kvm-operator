@@ -75,7 +75,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-worker-api-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.Cluster.Operator.CertctlVersion,
+			Image:           w.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -124,7 +124,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:            "k8s-worker-calico-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.Cluster.Operator.CertctlVersion,
+			Image:           w.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -165,7 +165,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:            "k8s-worker-etcd-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + w.Spec.Cluster.Operator.CertctlVersion,
+			Image:           w.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -448,7 +448,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_VERSION",
-									Value: w.Spec.Cluster.Operator.NetworkSetupVersion,
+									Value: w.Spec.Cluster.Operator.NetworkSetup.Docker.Image,
 								},
 								{
 									Name:  "K8S_SECURE_PORT",
@@ -456,7 +456,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "K8S_VERSION",
-									Value: w.Spec.Cluster.Kubernetes.Hyperkube.Version,
+									Value: w.Spec.Cluster.Kubernetes.Hyperkube.Docker.Image,
 								},
 								{
 									Name:  "MACHINE_MEM",

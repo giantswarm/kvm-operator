@@ -98,7 +98,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-api-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.Cluster.Operator.CertctlVersion,
+			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -147,7 +147,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-calico-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.Cluster.Operator.CertctlVersion,
+			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -188,7 +188,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-etcd-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.Cluster.Operator.CertctlVersion,
+			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -624,7 +624,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_VERSION",
-									Value: m.Spec.Cluster.Operator.NetworkSetupVersion,
+									Value: m.Spec.Cluster.Operator.NetworkSetup.Docker.Image,
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",
@@ -636,7 +636,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_VERSION",
-									Value: m.Spec.Cluster.Kubernetes.Hyperkube.Version,
+									Value: m.Spec.Cluster.Kubernetes.Hyperkube.Docker.Image,
 								},
 								{
 									Name:  "MACHINE_MEM",
