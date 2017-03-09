@@ -337,7 +337,6 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 	}
 
 	objects = append(objects, endpointMasterEtcd)
-	securePort := m.Spec.Cluster.Kubernetes.API.SecurePort
 
 	endpointMasterAPIHTTPS := &extensionsv1.Ingress{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -373,7 +372,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 									Path: "/",
 									Backend: extensionsv1.IngressBackend{
 										ServiceName: "master",
-										ServicePort: intstr.FromInt(securePort),
+										ServicePort: intstr.FromInt(m.Spec.Cluster.Kubernetes.API.SecurePort),
 									},
 								},
 							},
@@ -585,7 +584,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_CLUSTER_IP_SUBNET",
-									Value: m.Spec.Cluster.Flannel.Network,
+									Value: m.Spec.Cluster.Kubernetes.API.ClusterIPRange,
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
