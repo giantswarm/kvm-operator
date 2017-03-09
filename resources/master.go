@@ -125,7 +125,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("api", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.Domain),
+					Value: m.Spec.Cluster.Kubernetes.API.Domain,
 				},
 				{
 					Name:  "CLUSTER_ID",
@@ -215,7 +215,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("etcd", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.API.Domain),
+					Value: m.Spec.Cluster.Etcd.Domain,
 				},
 				{
 					Name:  "VAULT_TOKEN",
@@ -311,13 +311,13 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			TLS: []extensionsv1.IngressTLS{
 				extensionsv1.IngressTLS{
 					Hosts: []string{
-						ClusterDomain("etcd", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.API.Domain),
+						m.Spec.Cluster.Etcd.Domain,
 					},
 				},
 			},
 			Rules: []extensionsv1.IngressRule{
 				extensionsv1.IngressRule{
-					Host: ClusterDomain("etcd", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.API.Domain),
+					Host: m.Spec.Cluster.Etcd.Domain,
 					IngressRuleValue: extensionsv1.IngressRuleValue{
 						HTTP: &extensionsv1.HTTPIngressRuleValue{
 							Paths: []extensionsv1.HTTPIngressPath{
@@ -359,13 +359,13 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			TLS: []extensionsv1.IngressTLS{
 				extensionsv1.IngressTLS{
 					Hosts: []string{
-						ClusterDomain("api", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.API.Domain),
+						m.Spec.Cluster.Kubernetes.API.Domain,
 					},
 				},
 			},
 			Rules: []extensionsv1.IngressRule{
 				extensionsv1.IngressRule{
-					Host: ClusterDomain("api", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.API.Domain),
+					Host: m.Spec.Cluster.Kubernetes.API.Domain,
 					IngressRuleValue: extensionsv1.IngressRuleValue{
 						HTTP: &extensionsv1.HTTPIngressRuleValue{
 							Paths: []extensionsv1.HTTPIngressPath{

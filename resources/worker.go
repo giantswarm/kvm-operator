@@ -106,7 +106,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("api", ClusterID(w.CustomObject), w.Spec.Cluster.Kubernetes.Domain),
+					Value: w.Spec.Cluster.Kubernetes.API.Domain,
 				},
 				{
 					Name:  "IP_SANS",
@@ -192,7 +192,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("etcd", ClusterID(w.CustomObject), w.Spec.Cluster.Kubernetes.Domain),
+					Value: w.Spec.Cluster.Etcd.Domain,
 				},
 				{
 					Name:  "VAULT_TOKEN",
