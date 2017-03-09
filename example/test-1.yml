@@ -1,4 +1,4 @@
-apiVersion: "cluster.giantswarm.io/v1"
+apiVersion: "kvm.cluster.giantswarm.io/v1"
 kind: Kvm
 metadata:
   name: test
