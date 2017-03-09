@@ -12,6 +12,8 @@ import (
 	"github.com/giantswarm/clustertpr/cluster"
 	"github.com/giantswarm/clustertpr/customer"
 	"github.com/giantswarm/clustertpr/kubernetes"
+	"github.com/giantswarm/clustertpr/kubernetes/api"
+	"github.com/giantswarm/clustertpr/kubernetes/kubelet"
 	"github.com/giantswarm/clustertpr/node"
 	"github.com/giantswarm/kvmtpr"
 )
@@ -30,11 +32,11 @@ func TestResourceComputation(t *testing.T) {
 			ID: "test",
 		},
 		Kubernetes: kubernetes.Kubernetes{
-			API: kubernetes.API{
+			API: api.API{
 				SecurePort:   6443,
 				InsecurePort: 8080,
 			},
-			Kubelet: kubernetes.Kubelet{
+			Kubelet: kubelet.Kubelet{
 				Port: 4194,
 			},
 		},
@@ -82,11 +84,11 @@ func TestResourcesDontHaveClusterIDAsPrefix(t *testing.T) {
 			ID: id,
 		},
 		Kubernetes: kubernetes.Kubernetes{
-			API: kubernetes.API{
+			API: api.API{
 				SecurePort:   6443,
 				InsecurePort: 8080,
 			},
-			Kubelet: kubernetes.Kubelet{
+			Kubelet: kubelet.Kubelet{
 				Port: 4194,
 			},
 		},
@@ -151,11 +153,11 @@ func TestResourcesHaveCorrectLabelScheme(t *testing.T) {
 			ID: customerID,
 		},
 		Kubernetes: kubernetes.Kubernetes{
-			API: kubernetes.API{
+			API: api.API{
 				SecurePort:   6443,
 				InsecurePort: 8080,
 			},
-			Kubelet: kubernetes.Kubelet{
+			Kubelet: kubelet.Kubelet{
 				Port: 4194,
 			},
 		},
