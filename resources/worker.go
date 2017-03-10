@@ -447,7 +447,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Cluster.Kubernetes.API.Domain,
 								},
 								{
-									Name:  "K8S_NETWORK_SETUP_VERSION",
+									Name:  "K8S_NETWORK_SETUP_IMAGE",
 									Value: w.Spec.Cluster.Operator.NetworkSetup.Docker.Image,
 								},
 								{
@@ -455,7 +455,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: fmt.Sprintf("%d", w.Spec.Cluster.Kubernetes.API.SecurePort),
 								},
 								{
-									Name:  "K8S_VERSION",
+									Name:  "K8S_HYPERKUBE_IMAGE",
 									Value: w.Spec.Cluster.Kubernetes.Hyperkube.Docker.Image,
 								},
 								{

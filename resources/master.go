@@ -623,7 +623,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Cluster.Kubernetes.API.Domain,
 								},
 								{
-									Name:  "K8S_NETWORK_SETUP_VERSION",
+									Name:  "K8S_NETWORK_SETUP_IMAGE",
 									Value: m.Spec.Cluster.Operator.NetworkSetup.Docker.Image,
 								},
 								{
@@ -635,7 +635,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: fmt.Sprintf("%d", m.Spec.Cluster.Kubernetes.API.SecurePort),
 								},
 								{
-									Name:  "K8S_VERSION",
+									Name:  "K8S_HYPERKUBE_IMAGE",
 									Value: m.Spec.Cluster.Kubernetes.Hyperkube.Docker.Image,
 								},
 								{
