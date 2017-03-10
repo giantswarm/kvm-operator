@@ -607,7 +607,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Value: m.Spec.Cluster.Kubernetes.DNS.IP.String(),
 								},
 								{
-									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
+									Name:  "K8S_KUBEDNS_DOMAIN",
 									Value: ClusterID(m.CustomObject) + ".giantswarm.local.",
 								},
 								{

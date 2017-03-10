@@ -435,7 +435,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Value: w.Spec.Cluster.Kubernetes.DNS.IP.String(),
 								},
 								{
-									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
+									Name:  "K8S_KUBEDNS_DOMAIN",
 									Value: ClusterID(w.CustomObject) + ".giantswarm.local.",
 								},
 								{
