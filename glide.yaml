@@ -37,5 +37,5 @@ import:
 - package: github.com/spf13/viper
 - package: github.com/coreos/etcd
   version: 3.1.0
-- package: github.com/giantswarm/clustertpr
-  version: kubernetesd
+- package: github.com/giantswarm/kvmtpr
+  version: ce2a3e56de13e4917c5bc1a62217651af6258144
