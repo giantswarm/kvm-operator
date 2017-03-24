@@ -3,26 +3,26 @@ package resources
 import (
 	"fmt"
 
-	"github.com/giantswarm/clusterspec"
+	"github.com/giantswarm/kvmtpr"
 )
 
-func ClusterCustomer(customObject clusterspec.Cluster) string {
-	return customObject.Spec.Customer
+func ClusterCustomer(customObject kvmtpr.CustomObject) string {
+	return customObject.Spec.Cluster.Customer.ID
 }
 
 func ClusterDomain(sub, clusterID, domain string) string {
 	return fmt.Sprintf("%s.%s.%s", sub, clusterID, domain)
 }
 
-func ClusterID(customObject clusterspec.Cluster) string {
-	return customObject.Spec.ClusterId
+func ClusterID(customObject kvmtpr.CustomObject) string {
+	return customObject.Spec.Cluster.Cluster.ID
 }
 
-func ClusterName(customObject clusterspec.Cluster) string {
+func ClusterName(customObject kvmtpr.CustomObject) string {
 	return ClusterID(customObject)
 }
 
-func ClusterNamespace(customObject clusterspec.Cluster) string {
+func ClusterNamespace(customObject kvmtpr.CustomObject) string {
 	return ClusterID(customObject)
 }
 

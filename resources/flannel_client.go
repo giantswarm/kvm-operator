@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/giantswarm/clusterspec"
-
+	"github.com/giantswarm/kvmtpr"
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -18,7 +17,7 @@ type FlannelClient interface {
 }
 
 type flannelClient struct {
-	clusterspec.Cluster
+	kvmtpr.CustomObject
 }
 
 func (f *flannelClient) generateInitFlannelContainers() (string, error) {
@@ -30,11 +29,11 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "BACKEND_TYPE", // e.g. vxlan
-					Value: f.Spec.FlannelConfiguration.ClusterBackend,
+					Value: f.Spec.Cluster.Flannel.Backend,
 				},
 				{
 					Name:  "BACKEND_VNI", // e.g. 9
-					Value: fmt.Sprintf("%d", f.Spec.FlannelConfiguration.ClusterVni),
+					Value: fmt.Sprintf("%d", f.Spec.Cluster.Flannel.VNI),
 				},
 				{
 					Name: "ETCD_ENDPOINT",
@@ -47,15 +46,15 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 				},
 				{
 					Name:  "ETCD_PORT",
-					Value: f.Spec.GiantnetesConfiguration.EtcdPort,
+					Value: fmt.Sprintf("%d", f.Spec.Cluster.Etcd.Port),
 				},
 				{
 					Name:  "NETWORK", // e.g. 10.9.0.0/16
-					Value: f.Spec.FlannelConfiguration.ClusterNetwork,
+					Value: f.Spec.Cluster.Flannel.Network,
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME", // e.g. br-h8s2l
-					Value: NetworkBridgeName(f.Spec.ClusterId),
+					Value: NetworkBridgeName(ClusterID(f.CustomObject)),
 				},
 			},
 		},
@@ -83,7 +82,7 @@ func (f *flannelClient) generateFlannelPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{f.Spec.ClusterId},
+					Namespaces:  []string{ClusterID(f.CustomObject)},
 				},
 			},
 		},
@@ -110,7 +109,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 		return nil, maskAny(err)
 	}
 
-	flannelClientReplicas := int32(MasterReplicas) + f.Spec.Worker.Replicas
+	replicas := MasterReplicas + len(f.Spec.Cluster.Workers)
+	flannelClientReplicas := int32(replicas)
 
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -120,8 +120,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "flannel-client",
 			Labels: map[string]string{
-				"cluster":  f.Spec.ClusterId,
-				"customer": f.Spec.Customer,
+				"cluster":  ClusterID(f.CustomObject),
+				"customer": ClusterCustomer(f.CustomObject),
 				"app":      "flannel-client",
 			},
 		},
@@ -134,8 +134,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "flannel-client",
 					Labels: map[string]string{
-						"cluster":  f.Spec.ClusterId,
-						"customer": f.Spec.Customer,
+						"cluster":  ClusterID(f.CustomObject),
+						"customer": ClusterCustomer(f.CustomObject),
 						"app":      "flannel-client",
 					},
 					Annotations: map[string]string{
@@ -223,7 +223,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "flannel-client",
-							Image:           fmt.Sprintf("quay.io/coreos/flannel:%s", f.Spec.FlannelConfiguration.Version),
+							Image:           f.Spec.Cluster.Flannel.Docker.Image,
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
@@ -233,7 +233,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(f.Spec.ClusterId),
+									Value: NetworkBridgeName(ClusterID(f.CustomObject)),
 								},
 								{
 									Name: "NODE_IP",
@@ -271,19 +271,19 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_ENV_FILE_PATH",
-									Value: NetworkEnvFilePath(f.Spec.ClusterId),
+									Value: NetworkEnvFilePath(ClusterID(f.CustomObject)),
 								},
 								{
 									Name:  "HOST_SUBNET_RANGE", // TODO rename to NETWORK_SUBNET_RANGE (from f.Spec.Flannel.Network)
-									Value: f.Spec.GiantnetesConfiguration.HostSubnetRange,
+									Value: f.Spec.Cluster.Kubernetes.API.ClusterIPRange,
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(f.Spec.ClusterId),
+									Value: NetworkBridgeName(ClusterID(f.CustomObject)),
 								},
 								{
 									Name:  "NETWORK_INTERFACE_NAME",
-									Value: f.Spec.GiantnetesConfiguration.NetworkInterface,
+									Value: f.Spec.Cluster.Flannel.Interface,
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/giantswarm/clusterspec"
 	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvmtpr"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/unversioned"
@@ -34,7 +34,7 @@ func init() {
 	prometheus.MustRegister(namespaceActionTime)
 }
 
-func (s *Service) createNamespace(customObject clusterspec.Cluster) error {
+func (s *Service) createNamespace(customObject kvmtpr.CustomObject) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("create").Inc()
 
@@ -73,7 +73,7 @@ func (s *Service) createNamespace(customObject clusterspec.Cluster) error {
 	return nil
 }
 
-func (s *Service) deleteNamespace(customObject clusterspec.Cluster) error {
+func (s *Service) deleteNamespace(customObject kvmtpr.CustomObject) error {
 	start := time.Now()
 	namespaceActionTotal.WithLabelValues("delete").Inc()
 

@@ -5,10 +5,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/giantswarm/clustertpr"
+	"github.com/giantswarm/clustertpr/cluster"
+	"github.com/giantswarm/clustertpr/customer"
+	"github.com/giantswarm/clustertpr/kubernetes"
+	"github.com/giantswarm/clustertpr/kubernetes/api"
+	"github.com/giantswarm/clustertpr/kubernetes/kubelet"
+	"github.com/giantswarm/clustertpr/node"
+	"github.com/giantswarm/kvmtpr"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
-
-	"github.com/giantswarm/clusterspec"
 )
 
 func TestResourceComputation(t *testing.T) {
@@ -17,19 +23,43 @@ func TestResourceComputation(t *testing.T) {
 	// Worker: Deployment, Service
 	expectedObjects := 7
 
-	cluster := clusterspec.Cluster{
-		Spec: clusterspec.ClusterSpec{
-			ClusterId: "test",
-			Customer:  "test",
+	cluster := clustertpr.Cluster{
+		Cluster: cluster.Cluster{
+			ID: "test",
+		},
+		Customer: customer.Customer{
+			ID: "test",
+		},
+		Kubernetes: kubernetes.Kubernetes{
+			API: api.API{
+				SecurePort:   6443,
+				InsecurePort: 8080,
+			},
+			Kubelet: kubelet.Kubelet{
+				Port: 4194,
+			},
+		},
+		Masters: []node.Node{
+			node.Node{
+				Memory: "4096",
+				CPUs:   1,
+			},
+		},
+		Workers: []node.Node{
+			node.Node{
+				Memory: "4096",
+				CPUs:   1,
+			},
 		},
 	}
 
-	cluster.Spec.Worker.Replicas = int32(1)
-	cluster.Spec.Worker.WorkerServicePort = "4194"
-	cluster.Spec.Master.SecurePort = "6443"
-	cluster.Spec.Master.InsecurePort = "8080"
+	customObject := kvmtpr.CustomObject{
+		Spec: kvmtpr.Spec{
+			Cluster: cluster,
+		},
+	}
 
-	objects, err := ComputeResources(cluster)
+	objects, err := ComputeResources(customObject)
 	if err != nil {
 		t.Fatalf("Error when computing cluster resources %v", err)
 	}
@@ -45,19 +75,43 @@ func TestResourceComputation(t *testing.T) {
 func TestResourcesDontHaveClusterIDAsPrefix(t *testing.T) {
 	id := "test"
 
-	cluster := clusterspec.Cluster{
-		Spec: clusterspec.ClusterSpec{
-			ClusterId: id,
-			Customer:  id,
+	cluster := clustertpr.Cluster{
+		Cluster: cluster.Cluster{
+			ID: id,
+		},
+		Customer: customer.Customer{
+			ID: id,
+		},
+		Kubernetes: kubernetes.Kubernetes{
+			API: api.API{
+				SecurePort:   6443,
+				InsecurePort: 8080,
+			},
+			Kubelet: kubelet.Kubelet{
+				Port: 4194,
+			},
+		},
+		Masters: []node.Node{
+			node.Node{
+				Memory: "4096",
+				CPUs:   1,
+			},
+		},
+		Workers: []node.Node{
+			node.Node{
+				Memory: "4096",
+				CPUs:   1,
+			},
 		},
 	}
 
-	cluster.Spec.Worker.Replicas = int32(1)
-	cluster.Spec.Worker.WorkerServicePort = "4194"
-	cluster.Spec.Master.SecurePort = "6443"
-	cluster.Spec.Master.InsecurePort = "8080"
+	customObject := kvmtpr.CustomObject{
+		Spec: kvmtpr.Spec{
+			Cluster: cluster,
+		},
+	}
 
-	resources, err := ComputeResources(cluster)
+	resources, err := ComputeResources(customObject)
 	if err != nil {
 		t.Fatalf("Error when computing cluster resources: %v", err)
 	}
@@ -90,19 +144,43 @@ func TestResourcesHaveCorrectLabelScheme(t *testing.T) {
 	clusterID := "cluster-test"
 	customerID := "customer-test"
 
-	cluster := clusterspec.Cluster{
-		Spec: clusterspec.ClusterSpec{
-			ClusterId: clusterID,
-			Customer:  customerID,
+	cluster := clustertpr.Cluster{
+		Cluster: cluster.Cluster{
+			ID: clusterID,
+		},
+		Customer: customer.Customer{
+			ID: customerID,
+		},
+		Kubernetes: kubernetes.Kubernetes{
+			API: api.API{
+				SecurePort:   6443,
+				InsecurePort: 8080,
+			},
+			Kubelet: kubelet.Kubelet{
+				Port: 4194,
+			},
+		},
+		Masters: []node.Node{
+			node.Node{
+				Memory: "4096",
+				CPUs:   1,
+			},
+		},
+		Workers: []node.Node{
+			node.Node{
+				Memory: "4096",
+				CPUs:   1,
+			},
 		},
 	}
 
-	cluster.Spec.Worker.Replicas = int32(1)
-	cluster.Spec.Worker.WorkerServicePort = "4194"
-	cluster.Spec.Master.SecurePort = "6443"
-	cluster.Spec.Master.InsecurePort = "8080"
+	customObject := kvmtpr.CustomObject{
+		Spec: kvmtpr.Spec{
+			Cluster: cluster,
+		},
+	}
 
-	resources, err := ComputeResources(cluster)
+	resources, err := ComputeResources(customObject)
 	if err != nil {
 		t.Fatalf("Error when computing cluster resources: %v", err)
 	}

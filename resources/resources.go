@@ -5,15 +5,13 @@ import (
 	"log"
 	"time"
 
-	"github.com/giantswarm/clusterspec"
-
+	"github.com/giantswarm/kvmtpr"
 	"github.com/prometheus/client_golang/prometheus"
-
 	"k8s.io/client-go/pkg/runtime"
 )
 
 const (
-	MasterReplicas int32 = 1
+	MasterReplicas int = 1
 )
 
 var (
@@ -44,13 +42,13 @@ type ClusterObj interface {
 
 // computeResources returns a list of Kubernetes objects that define
 // the desired state of the given cluster.
-func ComputeResources(customObject clusterspec.Cluster) ([]runtime.Object, error) {
+func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error) {
 	clusterID := ClusterID(customObject)
 
 	if clusterID == "" {
 		return nil, errors.New("cluster ID must not be empty")
 	}
-	if customObject.Spec.Worker.Replicas == int32(0) {
+	if len(customObject.Spec.Cluster.Workers) == 0 {
 		return nil, errors.New("worker replicas must not be empty")
 	}
 
@@ -62,7 +60,7 @@ func ComputeResources(customObject clusterspec.Cluster) ([]runtime.Object, error
 	objects := []runtime.Object{}
 
 	flannelClient := &flannelClient{
-		Cluster: customObject,
+		CustomObject: customObject,
 	}
 	flannelComponents, err := flannelClient.GenerateResources()
 	if err != nil {
@@ -71,7 +69,7 @@ func ComputeResources(customObject clusterspec.Cluster) ([]runtime.Object, error
 	objects = append(objects, flannelComponents...)
 
 	master := &master{
-		Cluster: customObject,
+		CustomObject: customObject,
 	}
 	masterComponents, err := master.GenerateResources()
 	if err != nil {
@@ -80,7 +78,7 @@ func ComputeResources(customObject clusterspec.Cluster) ([]runtime.Object, error
 	objects = append(objects, masterComponents...)
 
 	worker := &worker{
-		Cluster: customObject,
+		CustomObject: customObject,
 	}
 	workerComponents, err := worker.GenerateResources()
 	if err != nil {

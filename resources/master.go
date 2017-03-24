@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"strconv"
 
-	"github.com/giantswarm/clusterspec"
-
+	"github.com/giantswarm/kvmtpr"
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -21,7 +19,7 @@ type Master interface {
 }
 
 type master struct {
-	clusterspec.Cluster
+	kvmtpr.CustomObject
 }
 
 func (m *master) generateMasterPodAffinity() (string, error) {
@@ -39,7 +37,7 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{m.Spec.ClusterId},
+					Namespaces:  []string{ClusterID(m.CustomObject)},
 				},
 			},
 		},
@@ -56,7 +54,7 @@ func (m *master) generateMasterPodAffinity() (string, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{m.Spec.ClusterId},
+					Namespaces:  []string{ClusterID(m.CustomObject)},
 				},
 			},
 		},
@@ -99,7 +97,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-api-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -122,33 +120,33 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "ALT_NAMES",
-					Value: m.Spec.Certificates.ApiAltNames,
+					Value: m.Spec.Cluster.Kubernetes.API.AltNames,
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Value: m.Spec.Cluster.Kubernetes.API.Domain,
 				},
 				{
 					Name:  "CLUSTER_ID",
-					Value: m.Spec.ClusterId,
+					Value: ClusterID(m.CustomObject),
 				},
 				{
 					Name:  "IP_SANS",
-					Value: m.Spec.GiantnetesConfiguration.ApiIp,
+					Value: m.Spec.Cluster.Kubernetes.API.IP.String(),
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: m.Spec.Certificates.VaultToken,
+					Value: m.Spec.Cluster.Vault.Token,
 				},
 				{
 					Name:  "VAULT_ADDR",
-					Value: m.Spec.GiantnetesConfiguration.VaultAddr,
+					Value: m.Spec.Cluster.Vault.Address,
 				},
 			},
 		},
 		{
 			Name:            "k8s-master-calico-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -171,25 +169,25 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "CLUSTER_ID",
-					Value: m.Spec.ClusterId,
+					Value: ClusterID(m.CustomObject),
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("calico", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Value: ClusterDomain("calico", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.Domain),
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: m.Spec.Certificates.VaultToken,
+					Value: m.Spec.Cluster.Vault.Token,
 				},
 				{
 					Name:  "VAULT_ADDR",
-					Value: m.Spec.GiantnetesConfiguration.VaultAddr,
+					Value: m.Spec.Cluster.Vault.Address,
 				},
 			},
 		},
 		{
 			Name:            "k8s-master-etcd-certs",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/certctl:" + m.Spec.CertctlVersion,
+			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -212,19 +210,19 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "CLUSTER_ID",
-					Value: m.Spec.ClusterId,
+					Value: ClusterID(m.CustomObject),
 				},
 				{
 					Name:  "COMMON_NAME",
-					Value: ClusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Value: m.Spec.Cluster.Etcd.Domain,
 				},
 				{
 					Name:  "VAULT_TOKEN",
-					Value: m.Spec.Certificates.VaultToken,
+					Value: m.Spec.Cluster.Vault.Token,
 				},
 				{
 					Name:  "VAULT_ADDR",
-					Value: m.Spec.GiantnetesConfiguration.VaultAddr,
+					Value: m.Spec.Cluster.Vault.Address,
 				},
 			},
 		},
@@ -243,11 +241,11 @@ func (m *master) generateInitMasterContainers() (string, error) {
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "ETCD_PORT",
-					Value: m.Spec.GiantnetesConfiguration.EtcdPort,
+					Value: fmt.Sprintf("%d", m.Spec.Cluster.Etcd.Port),
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME",
-					Value: NetworkBridgeName(m.Spec.ClusterId),
+					Value: NetworkBridgeName(ClusterID(m.CustomObject)),
 				},
 				{
 					Name: "NODE_IP",
@@ -300,8 +298,8 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "etcd",
 			Labels: map[string]string{
-				"cluster":  m.Spec.ClusterId,
-				"customer": m.Spec.Customer,
+				"cluster":  ClusterID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 			Annotations: map[string]string{
@@ -312,13 +310,13 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			TLS: []extensionsv1.IngressTLS{
 				extensionsv1.IngressTLS{
 					Hosts: []string{
-						ClusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+						m.Spec.Cluster.Etcd.Domain,
 					},
 				},
 			},
 			Rules: []extensionsv1.IngressRule{
 				extensionsv1.IngressRule{
-					Host: ClusterDomain("etcd", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Host: m.Spec.Cluster.Etcd.Domain,
 					IngressRuleValue: extensionsv1.IngressRuleValue{
 						HTTP: &extensionsv1.HTTPIngressRuleValue{
 							Paths: []extensionsv1.HTTPIngressPath{
@@ -339,11 +337,6 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 
 	objects = append(objects, endpointMasterEtcd)
 
-	securePort, err := strconv.Atoi(m.Spec.Master.SecurePort)
-	if err != nil {
-		return nil, maskAny(err)
-	}
-
 	endpointMasterAPIHTTPS := &extensionsv1.Ingress{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "Ingress",
@@ -352,8 +345,8 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "api",
 			Labels: map[string]string{
-				"cluster":  m.Spec.ClusterId,
-				"customer": m.Spec.Customer,
+				"cluster":  ClusterID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 			Annotations: map[string]string{
@@ -364,13 +357,13 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			TLS: []extensionsv1.IngressTLS{
 				extensionsv1.IngressTLS{
 					Hosts: []string{
-						ClusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+						m.Spec.Cluster.Kubernetes.API.Domain,
 					},
 				},
 			},
 			Rules: []extensionsv1.IngressRule{
 				extensionsv1.IngressRule{
-					Host: ClusterDomain("api", m.Spec.ClusterId, m.Spec.Master.Domain),
+					Host: m.Spec.Cluster.Kubernetes.API.Domain,
 					IngressRuleValue: extensionsv1.IngressRuleValue{
 						HTTP: &extensionsv1.HTTPIngressRuleValue{
 							Paths: []extensionsv1.HTTPIngressPath{
@@ -378,7 +371,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 									Path: "/",
 									Backend: extensionsv1.IngressBackend{
 										ServiceName: "master",
-										ServicePort: intstr.FromInt(securePort),
+										ServicePort: intstr.FromInt(m.Spec.Cluster.Kubernetes.API.SecurePort),
 									},
 								},
 							},
@@ -399,8 +392,8 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
-				"cluster":  m.Spec.ClusterId,
-				"customer": m.Spec.Customer,
+				"cluster":  ClusterID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 		},
@@ -414,7 +407,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 				},
 				{
 					Name:     "api",
-					Port:     int32(securePort),
+					Port:     int32(m.Spec.Cluster.Kubernetes.API.SecurePort),
 					Protocol: "TCP",
 				},
 			},
@@ -440,6 +433,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	}
 
 	masterReplicas := int32(MasterReplicas)
+	masterNode := m.Spec.Cluster.Masters[0]
 
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -449,8 +443,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
-				"cluster":  m.Spec.ClusterId,
-				"customer": m.Spec.Customer,
+				"cluster":  ClusterID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
 				"app":      "master",
 			},
 		},
@@ -463,8 +457,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "master",
 					Labels: map[string]string{
-						"cluster":  m.Spec.ClusterId,
-						"customer": m.Spec.Customer,
+						"cluster":  ClusterID(m.CustomObject),
+						"customer": ClusterCustomer(m.CustomObject),
 						"app":      "master",
 					},
 					Annotations: map[string]string{
@@ -479,7 +473,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "etcd-data",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/", m.Spec.ClusterId, "-k8s-master-vm/"),
+									Path: filepath.Join("/home/core/", ClusterID(m.CustomObject), "-k8s-master-vm/"),
 								},
 							},
 						},
@@ -487,7 +481,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "api-secrets",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/master/secrets"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/master/secrets"),
 								},
 							},
 						},
@@ -495,7 +489,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "calico-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/ssl/master/calico/"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/ssl/master/calico/"),
 								},
 							},
 						},
@@ -503,7 +497,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "etcd-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/ssl/master/etcd/"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/ssl/master/etcd/"),
 								},
 							},
 						},
@@ -519,7 +513,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/vms/", m.Spec.ClusterId, "-k8s-master-vm/"),
+									Path: filepath.Join("/home/core/vms/", ClusterID(m.CustomObject), "-k8s-master-vm/"),
 								},
 							},
 						},
@@ -535,7 +529,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Name: "api-certs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", m.Spec.ClusterId, "/", m.Spec.ClusterId, "/ssl/master/"),
+									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/ssl/master/"),
 								},
 							},
 						},
@@ -551,7 +545,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "k8s-vm",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-vm:0f135bdbd732bb78e83abca0bc678e1119ecde99",
+							Image:           m.Spec.Cluster.Operator.K8sVM.Docker.Image,
 							ImagePullPolicy: apiv1.PullAlways,
 							Args: []string{
 								"master",
@@ -559,11 +553,11 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(m.Spec.ClusterId),
+									Value: NetworkBridgeName(ClusterID(m.CustomObject)),
 								},
 								{
 									Name:  "CUSTOMER_ID",
-									Value: m.Spec.Customer,
+									Value: ClusterCustomer(m.CustomObject),
 								},
 								{
 									Name: "HOSTNAME",
@@ -585,71 +579,71 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_CLUSTER_IP_RANGE",
-									Value: m.Spec.Master.ClusterIpRange,
+									Value: m.Spec.Cluster.Kubernetes.API.ClusterIPRange,
 								},
 								{
 									Name:  "K8S_CLUSTER_IP_SUBNET",
-									Value: m.Spec.Master.ClusterIpSubnet,
+									Value: m.Spec.Cluster.Kubernetes.API.ClusterIPRange,
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
-									Value: m.Spec.Master.InsecurePort,
+									Value: fmt.Sprintf("%d", m.Spec.Cluster.Kubernetes.API.InsecurePort),
 								},
 								{
 									Name:  "CALICO_SUBNET",
-									Value: m.Spec.Master.CalicoSubnet,
+									Value: m.Spec.Cluster.Calico.Subnet,
 								},
 								{
 									Name:  "CALICO_CIDR",
-									Value: m.Spec.Master.CalicoCidr,
+									Value: m.Spec.Cluster.Calico.CIDR,
 								},
 								{
 									Name:  "MACHINE_CPU_CORES",
-									Value: fmt.Sprintf("%d", m.Spec.Master.Capabilities.CpuCores),
+									Value: fmt.Sprintf("%d", masterNode.CPUs),
 								},
 								{
 									Name:  "K8S_DNS_IP",
-									Value: m.Spec.Master.DnsIp,
+									Value: m.Spec.Cluster.Kubernetes.DNS.IP.String(),
 								},
 								{
-									Name:  "K8S_DOMAIN", // TODO rename to K8S_KUBEDNS_DOMAIN
-									Value: m.Spec.ClusterId + ".giantswarm.local.",
+									Name:  "K8S_KUBEDNS_DOMAIN",
+									Value: ClusterID(m.CustomObject) + ".giantswarm.local.",
 								},
 								{
 									Name:  "K8S_ETCD_DOMAIN_NAME",
-									Value: m.Spec.Master.EtcdDomainName,
+									Value: m.Spec.Cluster.Etcd.Domain,
 								},
 								{
 									Name:  "K8S_ETCD_PREFIX",
-									Value: m.Spec.ClusterId,
+									Value: ClusterID(m.CustomObject),
 								},
 								{
 									Name:  "K8S_MASTER_DOMAIN_NAME",
-									Value: m.Spec.Master.MasterDomainName,
+									Value: m.Spec.Cluster.Kubernetes.API.Domain,
 								},
 								{
-									Name:  "K8S_NETWORK_SETUP_VERSION",
-									Value: m.Spec.Master.NetworkSetupVersion,
+									Name:  "K8S_NETWORK_SETUP_IMAGE",
+									Value: m.Spec.Cluster.Operator.NetworkSetup.Docker.Image,
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",
-									Value: m.Spec.Master.DockerExtraArgs,
+									Value: m.Spec.Cluster.Docker.Daemon.ExtraArgs,
 								},
 								{
 									Name:  "K8S_SECURE_PORT",
-									Value: m.Spec.Master.SecurePort,
+									Value: fmt.Sprintf("%d", m.Spec.Cluster.Kubernetes.API.SecurePort),
 								},
 								{
-									Name:  "K8S_VERSION",
-									Value: m.Spec.K8sVersion,
+									Name:  "K8S_HYPERKUBE_IMAGE",
+									Value: m.Spec.Cluster.Kubernetes.Hyperkube.Docker.Image,
 								},
 								{
 									Name:  "MACHINE_MEM",
-									Value: m.Spec.Master.Capabilities.Memory,
+									Value: masterNode.Memory,
 								},
 								{
 									Name:  "REGISTRY",
-									Value: m.Spec.Master.Registry,
+									Value: m.Spec.Cluster.Docker.Registry.Endpoint,
 								},
 								{
 									Name: "K8S_ETCD_IP",
@@ -694,11 +688,11 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "CLUSTER_ID",
-									Value: m.Spec.ClusterId,
+									Value: ClusterID(m.CustomObject),
 								},
 								{
 									Name:  "CUSTOMER_ID",
-									Value: m.Spec.Customer,
+									Value: ClusterCustomer(m.CustomObject),
 								},
 								{
 									Name:  "SERVICE_NAME",

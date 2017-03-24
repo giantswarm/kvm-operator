@@ -34,4 +34,9 @@ import:
 - package: github.com/ventu-io/go-shortid
   version: ^1.0.0
 - package: github.com/giantswarm/microkit
+  version: eddd72801c08a534e31a6d987497317c720583b0
 - package: github.com/spf13/viper
+- package: github.com/coreos/etcd
+  version: 3.1.0
+- package: github.com/giantswarm/kvmtpr
+  version: ce2a3e56de13e4917c5bc1a62217651af6258144
