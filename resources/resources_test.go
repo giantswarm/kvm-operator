@@ -5,9 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
-
 	"github.com/giantswarm/clustertpr"
 	"github.com/giantswarm/clustertpr/cluster"
 	"github.com/giantswarm/clustertpr/customer"
@@ -16,6 +13,8 @@ import (
 	"github.com/giantswarm/clustertpr/kubernetes/kubelet"
 	"github.com/giantswarm/clustertpr/node"
 	"github.com/giantswarm/kvmtpr"
+	"k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
 
 func TestResourceComputation(t *testing.T) {

@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
-
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"

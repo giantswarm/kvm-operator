@@ -7,7 +7,6 @@ import (
 
 	"github.com/giantswarm/kvmtpr"
 	"github.com/ventu-io/go-shortid"
-
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
