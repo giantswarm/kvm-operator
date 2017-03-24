@@ -1,5 +1,5 @@
-hash: 4ae47283c8570b1e9b575f6fb601a6ea8517aa8a317fdfc35041ccb7a4be3c92
-updated: 2017-03-24T18:27:47.233140455+01:00
+hash: 96117bcecc6e2aacdcfe67f372c9070654f901e882de26c6bee3dd7fea5f3569
+updated: 2017-03-24T18:37:20.04725615+01:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -90,18 +90,12 @@ imports:
   subpackages:
   - kvm
 - name: github.com/giantswarm/microkit
-  version: 8081cd79373ce7175be0f13ddef5b546521c2a06
+  version: eddd72801c08a534e31a6d987497317c720583b0
   subpackages:
   - command
   - command/daemon
-  - command/daemon/flag
-  - command/daemon/flag/config
-  - command/daemon/flag/server
-  - command/daemon/flag/server/listen
-  - command/daemon/flag/server/tls
   - command/version
   - error
-  - flag
   - logger
   - server
   - storage

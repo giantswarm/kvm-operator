@@ -19,7 +19,6 @@ import (
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/viper"
 	"github.com/tylerb/graceful"
 	"golang.org/x/net/context"
 
@@ -74,8 +73,6 @@ type Config struct {
 	// TLSKeyFilePath is the file path to the certificate private key file, if
 	// any.
 	TLSKeyFile string
-	// Viper is a configuration management object.
-	Viper *viper.Viper
 }
 
 // DefaultConfig provides a default configuration to create a new server object
@@ -117,7 +114,6 @@ func DefaultConfig() Config {
 		TLSCAFile:      "",
 		TLSCrtFile:     "",
 		TLSKeyFile:     "",
-		Viper:          viper.New(),
 	}
 }
 
