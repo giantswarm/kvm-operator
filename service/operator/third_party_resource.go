@@ -3,8 +3,8 @@ package operator
 import (
 	"time"
 
+	"github.com/giantswarm/kvmtpr"
 	"github.com/prometheus/client_golang/prometheus"
-
 	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/api/v1"
@@ -18,7 +18,7 @@ var (
 			APIVersion: "extensions/v1beta1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name: ClusterThirdPartyResourceName,
+			Name: kvmtpr.Name,
 		},
 		Description: "A specification of a Kubernetes cluster",
 		Versions: []v1beta1.APIVersion{
@@ -32,10 +32,6 @@ var (
 		Name: "cluster_third_party_resource_creation_milliseconds",
 		Help: "Time taken to create cluster third party resource, in milliseconds",
 	})
-)
-
-const (
-	ClusterThirdPartyResourceName = "cluster.giantswarm.io"
 )
 
 func init() {

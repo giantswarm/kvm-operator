@@ -6,12 +6,11 @@ import (
 
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/net/context"
-
-	"github.com/giantswarm/kvm-operator/service/operator"
 )
 
 var (
@@ -88,7 +87,7 @@ func (s *Service) Check(ctx context.Context, request Request) (*Response, error)
 		healthCheckRequestTime.Set(float64(time.Since(start) / time.Millisecond))
 	}()
 
-	_, err := s.kubernetesClient.Extensions().ThirdPartyResources().Get(operator.ClusterThirdPartyResourceName)
+	_, err := s.kubernetesClient.Extensions().ThirdPartyResources().Get(kvmtpr.Name)
 	if err != nil {
 		healthCheckRequests.WithLabelValues("failed").Inc()
 		return nil, microerror.MaskAny(err)
