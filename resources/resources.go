@@ -64,7 +64,7 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	}
 	flannelComponents, err := flannelClient.GenerateResources()
 	if err != nil {
-		log.Println("generate resource flannelComponents error %v", err)
+		log.Printf("generate resource flannelComponents error: %v\n", err)
 	}
 	objects = append(objects, flannelComponents...)
 
@@ -73,7 +73,7 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	}
 	masterComponents, err := master.GenerateResources()
 	if err != nil {
-		log.Println("generate resource masterComponents error %v", err)
+		log.Printf("generate resource masterComponents error: %v\n", err)
 	}
 	objects = append(objects, masterComponents...)
 
@@ -82,7 +82,7 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	}
 	workerComponents, err := worker.GenerateResources()
 	if err != nil {
-		log.Println("generate resource workerComponents error %v", err)
+		log.Printf("generate resource workerComponents error: %v\n", err)
 	}
 	objects = append(objects, workerComponents...)
 
