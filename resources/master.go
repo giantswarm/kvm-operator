@@ -546,7 +546,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						{
 							Name:            "k8s-vm",
 							Image:           m.Spec.Cluster.Operator.K8sVM.Docker.Image,
-							ImagePullPolicy: apiv1.PullAlways,
+							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Args: []string{
 								"master",
 							},
@@ -682,42 +682,36 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
-							Name:            "k8s-watch-master-vm",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-watch-master-vm:4a226de00c16035f8bb38d43d32b211e5e7d4345",
+							Name:            "k8s-endpoint-updater",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:fc51ee67df4f87f34d7bfddfd540ef53623877d7",
 							ImagePullPolicy: apiv1.PullIfNotPresent,
+							Command: []string{
+								"/bin/sh",
+								"-c",
+								"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
+							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "CLUSTER_ID",
-									Value: ClusterID(m.CustomObject),
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: NetworkBridgeName(ClusterID(m.CustomObject)),
 								},
 								{
-									Name:  "CUSTOMER_ID",
-									Value: ClusterCustomer(m.CustomObject),
-								},
-								{
-									Name:  "SERVICE_NAME",
-									Value: "master",
-								},
-								{
-									Name: "NODE_IP",
+									Name: "POD_NAME",
 									ValueFrom: &apiv1.EnvVarSource{
 										FieldRef: &apiv1.ObjectFieldSelector{
 											APIVersion: "v1",
-											FieldPath:  "spec.nodeName",
+											FieldPath:  "metadata.name",
 										},
 									},
 								},
 								{
-									Name:  "NODE_ETCD_PORT",
-									Value: "2379",
-								},
-								{
-									Name:  "G8S_MASTER_HOST",
-									Value: "127.0.0.1",
-								},
-								{
-									Name:  "G8S_MASTER_PORT",
-									Value: "8080",
+									Name: "POD_NAMESPACE",
+									ValueFrom: &apiv1.EnvVarSource{
+										FieldRef: &apiv1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.namespace",
+										},
+									},
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{
