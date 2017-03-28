@@ -683,12 +683,12 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						},
 						{
 							Name:            "k8s-endpoint-updater",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:92152c6015210b71b98756786aaf990035eaa8d3",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:b38e0d2f662d3e8e84fd9769ccde9540806642f8",
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"ifconfig && /opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
+								"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
 							},
 							Env: []apiv1.EnvVar{
 								{
