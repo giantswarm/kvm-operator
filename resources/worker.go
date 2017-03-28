@@ -252,7 +252,7 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 			},
 		},
 		Spec: apiv1.ServiceSpec{
-			Type: apiv1.ServiceType("NodePort"),
+			Type: apiv1.ServiceTypeNodePort,
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "http",
@@ -269,7 +269,6 @@ func (w *worker) GenerateService() (*apiv1.Service, error) {
 	}
 
 	return service, nil
-
 }
 
 func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, error) {

@@ -398,7 +398,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			},
 		},
 		Spec: apiv1.ServiceSpec{
-			Type: apiv1.ServiceType("LoadBalancer"),
+			Type: apiv1.ServiceTypeNodePort,
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "etcd",
@@ -410,6 +410,11 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 					Port:     int32(m.Spec.Cluster.Kubernetes.API.SecurePort),
 					Protocol: "TCP",
 				},
+			},
+			Selector: map[string]string{
+				"cluster":  ClusterID(m.CustomObject),
+				"customer": ClusterCustomer(m.CustomObject),
+				"app":      "master",
 			},
 		},
 	}
