@@ -398,7 +398,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			},
 		},
 		Spec: apiv1.ServiceSpec{
-			Type: apiv1.ServiceTypeNodePort,
+			Type: apiv1.ServiceTypeLoadBalancer,
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "etcd",
