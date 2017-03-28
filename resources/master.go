@@ -411,11 +411,8 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 					Protocol: "TCP",
 				},
 			},
-			Selector: map[string]string{
-				"cluster":  ClusterID(m.CustomObject),
-				"customer": ClusterCustomer(m.CustomObject),
-				"app":      "master",
-			},
+			// Note that we do not use a selector definition on purpose to be able to
+			// manually set the IP address of the actual VM.
 		},
 	}
 
@@ -688,7 +685,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						},
 						{
 							Name:            "k8s-endpoint-updater",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:795bcf73fabb48d0c07657f4b739334d2f4c3c21",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:3ebcb1fe6021790019b7ccef543afd259935452f",
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Command: []string{
 								"/bin/sh",
