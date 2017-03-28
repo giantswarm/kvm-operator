@@ -688,7 +688,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						},
 						{
 							Name:            "k8s-endpoint-updater",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:0b31b5bad9f9aa525419198a70b8457d64ccdef2",
+							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:795bcf73fabb48d0c07657f4b739334d2f4c3c21",
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Command: []string{
 								"/bin/sh",
