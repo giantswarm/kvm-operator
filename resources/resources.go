@@ -2,7 +2,7 @@ package resources
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/giantswarm/kvmtpr"
@@ -55,7 +55,7 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	start := time.Now()
 	computeResourcesTotal.WithLabelValues(clusterID).Inc()
 
-	log.Println("started computing desired resources for cluster:", clusterID)
+	fmt.Printf("started computing desired resources for cluster '%s'\n", clusterID)
 
 	objects := []runtime.Object{}
 
@@ -64,7 +64,7 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	}
 	flannelComponents, err := flannelClient.GenerateResources()
 	if err != nil {
-		log.Println("generate resource flannelComponents error %v", err)
+		fmt.Printf("%#v\n", err)
 	}
 	objects = append(objects, flannelComponents...)
 
@@ -73,7 +73,7 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	}
 	masterComponents, err := master.GenerateResources()
 	if err != nil {
-		log.Println("generate resource masterComponents error %v", err)
+		fmt.Printf("%#v\n", err)
 	}
 	objects = append(objects, masterComponents...)
 
@@ -82,11 +82,11 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	}
 	workerComponents, err := worker.GenerateResources()
 	if err != nil {
-		log.Println("generate resource workerComponents error %v", err)
+		fmt.Printf("%#v\n", err)
 	}
 	objects = append(objects, workerComponents...)
 
-	log.Println("finished computing desired resources for cluster:", clusterID)
+	fmt.Printf("finished computing desired resources for cluster '%s'\n", clusterID)
 
 	computeResourceTime.WithLabelValues(clusterID).Set(float64(time.Since(start) / time.Millisecond))
 
