@@ -3,6 +3,7 @@ package resources
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
@@ -426,16 +427,23 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 
 	initContainers, err := m.generateInitMasterContainers()
 	if err != nil {
-		return &extensionsv1.Deployment{}, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	podAffinity, err := m.generateMasterPodAffinity()
 	if err != nil {
-		return &extensionsv1.Deployment{}, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	masterReplicas := int32(MasterReplicas)
 	masterNode := m.Spec.Cluster.Masters[0]
+
+	ip, cidr, err := net.ParseCIDR(m.Spec.Cluster.Kubernetes.API.ClusterIPRange)
+	if err != nil {
+		return nil, maskAny(err)
+	}
+	clusterIPRange := ip.String()
+	clusterIPSubnet, _ := cidr.Mask.Size()
 
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -581,11 +589,11 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_CLUSTER_IP_RANGE",
-									Value: m.Spec.Cluster.Kubernetes.API.ClusterIPRange,
+									Value: clusterIPRange,
 								},
 								{
 									Name:  "K8S_CLUSTER_IP_SUBNET",
-									Value: m.Spec.Cluster.Kubernetes.API.ClusterIPRange,
+									Value: fmt.Sprintf("%d", clusterIPSubnet),
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
