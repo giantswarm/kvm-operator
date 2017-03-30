@@ -76,7 +76,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-api-token",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-openssl:410c14100b89ffad9d84f0a5fbd9bdb398cdc2fd",
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -99,7 +99,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-api-certs",
 			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -148,7 +148,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-calico-certs",
 			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -189,7 +189,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-etcd-certs",
 			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -230,7 +230,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "set-iptables",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-iptables:4625e26b128c0ce637774ab0a3051fb6df07d0be",
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
