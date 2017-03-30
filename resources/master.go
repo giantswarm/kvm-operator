@@ -259,6 +259,43 @@ func (m *master) generateInitMasterContainers() (string, error) {
 				},
 			},
 		},
+		{
+			Name:            "k8s-endpoint-updater",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:0c3eb9835137dace83a178784d2607f527856570",
+			ImagePullPolicy: apiv1.PullIfNotPresent,
+			Command: []string{
+				"/bin/sh",
+				"-c",
+				"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
+			},
+			SecurityContext: &apiv1.SecurityContext{
+				Privileged: &privileged,
+			},
+			Env: []apiv1.EnvVar{
+				{
+					Name:  "NETWORK_BRIDGE_NAME",
+					Value: NetworkBridgeName(ClusterID(m.CustomObject)),
+				},
+				{
+					Name: "POD_NAME",
+					ValueFrom: &apiv1.EnvVarSource{
+						FieldRef: &apiv1.ObjectFieldSelector{
+							APIVersion: "v1",
+							FieldPath:  "metadata.name",
+						},
+					},
+				},
+				{
+					Name: "POD_NAMESPACE",
+					ValueFrom: &apiv1.EnvVarSource{
+						FieldRef: &apiv1.ObjectFieldSelector{
+							APIVersion: "v1",
+							FieldPath:  "metadata.namespace",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	bytes, err := json.Marshal(initContainers)
@@ -685,43 +722,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:      "etcd-data",
 									MountPath: "/etc/kubernetes/data/etcd/",
-								},
-							},
-							SecurityContext: &apiv1.SecurityContext{
-								Privileged: &privileged,
-							},
-						},
-						{
-							Name:            "k8s-endpoint-updater",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:0c3eb9835137dace83a178784d2607f527856570",
-							ImagePullPolicy: apiv1.PullIfNotPresent,
-							Command: []string{
-								"/bin/sh",
-								"-c",
-								"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
-							},
-							Env: []apiv1.EnvVar{
-								{
-									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(ClusterID(m.CustomObject)),
-								},
-								{
-									Name: "POD_NAME",
-									ValueFrom: &apiv1.EnvVarSource{
-										FieldRef: &apiv1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "metadata.name",
-										},
-									},
-								},
-								{
-									Name: "POD_NAMESPACE",
-									ValueFrom: &apiv1.EnvVarSource{
-										FieldRef: &apiv1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "metadata.namespace",
-										},
-									},
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{
