@@ -205,7 +205,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:            "k8s-endpoint-updater",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:489e7e9e6d4d44d0c2c84fe82aa9f9cefcd66647",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:b3e8b7236b93ffddbb9247d4993ba93727a5786c",
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
