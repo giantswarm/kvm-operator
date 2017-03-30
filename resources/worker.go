@@ -205,12 +205,12 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:            "k8s-endpoint-updater",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:0c3eb9835137dace83a178784d2607f527856570",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:e0b36098cb0f359636b2bcf137e753d1398af9ac",
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
-				"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
+				"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.cluster.service=worker --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
 			},
 			SecurityContext: &apiv1.SecurityContext{
 				Privileged: &privileged,
