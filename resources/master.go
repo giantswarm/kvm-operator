@@ -3,6 +3,7 @@ package resources
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
@@ -75,7 +76,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-api-token",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-openssl:410c14100b89ffad9d84f0a5fbd9bdb398cdc2fd",
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -98,7 +99,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-api-certs",
 			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -147,7 +148,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-calico-certs",
 			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -188,7 +189,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "k8s-master-etcd-certs",
 			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -229,7 +230,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		{
 			Name:            "set-iptables",
 			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-iptables:4625e26b128c0ce637774ab0a3051fb6df07d0be",
-			ImagePullPolicy: apiv1.PullAlways,
+			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
 				"-c",
@@ -253,6 +254,43 @@ func (m *master) generateInitMasterContainers() (string, error) {
 						FieldRef: &apiv1.ObjectFieldSelector{
 							APIVersion: "v1",
 							FieldPath:  "spec.nodeName",
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:            "k8s-endpoint-updater",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:84a3506e60edbec199e860070c076948bd9c7ca6",
+			ImagePullPolicy: apiv1.PullIfNotPresent,
+			Command: []string{
+				"/bin/sh",
+				"-c",
+				"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.cluster.service=master --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}",
+			},
+			SecurityContext: &apiv1.SecurityContext{
+				Privileged: &privileged,
+			},
+			Env: []apiv1.EnvVar{
+				{
+					Name:  "NETWORK_BRIDGE_NAME",
+					Value: NetworkBridgeName(ClusterID(m.CustomObject)),
+				},
+				{
+					Name: "POD_NAME",
+					ValueFrom: &apiv1.EnvVarSource{
+						FieldRef: &apiv1.ObjectFieldSelector{
+							APIVersion: "v1",
+							FieldPath:  "metadata.name",
+						},
+					},
+				},
+				{
+					Name: "POD_NAMESPACE",
+					ValueFrom: &apiv1.EnvVarSource{
+						FieldRef: &apiv1.ObjectFieldSelector{
+							APIVersion: "v1",
+							FieldPath:  "metadata.namespace",
 						},
 					},
 				},
@@ -398,7 +436,7 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 			},
 		},
 		Spec: apiv1.ServiceSpec{
-			Type: apiv1.ServiceType("LoadBalancer"),
+			Type: apiv1.ServiceTypeLoadBalancer,
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "etcd",
@@ -411,6 +449,8 @@ func (m *master) GenerateServiceResources() ([]runtime.Object, error) {
 					Protocol: "TCP",
 				},
 			},
+			// Note that we do not use a selector definition on purpose to be able to
+			// manually set the IP address of the actual VM.
 		},
 	}
 
@@ -424,16 +464,23 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 
 	initContainers, err := m.generateInitMasterContainers()
 	if err != nil {
-		return &extensionsv1.Deployment{}, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	podAffinity, err := m.generateMasterPodAffinity()
 	if err != nil {
-		return &extensionsv1.Deployment{}, maskAny(err)
+		return nil, maskAny(err)
 	}
 
 	masterReplicas := int32(MasterReplicas)
 	masterNode := m.Spec.Cluster.Masters[0]
+
+	ip, cidr, err := net.ParseCIDR(m.Spec.Cluster.Kubernetes.API.ClusterIPRange)
+	if err != nil {
+		return nil, maskAny(err)
+	}
+	clusterIPRange := ip.String()
+	clusterIPSubnet, _ := cidr.Mask.Size()
 
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -546,7 +593,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 						{
 							Name:            "k8s-vm",
 							Image:           m.Spec.Cluster.Operator.K8sVM.Docker.Image,
-							ImagePullPolicy: apiv1.PullAlways,
+							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Args: []string{
 								"master",
 							},
@@ -579,11 +626,11 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_CLUSTER_IP_RANGE",
-									Value: m.Spec.Cluster.Kubernetes.API.ClusterIPRange,
+									Value: clusterIPRange,
 								},
 								{
 									Name:  "K8S_CLUSTER_IP_SUBNET",
-									Value: m.Spec.Cluster.Kubernetes.API.ClusterIPRange,
+									Value: fmt.Sprintf("%d", clusterIPSubnet),
 								},
 								{
 									Name:  "K8S_INSECURE_PORT",
@@ -675,49 +722,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								{
 									Name:      "etcd-data",
 									MountPath: "/etc/kubernetes/data/etcd/",
-								},
-							},
-							SecurityContext: &apiv1.SecurityContext{
-								Privileged: &privileged,
-							},
-						},
-						{
-							Name:            "k8s-watch-master-vm",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-watch-master-vm:4a226de00c16035f8bb38d43d32b211e5e7d4345",
-							ImagePullPolicy: apiv1.PullIfNotPresent,
-							Env: []apiv1.EnvVar{
-								{
-									Name:  "CLUSTER_ID",
-									Value: ClusterID(m.CustomObject),
-								},
-								{
-									Name:  "CUSTOMER_ID",
-									Value: ClusterCustomer(m.CustomObject),
-								},
-								{
-									Name:  "SERVICE_NAME",
-									Value: "master",
-								},
-								{
-									Name: "NODE_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										FieldRef: &apiv1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "spec.nodeName",
-										},
-									},
-								},
-								{
-									Name:  "NODE_ETCD_PORT",
-									Value: "2379",
-								},
-								{
-									Name:  "G8S_MASTER_HOST",
-									Value: "127.0.0.1",
-								},
-								{
-									Name:  "G8S_MASTER_PORT",
-									Value: "8080",
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{

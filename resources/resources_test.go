@@ -32,8 +32,9 @@ func TestResourceComputation(t *testing.T) {
 		},
 		Kubernetes: kubernetes.Kubernetes{
 			API: api.API{
-				SecurePort:   6443,
-				InsecurePort: 8080,
+				ClusterIPRange: "10.3.0.0/31",
+				InsecurePort:   8080,
+				SecurePort:     6443,
 			},
 			Kubelet: kubelet.Kubelet{
 				Port: 4194,
@@ -63,6 +64,8 @@ func TestResourceComputation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error when computing cluster resources %v", err)
 	}
+
+	fmt.Printf("%#v\n", objects)
 
 	if len(objects) != expectedObjects {
 		t.Fatalf("Number of objects in expected output differed from received units: %d != %d", len(objects), expectedObjects)

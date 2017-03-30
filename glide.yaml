@@ -39,4 +39,4 @@ import:
 - package: github.com/coreos/etcd
   version: 3.1.0
 - package: github.com/giantswarm/kvmtpr
-  version: ce2a3e56de13e4917c5bc1a62217651af6258144
+  version: 7838a1b3fd34c60f800d6fbd74ad526fa96eb7c6

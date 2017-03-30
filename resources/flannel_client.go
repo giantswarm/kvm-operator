@@ -24,7 +24,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-network-config",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-config:7e6b155f78ce00b2193c3015863e1994e97ed4b5",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-config:d8e24534cee8d295757f30ceb0e95ca6e02c5ae7",
 			ImagePullPolicy: apiv1.PullAlways,
 			Env: []apiv1.EnvVar{
 				{
@@ -55,6 +55,10 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 				{
 					Name:  "NETWORK_BRIDGE_NAME", // e.g. br-h8s2l
 					Value: NetworkBridgeName(ClusterID(f.CustomObject)),
+				},
+				{
+					Name:  "SUBNET_LEN", // e.g. 30
+					Value: fmt.Sprintf("%d", f.Spec.Cluster.Flannel.Client.SubnetLen),
 				},
 			},
 		},
@@ -266,7 +270,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo 'Waiting for ${NETWORK_ENV_FILE_PATH} to be created'; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${HOST_SUBNET_RANGE}",
+								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo 'Waiting for ${NETWORK_ENV_FILE_PATH} to be created'; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${NETWORK_SUBNET_RANGE}",
 							},
 							Env: []apiv1.EnvVar{
 								{
@@ -274,8 +278,8 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 									Value: NetworkEnvFilePath(ClusterID(f.CustomObject)),
 								},
 								{
-									Name:  "HOST_SUBNET_RANGE", // TODO rename to NETWORK_SUBNET_RANGE (from f.Spec.Flannel.Network)
-									Value: f.Spec.Cluster.Kubernetes.API.ClusterIPRange,
+									Name:  "NETWORK_SUBNET_RANGE",
+									Value: f.Spec.Cluster.Flannel.Network,
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
