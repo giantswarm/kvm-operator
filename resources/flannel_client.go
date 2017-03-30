@@ -24,7 +24,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-network-config",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-config:9b8e90a5dfe9d6b63263baa209d521b064e760d9",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-config:d8e24534cee8d295757f30ceb0e95ca6e02c5ae7",
 			ImagePullPolicy: apiv1.PullAlways,
 			Env: []apiv1.EnvVar{
 				{
@@ -57,8 +57,8 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 					Value: NetworkBridgeName(ClusterID(f.CustomObject)),
 				},
 				{
-					Name:  "SUBNET_LEN", // e.g. 31
-					Value: "30",
+					Name:  "SUBNET_LEN", // e.g. 30
+					Value: fmt.Sprintf("%d", f.Spec.Cluster.Flannel.Client.SubnetLen),
 				},
 			},
 		},
