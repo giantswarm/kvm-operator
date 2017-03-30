@@ -15,6 +15,6 @@ test:
 
 deployment:
   master:
-    branch: bridge
+    branch: master
     commands:
       - ./architect deploy
