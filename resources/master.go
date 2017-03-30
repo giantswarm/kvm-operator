@@ -261,7 +261,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-endpoint-updater",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:e0b36098cb0f359636b2bcf137e753d1398af9ac",
+			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:e1a3db0c77c1346a37419f1b5d1b668eca702d17",
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
