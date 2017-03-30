@@ -58,7 +58,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 				},
 				{
 					Name:  "SUBNET_LEN", // e.g. 31
-					Value: "31",
+					Value: "30",
 				},
 			},
 		},
