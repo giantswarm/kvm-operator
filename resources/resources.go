@@ -3,6 +3,7 @@ package resources
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/giantswarm/kvmtpr"
@@ -82,7 +83,7 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 	}
 	workerComponents, err := worker.GenerateResources()
 	if err != nil {
-		fmt.Printf("%#v\n", err)
+		log.Printf("generate resource workerComponents error: %v\n", err)
 	}
 	objects = append(objects, workerComponents...)
 
