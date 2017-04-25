@@ -1,5 +1,5 @@
-hash: 15f7afdacb3f2d11583f787cdfd9160bcee98b19890b495a7c99df81abc1a682
-updated: 2017-04-25T15:13:48.686135659+02:00
+hash: aabc25965c01eb438443b2122c1f36987c084969e2663f01e18da56e7695a759
+updated: 2017-04-25T15:23:29.505799909+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -226,7 +226,7 @@ imports:
 - name: github.com/spf13/jwalterweatherman
   version: fa7ca7e836cf3a8bb4ebf799f472c12d7e903d66
 - name: github.com/spf13/pflag
-  version: 5ccb023bc27df288a957c5e994cd44fd19619465
+  version: 2300d0f8576fe575f71aaa5b9bbe4e1b0dc2eb51
 - name: github.com/spf13/viper
   version: 0967fc9aceab2ce9da34061253ac10fb99bba5b2
 - name: github.com/tylerb/graceful
