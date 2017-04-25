@@ -642,7 +642,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "CALICO_CIDR",
-									Value: m.Spec.Cluster.Calico.CIDR,
+									Value: fmt.Sprintf("%d", m.Spec.Cluster.Calico.CIDR),
 								},
 								{
 									Name:  "MACHINE_CPU_CORES",

@@ -13,9 +13,9 @@ type API struct {
 	ClusterIPRange string `json:"clusterIPRange" yaml:"clusterIPRange"`
 	// Domain is the API domain of the Kubernetes cluster, e.g.
 	// api.<cluster-id>.g8s.fra-1.giantswarm.io.
-	Domain       string `json:"domain" yaml:"domain"`
-	InsecurePort int    `json:"insecurePort" yaml:"insecurePort"`
+	Domain string `json:"domain" yaml:"domain"`
 	// IP is the Kubernetes API IP, e.g. 172.29.0.1.
-	IP         net.IP `json:"ip" yaml:"ip"`
-	SecurePort int    `json:"securePort" yaml:"securePort"`
+	IP           net.IP `json:"ip" yaml:"ip"`
+	InsecurePort int    `json:"insecurePort" yaml:"insecurePort"`
+	SecurePort   int    `json:"securePort" yaml:"securePort"`
 }

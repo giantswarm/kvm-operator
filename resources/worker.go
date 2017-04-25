@@ -452,7 +452,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "K8S_CALICO_MTU",
-									Value: w.Spec.Cluster.Calico.MTU,
+									Value: fmt.Sprintf("%d", w.Spec.Cluster.Calico.MTU),
 								},
 								{
 									Name:  "MACHINE_CPU_CORES",
