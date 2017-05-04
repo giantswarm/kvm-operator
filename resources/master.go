@@ -75,7 +75,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-master-api-token",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-openssl:410c14100b89ffad9d84f0a5fbd9bdb398cdc2fd",
+			Image:           m.Spec.KVM.Network.OpenSSL.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
@@ -98,7 +98,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-api-certs",
-			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
+			Image:           m.Spec.KVM.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
@@ -147,7 +147,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-calico-certs",
-			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
+			Image:           m.Spec.KVM.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
@@ -188,7 +188,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-master-etcd-certs",
-			Image:           m.Spec.Cluster.Operator.Certctl.Docker.Image,
+			Image:           m.Spec.KVM.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
@@ -229,7 +229,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "set-iptables",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-iptables:4625e26b128c0ce637774ab0a3051fb6df07d0be",
+			Image:           m.Spec.KVM.Network.IPTables.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
@@ -261,7 +261,7 @@ func (m *master) generateInitMasterContainers() (string, error) {
 		},
 		{
 			Name:            "k8s-endpoint-updater",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:84a3506e60edbec199e860070c076948bd9c7ca6",
+			Image:           m.Spec.KVM.EndpointUpdater.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
@@ -592,7 +592,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					Containers: []apiv1.Container{
 						{
 							Name:            "k8s-vm",
-							Image:           m.Spec.Cluster.Operator.K8sVM.Docker.Image,
+							Image:           m.Spec.KVM.K8sVM.Docker.Image,
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Args: []string{
 								"master",
@@ -670,7 +670,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_IMAGE",
-									Value: m.Spec.Cluster.Operator.NetworkSetup.Docker.Image,
+									Value: m.Spec.KVM.Network.Environment.Docker.Image,
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",

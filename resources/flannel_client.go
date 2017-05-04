@@ -24,7 +24,7 @@ func (f *flannelClient) generateInitFlannelContainers() (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-network-config",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-config:d8e24534cee8d295757f30ceb0e95ca6e02c5ae7",
+			Image:           f.Spec.KVM.Network.Config.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Env: []apiv1.EnvVar{
 				{
@@ -265,7 +265,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 						},
 						{
 							Name:            "k8s-network-bridge",
-							Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-network-bridge:f79c7dbefd349b95e875c1c5d5ae545ff09b64f6",
+							Image:           f.Spec.KVM.Network.Bridge.Docker.Image,
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
