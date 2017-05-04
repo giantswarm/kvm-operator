@@ -74,7 +74,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-worker-api-certs",
-			Image:           w.Spec.Cluster.Operator.Certctl.Docker.Image,
+			Image:           w.Spec.KVM.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -123,7 +123,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:            "k8s-worker-calico-certs",
-			Image:           w.Spec.Cluster.Operator.Certctl.Docker.Image,
+			Image:           w.Spec.KVM.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -164,7 +164,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:            "k8s-worker-etcd-certs",
-			Image:           w.Spec.Cluster.Operator.Certctl.Docker.Image,
+			Image:           w.Spec.KVM.Certctl.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
 			Command: []string{
 				"/bin/sh",
@@ -205,7 +205,7 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 		},
 		{
 			Name:            "k8s-endpoint-updater",
-			Image:           "leaseweb-registry.private.giantswarm.io/giantswarm/k8s-endpoint-updater:84a3506e60edbec199e860070c076948bd9c7ca6",
+			Image:           w.Spec.KVM.EndpointUpdater.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
 			Command: []string{
 				"/bin/sh",
@@ -415,7 +415,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					Containers: []apiv1.Container{
 						{
 							Name:  "k8s-vm",
-							Image: w.Spec.Cluster.Operator.K8sVM.Docker.Image,
+							Image: w.Spec.KVM.K8sVM.Docker.Image,
 							Args: []string{
 								"worker",
 							},
@@ -480,7 +480,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_IMAGE",
-									Value: w.Spec.Cluster.Operator.NetworkSetup.Docker.Image,
+									Value: w.Spec.KVM.Network.Environment.Docker.Image,
 								},
 								{
 									Name:  "K8S_SECURE_PORT",

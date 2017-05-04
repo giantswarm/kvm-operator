@@ -114,6 +114,9 @@ type Command struct {
 	// is commands slice are sorted or not
 	commandsAreSorted bool
 
+	// flagErrorBuf contains all error messages from pflag.
+	flagErrorBuf *bytes.Buffer
+
 	args          []string             // actual args parsed from flags
 	output        io.Writer            // out writer if set in SetOutput(w)
 	usageFunc     func(*Command) error // Usage can be defined by application
@@ -721,7 +724,13 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 func (c *Command) initHelpFlag() {
 	c.mergePersistentFlags()
 	if c.Flags().Lookup("help") == nil {
-		c.Flags().BoolP("help", "h", false, "help for "+c.Name())
+		usage := "help for "
+		if c.Name() == "" {
+			usage += "this command"
+		} else {
+			usage += c.Name()
+		}
+		c.Flags().BoolP("help", "h", false, usage)
 	}
 }
 
@@ -745,6 +754,7 @@ func (c *Command) initHelpCmd() {
 					c.Printf("Unknown help topic %#q\n", args)
 					c.Root().Usage()
 				} else {
+					cmd.initHelpFlag() // make possible 'help' flag to be shown
 					cmd.Help()
 				}
 			},
@@ -908,6 +918,7 @@ func (c *Command) DebugFlags() {
 				}
 			})
 		}
+		c.Println(x.flagErrorBuf)
 		if x.HasSubCommands() {
 			for _, y := range x.commands {
 				debugflags(y)
@@ -1048,7 +1059,10 @@ func (c *Command) GlobalNormalizationFunc() func(f *flag.FlagSet, name string) f
 func (c *Command) Flags() *flag.FlagSet {
 	if c.flags == nil {
 		c.flags = flag.NewFlagSet(c.Name(), flag.ContinueOnError)
-		c.flags.SetOutput(c.OutOrStderr())
+		if c.flagErrorBuf == nil {
+			c.flagErrorBuf = new(bytes.Buffer)
+		}
+		c.flags.SetOutput(c.flagErrorBuf)
 	}
 
 	return c.flags
@@ -1073,7 +1087,10 @@ func (c *Command) LocalFlags() *flag.FlagSet {
 
 	if c.lflags == nil {
 		c.lflags = flag.NewFlagSet(c.Name(), flag.ContinueOnError)
-		c.lflags.SetOutput(c.OutOrStderr())
+		if c.flagErrorBuf == nil {
+			c.flagErrorBuf = new(bytes.Buffer)
+		}
+		c.lflags.SetOutput(c.flagErrorBuf)
 	}
 	c.lflags.SortFlags = c.Flags().SortFlags
 
@@ -1093,6 +1110,10 @@ func (c *Command) InheritedFlags() *flag.FlagSet {
 
 	if c.iflags == nil {
 		c.iflags = flag.NewFlagSet(c.Name(), flag.ContinueOnError)
+		if c.flagErrorBuf == nil {
+			c.flagErrorBuf = new(bytes.Buffer)
+		}
+		c.iflags.SetOutput(c.flagErrorBuf)
 	}
 
 	local := c.LocalFlags()
@@ -1113,17 +1134,22 @@ func (c *Command) NonInheritedFlags() *flag.FlagSet {
 func (c *Command) PersistentFlags() *flag.FlagSet {
 	if c.pflags == nil {
 		c.pflags = flag.NewFlagSet(c.Name(), flag.ContinueOnError)
-		c.pflags.SetOutput(c.OutOrStderr())
+		if c.flagErrorBuf == nil {
+			c.flagErrorBuf = new(bytes.Buffer)
+		}
+		c.pflags.SetOutput(c.flagErrorBuf)
 	}
 	return c.pflags
 }
 
 // ResetFlags is used in testing.
 func (c *Command) ResetFlags() {
+	c.flagErrorBuf = new(bytes.Buffer)
+	c.flagErrorBuf.Reset()
 	c.flags = flag.NewFlagSet(c.Name(), flag.ContinueOnError)
-	c.flags.SetOutput(c.OutOrStderr())
+	c.flags.SetOutput(c.flagErrorBuf)
 	c.pflags = flag.NewFlagSet(c.Name(), flag.ContinueOnError)
-	c.pflags.SetOutput(c.OutOrStderr())
+	c.pflags.SetOutput(c.flagErrorBuf)
 }
 
 // HasFlags checks if the command contains any flags (local plus persistent from the entire structure).
@@ -1222,7 +1248,7 @@ func (c *Command) mergePersistentFlags() {
 func (c *Command) updateParentsPflags() {
 	if c.parentsPflags == nil {
 		c.parentsPflags = flag.NewFlagSet(c.Name(), flag.ContinueOnError)
-		c.parentsPflags.SetOutput(c.OutOrStderr())
+		c.parentsPflags.SetOutput(c.flagErrorBuf)
 		c.parentsPflags.SortFlags = false
 	}
 
