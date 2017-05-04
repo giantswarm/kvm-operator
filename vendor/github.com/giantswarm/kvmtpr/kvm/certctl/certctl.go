@@ -1,7 +1,7 @@
 package certctl
 
 import (
-	"github.com/giantswarm/clustertpr/operator/certctl/docker"
+	"github.com/giantswarm/kvmtpr/kvm/certctl/docker"
 )
 
 type Certctl struct {

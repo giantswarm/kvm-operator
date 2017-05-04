@@ -1,7 +1,7 @@
 package k8svm
 
 import (
-	"github.com/giantswarm/clustertpr/operator/k8svm/docker"
+	"github.com/giantswarm/kvmtpr/kvm/k8svm/docker"
 )
 
 type K8sVM struct {

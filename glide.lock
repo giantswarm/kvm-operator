@@ -1,5 +1,5 @@
 hash: aabc25965c01eb438443b2122c1f36987c084969e2663f01e18da56e7695a759
-updated: 2017-04-25T15:23:29.505799909+02:00
+updated: 2017-05-04T16:49:48.78980146+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -57,7 +57,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/clustertpr
-  version: bc3c7a26ee5fce2814d03ee61dacb719bc88d822
+  version: 7cebfea7ab7606a6db62e60048293f96c18cdb97
   subpackages:
   - calico
   - cluster
@@ -77,20 +77,30 @@ imports:
   - kubernetes/ingress
   - kubernetes/kubelet
   - node
-  - operator
-  - operator/certctl
-  - operator/certctl/docker
-  - operator/k8svm
-  - operator/k8svm/docker
-  - operator/kubectl
-  - operator/kubectl/googleapi
-  - operator/networksetup
-  - operator/networksetup/docker
   - vault
 - name: github.com/giantswarm/kvmtpr
-  version: 4200a4e47445ded201ff58156982af4b462a8af5
+  version: 9f2cdc564df85f09bd0e8af101f2e35ff66b1c96
   subpackages:
   - kvm
+  - kvm/certctl
+  - kvm/certctl/docker
+  - kvm/endpointupdater
+  - kvm/endpointupdater/docker
+  - kvm/k8svm
+  - kvm/k8svm/docker
+  - kvm/kubectl
+  - kvm/kubectl/googleapi
+  - kvm/network
+  - kvm/network/bridge
+  - kvm/network/bridge/docker
+  - kvm/network/config
+  - kvm/network/config/docker
+  - kvm/network/environment
+  - kvm/network/environment/docker
+  - kvm/network/iptables
+  - kvm/network/iptables/docker
+  - kvm/network/openssl
+  - kvm/network/openssl/docker
 - name: github.com/giantswarm/microkit
   version: eddd72801c08a534e31a6d987497317c720583b0
   subpackages:
@@ -191,7 +201,7 @@ imports:
 - name: github.com/pelletier/go-buffruneio
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: fe206efb84b2bc8e8cfafe6b4c1826622be969e3
+  version: 97253b98df84f9eef872866d079e74b8265150f1
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -202,13 +212,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 9e0844febd9e2856f839c9cb974fbd676d1755a8
+  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 6ac8c5d890d415025dd5aae7595bcb2a6e7e2fad
+  version: d098ca18df8bc825079013daf7bacefbb1ee877e
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -222,7 +232,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: f4f10f6873175e78bb1503da7e78c260a7f3ef63
+  version: 8f0203be891287870100e4af46262cdf4a4261d1
 - name: github.com/spf13/jwalterweatherman
   version: fa7ca7e836cf3a8bb4ebf799f472c12d7e903d66
 - name: github.com/spf13/pflag

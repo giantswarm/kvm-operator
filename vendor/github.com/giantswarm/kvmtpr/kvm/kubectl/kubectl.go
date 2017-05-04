@@ -1,7 +1,7 @@
 package kubectl
 
 import (
-	"github.com/giantswarm/clustertpr/operator/kubectl/googleapi"
+	"github.com/giantswarm/kvmtpr/kvm/kubectl/googleapi"
 )
 
 type Kubectl struct {
