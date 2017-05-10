@@ -23,7 +23,7 @@ spec:
             path: config.yml
       containers:
       - name: kvm-operator
-        image: registry.giantswarm.io/giantswarm/kvm-operator:%%DOCKER_TAG%%
+        image: quay.io/giantswarm/kvm-operator:%%DOCKER_TAG%%
         args:
         - daemon
         - --config.dirs=/var/run/kvm-operator/configmap/,/var/run/kvm-operator/secret/
@@ -45,4 +45,4 @@ spec:
             cpu: 250m
             memory: 250Mi
       imagePullSecrets:
-      - name: circleci-giantswarm-registry
+      - name: giantswarm-registry
