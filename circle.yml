@@ -15,6 +15,6 @@ test:
 
 deployment:
   master:
-    branch: watch
+    branch: master
     commands:
       - ./architect deploy
