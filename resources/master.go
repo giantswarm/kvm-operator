@@ -670,7 +670,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_IMAGE",
-									Value: m.Spec.KVM.Network.Environment.Docker.Image,
+									Value: m.Spec.Cluster.Kubernetes.NetworkSetup.Docker.Image,
 								},
 								{
 									Name:  "DOCKER_EXTRA_ARGS",
