@@ -14,7 +14,6 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"strings"
@@ -90,34 +89,27 @@ func initializePath(path string) {
 func createLicenseFile() {
 	lic := getLicense()
 
-	// Don't bother writing a LICENSE file if there is no text.
-	if lic.Text != "" {
-		data := make(map[string]interface{})
+	template := lic.Text
 
-		// Try to remove the email address, if any
-		data["copyright"] = strings.Split(copyrightLine(), " <")[0]
+	var data map[string]interface{}
+	data = make(map[string]interface{})
 
-		data["appName"] = projectName()
+	// Try to remove the email address, if any
+	data["copyright"] = strings.Split(copyrightLine(), " <")[0]
 
-		// Generate license template from text and data.
-		r, _ := templateToReader(lic.Text, data)
-		buf := new(bytes.Buffer)
-		buf.ReadFrom(r)
-
-		err := writeTemplateToFile(ProjectPath(), "LICENSE", buf.String(), data)
-		_ = err
-		// if err != nil {
-		// 	er(err)
-		// }
-	}
+	err := writeTemplateToFile(ProjectPath(), "LICENSE", template, data)
+	_ = err
+	// if err != nil {
+	// 	er(err)
+	// }
 }
 
 func createMainFile() {
 	lic := getLicense()
 
 	template := `{{ comment .copyright }}
-{{if .license}}{{ comment .license }}
-{{end}}
+{{ comment .license }}
+
 package main
 
 import "{{ .importpath }}"
@@ -126,17 +118,11 @@ func main() {
 	cmd.Execute()
 }
 `
-	data := make(map[string]interface{})
+	var data map[string]interface{}
+	data = make(map[string]interface{})
 
 	data["copyright"] = copyrightLine()
-	data["appName"] = projectName()
-
-	// Generate license template from header and data.
-	r, _ := templateToReader(lic.Header, data)
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(r)
-	data["license"] = buf.String()
-
+	data["license"] = lic.Header
 	data["importpath"] = guessImportPath() + "/" + guessCmdDir()
 
 	err := writeTemplateToFile(ProjectPath(), "main.go", template, data)
@@ -150,8 +136,8 @@ func createRootCmdFile() {
 	lic := getLicense()
 
 	template := `{{ comment .copyright }}
-{{if .license}}{{ comment .license }}
-{{end}}
+{{ comment .license }}
+
 package cmd
 
 import (
@@ -210,8 +196,8 @@ func initConfig() {
 	}
 
 	viper.SetConfigName(".{{ .appName }}") // name of config file (without extension)
-	viper.AddConfigPath(os.Getenv("HOME")) // adding home directory as first search path
-	viper.AutomaticEnv()                   // read in environment variables that match
+	viper.AddConfigPath("$HOME")  // adding home directory as first search path
+	viper.AutomaticEnv()          // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
@@ -220,17 +206,12 @@ func initConfig() {
 }
 {{ end }}`
 
-	data := make(map[string]interface{})
+	var data map[string]interface{}
+	data = make(map[string]interface{})
 
 	data["copyright"] = copyrightLine()
+	data["license"] = lic.Header
 	data["appName"] = projectName()
-
-	// Generate license template from header and data.
-	r, _ := templateToReader(lic.Header, data)
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(r)
-	data["license"] = buf.String()
-
 	data["viper"] = viper.GetBool("useViper")
 
 	err := writeTemplateToFile(ProjectPath()+string(os.PathSeparator)+guessCmdDir(), "root.go", template, data)
