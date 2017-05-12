@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	ClusterListAPIEndpoint  = "/apis/giantswarm.io/v1/kvms"
-	ClusterWatchAPIEndpoint = "/apis/giantswarm.io/v1/watch/kvms"
+	ClusterListAPIEndpoint  = "/apis/cluster.giantswarm.io/v1/kvms"
+	ClusterWatchAPIEndpoint = "/apis/cluster.giantswarm.io/v1/watch/kvms"
 )
 
 var (
