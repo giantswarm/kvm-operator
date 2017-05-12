@@ -480,7 +480,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 								},
 								{
 									Name:  "K8S_NETWORK_SETUP_IMAGE",
-									Value: w.Spec.KVM.Network.Environment.Docker.Image,
+									Value: w.Spec.Cluster.Kubernetes.NetworkSetup.Docker.Image,
 								},
 								{
 									Name:  "K8S_SECURE_PORT",

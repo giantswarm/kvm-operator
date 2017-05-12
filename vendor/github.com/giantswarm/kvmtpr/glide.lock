@@ -1,5 +1,5 @@
 hash: 3096f25f8c65b6f8f258416d763132b3b1d9d99bc5c41b40b210d0b01957bd2b
-updated: 2017-05-04T15:35:13.334881366+02:00
+updated: 2017-05-05T10:06:38.517051963+02:00
 imports:
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
@@ -18,7 +18,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/clustertpr
-  version: 7cebfea7ab7606a6db62e60048293f96c18cdb97
+  version: 81d44901ce63086368ddcf639dffd1c8b4344190
   subpackages:
   - calico
   - cluster
@@ -37,6 +37,8 @@ imports:
   - kubernetes/hyperkube/docker
   - kubernetes/ingress
   - kubernetes/kubelet
+  - kubernetes/networksetup
+  - kubernetes/networksetup/docker
   - node
   - vault
 - name: github.com/go-openapi/jsonpointer
