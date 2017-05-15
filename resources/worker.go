@@ -250,12 +250,13 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "CUSTOMER_ID",
-									Value: ClusterCustomer(w.CustomObject),
+									Name:  "CORES",
+									Value: fmt.Sprintf("%d", workerNode.CPUs),
 								},
 								{
-									Name:  "DOCKER_EXTRA_ARGS",
-									Value: w.Spec.Cluster.Docker.Daemon.ExtraArgs,
+									Name: "DISK",
+									// TODO this should be configured via clustertpr.Node
+									Value: "4G",
 								},
 								{
 									Name: "HOSTNAME",
@@ -267,69 +268,16 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									},
 								},
 								{
-									Name: "HOST_PUBLIC_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										FieldRef: &apiv1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "spec.nodeName",
-										},
-									},
-								},
-								{
-									Name:  "K8S_INSECURE_PORT",
-									Value: fmt.Sprintf("%d", w.Spec.Cluster.Kubernetes.API.InsecurePort),
-								},
-								{
-									Name:  "K8S_CALICO_MTU",
-									Value: fmt.Sprintf("%d", w.Spec.Cluster.Calico.MTU),
-								},
-								{
-									Name:  "MACHINE_CPU_CORES",
-									Value: fmt.Sprintf("%d", workerNode.CPUs),
-								},
-								{
 									Name:  "NETWORK_BRIDGE_NAME",
 									Value: NetworkBridgeName(ClusterID(w.CustomObject)),
 								},
 								{
-									Name:  "K8S_DNS_IP",
-									Value: w.Spec.Cluster.Kubernetes.DNS.IP.String(),
-								},
-								{
-									Name:  "K8S_KUBEDNS_DOMAIN",
-									Value: ClusterID(w.CustomObject) + ".giantswarm.local.",
-								},
-								{
-									Name:  "K8S_ETCD_DOMAIN_NAME",
-									Value: w.Spec.Cluster.Etcd.Domain,
-								},
-								{
-									Name:  "K8S_MASTER_DOMAIN_NAME",
-									Value: w.Spec.Cluster.Kubernetes.API.Domain,
-								},
-								{
-									Name:  "K8S_NETWORK_SETUP_IMAGE",
-									Value: w.Spec.Cluster.Kubernetes.NetworkSetup.Docker.Image,
-								},
-								{
-									Name:  "K8S_SECURE_PORT",
-									Value: fmt.Sprintf("%d", w.Spec.Cluster.Kubernetes.API.SecurePort),
-								},
-								{
-									Name:  "K8S_HYPERKUBE_IMAGE",
-									Value: w.Spec.Cluster.Kubernetes.Hyperkube.Docker.Image,
-								},
-								{
-									Name:  "MACHINE_MEM",
+									Name:  "MEMORY",
 									Value: workerNode.Memory,
 								},
 								{
-									Name:  "REGISTRY",
-									Value: w.Spec.Cluster.Docker.Registry.Endpoint,
-								},
-								{
-									Name:  "K8S_NODE_LABELS",
-									Value: w.Spec.Cluster.Kubernetes.Kubelet.Labels,
+									Name:  "ROLE",
+									Value: "worker",
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
@@ -341,6 +289,7 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 									Name:      "rootfs",
 									MountPath: "/usr/code/rootfs/",
 								},
+								// TODO cloud config has to be written into "/usr/code/cloudconfig/openstack/latest/user_data".
 							},
 							SecurityContext: &apiv1.SecurityContext{
 								Privileged: &privileged,
