@@ -12,7 +12,9 @@ import (
 
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/spf13/viper"
 
+	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
 	"github.com/giantswarm/kvm-operator/service/version"
@@ -24,11 +26,8 @@ type Config struct {
 	Logger micrologger.Logger
 
 	// Settings.
-	KubernetesAddress    string
-	KubernetesInCluster  bool
-	KubernetesTLSCAFile  string
-	KubernetesTLSCrtFile string
-	KubernetesTLSKeyFile string
+	Flag  *flag.Flag
+	Viper *viper.Viper
 
 	Description string
 	GitCommit   string
@@ -44,11 +43,8 @@ func DefaultConfig() Config {
 		Logger: nil,
 
 		// Settings.
-		KubernetesAddress:    "",
-		KubernetesInCluster:  false,
-		KubernetesTLSCAFile:  "",
-		KubernetesTLSCrtFile: "",
-		KubernetesTLSKeyFile: "",
+		Flag:  nil,
+		Viper: nil,
 
 		Description: "",
 		GitCommit:   "",
@@ -70,27 +66,28 @@ func New(config Config) (*Service, error) {
 	var kubernetesClient *kubernetes.Clientset
 	{
 		var restConfig *rest.Config
+		address := config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
 
-		if config.KubernetesInCluster {
+		if config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster) {
 			config.Logger.Log("debug", "creating in-cluster config")
 			restConfig, err = rest.InClusterConfig()
 			if err != nil {
 				return nil, microerror.MaskAny(err)
 			}
 
-			if config.KubernetesAddress != "" {
+			if address != "" {
 				config.Logger.Log("debug", "using explicit api server")
-				restConfig.Host = config.KubernetesAddress
+				restConfig.Host = address
 			}
 		} else {
-			if config.KubernetesAddress == "" {
+			if address == "" {
 				return nil, microerror.MaskAnyf(invalidConfigError, "kubernetes address must not be empty")
 			}
 
 			config.Logger.Log("debug", "creating out-cluster config")
 
 			// Kubernetes listen URL.
-			u, err := url.Parse(config.KubernetesAddress)
+			u, err := url.Parse(address)
 			if err != nil {
 				return nil, microerror.MaskAny(err)
 			}
@@ -98,9 +95,9 @@ func New(config Config) (*Service, error) {
 			restConfig = &rest.Config{
 				Host: u.String(),
 				TLSClientConfig: rest.TLSClientConfig{
-					CAFile:   config.KubernetesTLSCAFile,
-					CertFile: config.KubernetesTLSCrtFile,
-					KeyFile:  config.KubernetesTLSKeyFile,
+					CAFile:   config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CaFile),
+					CertFile: config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile),
+					KeyFile:  config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile),
 				},
 			}
 		}
