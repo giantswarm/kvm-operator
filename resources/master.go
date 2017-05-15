@@ -74,160 +74,6 @@ func (m *master) generateInitMasterContainers() (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:            "k8s-master-api-token",
-			Image:           m.Spec.KVM.Network.OpenSSL.Docker.Image,
-			ImagePullPolicy: apiv1.PullIfNotPresent,
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/usr/bin/test ! -f /etc/kubernetes/secrets/token_sign_key.pem  && /usr/bin/openssl genrsa -out /etc/kubernetes/secrets/token_sign_key.pem 2048 && /bin/echo 'Generated new token sign key.' || /bin/echo 'Token sign key already exists, skipping.'",
-			},
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "ssl",
-					MountPath: "/etc/ssl/certs/ca-certificates.crt",
-				},
-				{
-					Name:      "api-secrets",
-					MountPath: "/etc/kubernetes/secrets",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-		},
-		{
-			Name:            "k8s-master-api-certs",
-			Image:           m.Spec.KVM.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullIfNotPresent,
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/master/apiserver.pem --key-file=/etc/kubernetes/ssl/master/apiserver-key.pem --ca-file=/etc/kubernetes/ssl/master/apiserver-ca.pem --alt-names=$ALT_NAMES --ip-sans=$IP_SANS",
-			},
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "ssl",
-					MountPath: "/etc/ssl/certs/ca-certificates.crt",
-				},
-				{
-					Name:      "api-certs",
-					MountPath: "/etc/kubernetes/ssl/master/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "ALT_NAMES",
-					Value: m.Spec.Cluster.Kubernetes.API.AltNames,
-				},
-				{
-					Name:  "COMMON_NAME",
-					Value: m.Spec.Cluster.Kubernetes.API.Domain,
-				},
-				{
-					Name:  "CLUSTER_ID",
-					Value: ClusterID(m.CustomObject),
-				},
-				{
-					Name:  "IP_SANS",
-					Value: m.Spec.Cluster.Kubernetes.API.IP.String(),
-				},
-				{
-					Name:  "VAULT_TOKEN",
-					Value: m.Spec.Cluster.Vault.Token,
-				},
-				{
-					Name:  "VAULT_ADDR",
-					Value: m.Spec.Cluster.Vault.Address,
-				},
-			},
-		},
-		{
-			Name:            "k8s-master-calico-certs",
-			Image:           m.Spec.KVM.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullIfNotPresent,
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem",
-			},
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "ssl",
-					MountPath: "/etc/ssl/certs/ca-certificates.crt",
-				},
-				{
-					Name:      "calico-certs",
-					MountPath: "/etc/kubernetes/ssl/calico/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "CLUSTER_ID",
-					Value: ClusterID(m.CustomObject),
-				},
-				{
-					Name:  "COMMON_NAME",
-					Value: ClusterDomain("calico", ClusterID(m.CustomObject), m.Spec.Cluster.Kubernetes.Domain),
-				},
-				{
-					Name:  "VAULT_TOKEN",
-					Value: m.Spec.Cluster.Vault.Token,
-				},
-				{
-					Name:  "VAULT_ADDR",
-					Value: m.Spec.Cluster.Vault.Address,
-				},
-			},
-		},
-		{
-			Name:            "k8s-master-etcd-certs",
-			Image:           m.Spec.KVM.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullIfNotPresent,
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/server.pem --key-file=/etc/kubernetes/ssl/etcd/server-key.pem --ca-file=/etc/kubernetes/ssl/etcd/server-ca.pem",
-			},
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "ssl",
-					MountPath: "/etc/ssl/certs/ca-certificates.crt",
-				},
-				{
-					Name:      "etcd-certs",
-					MountPath: "/etc/kubernetes/ssl/etcd/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "CLUSTER_ID",
-					Value: ClusterID(m.CustomObject),
-				},
-				{
-					Name:  "COMMON_NAME",
-					Value: m.Spec.Cluster.Etcd.Domain,
-				},
-				{
-					Name:  "VAULT_TOKEN",
-					Value: m.Spec.Cluster.Vault.Token,
-				},
-				{
-					Name:  "VAULT_ADDR",
-					Value: m.Spec.Cluster.Vault.Address,
-				},
-			},
-		},
-		{
 			Name:            "set-iptables",
 			Image:           m.Spec.KVM.Network.IPTables.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
@@ -525,30 +371,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 						},
 						{
-							Name: "api-secrets",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/master/secrets"),
-								},
-							},
-						},
-						{
-							Name: "calico-certs",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/ssl/master/calico/"),
-								},
-							},
-						},
-						{
-							Name: "etcd-certs",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/ssl/master/etcd/"),
-								},
-							},
-						},
-						{
 							Name: "images",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -561,22 +383,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
 									Path: filepath.Join("/home/core/vms/", ClusterID(m.CustomObject), "-k8s-master-vm/"),
-								},
-							},
-						},
-						{
-							Name: "ssl",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/ssl/certs/ca-certificates.crt",
-								},
-							},
-						},
-						{
-							Name: "api-certs",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(m.CustomObject), "/", ClusterID(m.CustomObject), "/ssl/master/"),
 								},
 							},
 						},
@@ -703,14 +509,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
-								{
-									Name:      "api-certs",
-									MountPath: "/etc/kubernetes/ssl/",
-								},
-								{
-									Name:      "api-secrets",
-									MountPath: "/etc/kubernetes/secrets/",
-								},
 								{
 									Name:      "images",
 									MountPath: "/usr/code/images/",
