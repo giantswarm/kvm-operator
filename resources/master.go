@@ -591,8 +591,8 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:            "k8s-vm",
-							Image:           m.Spec.KVM.K8sVM.Docker.Image,
+							Name:            "k8s-kvm",
+							Image:           m.Spec.KVM.K8sKVM.Docker.Image,
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Args: []string{
 								"master",
