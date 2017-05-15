@@ -33,7 +33,7 @@ import:
 - package: github.com/ventu-io/go-shortid
   version: ^1.0.0
 - package: github.com/giantswarm/microkit
-  version: eddd72801c08a534e31a6d987497317c720583b0
+  version: master
 # The versions of pflag and cobra were previously indicated by
 # kubernetes/client-go, but due to continuously appearing errors on upgrades, we
 # decided to pin them by ourselves.
