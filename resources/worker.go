@@ -414,8 +414,8 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					},
 					Containers: []apiv1.Container{
 						{
-							Name:  "k8s-vm",
-							Image: w.Spec.KVM.K8sVM.Docker.Image,
+							Name:  "k8s-kvm",
+							Image: w.Spec.KVM.K8sKVM.Docker.Image,
 							Args: []string{
 								"worker",
 							},
