@@ -73,137 +73,6 @@ func (w *worker) generateInitWorkerContainers(workerId string) (string, error) {
 
 	initContainers := []apiv1.Container{
 		{
-			Name:            "k8s-worker-api-certs",
-			Image:           w.Spec.KVM.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/" + workerId + "/worker.pem --key-file=/etc/kubernetes/ssl/" + workerId + "/worker-key.pem --ca-file=/etc/kubernetes/ssl/" + workerId + "/worker-ca.pem --alt-names=$ALT_NAMES --ip-sans=$IP_SANS",
-			},
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "ssl",
-					MountPath: "/etc/ssl/certs/ca-certificates.crt",
-				},
-				{
-					Name:      "api-certs",
-					MountPath: filepath.Join("/etc/kubernetes/ssl/", workerId, "/"),
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "ALT_NAMES",
-					Value: w.Spec.Cluster.Kubernetes.API.AltNames,
-				},
-				{
-					Name:  "CLUSTER_ID",
-					Value: ClusterID(w.CustomObject),
-				},
-				{
-					Name:  "COMMON_NAME",
-					Value: w.Spec.Cluster.Kubernetes.API.Domain,
-				},
-				{
-					Name:  "IP_SANS",
-					Value: w.Spec.Cluster.Kubernetes.API.IP.String(),
-				},
-				{
-					Name:  "VAULT_TOKEN",
-					Value: w.Spec.Cluster.Vault.Token,
-				},
-				{
-					Name:  "VAULT_ADDR",
-					Value: w.Spec.Cluster.Vault.Address,
-				},
-			},
-		},
-		{
-			Name:            "k8s-worker-calico-certs",
-			Image:           w.Spec.KVM.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/calico/client.pem --key-file=/etc/kubernetes/ssl/calico/client-key.pem --ca-file=/etc/kubernetes/ssl/calico/client-ca.pem",
-			},
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "ssl",
-					MountPath: "/etc/ssl/certs/ca-certificates.crt",
-				},
-				{
-					Name:      "calico-certs",
-					MountPath: "/etc/kubernetes/ssl/calico/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "CLUSTER_ID",
-					Value: ClusterID(w.CustomObject),
-				},
-				{
-					Name:  "COMMON_NAME",
-					Value: ClusterDomain("calico", ClusterID(w.CustomObject), w.Spec.Cluster.Kubernetes.Domain),
-				},
-				{
-					Name:  "VAULT_TOKEN",
-					Value: w.Spec.Cluster.Vault.Token,
-				},
-				{
-					Name:  "VAULT_ADDR",
-					Value: w.Spec.Cluster.Vault.Address,
-				},
-			},
-		},
-		{
-			Name:            "k8s-worker-etcd-certs",
-			Image:           w.Spec.KVM.Certctl.Docker.Image,
-			ImagePullPolicy: apiv1.PullAlways,
-			Command: []string{
-				"/bin/sh",
-				"-c",
-				"/opt/certctl issue --vault-addr=$VAULT_ADDR --vault-token=$VAULT_TOKEN --cluster-id=$CLUSTER_ID --common-name=$COMMON_NAME --ttl=720h --crt-file=/etc/kubernetes/ssl/etcd/client.pem --key-file=/etc/kubernetes/ssl/etcd/client-key.pem --ca-file=/etc/kubernetes/ssl/etcd/client-ca.pem",
-			},
-			VolumeMounts: []apiv1.VolumeMount{
-				{
-					Name:      "ssl",
-					MountPath: "/etc/ssl/certs/ca-certificates.crt",
-				},
-				{
-					Name:      "etcd-certs",
-					MountPath: "/etc/kubernetes/ssl/etcd/",
-				},
-			},
-			SecurityContext: &apiv1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env: []apiv1.EnvVar{
-				{
-					Name:  "CLUSTER_ID",
-					Value: ClusterID(w.CustomObject),
-				},
-				{
-					Name:  "COMMON_NAME",
-					Value: w.Spec.Cluster.Etcd.Domain,
-				},
-				{
-					Name:  "VAULT_TOKEN",
-					Value: w.Spec.Cluster.Vault.Token,
-				},
-				{
-					Name:  "VAULT_ADDR",
-					Value: w.Spec.Cluster.Vault.Address,
-				},
-			},
-		},
-		{
 			Name:            "k8s-endpoint-updater",
 			Image:           w.Spec.KVM.EndpointUpdater.Docker.Image,
 			ImagePullPolicy: apiv1.PullIfNotPresent,
@@ -356,30 +225,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
 						{
-							Name: "api-certs",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/"),
-								},
-							},
-						},
-						{
-							Name: "calico-certs",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/calico/"),
-								},
-							},
-						},
-						{
-							Name: "etcd-certs",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/etcd/"),
-								},
-							},
-						},
-						{
 							Name: "images",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
@@ -392,22 +237,6 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
 									Path: filepath.Join("/home/core/vms/", ClusterID(w.CustomObject), "-", workerId, "/"),
-								},
-							},
-						},
-						{
-							Name: "ssl",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/etc/ssl/certs/ca-certificates.crt",
-								},
-							},
-						},
-						{
-							Name: "certs",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/etc/kubernetes/", ClusterID(w.CustomObject), "/", ClusterID(w.CustomObject), "/ssl/", workerId, "/"),
 								},
 							},
 						},
@@ -505,20 +334,12 @@ func (w *worker) GenerateDeployment(workerId string) (*extensionsv1.Deployment, 
 							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
-									Name:      "ssl",
-									MountPath: "/etc/ssl/certs/ca-certificates.crt",
-								},
-								{
 									Name:      "images",
 									MountPath: "/usr/code/images/",
 								},
 								{
 									Name:      "rootfs",
 									MountPath: "/usr/code/rootfs/",
-								},
-								{
-									Name:      "certs",
-									MountPath: "/etc/kubernetes/ssl/",
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{

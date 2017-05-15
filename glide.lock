@@ -1,5 +1,5 @@
-hash: aabc25965c01eb438443b2122c1f36987c084969e2663f01e18da56e7695a759
-updated: 2017-05-15T15:50:29.317146438+02:00
+hash: 6a523d2c32ca5cd898606e27944f2dd45e5df44e6ca56210dadd46c13b4462ff
+updated: 2017-05-15T17:30:16.863164485+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -38,10 +38,6 @@ imports:
   - health
   - httputil
   - timeutil
-- name: github.com/cpuguy83/go-md2man
-  version: bcc0a711c5e6bbe72c7cb13d81c7109b45267fd2
-  subpackages:
-  - md2man
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
@@ -85,11 +81,9 @@ imports:
   - node
   - vault
 - name: github.com/giantswarm/kvmtpr
-  version: 183680eaa087ca5ee280d0bcdf31744bcc07ada5
+  version: dbe3031326af01597a462d58fafb87ecac9fdae8
   subpackages:
   - kvm
-  - kvm/certctl
-  - kvm/certctl/docker
   - kvm/endpointupdater
   - kvm/endpointupdater/docker
   - kvm/k8skvm
@@ -106,12 +100,18 @@ imports:
   - kvm/network/openssl
   - kvm/network/openssl/docker
 - name: github.com/giantswarm/microkit
-  version: eddd72801c08a534e31a6d987497317c720583b0
+  version: ef2f8fdba32a0a0275d739abf84371e36880ecdc
   subpackages:
   - command
   - command/daemon
+  - command/daemon/flag
+  - command/daemon/flag/config
+  - command/daemon/flag/server
+  - command/daemon/flag/server/listen
+  - command/daemon/flag/server/tls
   - command/version
   - error
+  - flag
   - logger
   - server
   - storage
@@ -229,8 +229,6 @@ imports:
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
-- name: github.com/russross/blackfriday
-  version: 0ba0f2b6ed7c475a92e4df8641825cb7a11d1fa3
 - name: github.com/spf13/afero
   version: 9be650865eab0c12963d8753212f4f9c66cdcf12
   subpackages:
@@ -238,11 +236,11 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 83773614293e6c9406454a53ce5e263500ce6e44
+  version: 4c05eb1145f16d0e6bb4a3e1b6d769f4713cb41f
 - name: github.com/spf13/jwalterweatherman
   version: 8f07c835e5cc1450c082fe3a439cf87b0cbb2d99
 - name: github.com/spf13/pflag
-  version: 2300d0f8576fe575f71aaa5b9bbe4e1b0dc2eb51
+  version: 08b1a584251b5b62f458943640fc8ebd4d50aaa5
 - name: github.com/spf13/viper
   version: 0967fc9aceab2ce9da34061253ac10fb99bba5b2
 - name: github.com/tylerb/graceful
