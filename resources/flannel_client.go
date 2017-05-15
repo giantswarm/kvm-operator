@@ -232,7 +232,7 @@ func (f *flannelClient) GenerateResources() ([]runtime.Object, error) {
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"/opt/bin/flanneld --remote=$NODE_IP:8889 --public-ip=$NODE_IP --iface=$NODE_IP --networks=$NETWORK_BRIDGE_NAME -v=1",
+								"/opt/bin/flanneld --public-ip=$NODE_IP --iface=$NODE_IP --networks=$NETWORK_BRIDGE_NAME -v=1",
 							},
 							Env: []apiv1.EnvVar{
 								{
