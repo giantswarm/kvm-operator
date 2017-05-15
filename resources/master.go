@@ -3,7 +3,6 @@ package resources
 import (
 	"encoding/json"
 	"fmt"
-	"net"
 	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
@@ -321,13 +320,6 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 	masterReplicas := int32(MasterReplicas)
 	masterNode := m.Spec.Cluster.Masters[0]
 
-	ip, cidr, err := net.ParseCIDR(m.Spec.Cluster.Kubernetes.API.ClusterIPRange)
-	if err != nil {
-		return nil, maskAny(err)
-	}
-	clusterIPRange := ip.String()
-	clusterIPSubnet, _ := cidr.Mask.Size()
-
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "deployment",
@@ -405,12 +397,12 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 							},
 							Env: []apiv1.EnvVar{
 								{
-									Name:  "NETWORK_BRIDGE_NAME",
-									Value: NetworkBridgeName(ClusterID(m.CustomObject)),
+									Name:  "CORES",
+									Value: fmt.Sprintf("%d", masterNode.CPUs),
 								},
 								{
-									Name:  "CUSTOMER_ID",
-									Value: ClusterCustomer(m.CustomObject),
+									Name:  "DISK",
+									Value: "4G",
 								},
 								{
 									Name: "HOSTNAME",
@@ -422,90 +414,16 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									},
 								},
 								{
-									Name: "HOST_PUBLIC_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										FieldRef: &apiv1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "spec.nodeName",
-										},
-									},
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: NetworkBridgeName(ClusterID(m.CustomObject)),
 								},
 								{
-									Name:  "K8S_CLUSTER_IP_RANGE",
-									Value: clusterIPRange,
-								},
-								{
-									Name:  "K8S_CLUSTER_IP_SUBNET",
-									Value: fmt.Sprintf("%d", clusterIPSubnet),
-								},
-								{
-									Name:  "K8S_INSECURE_PORT",
-									Value: fmt.Sprintf("%d", m.Spec.Cluster.Kubernetes.API.InsecurePort),
-								},
-								{
-									Name:  "CALICO_SUBNET",
-									Value: m.Spec.Cluster.Calico.Subnet,
-								},
-								{
-									Name:  "CALICO_CIDR",
-									Value: fmt.Sprintf("%d", m.Spec.Cluster.Calico.CIDR),
-								},
-								{
-									Name:  "MACHINE_CPU_CORES",
-									Value: fmt.Sprintf("%d", masterNode.CPUs),
-								},
-								{
-									Name:  "K8S_DNS_IP",
-									Value: m.Spec.Cluster.Kubernetes.DNS.IP.String(),
-								},
-								{
-									Name:  "K8S_KUBEDNS_DOMAIN",
-									Value: ClusterID(m.CustomObject) + ".giantswarm.local.",
-								},
-								{
-									Name:  "K8S_ETCD_DOMAIN_NAME",
-									Value: m.Spec.Cluster.Etcd.Domain,
-								},
-								{
-									Name:  "K8S_ETCD_PREFIX",
-									Value: ClusterID(m.CustomObject),
-								},
-								{
-									Name:  "K8S_MASTER_DOMAIN_NAME",
-									Value: m.Spec.Cluster.Kubernetes.API.Domain,
-								},
-								{
-									Name:  "K8S_NETWORK_SETUP_IMAGE",
-									Value: m.Spec.Cluster.Kubernetes.NetworkSetup.Docker.Image,
-								},
-								{
-									Name:  "DOCKER_EXTRA_ARGS",
-									Value: m.Spec.Cluster.Docker.Daemon.ExtraArgs,
-								},
-								{
-									Name:  "K8S_SECURE_PORT",
-									Value: fmt.Sprintf("%d", m.Spec.Cluster.Kubernetes.API.SecurePort),
-								},
-								{
-									Name:  "K8S_HYPERKUBE_IMAGE",
-									Value: m.Spec.Cluster.Kubernetes.Hyperkube.Docker.Image,
-								},
-								{
-									Name:  "MACHINE_MEM",
+									Name:  "MEMORY",
 									Value: masterNode.Memory,
 								},
 								{
-									Name:  "REGISTRY",
-									Value: m.Spec.Cluster.Docker.Registry.Endpoint,
-								},
-								{
-									Name: "K8S_ETCD_IP",
-									ValueFrom: &apiv1.EnvVarSource{
-										FieldRef: &apiv1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "spec.nodeName",
-										},
-									},
+									Name:  "ROLE",
+									Value: "master",
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
@@ -521,6 +439,7 @@ func (m *master) GenerateDeployment() (*extensionsv1.Deployment, error) {
 									Name:      "etcd-data",
 									MountPath: "/etc/kubernetes/data/etcd/",
 								},
+								// TODO cloud config has to be written into "/usr/code/cloudconfig/openstack/latest/user_data".
 							},
 							SecurityContext: &apiv1.SecurityContext{
 								Privileged: &privileged,
