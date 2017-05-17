@@ -8,7 +8,7 @@ import (
 )
 
 type ListDecoder interface {
-	Decode(b []byte) (object runtime.Object, err error)
+	Decode(b []byte) (runtime.Object, error)
 }
 
 type Resource interface {
@@ -18,6 +18,6 @@ type Resource interface {
 
 type WatchDecoder interface {
 	Close()
-	Decode() (action watch.EventType, object runtime.Object, err error)
+	Decode() (watch.EventType, runtime.Object, error)
 	SetStream(stream io.ReadCloser)
 }
