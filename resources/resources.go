@@ -60,15 +60,6 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 
 	objects := []runtime.Object{}
 
-	master := &master{
-		CustomObject: customObject,
-	}
-	masterComponents, err := master.GenerateResources()
-	if err != nil {
-		fmt.Printf("%#v\n", err)
-	}
-	objects = append(objects, masterComponents...)
-
 	worker := &worker{
 		CustomObject: customObject,
 	}
