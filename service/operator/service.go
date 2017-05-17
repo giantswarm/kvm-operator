@@ -17,7 +17,7 @@ type Config struct {
 	// Dependencies.
 	KubernetesClient *kubernetes.Clientset
 	Logger           micrologger.Logger
-	Reconciler       *k8sreconciler.Service
+	Reconciler       *k8sreconciler.Reconciler
 }
 
 // DefaultConfig provides a default configuration to create a new service by
@@ -62,7 +62,7 @@ type Service struct {
 	// Dependencies.
 	kubernetesClient *kubernetes.Clientset
 	logger           micrologger.Logger
-	reconciler       *k8sreconciler.Service
+	reconciler       *k8sreconciler.Reconciler
 
 	// Internals.
 	bootOnce sync.Once

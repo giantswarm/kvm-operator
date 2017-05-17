@@ -127,7 +127,7 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var newReconciler *k8sreconciler.Service
+	var newReconciler *k8sreconciler.Reconciler
 	{
 		newConfig := k8sreconciler.DefaultConfig()
 
