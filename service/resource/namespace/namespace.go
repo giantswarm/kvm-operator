@@ -48,6 +48,28 @@ type Service struct {
 }
 
 func (s *Service) GetForCreate(obj interface{}) (runtime.Object, error) {
+	ro, err := s.newRuntimeObject(obj)
+	if err != nil {
+		return nil, microerror.MaskAny(err)
+	}
+
+	return ro, nil
+}
+
+func (s *Service) GetForDelete(obj interface{}) (runtime.Object, error) {
+	// Deleting a namespace requires the same resource properties being used
+	// during creation. E.g. the object meta name has to be equal. This is why we
+	// just use the same runtime object for deletion that we already used for
+	// creation.
+	ro, err := s.newRuntimeObject(obj)
+	if err != nil {
+		return nil, microerror.MaskAny(err)
+	}
+
+	return ro, nil
+}
+
+func (s *Service) newRuntimeObject(obj interface{}) (runtime.Object, error) {
 	customObject, ok := obj.(*kvmtpr.CustomObject)
 	if !ok {
 		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
@@ -68,16 +90,4 @@ func (s *Service) GetForCreate(obj interface{}) (runtime.Object, error) {
 	}
 
 	return namespace, nil
-}
-
-func (s *Service) GetForDelete(obj interface{}) (runtime.Object, error) {
-	// Deleting a namespace requires the same resource properties being used
-	// during creation. E.g. the object meta name has to be equal. This is why we
-	// just redirect here.
-	ro, err := s.GetForCreate(obj)
-	if err != nil {
-		return nil, microerror.MaskAny(err)
-	}
-
-	return ro, nil
 }
