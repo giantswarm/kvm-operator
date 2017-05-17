@@ -111,17 +111,19 @@ func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 		var namespace *v1.Namespace
 
 		for _, res := range r.resources {
-			ro, err := res.GetForCreate(obj)
+			ros, err := res.GetForCreate(obj)
 			if err != nil {
 				r.logger.Log("error", err.Error(), "event", "create")
 			}
 
-			switch t := ro.(type) {
-			case *v1.Namespace:
-				namespace = t
+			for _, ro := range ros {
+				switch t := ro.(type) {
+				case *v1.Namespace:
+					namespace = t
+				}
 			}
 
-			runtimeObjects = append(runtimeObjects, ro)
+			runtimeObjects = append(runtimeObjects, ros...)
 		}
 
 		if namespace == nil {
@@ -173,27 +175,20 @@ func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 		var namespace *v1.Namespace
 
 		for _, res := range r.resources {
-			ro, err := res.GetForDelete(obj)
+			ros, err := res.GetForDelete(obj)
 			if err != nil {
 				r.logger.Log("error", err.Error(), "event", "delete")
 				return
 			}
 
-			// In case the runtime object is nil, we do not track it. The client's
-			// intention is then to not process any deletion action. This might make
-			// sense if the only resource intended to be deleted is the Kubernetes
-			// namespace, which in turn deletes all other resources being inside this
-			// namespace.
-			if ro == nil {
-				continue
+			for _, ro := range ros {
+				switch t := ro.(type) {
+				case *v1.Namespace:
+					namespace = t
+				}
 			}
 
-			switch t := ro.(type) {
-			case *v1.Namespace:
-				namespace = t
-			}
-
-			runtimeObjects = append(runtimeObjects, ro)
+			runtimeObjects = append(runtimeObjects, ros...)
 		}
 
 		if namespace == nil {

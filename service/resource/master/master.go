@@ -1,10 +1,11 @@
-package flannel
+package master
 
 import (
 	"encoding/json"
 
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
 )
@@ -39,13 +40,13 @@ func New(config Config) (*Service, error) {
 	return newService, nil
 }
 
-// Service implements the flannel service.
+// Service implements the master service.
 type Service struct {
 	// Dependencies.
 	logger micrologger.Logger
 }
 
-// GetForCreate returns the Kubernetes runtime object for the flannel resource
+// GetForCreate returns the Kubernetes runtime object for the master resource
 // being used in reconciliation loops on create events.
 func (s *Service) GetForCreate(obj interface{}) ([]runtime.Object, error) {
 	ros, err := s.newRuntimeObjects(obj)
@@ -56,9 +57,9 @@ func (s *Service) GetForCreate(obj interface{}) ([]runtime.Object, error) {
 	return ros, nil
 }
 
-// GetForDelete returns the Kubernetes runtime object for the flannel resource
+// GetForDelete returns the Kubernetes runtime object for the master resource
 // being used in reconciliation loops on delete events. Note that deleting a
-// flannel resources happens implicity by deleting the namespace the flannel
+// master resources happens implicity by deleting the namespace the master
 // resource is attached to. This is why we do not return any implementation
 // here, but nil. That causes the reconcilliation to ignore the deletion for
 // this resource.
@@ -106,6 +107,26 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		newDeployment.Spec.Template.Annotations["scheduler.alpha.kubernetes.io/affinity"] = podAffinity
 	}
 
+	var newIngresses []*extensionsv1.Ingress
+	{
+		newIngresses, err = s.newIngresses(obj)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
+	var newService *apiv1.Service
+	{
+		newService, err = s.newService(obj)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
+	for _, i := range newIngresses {
+		runtimeObjects = append(runtimeObjects, i)
+	}
+	runtimeObjects = append(runtimeObjects, newService)
 	runtimeObjects = append(runtimeObjects, newDeployment)
 
 	return runtimeObjects, nil

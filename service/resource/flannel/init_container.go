@@ -16,11 +16,16 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
+	privileged := true
+
 	initContainers := []apiv1.Container{
 		{
 			Name:            "k8s-network-config",
 			Image:           customObject.Spec.KVM.Network.Config.Docker.Image,
 			ImagePullPolicy: apiv1.PullAlways,
+			SecurityContext: &apiv1.SecurityContext{
+				Privileged: &privileged,
+			},
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "BACKEND_TYPE", // e.g. vxlan
