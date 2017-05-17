@@ -159,7 +159,14 @@ func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 }
 
 // GetDeleteFunc returns the delete function used to be registered in Kubernetes
-// client watches.
+// client watches. The reconcilliation collects all runtime objects based on the
+// configured resources nefore applying the delete operations on them. In case
+// the runtime object is nil, we do not track it, that is, there will be no
+// deletion being performed on the configured resource. The client's intention
+// is then to not process any deletion action, so this implementation detail is
+// up to the client's responsibility. This might make sense if the only resource
+// intended to be deleted is the Kubernetes namespace, which in turn deletes all
+// other resources being inside this namespace.
 func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 	return func(obj interface{}) {
 		var runtimeObjects []runtime.Object
