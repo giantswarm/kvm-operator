@@ -17,7 +17,14 @@ import (
 	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
+	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
+	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	"github.com/giantswarm/kvm-operator/service/version"
+)
+
+const (
+	ListAPIEndpoint  = "/apis/cluster.giantswarm.io/v1/kvms"
+	WatchAPIEndpoint = "/apis/cluster.giantswarm.io/v1/watch/kvms"
 )
 
 // Config represents the configuration used to create a new service.
@@ -108,6 +115,43 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var namespaceResource k8sreconciler.Resource
+	{
+		namespaceConfig := namespaceresource.DefaultConfig()
+
+		namespaceConfig.Logger = config.Logger
+
+		namespaceResource, err = namespaceresource.New(namespaceConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
+	var newReconciler *k8sreconciler.Reconciler
+	{
+		newConfig := k8sreconciler.DefaultConfig()
+
+		// Dependencies.
+		newConfig.KubernetesClient = kubernetesClient
+		newConfig.ListDecoder = &listDecoder{}
+		newConfig.Logger = config.Logger
+
+		// Settings.
+		newConfig.ListEndpoint = ListAPIEndpoint
+		newConfig.Resources = []k8sreconciler.Resource{
+			//flannelResource,
+			//masterResource,
+			namespaceResource,
+			//workerRecource,
+		}
+		newConfig.WatchEndpoint = WatchAPIEndpoint
+
+		newReconciler, err = k8sreconciler.New(newConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
 	var healthzService *healthz.Service
 	{
 		healthzConfig := healthz.DefaultConfig()
@@ -125,8 +169,9 @@ func New(config Config) (*Service, error) {
 	{
 		operatorConfig := operator.DefaultConfig()
 
-		operatorConfig.Logger = config.Logger
 		operatorConfig.KubernetesClient = kubernetesClient
+		operatorConfig.Logger = config.Logger
+		operatorConfig.Reconciler = newReconciler
 
 		operatorService, err = operator.New(operatorConfig)
 		if err != nil {
