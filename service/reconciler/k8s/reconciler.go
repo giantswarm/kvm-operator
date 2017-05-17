@@ -103,6 +103,8 @@ type Reconciler struct {
 	watchEndpoint string
 }
 
+// GetAddFunc returns the add function used to be registered in Kubernetes
+// client watches.
 func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 	return func(obj interface{}) {
 		var runtimeObjects []runtime.Object
@@ -156,6 +158,8 @@ func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 	}
 }
 
+// GetDeleteFunc returns the delete function used to be registered in Kubernetes
+// client watches.
 func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 	return func(obj interface{}) {
 		var runtimeObjects []runtime.Object
@@ -219,6 +223,8 @@ func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 	}
 }
 
+// GetListWatch returns the list-watch used to be registered in Kubernetes
+// client watches.
 func (r *Reconciler) GetListWatch() *cache.ListWatch {
 	listWatch := &cache.ListWatch{
 		ListFunc: func(options api.ListOptions) (runtime.Object, error) {

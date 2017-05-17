@@ -47,6 +47,8 @@ type Service struct {
 	logger micrologger.Logger
 }
 
+// GetForCreate returns the Kubernetes runtime object for the namespace resource
+// being used in reconciliation loops on create events.
 func (s *Service) GetForCreate(obj interface{}) (runtime.Object, error) {
 	ro, err := s.newRuntimeObject(obj)
 	if err != nil {
@@ -56,11 +58,12 @@ func (s *Service) GetForCreate(obj interface{}) (runtime.Object, error) {
 	return ro, nil
 }
 
+// GetForDelete returns the Kubernetes runtime object for the namespace resource
+// being used in reconciliation loops on delete events. Note that deleting a
+// namespace requires the same resource properties being used during creation.
+// E.g. the object meta name has to be equal. This is why we just use the same
+// runtime object for deletion that we already used for creation.
 func (s *Service) GetForDelete(obj interface{}) (runtime.Object, error) {
-	// Deleting a namespace requires the same resource properties being used
-	// during creation. E.g. the object meta name has to be equal. This is why we
-	// just use the same runtime object for deletion that we already used for
-	// creation.
 	ro, err := s.newRuntimeObject(obj)
 	if err != nil {
 		return nil, microerror.MaskAny(err)
