@@ -60,15 +60,6 @@ func ComputeResources(customObject kvmtpr.CustomObject) ([]runtime.Object, error
 
 	objects := []runtime.Object{}
 
-	flannelClient := &flannelClient{
-		CustomObject: customObject,
-	}
-	flannelComponents, err := flannelClient.GenerateResources()
-	if err != nil {
-		fmt.Printf("%#v\n", err)
-	}
-	objects = append(objects, flannelComponents...)
-
 	master := &master{
 		CustomObject: customObject,
 	}

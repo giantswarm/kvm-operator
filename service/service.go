@@ -18,6 +18,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
 	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
+	flannelresource "github.com/giantswarm/kvm-operator/service/resource/flannel"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	"github.com/giantswarm/kvm-operator/service/version"
 )
@@ -115,6 +116,18 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var flannelResource k8sreconciler.Resource
+	{
+		flannelConfig := flannelresource.DefaultConfig()
+
+		flannelConfig.Logger = config.Logger
+
+		flannelResource, err = flannelresource.New(flannelConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
 	var namespaceResource k8sreconciler.Resource
 	{
 		namespaceConfig := namespaceresource.DefaultConfig()
@@ -139,7 +152,7 @@ func New(config Config) (*Service, error) {
 		// Settings.
 		newConfig.ListEndpoint = ListAPIEndpoint
 		newConfig.Resources = []k8sreconciler.Resource{
-			//flannelResource,
+			flannelResource,
 			//masterResource,
 			namespaceResource,
 			//workerRecource,
