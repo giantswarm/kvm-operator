@@ -8,7 +8,7 @@ import (
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error) {
@@ -26,8 +26,8 @@ func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error)
 			ObjectMeta: apiv1.ObjectMeta{
 				Name: "etcd",
 				Labels: map[string]string{
-					"cluster":  resources.ClusterID(*customObject),
-					"customer": resources.ClusterCustomer(*customObject),
+					"cluster":  resource.ClusterID(*customObject),
+					"customer": resource.ClusterCustomer(*customObject),
 					"app":      "master",
 				},
 				Annotations: map[string]string{
@@ -70,8 +70,8 @@ func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error)
 			ObjectMeta: apiv1.ObjectMeta{
 				Name: "api",
 				Labels: map[string]string{
-					"cluster":  resources.ClusterID(*customObject),
-					"customer": resources.ClusterCustomer(*customObject),
+					"cluster":  resource.ClusterID(*customObject),
+					"customer": resource.ClusterCustomer(*customObject),
 					"app":      "master",
 				},
 				Annotations: map[string]string{

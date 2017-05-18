@@ -8,7 +8,7 @@ import (
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/runtime"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 // Config represents the configuration used to create a new service.
@@ -86,10 +86,10 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: v1.ObjectMeta{
-			Name: resources.ClusterNamespace(*customObject),
+			Name: resource.ClusterNamespace(*customObject),
 			Labels: map[string]string{
-				"cluster":  resources.ClusterID(*customObject),
-				"customer": resources.ClusterCustomer(*customObject),
+				"cluster":  resource.ClusterID(*customObject),
+				"customer": resource.ClusterCustomer(*customObject),
 			},
 		},
 	}

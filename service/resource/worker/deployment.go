@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
@@ -33,8 +33,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "worker",
 			Labels: map[string]string{
-				"cluster":  resources.ClusterID(*customObject),
-				"customer": resources.ClusterCustomer(*customObject),
+				"cluster":  resource.ClusterID(*customObject),
+				"customer": resource.ClusterCustomer(*customObject),
 				"app":      "worker",
 			},
 		},
@@ -47,8 +47,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 				ObjectMeta: apiv1.ObjectMeta{
 					Name: "worker",
 					Labels: map[string]string{
-						"cluster":  resources.ClusterID(*customObject),
-						"customer": resources.ClusterCustomer(*customObject),
+						"cluster":  resource.ClusterID(*customObject),
+						"customer": resource.ClusterCustomer(*customObject),
 						"app":      "worker",
 					},
 				},
@@ -67,7 +67,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/vms", resources.ClusterID(*customObject), workerID),
+									Path: filepath.Join("/home/core/vms", resource.ClusterID(*customObject), workerID),
 								},
 							},
 						},
@@ -104,7 +104,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: resources.NetworkBridgeName(resources.ClusterID(*customObject)),
+									Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 								},
 								{
 									Name:  "MEMORY",
