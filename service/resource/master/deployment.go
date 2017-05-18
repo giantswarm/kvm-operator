@@ -90,6 +90,9 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Name:            "k8s-kvm",
 							Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
 							ImagePullPolicy: apiv1.PullIfNotPresent,
+							SecurityContext: &apiv1.SecurityContext{
+								Privileged: &privileged,
+							},
 							Args: []string{
 								"master",
 							},
@@ -139,9 +142,6 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 									MountPath: "/etc/kubernetes/data/etcd/",
 								},
 								// TODO cloud config has to be written into "/usr/code/cloudconfig/openstack/latest/user_data".
-							},
-							SecurityContext: &apiv1.SecurityContext{
-								Privileged: &privileged,
 							},
 						},
 					},
