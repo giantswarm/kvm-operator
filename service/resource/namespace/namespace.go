@@ -49,13 +49,13 @@ type Service struct {
 
 // GetForCreate returns the Kubernetes runtime object for the namespace resource
 // being used in reconciliation loops on create events.
-func (s *Service) GetForCreate(obj interface{}) (runtime.Object, error) {
-	ro, err := s.newRuntimeObject(obj)
+func (s *Service) GetForCreate(obj interface{}) ([]runtime.Object, error) {
+	ros, err := s.newRuntimeObjects(obj)
 	if err != nil {
 		return nil, microerror.MaskAny(err)
 	}
 
-	return ro, nil
+	return ros, nil
 }
 
 // GetForDelete returns the Kubernetes runtime object for the namespace resource
@@ -63,22 +63,24 @@ func (s *Service) GetForCreate(obj interface{}) (runtime.Object, error) {
 // namespace requires the same resource properties being used during creation.
 // E.g. the object meta name has to be equal. This is why we just use the same
 // runtime object for deletion that we already used for creation.
-func (s *Service) GetForDelete(obj interface{}) (runtime.Object, error) {
-	ro, err := s.newRuntimeObject(obj)
+func (s *Service) GetForDelete(obj interface{}) ([]runtime.Object, error) {
+	ros, err := s.newRuntimeObjects(obj)
 	if err != nil {
 		return nil, microerror.MaskAny(err)
 	}
 
-	return ro, nil
+	return ros, nil
 }
 
-func (s *Service) newRuntimeObject(obj interface{}) (runtime.Object, error) {
+func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
+	var runtimeObjects []runtime.Object
+
 	customObject, ok := obj.(*kvmtpr.CustomObject)
 	if !ok {
 		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
-	namespace := &v1.Namespace{
+	newNamespace := &v1.Namespace{
 		TypeMeta: unversioned.TypeMeta{
 			Kind:       "Namespace",
 			APIVersion: "v1",
@@ -92,5 +94,7 @@ func (s *Service) newRuntimeObject(obj interface{}) (runtime.Object, error) {
 		},
 	}
 
-	return namespace, nil
+	runtimeObjects = append(runtimeObjects, newNamespace)
+
+	return runtimeObjects, nil
 }

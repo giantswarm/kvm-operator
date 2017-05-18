@@ -16,12 +16,12 @@ type ListDecoder interface {
 
 // Resource implements any Kubernetes resource being reconciled.
 type Resource interface {
-	// GetForCreate returns the Kubernetes runtime object for any resource being
+	// GetForCreate returns the Kubernetes runtime objects for any resource being
 	// used in reconciliation loops on create events.
-	GetForCreate(obj interface{}) (runtime.Object, error)
-	// GetForDelete returns the Kubernetes runtime object for any resource being
+	GetForCreate(obj interface{}) ([]runtime.Object, error)
+	// GetForDelete returns the Kubernetes runtime objects for any resource being
 	// used in reconciliation loops on delete events.
-	GetForDelete(obj interface{}) (runtime.Object, error)
+	GetForDelete(obj interface{}) ([]runtime.Object, error)
 }
 
 // WatchDecoder implements general decoding of watch streams created in
