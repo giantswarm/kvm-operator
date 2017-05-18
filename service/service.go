@@ -19,7 +19,9 @@ import (
 	"github.com/giantswarm/kvm-operator/service/operator"
 	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
 	flannelresource "github.com/giantswarm/kvm-operator/service/resource/flannel"
+	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
+	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
 	"github.com/giantswarm/kvm-operator/service/version"
 )
 
@@ -128,6 +130,18 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var masterResource k8sreconciler.Resource
+	{
+		masterConfig := masterresource.DefaultConfig()
+
+		masterConfig.Logger = config.Logger
+
+		masterResource, err = masterresource.New(masterConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
 	var namespaceResource k8sreconciler.Resource
 	{
 		namespaceConfig := namespaceresource.DefaultConfig()
@@ -135,6 +149,18 @@ func New(config Config) (*Service, error) {
 		namespaceConfig.Logger = config.Logger
 
 		namespaceResource, err = namespaceresource.New(namespaceConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
+	var workerResource k8sreconciler.Resource
+	{
+		workerConfig := workerresource.DefaultConfig()
+
+		workerConfig.Logger = config.Logger
+
+		workerResource, err = workerresource.New(workerConfig)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
@@ -153,9 +179,9 @@ func New(config Config) (*Service, error) {
 		newConfig.ListEndpoint = ListAPIEndpoint
 		newConfig.Resources = []k8sreconciler.Resource{
 			flannelResource,
-			//masterResource,
+			masterResource,
 			namespaceResource,
-			//workerRecource,
+			workerResource,
 		}
 		newConfig.WatchEndpoint = WatchAPIEndpoint
 

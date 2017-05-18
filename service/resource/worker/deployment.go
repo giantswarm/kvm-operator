@@ -1,8 +1,10 @@
-package master
+package worker
 
 import (
 	"fmt"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/giantswarm/kvm-operator/resources"
 	"github.com/giantswarm/kvmtpr"
@@ -20,7 +22,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 
 	privileged := true
 	replicas := int32(1)
-	masterNode := customObject.Spec.Cluster.Masters[0]
+	workerID := strconv.FormatInt(time.Now().UnixNano(), 64)
+	workerNode := customObject.Spec.Cluster.Workers[0]
 
 	deployment := &extensionsv1.Deployment{
 		TypeMeta: apiunversioned.TypeMeta{
@@ -28,11 +31,11 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apiv1.ObjectMeta{
-			Name: "master",
+			Name: "worker",
 			Labels: map[string]string{
 				"cluster":  resources.ClusterID(*customObject),
 				"customer": resources.ClusterCustomer(*customObject),
-				"app":      "master",
+				"app":      "worker",
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -42,24 +45,16 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 			Replicas: &replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apiv1.ObjectMeta{
-					GenerateName: "master",
+					Name: "worker",
 					Labels: map[string]string{
 						"cluster":  resources.ClusterID(*customObject),
 						"customer": resources.ClusterCustomer(*customObject),
-						"app":      "master",
+						"app":      "worker",
 					},
 				},
 				Spec: apiv1.PodSpec{
 					HostNetwork: true,
 					Volumes: []apiv1.Volume{
-						{
-							Name: "etcd-data",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/", resources.ClusterID(*customObject), "-k8s-master-vm/"),
-								},
-							},
-						},
 						{
 							Name: "images",
 							VolumeSource: apiv1.VolumeSource{
@@ -72,15 +67,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/vms/", resources.ClusterID(*customObject), "-k8s-master-vm/"),
-								},
-							},
-						},
-						{
-							Name: "flannel",
-							VolumeSource: apiv1.VolumeSource{
-								HostPath: &apiv1.HostPathVolumeSource{
-									Path: "/run/flannel",
+									Path: filepath.Join("/home/core/vms", resources.ClusterID(*customObject), workerID),
 								},
 							},
 						},
@@ -94,12 +81,12 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 								Privileged: &privileged,
 							},
 							Args: []string{
-								"master",
+								"worker",
 							},
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "CORES",
-									Value: fmt.Sprintf("%d", masterNode.CPUs),
+									Value: fmt.Sprintf("%d", workerNode.CPUs),
 								},
 								{
 									Name: "DISK",
@@ -121,11 +108,11 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 								},
 								{
 									Name:  "MEMORY",
-									Value: masterNode.Memory,
+									Value: workerNode.Memory,
 								},
 								{
 									Name:  "ROLE",
-									Value: "master",
+									Value: "worker",
 								},
 							},
 							VolumeMounts: []apiv1.VolumeMount{
@@ -136,10 +123,6 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 								{
 									Name:      "rootfs",
 									MountPath: "/usr/code/rootfs/",
-								},
-								{
-									Name:      "etcd-data",
-									MountPath: "/etc/kubernetes/data/etcd/",
 								},
 								// TODO cloud config has to be written into "/usr/code/cloudconfig/openstack/latest/user_data".
 							},
