@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
@@ -22,8 +22,8 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "worker",
 			Labels: map[string]string{
-				"cluster":  resources.ClusterID(*customObject),
-				"customer": resources.ClusterCustomer(*customObject),
+				"cluster":  resource.ClusterID(*customObject),
+				"customer": resource.ClusterCustomer(*customObject),
 				"app":      "worker",
 			},
 		},

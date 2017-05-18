@@ -7,7 +7,7 @@ import (
 	microerror "github.com/giantswarm/microkit/error"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) {
@@ -54,7 +54,7 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME", // e.g. br-h8s2l
-					Value: resources.NetworkBridgeName(resources.ClusterID(*customObject)),
+					Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 				},
 				{
 					Name:  "SUBNET_LEN", // e.g. 30

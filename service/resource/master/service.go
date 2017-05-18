@@ -6,7 +6,7 @@ import (
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
@@ -23,8 +23,8 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
-				"cluster":  resources.ClusterID(*customObject),
-				"customer": resources.ClusterCustomer(*customObject),
+				"cluster":  resource.ClusterID(*customObject),
+				"customer": resource.ClusterCustomer(*customObject),
 				"app":      "master",
 			},
 		},

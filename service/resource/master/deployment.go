@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
@@ -30,8 +30,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
-				"cluster":  resources.ClusterID(*customObject),
-				"customer": resources.ClusterCustomer(*customObject),
+				"cluster":  resource.ClusterID(*customObject),
+				"customer": resource.ClusterCustomer(*customObject),
 				"app":      "master",
 			},
 		},
@@ -44,8 +44,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "master",
 					Labels: map[string]string{
-						"cluster":  resources.ClusterID(*customObject),
-						"customer": resources.ClusterCustomer(*customObject),
+						"cluster":  resource.ClusterID(*customObject),
+						"customer": resource.ClusterCustomer(*customObject),
 						"app":      "master",
 					},
 				},
@@ -56,7 +56,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Name: "etcd-data",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/", resources.ClusterID(*customObject), "-k8s-master-vm/"),
+									Path: filepath.Join("/home/core/", resource.ClusterID(*customObject), "-k8s-master-vm/"),
 								},
 							},
 						},
@@ -72,7 +72,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Name: "rootfs",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
-									Path: filepath.Join("/home/core/vms/", resources.ClusterID(*customObject), "-k8s-master-vm/"),
+									Path: filepath.Join("/home/core/vms/", resource.ClusterID(*customObject), "-k8s-master-vm/"),
 								},
 							},
 						},
@@ -117,7 +117,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: resources.NetworkBridgeName(resources.ClusterID(*customObject)),
+									Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 								},
 								{
 									Name:  "MEMORY",

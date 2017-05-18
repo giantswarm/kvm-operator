@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -31,7 +31,7 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "NETWORK_BRIDGE_NAME",
-					Value: resources.NetworkBridgeName(resources.ClusterID(*customObject)),
+					Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 				},
 				{
 					Name: "POD_NAME",

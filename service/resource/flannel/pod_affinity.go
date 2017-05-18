@@ -6,7 +6,7 @@ import (
 	"k8s.io/client-go/pkg/api"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newPodAfinity(obj interface{}) (*api.Affinity, error) {
@@ -29,7 +29,7 @@ func (s *Service) newPodAfinity(obj interface{}) (*api.Affinity, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{resources.ClusterID(*customObject)},
+					Namespaces:  []string{resource.ClusterID(*customObject)},
 				},
 			},
 		},

@@ -1,7 +1,7 @@
 package master
 
 import (
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	"k8s.io/client-go/pkg/api"
@@ -28,7 +28,7 @@ func (s *Service) newPodAfinity(obj interface{}) (*api.Affinity, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{resources.ClusterID(*customObject)},
+					Namespaces:  []string{resource.ClusterID(*customObject)},
 				},
 			},
 		},
@@ -45,7 +45,7 @@ func (s *Service) newPodAfinity(obj interface{}) (*api.Affinity, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{resources.ClusterID(*customObject)},
+					Namespaces:  []string{resource.ClusterID(*customObject)},
 				},
 			},
 		},

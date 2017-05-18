@@ -7,7 +7,7 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/resources"
+	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, error) {
@@ -27,8 +27,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 		ObjectMeta: apiv1.ObjectMeta{
 			Name: "flannel-client",
 			Labels: map[string]string{
-				"cluster":  resources.ClusterID(*customObject),
-				"customer": resources.ClusterCustomer(*customObject),
+				"cluster":  resource.ClusterID(*customObject),
+				"customer": resource.ClusterCustomer(*customObject),
 				"app":      "flannel-client",
 			},
 		},
@@ -41,8 +41,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 				ObjectMeta: apiv1.ObjectMeta{
 					GenerateName: "flannel-client",
 					Labels: map[string]string{
-						"cluster":  resources.ClusterID(*customObject),
-						"customer": resources.ClusterCustomer(*customObject),
+						"cluster":  resource.ClusterID(*customObject),
+						"customer": resource.ClusterCustomer(*customObject),
 						"app":      "flannel-client",
 					},
 					Annotations: map[string]string{
@@ -138,7 +138,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: resources.NetworkBridgeName(resources.ClusterID(*customObject)),
+									Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 								},
 								{
 									Name: "NODE_IP",
@@ -176,7 +176,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "NETWORK_ENV_FILE_PATH",
-									Value: resources.NetworkEnvFilePath(resources.ClusterID(*customObject)),
+									Value: resource.NetworkEnvFilePath(resource.ClusterID(*customObject)),
 								},
 								{
 									Name:  "NETWORK_SUBNET_RANGE",
@@ -184,7 +184,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
-									Value: resources.NetworkBridgeName(resources.ClusterID(*customObject)),
+									Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 								},
 								{
 									Name:  "NETWORK_INTERFACE_NAME",
