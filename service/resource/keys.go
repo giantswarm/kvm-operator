@@ -3,6 +3,7 @@ package resource
 import (
 	"fmt"
 
+	"github.com/giantswarm/clustertpr/node"
 	"github.com/giantswarm/kvmtpr"
 )
 
@@ -24,6 +25,10 @@ func ClusterName(customObject kvmtpr.CustomObject) string {
 
 func ClusterNamespace(customObject kvmtpr.CustomObject) string {
 	return ClusterID(customObject)
+}
+
+func ConfigMapName(customObject kvmtpr.CustomObject, node node.Node) string {
+	return fmt.Sprintf("%s-%s", ClusterID(customObject), node.ID)
 }
 
 func NetworkBridgeName(ID string) string {
