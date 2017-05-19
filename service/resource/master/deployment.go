@@ -84,7 +84,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms/", resource.ClusterID(*customObject), "-k8s-master-vm/"),
+										Path: filepath.Join("/home/core/vms", resource.ClusterID(*customObject), masterNode.ID),
 									},
 								},
 							},
