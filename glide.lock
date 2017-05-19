@@ -1,5 +1,5 @@
 hash: 6a523d2c32ca5cd898606e27944f2dd45e5df44e6ca56210dadd46c13b4462ff
-updated: 2017-05-15T17:30:16.863164485+02:00
+updated: 2017-05-19T17:11:13.066671464+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -57,7 +57,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/clustertpr
-  version: 81d44901ce63086368ddcf639dffd1c8b4344190
+  version: 978d75bd50744b23be1bc6370035e88f9c35447b
   subpackages:
   - calico
   - cluster
@@ -80,8 +80,10 @@ imports:
   - kubernetes/networksetup/docker
   - node
   - vault
+- name: github.com/giantswarm/k8scloudconfig
+  version: cfd00e1730ce4874a51f70c784083f145929a5ac
 - name: github.com/giantswarm/kvmtpr
-  version: dbe3031326af01597a462d58fafb87ecac9fdae8
+  version: 2a1bfd58d42916dacbb35e2f00462c99f379b8d6
   subpackages:
   - kvm
   - kvm/endpointupdater
@@ -205,7 +207,7 @@ imports:
 - name: github.com/pelletier/go-buffruneio
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: 685a1f1cb7a66b9cadbe8f1ac49d9f8f567d6a9d
+  version: 5c26a6ff6fd178719e15decac1c8196da0d7d6d1
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -312,7 +314,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 - name: k8s.io/client-go
   version: e121606b0d09b2e1c467183ee46217fa85a6b672
   subpackages:
