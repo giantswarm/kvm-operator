@@ -18,6 +18,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
 	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
+	cloudconfigresource "github.com/giantswarm/kvm-operator/service/resource/cloudconfig"
 	flannelresource "github.com/giantswarm/kvm-operator/service/resource/flannel"
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
@@ -118,6 +119,19 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var cloudConfigResource k8sreconciler.Resource
+	{
+		cloudConfigConfig := cloudconfigresource.DefaultConfig()
+
+		cloudConfigConfig.KubernetesClient = kubernetesClient
+		cloudConfigConfig.Logger = config.Logger
+
+		cloudConfigResource, err = cloudconfigresource.New(cloudConfigConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
 	var flannelResource k8sreconciler.Resource
 	{
 		flannelConfig := flannelresource.DefaultConfig()
@@ -178,6 +192,12 @@ func New(config Config) (*Service, error) {
 		// Settings.
 		newConfig.ListEndpoint = ListAPIEndpoint
 		newConfig.Resources = []k8sreconciler.Resource{
+			// Note that the cloud config resource is special since the creation of
+			// configmaps has to be done before any pod can make use of it. The
+			// current reconciliation is synchronous and processes resources in a
+			// series. This is why the cloud config resource has to be registered
+			// first.
+			cloudConfigResource,
 			flannelResource,
 			masterResource,
 			namespaceResource,
