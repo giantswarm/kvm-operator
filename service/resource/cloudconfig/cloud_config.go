@@ -103,7 +103,7 @@ func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string
 				},
 			},
 			Data: map[string]string{
-				"user_data": newCloudConfig.Base64(),
+				"user_data": newCloudConfig.String(),
 			},
 		}
 	}
