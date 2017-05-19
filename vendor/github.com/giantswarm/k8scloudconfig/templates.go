@@ -458,7 +458,7 @@ write_files:
     ClientAliveCountMax 2
     PasswordAuthentication no
 
-{{range .Files}}
+{{range .Extension.Files}}
 - path: {{.Metadata.Path}}
   owner: {{.Metadata.Owner}}
   {{ if .Metadata.Encoding }}
@@ -471,7 +471,7 @@ write_files:
 
 coreos:
   units:
-  {{range .Units}}
+  {{range .Extension.Units}}
   - name: {{.Metadata.Name}}
     enable: {{.Metadata.Enable}}
     command: {{.Metadata.Command}}
@@ -1078,7 +1078,7 @@ write_files:
     ClientAliveCountMax 2
     PasswordAuthentication no
 
-{{range .Files}}
+{{range .Extension.Files}}
 - path: {{.Metadata.Path}}
   owner: {{.Metadata.Owner}}
   {{ if .Metadata.Encoding }}
@@ -1091,7 +1091,7 @@ write_files:
 
 coreos:
   units:
-  {{range .Units}}
+  {{range .Extension.Units}}
   - name: {{.Metadata.Name}}
     enable: {{.Metadata.Enable}}
     command: {{.Metadata.Command}}

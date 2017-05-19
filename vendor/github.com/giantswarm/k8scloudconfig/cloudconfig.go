@@ -11,37 +11,25 @@ import (
 )
 
 type Params struct {
-	Cluster clustertpr.Cluster
-	Node    node.Node
-	Files   []FileAsset
-	Units   []UnitAsset
+	Cluster   clustertpr.Cluster
+	Extension Extension
+	Node      node.Node
 }
 
 type CloudConfig struct {
-	config    string
-	extension Extension
-	params    Params
-	template  string
+	config   string
+	params   Params
+	template string
 }
 
-func NewCloudConfig(template string, params Params, extension Extension) (*CloudConfig, error) {
-	files, err := extension.Files()
-	if err != nil {
-		return nil, err
-	}
-
-	units, err := extension.Units()
-	if err != nil {
-		return nil, err
-	}
-
-	params.Files = files
-	params.Units = units
-
-	return &CloudConfig{
-		template: template,
+func NewCloudConfig(template string, params Params) (*CloudConfig, error) {
+	newCloudConfig := &CloudConfig{
+		config:   "",
 		params:   params,
-	}, nil
+		template: template,
+	}
+
+	return newCloudConfig, nil
 }
 
 func (c *CloudConfig) ExecuteTemplate() error {

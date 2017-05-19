@@ -1,5 +1,5 @@
-hash: 6a523d2c32ca5cd898606e27944f2dd45e5df44e6ca56210dadd46c13b4462ff
-updated: 2017-05-19T17:11:13.066671464+02:00
+hash: c7606cec78c868af92777083f2fd4a8e3ecc8be1320b24d76d472febc431bb5d
+updated: 2017-05-19T18:03:49.475798293+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -81,7 +81,7 @@ imports:
   - node
   - vault
 - name: github.com/giantswarm/k8scloudconfig
-  version: cfd00e1730ce4874a51f70c784083f145929a5ac
+  version: c27d83ccde69dae71c2ba1eb931d95cc7b58d031
 - name: github.com/giantswarm/kvmtpr
   version: 2a1bfd58d42916dacbb35e2f00462c99f379b8d6
   subpackages:
