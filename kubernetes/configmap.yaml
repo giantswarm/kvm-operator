@@ -10,9 +10,9 @@ data:
         address: 'http://0.0.0.0:8000'
     service:
       kubernetes:
-        address: ""
+        address: ''
         inCluster: true
         tls:
-          caFile: ""
-          crtFile: ""
-          keyFile: ""
+          caFile: ''
+          crtFile: ''
+          keyFile: '"

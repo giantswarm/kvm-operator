@@ -23,11 +23,11 @@ spec:
             path: config.yml
       containers:
       - name: kvm-operator
-        image: quay.io/giantswarm/kvm-operator:%%DOCKER_TAG%%
+        image: quay.io/giantswarm/kvm-operator:{{ .BuildInfo.SHA }}
         args:
         - daemon
-        - --config.dirs=/var/run/kvm-operator/configmap/,/var/run/kvm-operator/secret/
-        - --config.files=config,secret
+        - --config.dirs=/var/run/kvm-operator/configmap/
+        - --config.files=config
         volumeMounts:
         - name: kvm-operator-configmap
           mountPath: /var/run/kvm-operator/configmap/
