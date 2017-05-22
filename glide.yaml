@@ -47,3 +47,5 @@ import:
   version: 3.1.0
 - package: github.com/giantswarm/kvmtpr
   version: master
+- package: github.com/giantswarm/k8scloudconfig
+  version: master

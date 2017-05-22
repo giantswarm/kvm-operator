@@ -97,14 +97,16 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		podAffinity = string(marshalled)
 	}
 
-	var newDeployment *extensionsv1.Deployment
+	var newDeployments []*extensionsv1.Deployment
 	{
-		newDeployment, err = s.newDeployment(obj)
+		newDeployments, err = s.newDeployments(obj)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
-		newDeployment.Spec.Template.Annotations["pod.beta.kubernetes.io/init-containers"] = initContainers
-		newDeployment.Spec.Template.Annotations["scheduler.alpha.kubernetes.io/affinity"] = podAffinity
+		for i, _ := range newDeployments {
+			newDeployments[i].Spec.Template.Annotations["pod.beta.kubernetes.io/init-containers"] = initContainers
+			newDeployments[i].Spec.Template.Annotations["scheduler.alpha.kubernetes.io/affinity"] = podAffinity
+		}
 	}
 
 	var newIngresses []*extensionsv1.Ingress
@@ -127,7 +129,9 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		runtimeObjects = append(runtimeObjects, i)
 	}
 	runtimeObjects = append(runtimeObjects, newService)
-	runtimeObjects = append(runtimeObjects, newDeployment)
+	for _, d := range newDeployments {
+		runtimeObjects = append(runtimeObjects, d)
+	}
 
 	return runtimeObjects, nil
 }

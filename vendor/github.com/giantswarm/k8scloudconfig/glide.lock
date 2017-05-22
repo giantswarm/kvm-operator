@@ -1,0 +1,44 @@
+hash: 9b751a013a655d9853ad510d8e2fc690c856ac5f644cec8afcaf24280db0f6a9
+updated: 2017-05-19T15:49:07.826610779+02:00
+imports:
+- name: github.com/giantswarm/awstpr
+  version: 2a9b74f9462593e89ce05d88cacbd8aff433ce08
+  subpackages:
+  - aws
+- name: github.com/giantswarm/clustertpr
+  version: 978d75bd50744b23be1bc6370035e88f9c35447b
+  subpackages:
+  - calico
+  - cluster
+  - customer
+  - docker
+  - docker/daemon
+  - docker/registry
+  - etcd
+  - flannel
+  - flannel/client
+  - flannel/docker
+  - kubernetes
+  - kubernetes/api
+  - kubernetes/dns
+  - kubernetes/hyperkube
+  - kubernetes/hyperkube/docker
+  - kubernetes/ingress
+  - kubernetes/kubelet
+  - kubernetes/networksetup
+  - kubernetes/networksetup/docker
+  - node
+  - vault
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 4d4bfba8f1d1027c4fdbe371823030df51419987
+  subpackages:
+  - assert

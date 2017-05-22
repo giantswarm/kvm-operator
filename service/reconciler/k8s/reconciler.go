@@ -24,7 +24,11 @@ type Config struct {
 	WatchDecoder     WatchDecoder
 
 	// Settings.
-	ListEndpoint  string
+	ListEndpoint string
+	// Resources is the list of resources to be processed during creation and
+	// deletion reconciliations. The current reconciliation is synchronous and
+	// processes resources in a series. One resource after another will be
+	// processed.
 	Resources     []Resource
 	WatchEndpoint string
 }
