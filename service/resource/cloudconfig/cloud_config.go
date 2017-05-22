@@ -5,18 +5,23 @@ import (
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
-	"k8s.io/client-go/kubernetes"
+	certkit "github.com/giantswarm/operatorkit/secret/cert"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/runtime"
 
 	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
+const (
+	FileOwner      = "root:root"
+	FilePermission = 0700
+)
+
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
-	KubernetesClient *kubernetes.Clientset
-	Logger           micrologger.Logger
+	CertWatcher *certkit.Service
+	Logger      micrologger.Logger
 }
 
 // DefaultConfig provides a default configuration to create a new service by
@@ -24,16 +29,16 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		KubernetesClient: nil,
-		Logger:           nil,
+		CertWatcher: nil,
+		Logger:      nil,
 	}
 }
 
 // New creates a new configured service.
 func New(config Config) (*Service, error) {
 	// Dependencies.
-	if config.KubernetesClient == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.KubernetesClient must not be empty")
+	if config.CertWatcher == nil {
+		return nil, microerror.MaskAnyf(invalidConfigError, "config.CertWatcher must not be empty")
 	}
 	if config.Logger == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "config.Logger must not be empty")
@@ -41,8 +46,8 @@ func New(config Config) (*Service, error) {
 
 	newService := &Service{
 		// Dependencies.
-		kubernetesClient: config.KubernetesClient,
-		logger:           config.Logger,
+		certWatcher: config.CertWatcher,
+		logger:      config.Logger,
 	}
 
 	return newService, nil
@@ -51,8 +56,8 @@ func New(config Config) (*Service, error) {
 // Service implements the cloud config service.
 type Service struct {
 	// Dependencies.
-	kubernetesClient *kubernetes.Clientset
-	logger           micrologger.Logger
+	certWatcher *certkit.Service
+	logger      micrologger.Logger
 }
 
 // GetForCreate returns the Kubernetes runtime object for the cloud config
@@ -111,11 +116,6 @@ func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string
 	return newConfigMap, nil
 }
 
-func (s *Service) newMasterExtension() (cloudconfig.Extension, error) {
-	// TODO
-	return nil, nil
-}
-
 func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	var err error
 	var runtimeObjects []runtime.Object
@@ -125,13 +125,14 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
+	certs, err := s.certWatcher.SearchCerts(customObject.Spec.Cluster.Cluster.ID)
+	if err != nil {
+		return nil, microerror.MaskAny(err)
+	}
+
 	for _, mn := range customObject.Spec.Cluster.Masters {
-		var newExtension cloudconfig.Extension
-		{
-			newExtension, err = s.newMasterExtension()
-			if err != nil {
-				return nil, microerror.MaskAny(err)
-			}
+		newExtension := &MasterExtension{
+			certs: certs,
 		}
 
 		var params cloudconfig.Params
@@ -150,12 +151,8 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	}
 
 	for _, wn := range customObject.Spec.Cluster.Workers {
-		var newExtension cloudconfig.Extension
-		{
-			newExtension, err = s.newWorkerExtension()
-			if err != nil {
-				return nil, microerror.MaskAny(err)
-			}
+		newExtension := &WorkerExtension{
+			certs: certs,
 		}
 
 		var params cloudconfig.Params
@@ -174,9 +171,4 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	}
 
 	return runtimeObjects, nil
-}
-
-func (s *Service) newWorkerExtension() (cloudconfig.Extension, error) {
-	// TODO
-	return nil, nil
 }

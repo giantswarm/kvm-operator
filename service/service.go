@@ -24,6 +24,7 @@ import (
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
 	"github.com/giantswarm/kvm-operator/service/version"
+	certkit "github.com/giantswarm/operatorkit/secret/cert"
 )
 
 const (
@@ -119,11 +120,22 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var certWatcher *certkit.Service
+	{
+		certConfig := certkit.DefaultConfig()
+		certConfig.K8sClient = kubernetesClient
+		certConfig.Logger = config.Logger
+		certWatcher, err = certkit.New(certConfig)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+	}
+
 	var cloudConfigResource k8sreconciler.Resource
 	{
 		cloudConfigConfig := cloudconfigresource.DefaultConfig()
 
-		cloudConfigConfig.KubernetesClient = kubernetesClient
+		cloudConfigConfig.CertWatcher = certWatcher
 		cloudConfigConfig.Logger = config.Logger
 
 		cloudConfigResource, err = cloudconfigresource.New(cloudConfigConfig)
