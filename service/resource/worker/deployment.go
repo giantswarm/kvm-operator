@@ -50,6 +50,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 							"customer": resource.ClusterCustomer(*customObject),
 							"app":      "worker",
 						},
+						Annotations: map[string]string{},
 					},
 					Spec: apiv1.PodSpec{
 						HostNetwork: true,
