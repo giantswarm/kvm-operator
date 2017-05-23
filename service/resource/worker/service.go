@@ -14,6 +14,8 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
+	// TODO maybe add one service per worker?
+
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "service",
