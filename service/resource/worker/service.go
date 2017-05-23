@@ -31,8 +31,9 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 			Type: apiv1.ServiceTypeLoadBalancer,
 			Ports: []apiv1.ServicePort{
 				{
-					Name:     "http",
-					Port:     int32(customObject.Spec.Cluster.Kubernetes.Kubelet.Port),
+					Name: "http",
+					//Port:     int32(customObject.Spec.Cluster.Kubernetes.Kubelet.Port),
+					Port:     int32(8000),
 					Protocol: "TCP",
 				},
 			},
