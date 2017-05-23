@@ -30,11 +30,12 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apiv1.ObjectMeta{
-				Name: "master",
+				GenerateName: "master-",
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(*customObject),
 					"customer": resource.ClusterCustomer(*customObject),
 					"app":      "master",
+					"node":     masterNode.ID,
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{
@@ -49,7 +50,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 							"cluster":  resource.ClusterID(*customObject),
 							"customer": resource.ClusterCustomer(*customObject),
 							"app":      "master",
+							"node":     masterNode.ID,
 						},
+						Annotations: map[string]string{},
 					},
 					Spec: apiv1.PodSpec{
 						HostNetwork: true,

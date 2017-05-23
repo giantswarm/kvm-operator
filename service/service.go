@@ -204,15 +204,20 @@ func New(config Config) (*Service, error) {
 		// Settings.
 		newConfig.ListEndpoint = ListAPIEndpoint
 		newConfig.Resources = []k8sreconciler.Resource{
+			// Note that the namespace resource is special since the creation of the
+			// cluster namespace has to be done before any other resource can be
+			// created inside of it. The current reconciliation is synchronous and
+			// processes resources in a series. This is why the namespace resource has
+			// to be registered first.
+			namespaceResource,
 			// Note that the cloud config resource is special since the creation of
 			// configmaps has to be done before any pod can make use of it. The
 			// current reconciliation is synchronous and processes resources in a
 			// series. This is why the cloud config resource has to be registered
-			// first.
+			// second.
 			cloudConfigResource,
 			flannelResource,
 			masterResource,
-			namespaceResource,
 			workerResource,
 		}
 		newConfig.WatchEndpoint = WatchAPIEndpoint

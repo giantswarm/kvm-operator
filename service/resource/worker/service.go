@@ -14,6 +14,8 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
+	// TODO maybe add one service per worker?
+
 	service := &apiv1.Service{
 		TypeMeta: apiunversioned.TypeMeta{
 			Kind:       "service",
@@ -31,8 +33,9 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 			Type: apiv1.ServiceTypeLoadBalancer,
 			Ports: []apiv1.ServicePort{
 				{
-					Name:     "http",
-					Port:     int32(customObject.Spec.Cluster.Kubernetes.Kubelet.Port),
+					Name: "http",
+					//Port:     int32(customObject.Spec.Cluster.Kubernetes.Kubelet.Port),
+					Port:     int32(8000),
 					Protocol: "TCP",
 				},
 			},

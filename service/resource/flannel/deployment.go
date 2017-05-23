@@ -133,7 +133,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"/opt/bin/flanneld --public-ip=$NODE_IP --iface=$NODE_IP --networks=$NETWORK_BRIDGE_NAME -v=1",
+								"/opt/bin/flanneld --etcd-endpoints https://127.0.0.1:2379 --public-ip=$NODE_IP --iface=$NODE_IP --networks=$NETWORK_BRIDGE_NAME -v=0",
 							},
 							Env: []apiv1.EnvVar{
 								{
@@ -171,7 +171,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo 'Waiting for ${NETWORK_ENV_FILE_PATH} to be created'; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${NETWORK_SUBNET_RANGE}",
+								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo \"Waiting for ${NETWORK_ENV_FILE_PATH} to be created\"; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${NETWORK_SUBNET_RANGE}",
 							},
 							Env: []apiv1.EnvVar{
 								{
