@@ -35,6 +35,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 					"cluster":  resource.ClusterID(*customObject),
 					"customer": resource.ClusterCustomer(*customObject),
 					"app":      "worker",
+					"node":     workerNode.ID,
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{
@@ -49,6 +50,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 							"cluster":  resource.ClusterID(*customObject),
 							"customer": resource.ClusterCustomer(*customObject),
 							"app":      "worker",
+							"node":     workerNode.ID,
 						},
 						Annotations: map[string]string{},
 					},
