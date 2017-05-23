@@ -15,4 +15,4 @@ data:
         tls:
           caFile: ''
           crtFile: ''
-          keyFile: '"
+          keyFile: ''
