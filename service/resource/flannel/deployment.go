@@ -171,7 +171,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo 'Waiting for ${NETWORK_ENV_FILE_PATH} to be created'; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${NETWORK_SUBNET_RANGE}",
+								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo \"Waiting for ${NETWORK_ENV_FILE_PATH} to be created\"; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${NETWORK_SUBNET_RANGE}",
 							},
 							Env: []apiv1.EnvVar{
 								{
