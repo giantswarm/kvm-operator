@@ -111,6 +111,8 @@ type Reconciler struct {
 // client watches.
 func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 	return func(obj interface{}) {
+		r.logger.Log("debug", "executing the reconciler's add function", "event", "create")
+
 		var runtimeObjects []runtime.Object
 		var namespace *v1.Namespace
 
@@ -131,7 +133,7 @@ func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 		}
 
 		if namespace == nil {
-			r.logger.Log("error", "namespace must not be empty", "event", "delete")
+			r.logger.Log("error", "namespace must not be empty", "event", "create")
 			return
 		}
 
@@ -175,6 +177,8 @@ func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 // other resources being inside this namespace.
 func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 	return func(obj interface{}) {
+		r.logger.Log("debug", "executing the reconciler's delete function", "event", "delete")
+
 		var runtimeObjects []runtime.Object
 		var namespace *v1.Namespace
 
@@ -234,6 +238,8 @@ func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 func (r *Reconciler) GetListWatch() *cache.ListWatch {
 	listWatch := &cache.ListWatch{
 		ListFunc: func(options api.ListOptions) (runtime.Object, error) {
+			r.logger.Log("debug", "executing the reconciler's list function", "event", "list")
+
 			req := r.kubernetesClient.Core().RESTClient().Get().AbsPath(r.listEndpoint)
 			b, err := req.DoRaw()
 			if err != nil {
@@ -248,6 +254,8 @@ func (r *Reconciler) GetListWatch() *cache.ListWatch {
 			return v, nil
 		},
 		WatchFunc: func(options api.ListOptions) (watch.Interface, error) {
+			r.logger.Log("debug", "executing the reconciler's watch function", "event", "watch")
+
 			req := r.kubernetesClient.Core().RESTClient().Get().AbsPath(r.watchEndpoint)
 			stream, err := req.Stream()
 			if err != nil {
