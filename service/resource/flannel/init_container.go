@@ -36,17 +36,8 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 					Value: fmt.Sprintf("%d", customObject.Spec.Cluster.Flannel.VNI),
 				},
 				{
-					Name: "ETCD_ENDPOINT",
-					ValueFrom: &apiv1.EnvVarSource{
-						FieldRef: &apiv1.ObjectFieldSelector{
-							APIVersion: "v1",
-							FieldPath:  "spec.nodeName",
-						},
-					},
-				},
-				{
-					Name:  "ETCD_PORT",
-					Value: fmt.Sprintf("%d", customObject.Spec.Cluster.Etcd.Port),
+					Name:  "ETCD_ENDPOINT",
+					Value: "https://127.0.0.1:2379",
 				},
 				{
 					Name:  "NETWORK", // e.g. 10.9.0.0/16
@@ -59,6 +50,12 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 				{
 					Name:  "SUBNET_LEN", // e.g. 30
 					Value: fmt.Sprintf("%d", customObject.Spec.Cluster.Flannel.Client.SubnetLen),
+				},
+			},
+			VolumeMounts: []apiv1.VolumeMount{
+				{
+					Name:      "etcd-certs",
+					MountPath: "/etc/kubernetes/ssl/etcd/",
 				},
 			},
 		},
