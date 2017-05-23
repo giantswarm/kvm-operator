@@ -30,7 +30,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apiv1.ObjectMeta{
-				Name: "master",
+				GenerateName: "master-",
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(*customObject),
 					"customer": resource.ClusterCustomer(*customObject),
