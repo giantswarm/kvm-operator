@@ -100,8 +100,10 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
 								},
-								Args: []string{
-									"master",
+								Command: []string{
+									"/bin/sh",
+									"-c",
+									"/docker-entrypoint.sh master",
 								},
 								Env: []apiv1.EnvVar{
 									{
