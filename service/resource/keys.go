@@ -27,8 +27,8 @@ func ClusterNamespace(customObject kvmtpr.CustomObject) string {
 	return ClusterID(customObject)
 }
 
-func ConfigMapName(customObject kvmtpr.CustomObject, node node.Node) string {
-	return fmt.Sprintf("%s-%s", ClusterID(customObject), node.ID)
+func ConfigMapName(customObject kvmtpr.CustomObject, node node.Node, prefix string) string {
+	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
 func NetworkBridgeName(ID string) string {
