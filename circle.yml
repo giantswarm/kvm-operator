@@ -15,6 +15,6 @@ test:
 
 deployment:
   master:
-    branch: k8s-kvm
+    branch: master
     commands:
       - ./architect deploy
