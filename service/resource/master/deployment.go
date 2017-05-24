@@ -62,7 +62,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: resource.ConfigMapName(*customObject, masterNode),
+											Name: resource.ConfigMapName(*customObject, masterNode, "master"),
 										},
 									},
 								},

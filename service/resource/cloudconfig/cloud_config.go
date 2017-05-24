@@ -81,7 +81,12 @@ func (s *Service) GetForDelete(obj interface{}) ([]runtime.Object, error) {
 	return nil, nil
 }
 
-func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string, params cloudconfig.Params) (*v1.ConfigMap, error) {
+// newConfigMap creates a new Kubernetes configmap using the provided
+// information. customObject is used for name and label creation. params serves
+// as structure being injected into the template execution to interpolate
+// variables. prefix can be either "master" or "worker" and is used to prefix
+// the configmap name.
+func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string, params cloudconfig.Params, prefix string) (*v1.ConfigMap, error) {
 	var err error
 
 	var newCloudConfig *cloudconfig.CloudConfig
@@ -101,7 +106,7 @@ func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string
 	{
 		newConfigMap = &v1.ConfigMap{
 			ObjectMeta: v1.ObjectMeta{
-				Name: resource.ConfigMapName(customObject, params.Node),
+				Name: resource.ConfigMapName(customObject, params.Node, prefix),
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(customObject),
 					"customer": resource.ClusterCustomer(customObject),
@@ -142,7 +147,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 			params.Node = mn
 		}
 
-		cm, err := s.newConfigMap(*customObject, cloudconfig.MasterTemplate, params)
+		cm, err := s.newConfigMap(*customObject, cloudconfig.MasterTemplate, params, "master")
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
@@ -162,7 +167,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 			params.Node = wn
 		}
 
-		cm, err := s.newConfigMap(*customObject, cloudconfig.WorkerTemplate, params)
+		cm, err := s.newConfigMap(*customObject, cloudconfig.WorkerTemplate, params, "worker")
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
