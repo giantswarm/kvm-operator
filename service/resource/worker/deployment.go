@@ -88,7 +88,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 							{
 								Name: "k8s-kvm",
 								//Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
-								Image:           "quay.io/giantswarm/k8s-kvm:17a09290ae48a4e2ccd929df2506a18f90c20dd5",
+								Image:           "quay.io/giantswarm/k8s-kvm:c064435bf211cc4af7bfe03ff3f3ce9946079e20",
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
