@@ -77,6 +77,14 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							},
 						},
 						{
+							Name: "etcd-certs",
+							VolumeSource: apiv1.VolumeSource{
+								HostPath: &apiv1.HostPathVolumeSource{
+									Path: "/etc/giantswarm/g8s/ssl/etcd/",
+								},
+							},
+						},
+						{
 							Name: "etc-systemd",
 							VolumeSource: apiv1.VolumeSource{
 								HostPath: &apiv1.HostPathVolumeSource{
