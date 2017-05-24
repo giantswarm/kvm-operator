@@ -81,6 +81,11 @@ func (s *Service) GetForDelete(obj interface{}) ([]runtime.Object, error) {
 	return nil, nil
 }
 
+// newConfigMap creates a new Kubernetes configmap using the provided
+// information. customObject is used for name and label creation. params serves
+// as structure being injected into the template execution to interpolate
+// variables. prefix can be either "master" or "worker" and is used to prefix
+// the configmap name.
 func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string, params cloudconfig.Params, prefix string) (*v1.ConfigMap, error) {
 	var err error
 
