@@ -29,11 +29,11 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 			Env: []apiv1.EnvVar{
 				{
 					Name:  "BACKEND_TYPE", // e.g. vxlan
-					Value: customObject.Spec.Cluster.Flannel.Backend,
+					Value: customObject.Spec.KVM.Flannel.Backend,
 				},
 				{
 					Name:  "BACKEND_VNI", // e.g. 9
-					Value: fmt.Sprintf("%d", customObject.Spec.Cluster.Flannel.VNI),
+					Value: fmt.Sprintf("%d", customObject.Spec.KVM.Flannel.VNI),
 				},
 				{
 					Name:  "ETCD_ENDPOINT",
@@ -41,7 +41,7 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 				},
 				{
 					Name:  "NETWORK", // e.g. 10.9.0.0/16
-					Value: customObject.Spec.Cluster.Flannel.Network,
+					Value: customObject.Spec.KVM.Flannel.Network,
 				},
 				{
 					Name:  "NETWORK_BRIDGE_NAME", // e.g. br-h8s2l
@@ -49,7 +49,7 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 				},
 				{
 					Name:  "SUBNET_LEN", // e.g. 30
-					Value: fmt.Sprintf("%d", customObject.Spec.Cluster.Flannel.Client.SubnetLen),
+					Value: fmt.Sprintf("%d", customObject.Spec.KVM.Flannel.Client.SubnetLen),
 				},
 			},
 			VolumeMounts: []apiv1.VolumeMount{
