@@ -1,5 +1,5 @@
 hash: 3ae450545464c7e0eaa03512ea18072649460626536628afe71a53231f03e159
-updated: 2017-05-29T11:35:56.178126032+02:00
+updated: 2017-05-29T16:29:52.76768109+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -59,7 +59,7 @@ imports:
 - name: github.com/giantswarm/certificatetpr
   version: 989414c916fafbc70d7e09fb48ef053b7290a9e4
 - name: github.com/giantswarm/clustertpr
-  version: 3725e2e96aad0963224cef95b0cad534d94cb4cb
+  version: 209745d7dd533b09dc3dace629aa50c328451018
   subpackages:
   - calico
   - cluster
@@ -77,12 +77,13 @@ imports:
   - kubernetes/kubelet
   - kubernetes/networksetup
   - kubernetes/networksetup/docker
+  - kubernetes/ssh
   - node
   - vault
 - name: github.com/giantswarm/k8scloudconfig
-  version: 598dcd84ccf3dd184f135e48e06e260456e141f5
+  version: e61ca3e2aa1d7950e7161264c1e4ab7b5d0ca6a2
 - name: github.com/giantswarm/kvmtpr
-  version: 882bd80c882ff02d1ad4e705b5fbbc6c212b02ea
+  version: b93ee09e0009e652fe47a3290295d27bbae1216b
   subpackages:
   - kvm
   - kvm/endpointupdater
@@ -320,7 +321,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 - name: k8s.io/client-go
   version: e121606b0d09b2e1c467183ee46217fa85a6b672
   subpackages:

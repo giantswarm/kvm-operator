@@ -2,6 +2,9 @@ package cloudconfig
 
 const (
 	MasterTemplate = `#cloud-config
+ssh_authorized_keys:
+{{range .Cluster.Kubernetes.SSH.PublicKeys}}
+- '{{.}}'{{end}}
 write_files:
 - path: /srv/calico-policy-controller-sa.yaml
   owner: root
@@ -44,7 +47,7 @@ write_files:
 
       # Configure the Calico backend to use.
       calico_backend: "bird"
-    
+
       # The CNI network configuration to install on each node.
       # TODO: Do we still need to set MTU manually?
       cni_network_config: |-
@@ -70,16 +73,16 @@ write_files:
                 "kubeconfig": "__KUBECONFIG_FILEPATH__"
             }
         }
-    
+
       etcd_ca: "/etc/kubernetes/ssl/etcd/client-ca.pem"
       etcd_cert: "/etc/kubernetes/ssl/etcd/client-crt.pem"
       etcd_key: "/etc/kubernetes/ssl/etcd/client-key.pem"
-    
+
 - path: /srv/calico-ds.yaml
   owner: root
   permissions: 644
   content: |
-    
+
     # This manifest installs the calico/node container, as well
     # as the Calico CNI plugins and network config on
     # each master and worker node in a Kubernetes cluster.
@@ -504,6 +507,15 @@ write_files:
                 scheme: HTTP
               initialDelaySeconds: 30
               timeoutSeconds: 5
+            ports:
+            - containerPort: 8080
+            resources:
+              limits:
+                cpu: 10m
+                memory: 20Mi
+              requests:
+                cpu: 10m
+                memory: 20Mi
 - path: /srv/default-backend-svc.yml
   owner: root
   permissions: 0644
@@ -531,7 +543,7 @@ write_files:
     metadata:
       name: ingress-nginx
       labels:
-      k8s-addon: ingress-nginx.addons.k8s.io
+        k8s-addon: ingress-nginx.addons.k8s.io
     data:
       server-name-hash-bucket-size: "1024"
       server-name-hash-max-size: "1024"
@@ -658,71 +670,50 @@ write_files:
   permissions: 0544
   content: |
       #!/bin/bash
-      while ! curl --output /dev/null --silent --head --fail --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem "https://{{.Cluster.Kubernetes.API.Domain}}:443"; do sleep 1 && echo 'Waiting for master'; done
-      curl -o /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.6.1/bin/linux/amd64/kubectl 
+      # get kubectl
+      curl -o /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.6.1/bin/linux/amd64/kubectl
       chmod +x /opt/bin/kubectl
+
+      # wait for healthy master
       while [ "$(/opt/bin/kubectl get cs | grep Healthy | wc -l)" -ne "3" ];do sleep 1 && echo 'Waiting for healthy k8s'; done
 
-      echo "K8S: Calico node config map"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/calico-configmap.yaml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/api/v1/namespaces/kube-system/configmaps"
-      echo "K8S: Calico node ServiceAccount"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/calico-node-sa.yaml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/api/v1/namespaces/kube-system/serviceaccounts"
-      echo "K8S: Calico policy controller ServiceAccount"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/calico-policy-controller-sa.yaml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/api/v1/namespaces/kube-system/serviceaccounts"
-      echo "K8S: Calico node ds"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/calico-ds.yaml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/apis/extensions/v1beta1/namespaces/kube-system/daemonsets"
-      echo "K8S: Calico policy "
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/calico-policy-controller.yaml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/apis/extensions/v1beta1/namespaces/kube-system/deployments"
+      # apply calico CNI
+      CALICO_FILES="calico-configmap.yaml calico-node-sa.yaml calico-policy-controller-sa.yaml calico-ds.yaml calico-policy-controller.yaml"
 
-      echo "K8S: DNS addons"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/kubedns-dep.yaml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/apis/extensions/v1beta1/namespaces/kube-system/deployments"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/kubedns-svc.yaml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/api/v1/namespaces/kube-system/services"
+      for manifest in $CALICO_FILES
+      do
+          while
+              /opt/bin/kubectl --kubeconfig=/etc/kubernetes/config/kubelet-kubeconfig.yml apply -f /srv/$manifest
+              [ "$?" -ne "0" ]
+          do
+              echo "failed to apply /src/$manifest, retrying in 5 sec"
+              sleep 5s
+          done
+      done
 
-      echo "K8S: Default Backend"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/default-backend-dep.yml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/apis/extensions/v1beta1/namespaces/kube-system/deployments"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/default-backend-svc.yml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/api/v1/namespaces/kube-system/services"
+      # wait for healthy calico - we check for pods - desired vs ready
+      while
+          # result of this is 'eval [ "$DESIRED_POD_COUNT" -eq "$READY_POD_COUNT" ]'
+          eval $(/opt/bin/kubectl --kubeconfig=/etc/kubernetes/config/kubelet-kubeconfig.yml -n kube-system get ds calico-node | tail -1 | awk '{print "[ \"" $2"\" -eq \""$3"\" ] "}')
+          [ "$?" -ne "0" ]
+      do
+          echo "Waiting for calico to be ready . . "
+          sleep 3s
+      done
 
-      echo "K8S: Ingress Controller"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/ingress-controller-cm.yml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/apis/extensions/v1beta1/namespaces/kube-system/configmaps"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/ingress-controller-dep.yml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/apis/extensions/v1beta1/namespaces/kube-system/deployments"
-      curl -H "Content-Type: application/yaml" \
-        -XPOST -d"$(cat /srv/ingress-controller-svc.yml)" \
-        --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem \
-        "https://{{.Cluster.Kubernetes.API.Domain}}:443/api/v1/namespaces/kube-system/services"
+      # apply k8s addons
+      MANIFESTS="kubedns-dep.yaml kubedns-svc.yaml default-backend-dep.yml default-backend-svc.yml ingress-controller-cm.yml ingress-controller-dep.yml ingress-controller-svc.yml"
 
+      for manifest in $MANIFESTS
+      do
+          while
+              /opt/bin/kubectl --kubeconfig=/etc/kubernetes/config/kubelet-kubeconfig.yml apply -f /srv/$manifest
+              [ "$?" -ne "0" ]
+          do
+              echo "failed to apply /src/$manifest, retrying in 5 sec"
+              sleep 5s
+          done
+      done
       echo "Addons successfully installed"
 - path: /etc/kubernetes/config/proxy-kubeconfig.yml
   owner: root
@@ -916,7 +907,7 @@ coreos:
       Requires=k8s-setup-network-env.service
       After=k8s-setup-network-env.service
       Conflicts=etcd.service etcd2.service
-      
+
       [Service]
       StartLimitIntervalSec=0
       Restart=always
@@ -1224,6 +1215,9 @@ coreos:
 `
 
 	WorkerTemplate = `#cloud-config
+ssh_authorized_keys:
+{{range .Cluster.Kubernetes.SSH.PublicKeys}}
+- '{{.}}'{{end}}
 write_files:
 - path: /etc/kubernetes/config/proxy-kubeconfig.yml
   owner: root
