@@ -1,5 +1,5 @@
-hash: c7606cec78c868af92777083f2fd4a8e3ecc8be1320b24d76d472febc431bb5d
-updated: 2017-05-22T18:24:34.826779028+02:00
+hash: 3ae450545464c7e0eaa03512ea18072649460626536628afe71a53231f03e159
+updated: 2017-05-29T11:35:56.178126032+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -59,7 +59,7 @@ imports:
 - name: github.com/giantswarm/certificatetpr
   version: 989414c916fafbc70d7e09fb48ef053b7290a9e4
 - name: github.com/giantswarm/clustertpr
-  version: 978d75bd50744b23be1bc6370035e88f9c35447b
+  version: 3725e2e96aad0963224cef95b0cad534d94cb4cb
   subpackages:
   - calico
   - cluster
@@ -68,9 +68,6 @@ imports:
   - docker/daemon
   - docker/registry
   - etcd
-  - flannel
-  - flannel/client
-  - flannel/docker
   - kubernetes
   - kubernetes/api
   - kubernetes/dns
@@ -83,13 +80,16 @@ imports:
   - node
   - vault
 - name: github.com/giantswarm/k8scloudconfig
-  version: c27d83ccde69dae71c2ba1eb931d95cc7b58d031
+  version: 598dcd84ccf3dd184f135e48e06e260456e141f5
 - name: github.com/giantswarm/kvmtpr
-  version: 2a1bfd58d42916dacbb35e2f00462c99f379b8d6
+  version: 882bd80c882ff02d1ad4e705b5fbbc6c212b02ea
   subpackages:
   - kvm
   - kvm/endpointupdater
   - kvm/endpointupdater/docker
+  - kvm/flannel
+  - kvm/flannel/client
+  - kvm/flannel/docker
   - kvm/k8skvm
   - kvm/k8skvm/docker
   - kvm/kubectl
@@ -126,7 +126,7 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/operatorkit
-  version: 31b81e1c5609e7fc499570878e85009f7c7cf63f
+  version: 253b2cac8d5cca3df855a6eb4a20783d0a61662d
   subpackages:
   - secret/cert
 - name: github.com/go-kit/kit
@@ -207,13 +207,13 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
-  version: cc8532a8e9a55ea36402aa21efdf403a60d34096
+  version: d0303fe809921458f417bcf828397a65db30a7e4
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/pelletier/go-buffruneio
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: 5c26a6ff6fd178719e15decac1c8196da0d7d6d1
+  version: 048765b4491bcff26505dfbb8a7b920133a19fd2
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -246,7 +246,7 @@ imports:
 - name: github.com/spf13/cobra
   version: 4c05eb1145f16d0e6bb4a3e1b6d769f4713cb41f
 - name: github.com/spf13/jwalterweatherman
-  version: 8f07c835e5cc1450c082fe3a439cf87b0cbb2d99
+  version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
   version: 08b1a584251b5b62f458943640fc8ebd4d50aaa5
 - name: github.com/spf13/viper
@@ -320,7 +320,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/client-go
   version: e121606b0d09b2e1c467183ee46217fa85a6b672
   subpackages:
