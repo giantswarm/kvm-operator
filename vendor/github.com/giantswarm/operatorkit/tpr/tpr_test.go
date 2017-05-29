@@ -20,14 +20,101 @@ func newClientset(nodes int) *fake.Clientset {
 	return clientset
 }
 
+func TestKindGroupAndAPIVersion(t *testing.T) {
+	clientset := newClientset(3)
+
+	config := Config{
+		Clientset: clientset,
+
+		Name:        "test-name.example.com",
+		Version:     "v1test1",
+		Description: "Test Desc",
+	}
+
+	tpr, err := New(config)
+	assert.NoError(t, err, "New")
+
+	assert.Equal(t, "TestName", tpr.Kind())
+	assert.Equal(t, "example.com/v1test1", tpr.APIVersion())
+	assert.Equal(t, config.Name, tpr.Name())
+	assert.Equal(t, "example.com", tpr.Group())
+
+	// Rest of tests should be covered in extractKindAndGroup tests.
+}
+
+func TestEndpoint(t *testing.T) {
+	clientset := newClientset(3)
+
+	config := Config{
+		Clientset: clientset,
+
+		Name:        "test-name.example.com",
+		Version:     "v1test1",
+		Description: "Test Desc",
+	}
+
+	tpr, err := New(config)
+	assert.NoError(t, err, "New")
+
+	tests := []struct {
+		namespace        string
+		expectedEndpoint string
+	}{
+		{
+			namespace:        "default",
+			expectedEndpoint: "/apis/example.com/v1test1/namespace/default/testnames",
+		},
+		{
+			namespace:        "",
+			expectedEndpoint: "/apis/example.com/v1test1/testnames",
+		},
+	}
+	for i, tc := range tests {
+		endpoint := tpr.Endpoint(tc.namespace)
+		assert.Equal(t, tc.expectedEndpoint, endpoint, "#%d", i)
+	}
+}
+
+func TestWatchEndpoint(t *testing.T) {
+	clientset := newClientset(3)
+
+	config := Config{
+		Clientset: clientset,
+
+		Name:        "test-name.example.com",
+		Version:     "v1test1",
+		Description: "Test Desc",
+	}
+
+	tpr, err := New(config)
+	assert.NoError(t, err, "New")
+
+	tests := []struct {
+		namespace             string
+		expectedWatchEndpoint string
+	}{
+		{
+			namespace:             "default",
+			expectedWatchEndpoint: "/apis/example.com/v1test1/namespace/default/watch/testnames",
+		},
+		{
+			namespace:             "",
+			expectedWatchEndpoint: "/apis/example.com/v1test1/watch/testnames",
+		},
+	}
+	for i, tc := range tests {
+		watchEndpoint := tpr.WatchEndpoint(tc.namespace)
+		assert.Equal(t, tc.expectedWatchEndpoint, watchEndpoint, "#%d", i)
+	}
+}
+
 func TestCreateTPR(t *testing.T) {
 	clientset := newClientset(3)
 
 	config := Config{
 		Clientset: clientset,
 
-		Name:        "testname",
-		Domain:      "example.com",
+		Name:        "test-name.example.com",
 		Version:     "v1test1",
 		Description: "Test Desc",
 	}
@@ -44,7 +131,7 @@ func TestCreateTPR(t *testing.T) {
 	resp, err = clientset.ExtensionsV1beta1().ThirdPartyResources().List(v1.ListOptions{})
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp.Items))
-	assert.Equal(t, config.Name+"."+config.Domain, resp.Items[0].Name)
+	assert.Equal(t, config.Name, resp.Items[0].Name)
 	assert.Equal(t, 1, len(resp.Items[0].Versions))
 	assert.Equal(t, "v1test1", resp.Items[0].Versions[0].Name)
 	assert.Equal(t, "Test Desc", resp.Items[0].Description)

@@ -136,7 +136,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 					Containers: []apiv1.Container{
 						{
 							Name:            "flannel-client",
-							Image:           customObject.Spec.Cluster.Flannel.Docker.Image,
+							Image:           customObject.Spec.KVM.Flannel.Docker.Image,
 							ImagePullPolicy: apiv1.PullAlways,
 							Command: []string{
 								"/bin/sh",
@@ -179,7 +179,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 							Command: []string{
 								"/bin/sh",
 								"-c",
-								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo \"Waiting for ${NETWORK_ENV_FILE_PATH} to be created\"; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${NETWORK_SUBNET_RANGE}",
+								"while [ ! -f ${NETWORK_ENV_FILE_PATH} ]; do echo \"Waiting for ${NETWORK_ENV_FILE_PATH} to be created\"; sleep 1; done; /docker-entrypoint.sh create ${NETWORK_ENV_FILE_PATH} ${NETWORK_BRIDGE_NAME} ${NETWORK_INTERFACE_NAME} ${HOST_PRIVATE_NETWORK}",
 							},
 							Env: []apiv1.EnvVar{
 								{
@@ -187,8 +187,8 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 									Value: resource.NetworkEnvFilePath(resource.ClusterID(*customObject)),
 								},
 								{
-									Name:  "NETWORK_SUBNET_RANGE",
-									Value: customObject.Spec.Cluster.Flannel.Network,
+									Name:  "HOST_PRIVATE_NETWORK",
+									Value: customObject.Spec.KVM.Flannel.PrivateNetwork,
 								},
 								{
 									Name:  "NETWORK_BRIDGE_NAME",
@@ -196,7 +196,7 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 								},
 								{
 									Name:  "NETWORK_INTERFACE_NAME",
-									Value: customObject.Spec.Cluster.Flannel.Interface,
+									Value: customObject.Spec.KVM.Flannel.Interface,
 								},
 							},
 							SecurityContext: &apiv1.SecurityContext{
