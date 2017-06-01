@@ -1,5 +1,5 @@
 hash: 3ae450545464c7e0eaa03512ea18072649460626536628afe71a53231f03e159
-updated: 2017-05-29T16:29:52.76768109+02:00
+updated: 2017-06-01T12:07:03.267446614+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -59,7 +59,7 @@ imports:
 - name: github.com/giantswarm/certificatetpr
   version: 989414c916fafbc70d7e09fb48ef053b7290a9e4
 - name: github.com/giantswarm/clustertpr
-  version: 209745d7dd533b09dc3dace629aa50c328451018
+  version: 13ee60687afcd5e519d1d3e8a60c1c57d2d21ccf
   subpackages:
   - calico
   - cluster
@@ -74,6 +74,8 @@ imports:
   - kubernetes/hyperkube
   - kubernetes/hyperkube/docker
   - kubernetes/ingress
+  - kubernetes/kubectl
+  - kubernetes/kubectl/docker
   - kubernetes/kubelet
   - kubernetes/networksetup
   - kubernetes/networksetup/docker
@@ -81,9 +83,9 @@ imports:
   - node
   - vault
 - name: github.com/giantswarm/k8scloudconfig
-  version: e61ca3e2aa1d7950e7161264c1e4ab7b5d0ca6a2
+  version: 29623f0db688edae78bbf9030708111c4cbe3765
 - name: github.com/giantswarm/kvmtpr
-  version: b93ee09e0009e652fe47a3290295d27bbae1216b
+  version: 9e2f4a7a1718134df121594efccc224a76de3e58
   subpackages:
   - kvm
   - kvm/endpointupdater
@@ -127,7 +129,7 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/operatorkit
-  version: 253b2cac8d5cca3df855a6eb4a20783d0a61662d
+  version: 36e0e3721647690e12d26e2e2cf31da81b8559ff
   subpackages:
   - secret/cert
 - name: github.com/go-kit/kit
@@ -214,7 +216,7 @@ imports:
 - name: github.com/pelletier/go-buffruneio
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: 048765b4491bcff26505dfbb8a7b920133a19fd2
+  version: 5ccdfb18c776b740aecaf085c4d9a2779199c279
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -321,7 +323,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/client-go
   version: e121606b0d09b2e1c467183ee46217fa85a6b672
   subpackages:
