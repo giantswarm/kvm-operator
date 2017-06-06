@@ -546,7 +546,7 @@ func (s *server) newNotFoundHandler() http.Handler {
 }
 
 // newRequestContext creates a new request context and enriches it with request
-// relevant information. E.g. here we put the HTTP X-Transaction-ID header into
+// relevant information. E.g. here we put the HTTP X-Idempotency-Key header into
 // the request context, if any. We also check if there is a transaction response
 // already tracked for the given transaction ID. This information is then stored
 // within the given request context as well. Note that we initialize the
