@@ -50,6 +50,25 @@ func (me *MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
+		// Etcd client.
+		k8scloudconfig.FileMetadata{
+			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
+			Path:         "/etc/kubernetes/ssl/etcd/client-ca.pem",
+			Owner:        FileOwner,
+			Permissions:  FilePermission,
+		},
+		k8scloudconfig.FileMetadata{
+			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
+			Path:         "/etc/kubernetes/ssl/etcd/client-crt.pem",
+			Owner:        FileOwner,
+			Permissions:  FilePermission,
+		},
+		k8scloudconfig.FileMetadata{
+			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
+			Path:         "/etc/kubernetes/ssl/etcd/client-key.pem",
+			Owner:        FileOwner,
+			Permissions:  FilePermission,
+		},
 		// Etcd server.
 		k8scloudconfig.FileMetadata{
 			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
