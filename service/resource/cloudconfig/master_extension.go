@@ -131,3 +131,7 @@ func (me *MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 func (me *MasterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 	return nil, nil
 }
+
+func (me *MasterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
+	return nil
+}

@@ -93,3 +93,7 @@ func (we *WorkerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 func (we *WorkerExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 	return nil, nil
 }
+
+func (we *WorkerExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
+	return nil
+}
