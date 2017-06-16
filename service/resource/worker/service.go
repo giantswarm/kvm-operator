@@ -1,11 +1,13 @@
 package worker
 
 import (
-	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/util/intstr"
+
+	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
@@ -33,10 +35,16 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 			Type: apiv1.ServiceTypeLoadBalancer,
 			Ports: []apiv1.ServicePort{
 				{
-					Name: "http",
-					//Port:     int32(customObject.Spec.Cluster.Kubernetes.Kubelet.Port),
-					Port:     int32(8000),
-					Protocol: "TCP",
+					Name:       "http",
+					Port:       int32(30010),
+					Protocol:   apiv1.ProtocolTCP,
+					TargetPort: intstr.FromInt(30010),
+				},
+				{
+					Name:       "https",
+					Port:       int32(30011),
+					Protocol:   apiv1.ProtocolTCP,
+					TargetPort: intstr.FromInt(30011),
 				},
 			},
 			// Note that we do not use a selector definition on purpose to be able to
