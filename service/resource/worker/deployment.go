@@ -88,6 +88,43 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 						},
 						Containers: []apiv1.Container{
 							{
+								Name:            "k8s-endpoint-updater",
+								Image:           customObject.Spec.KVM.EndpointUpdater.Docker.Image,
+								ImagePullPolicy: apiv1.PullIfNotPresent,
+								Command: []string{
+									"/bin/sh",
+									"-c",
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.cluster.service=worker --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}; while true; do sleep inf; done",
+								},
+								SecurityContext: &apiv1.SecurityContext{
+									Privileged: &privileged,
+								},
+								Env: []apiv1.EnvVar{
+									{
+										Name:  "NETWORK_BRIDGE_NAME",
+										Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
+									},
+									{
+										Name: "POD_NAME",
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												APIVersion: "v1",
+												FieldPath:  "metadata.name",
+											},
+										},
+									},
+									{
+										Name: "POD_NAMESPACE",
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												APIVersion: "v1",
+												FieldPath:  "metadata.namespace",
+											},
+										},
+									},
+								},
+							},
+							{
 								Name:            "k8s-kvm",
 								Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
@@ -128,11 +165,15 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 										Name:  "ROLE",
 										Value: "worker",
 									},
+									{
+										Name:  "CLOUD_CONFIG_PATH",
+										Value: "/cloudconfig/user_data",
+									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{
 									{
 										Name:      "cloud-config",
-										MountPath: "/usr/code/cloudconfig/openstack/latest/",
+										MountPath: "/cloudconfig/",
 									},
 									{
 										Name:      "images",

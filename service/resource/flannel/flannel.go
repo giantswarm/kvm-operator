@@ -1,12 +1,10 @@
 package flannel
 
 import (
-	"encoding/json"
-
+	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
-	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
-	"k8s.io/client-go/pkg/runtime"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 // Config represents the configuration used to create a new service.
@@ -45,68 +43,29 @@ type Service struct {
 	logger micrologger.Logger
 }
 
-// GetForCreate returns the Kubernetes runtime object for the flannel resource
-// being used in reconciliation loops on create events.
-func (s *Service) GetForCreate(obj interface{}) ([]runtime.Object, error) {
-	ros, err := s.newRuntimeObjects(obj)
-	if err != nil {
-		return nil, microerror.MaskAny(err)
+func (s *Service) Containers(obj interface{}) ([]apiv1.Container, error) {
+	customObject, ok := obj.(*kvmtpr.CustomObject)
+	if !ok {
+		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
-	return ros, nil
+	return s.newContainers(customObject), nil
 }
 
-// GetForDelete returns the Kubernetes runtime object for the flannel resource
-// being used in reconciliation loops on delete events. Note that deleting a
-// flannel resources happens implicity by deleting the namespace the flannel
-// resource is attached to. This is why we do not return any implementation
-// here, but nil. That causes the reconcilliation to ignore the deletion for
-// this resource.
-func (s *Service) GetForDelete(obj interface{}) ([]runtime.Object, error) {
-	return nil, nil
+func (s *Service) InitContainers(obj interface{}) ([]apiv1.Container, error) {
+	customObject, ok := obj.(*kvmtpr.CustomObject)
+	if !ok {
+		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
+	}
+
+	return s.newInitContainers(customObject), nil
 }
 
-func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
-	var err error
-	var runtimeObjects []runtime.Object
-
-	var initContainers string
-	{
-		ics, err := s.newInitContainers(obj)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		marshalled, err := json.Marshal(ics)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		initContainers = string(marshalled)
+func (s *Service) Volumes(obj interface{}) ([]apiv1.Volume, error) {
+	customObject, ok := obj.(*kvmtpr.CustomObject)
+	if !ok {
+		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
-	var podAffinity string
-	{
-		pa, err := s.newPodAfinity(obj)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		marshalled, err := json.Marshal(pa)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		podAffinity = string(marshalled)
-	}
-
-	var newDeployment *extensionsv1.Deployment
-	{
-		newDeployment, err = s.newDeployment(obj)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		newDeployment.Spec.Template.Annotations["pod.beta.kubernetes.io/init-containers"] = initContainers
-		newDeployment.Spec.Template.Annotations["scheduler.alpha.kubernetes.io/affinity"] = podAffinity
-	}
-
-	runtimeObjects = append(runtimeObjects, newDeployment)
-
-	return runtimeObjects, nil
+	return s.newVolumes(customObject), nil
 }

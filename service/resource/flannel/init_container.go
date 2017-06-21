@@ -4,21 +4,15 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/kvmtpr"
-	microerror "github.com/giantswarm/microkit/error"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
-func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) {
-	customObject, ok := obj.(*kvmtpr.CustomObject)
-	if !ok {
-		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
-	}
-
+func (s *Service) newInitContainers(customObject *kvmtpr.CustomObject) []apiv1.Container {
 	privileged := true
 
-	initContainers := []apiv1.Container{
+	return []apiv1.Container{
 		{
 			Name:            "k8s-network-config",
 			Image:           customObject.Spec.KVM.Network.Config.Docker.Image,
@@ -60,6 +54,4 @@ func (s *Service) newInitContainers(obj interface{}) ([]apiv1.Container, error) 
 			},
 		},
 	}
-
-	return initContainers, nil
 }

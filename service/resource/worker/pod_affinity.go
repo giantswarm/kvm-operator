@@ -23,24 +23,10 @@ func (s *Service) newPodAfinity(obj interface{}) (*api.Affinity, error) {
 							{
 								Key:      "app",
 								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{"worker"},
-							},
-						},
-					},
-					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{resource.ClusterID(*customObject)},
-				},
-			},
-		},
-		PodAffinity: &api.PodAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
-				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
-							{
-								Key:      "app",
-								Operator: apiunversioned.LabelSelectorOpIn,
-								Values:   []string{"flannel-client"},
+								Values: []string{
+									"master",
+									"worker",
+								},
 							},
 						},
 					},
