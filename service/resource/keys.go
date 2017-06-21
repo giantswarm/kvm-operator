@@ -2,6 +2,8 @@ package resource
 
 import (
 	"fmt"
+	"net"
+	"strings"
 
 	"github.com/giantswarm/clustertpr/node"
 	"github.com/giantswarm/kvmtpr"
@@ -33,6 +35,18 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node node.Node, prefix stri
 
 func NetworkBridgeName(ID string) string {
 	return fmt.Sprintf("br-%s", ID)
+}
+
+func NetworkDNSBlock(servers []net.IP) string {
+	var dnsBlockParts []string
+
+	for _, s := range servers {
+		dnsBlockParts = append(dnsBlockParts, fmt.Sprintf("DNS=%s", s.String()))
+	}
+
+	dnsBlock := strings.Join(dnsBlockParts, "\n")
+
+	return dnsBlock
 }
 
 func NetworkEnvFilePath(ID string) string {

@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"net"
 	"testing"
 
 	"github.com/giantswarm/clustertpr"
@@ -52,5 +53,19 @@ func TestClusterCustomer(t *testing.T) {
 
 	if ClusterCustomer(customObject) != expectedID {
 		t.Fatalf("Expected customer ID %s but was %s", expectedID, ClusterCustomer(customObject))
+	}
+}
+
+func Test_NetworkDNSBlock(t *testing.T) {
+	dnsServers := NetworkDNSBlock([]net.IP{
+		net.ParseIP("8.8.8.8"),
+		net.ParseIP("8.8.4.4"),
+	})
+
+	expected := `DNS=8.8.8.8
+DNS=8.8.4.4`
+
+	if dnsServers != expected {
+		t.Fatal("expected", expected, "got", dnsServers)
 	}
 }
