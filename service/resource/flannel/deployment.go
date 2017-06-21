@@ -195,6 +195,10 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 									Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 								},
 								{
+									Name:  "NETWORK_DNS_BLOCK",
+									Value: resource.NetworkDNSBlock(customObject.Spec.KVM.DNS.Servers),
+								},
+								{
 									Name:  "NETWORK_INTERFACE_NAME",
 									Value: customObject.Spec.KVM.Flannel.Interface,
 								},
