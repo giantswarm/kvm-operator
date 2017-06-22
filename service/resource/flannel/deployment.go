@@ -199,6 +199,10 @@ func (s *Service) newDeployment(obj interface{}) (*extensionsv1.Deployment, erro
 									Value: resource.NetworkDNSBlock(customObject.Spec.KVM.DNS.Servers),
 								},
 								{
+									Name:  "NETWORK_NTP_BLOCK",
+									Value: resource.NetworkNTPBlock(customObject.Spec.KVM.NTP.Servers),
+								},
+								{
 									Name:  "NETWORK_INTERFACE_NAME",
 									Value: customObject.Spec.KVM.Flannel.Interface,
 								},

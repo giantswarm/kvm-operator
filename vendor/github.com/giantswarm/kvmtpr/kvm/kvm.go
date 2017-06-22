@@ -8,6 +8,7 @@ import (
 	"github.com/giantswarm/kvmtpr/kvm/kubectl"
 	"github.com/giantswarm/kvmtpr/kvm/network"
 	"github.com/giantswarm/kvmtpr/kvm/node"
+	"github.com/giantswarm/kvmtpr/kvm/ntp"
 )
 
 type KVM struct {
@@ -18,5 +19,6 @@ type KVM struct {
 	Kubectl         kubectl.Kubectl                 `json:"kubectl" yaml:"kubectl"`
 	Masters         []node.Node                     `json:"masters" yaml:"masters"`
 	Network         network.Network                 `json:"network" yaml:"network"`
+	NTP             ntp.NTP                         `json:"ntp" yaml:"ntp"`
 	Workers         []node.Node                     `json:"workers" yaml:"workers"`
 }

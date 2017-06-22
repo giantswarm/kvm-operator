@@ -1,5 +1,5 @@
 hash: 3ae450545464c7e0eaa03512ea18072649460626536628afe71a53231f03e159
-updated: 2017-06-22T12:54:47.55284303+02:00
+updated: 2017-06-22T17:56:39.178659419+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -59,7 +59,7 @@ imports:
 - name: github.com/giantswarm/certificatetpr
   version: 989414c916fafbc70d7e09fb48ef053b7290a9e4
 - name: github.com/giantswarm/clustertpr
-  version: 82b6c105237b50ef62c77ab5cc8696488c133170
+  version: e7fdf931e1699bc9480aaf6d27664b539889918e
   subpackages:
   - calico
   - cluster
@@ -83,9 +83,9 @@ imports:
   - node
   - vault
 - name: github.com/giantswarm/k8scloudconfig
-  version: 78bfc9b0298f6578d3014c316bdcd3df68a9a69d
+  version: b6de4feec7e1ed372a648e0d711ae799a03602fe
 - name: github.com/giantswarm/kvmtpr
-  version: 744b0f0fa895d0fba400b40bd3071444c18f408a
+  version: 7c5d3db4452538d48bc03e315596d5efff738b9c
   subpackages:
   - kvm
   - kvm/dns
@@ -108,6 +108,7 @@ imports:
   - kvm/network/openssl
   - kvm/network/openssl/docker
   - kvm/node
+  - kvm/ntp
 - name: github.com/giantswarm/microkit
   version: 1ac51fb9905e0c7ab5a8d12fec127c6fbfd75aac
   subpackages:
