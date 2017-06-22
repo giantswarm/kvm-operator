@@ -49,6 +49,18 @@ func NetworkDNSBlock(servers []net.IP) string {
 	return dnsBlock
 }
 
+func NetworkNTPBlock(servers []net.IP) string {
+	var ntpBlockParts []string
+
+	for _, s := range servers {
+		ntpBlockParts = append(ntpBlockParts, fmt.Sprintf("NTP=%s", s.String()))
+	}
+
+	ntpBlock := strings.Join(ntpBlockParts, "\n")
+
+	return ntpBlock
+}
+
 func NetworkEnvFilePath(ID string) string {
 	return fmt.Sprintf("/run/flannel/networks/%s.env", NetworkBridgeName(ID))
 }
