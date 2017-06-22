@@ -1,5 +1,5 @@
 hash: 3ae450545464c7e0eaa03512ea18072649460626536628afe71a53231f03e159
-updated: 2017-06-21T11:24:23.943324376+02:00
+updated: 2017-06-22T12:54:47.55284303+02:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -59,7 +59,7 @@ imports:
 - name: github.com/giantswarm/certificatetpr
   version: 989414c916fafbc70d7e09fb48ef053b7290a9e4
 - name: github.com/giantswarm/clustertpr
-  version: 13ee60687afcd5e519d1d3e8a60c1c57d2d21ccf
+  version: 82b6c105237b50ef62c77ab5cc8696488c133170
   subpackages:
   - calico
   - cluster
@@ -85,7 +85,7 @@ imports:
 - name: github.com/giantswarm/k8scloudconfig
   version: 78bfc9b0298f6578d3014c316bdcd3df68a9a69d
 - name: github.com/giantswarm/kvmtpr
-  version: 97e779e0a902b0c2389bfe47c13283e9b37b1870
+  version: 744b0f0fa895d0fba400b40bd3071444c18f408a
   subpackages:
   - kvm
   - kvm/dns
@@ -107,6 +107,7 @@ imports:
   - kvm/network/iptables/docker
   - kvm/network/openssl
   - kvm/network/openssl/docker
+  - kvm/node
 - name: github.com/giantswarm/microkit
   version: 1ac51fb9905e0c7ab5a8d12fec127c6fbfd75aac
   subpackages:
@@ -229,7 +230,7 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 0d0c3d572886e0f2323ed376557f9eb99b97d25b
+  version: 0866df4b85a18d652b6965be022d007cdf076822
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg

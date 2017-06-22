@@ -23,7 +23,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 	privileged := true
 	replicas := int32(1)
 
-	for _, workerNode := range customObject.Spec.Cluster.Workers {
+	for i, workerNode := range customObject.Spec.Cluster.Workers {
+		capabilities := customObject.Spec.KVM.Workers[i]
+
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apiunversioned.TypeMeta{
 				Kind:       "deployment",
@@ -98,12 +100,11 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Env: []apiv1.EnvVar{
 									{
 										Name:  "CORES",
-										Value: fmt.Sprintf("%d", workerNode.CPUs),
+										Value: fmt.Sprintf("%d", capabilities.CPUs),
 									},
 									{
-										Name: "DISK",
-										// TODO this should be configured via clustertpr.Node
-										Value: "4G",
+										Name:  "DISK",
+										Value: fmt.Sprintf("%.0fG", capabilities.Disk),
 									},
 									{
 										Name: "HOSTNAME",
@@ -119,8 +120,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 										Value: resource.NetworkBridgeName(resource.ClusterID(*customObject)),
 									},
 									{
-										Name:  "MEMORY",
-										Value: workerNode.Memory,
+										Name: "MEMORY",
+										// TODO provide memory like disk as float64 and format here.
+										Value: capabilities.Memory,
 									},
 									{
 										Name:  "ROLE",
