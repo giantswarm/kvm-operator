@@ -6,6 +6,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource/flannel"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	"k8s.io/client-go/pkg/api"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/runtime"
@@ -123,13 +124,8 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 			return nil, microerror.MaskAny(err)
 		}
 		for i, _ := range newDeployments {
-			ics := flannelInitContainers
-			icsBytes, err := json.Marshal(ics)
-			if err != nil {
-				return nil, microerror.MaskAny(err)
-			}
-			newDeployments[i].Spec.Template.Annotations["pod.beta.kubernetes.io/init-containers"] = string(icsBytes)
-			newDeployments[i].Spec.Template.Annotations["scheduler.alpha.kubernetes.io/affinity"] = podAffinity
+			newDeployments[i].Spec.Template.Annotations[api.AffinityAnnotationKey] = podAffinity
+			newDeployments[i].Spec.Template.Spec.InitContainers = flannelInitContainers
 			newDeployments[i].Spec.Template.Spec.Containers = append(flannelContainers, newDeployments[i].Spec.Template.Spec.Containers...)
 			newDeployments[i].Spec.Template.Spec.Volumes = append(flannelVolumes, newDeployments[i].Spec.Template.Spec.Volumes...)
 		}
