@@ -32,7 +32,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apiv1.ObjectMeta{
-				GenerateName: "master-",
+				Name: "master-" + masterNode.ID,
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(*customObject),
 					"customer": resource.ClusterCustomer(*customObject),
