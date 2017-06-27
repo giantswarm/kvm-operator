@@ -19,7 +19,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/operator"
 	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
 	cloudconfigresource "github.com/giantswarm/kvm-operator/service/resource/cloudconfig"
-	flannelresource "github.com/giantswarm/kvm-operator/service/resource/flannel"
+	flannelservice "github.com/giantswarm/kvm-operator/service/resource/flannel"
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
@@ -144,13 +144,13 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var flannelResource k8sreconciler.Resource
+	var flannel *flannelservice.Service
 	{
-		flannelConfig := flannelresource.DefaultConfig()
+		flannelConfig := flannelservice.DefaultConfig()
 
 		flannelConfig.Logger = config.Logger
 
-		flannelResource, err = flannelresource.New(flannelConfig)
+		flannel, err = flannelservice.New(flannelConfig)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
@@ -161,6 +161,7 @@ func New(config Config) (*Service, error) {
 		masterConfig := masterresource.DefaultConfig()
 
 		masterConfig.Logger = config.Logger
+		masterConfig.Flannel = flannel
 
 		masterResource, err = masterresource.New(masterConfig)
 		if err != nil {
@@ -185,6 +186,7 @@ func New(config Config) (*Service, error) {
 		workerConfig := workerresource.DefaultConfig()
 
 		workerConfig.Logger = config.Logger
+		workerConfig.Flannel = flannel
 
 		workerResource, err = workerresource.New(workerConfig)
 		if err != nil {
@@ -216,7 +218,6 @@ func New(config Config) (*Service, error) {
 			// series. This is why the cloud config resource has to be registered
 			// second.
 			cloudConfigResource,
-			flannelResource,
 			masterResource,
 			workerResource,
 		}
