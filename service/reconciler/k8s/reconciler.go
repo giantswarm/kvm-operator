@@ -5,13 +5,14 @@ import (
 
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/v1"
+	apisbatchv1 "k8s.io/client-go/pkg/apis/batch/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
-	"k8s.io/client-go/pkg/runtime"
-	"k8s.io/client-go/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -147,8 +148,8 @@ func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 				_, err = r.kubernetesClient.Extensions().Deployments(namespace.Name).Create(t)
 			case *v1beta1.Ingress:
 				_, err = r.kubernetesClient.Extensions().Ingresses(namespace.Name).Create(t)
-			case *v1beta1.Job:
-				_, err = r.kubernetesClient.Extensions().Jobs(namespace.Name).Create(t)
+			case *apisbatchv1.Job:
+				_, err = r.kubernetesClient.BatchV1().Jobs(namespace.Name).Create(t)
 			case *v1.Namespace:
 				_, err = r.kubernetesClient.Core().Namespaces().Create(t)
 			case *v1.Service:
@@ -214,8 +215,8 @@ func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 				err = r.kubernetesClient.Extensions().Deployments(namespace.Name).Delete(t.Name, nil)
 			case *v1beta1.Ingress:
 				err = r.kubernetesClient.Extensions().Ingresses(namespace.Name).Delete(t.Name, nil)
-			case *v1beta1.Job:
-				err = r.kubernetesClient.Extensions().Jobs(namespace.Name).Delete(t.Name, nil)
+			case *apisbatchv1.Job:
+				err = r.kubernetesClient.BatchV1().Jobs(namespace.Name).Delete(t.Name, nil)
 			case *v1.Namespace:
 				err = r.kubernetesClient.Core().Namespaces().Delete(t.Name, nil)
 			case *v1.Service:
@@ -237,7 +238,7 @@ func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 // client watches.
 func (r *Reconciler) GetListWatch() *cache.ListWatch {
 	listWatch := &cache.ListWatch{
-		ListFunc: func(options api.ListOptions) (runtime.Object, error) {
+		ListFunc: func(options apismetav1.ListOptions) (runtime.Object, error) {
 			r.logger.Log("debug", "executing the reconciler's list function", "event", "list")
 
 			req := r.kubernetesClient.Core().RESTClient().Get().AbsPath(r.listEndpoint)
@@ -253,8 +254,8 @@ func (r *Reconciler) GetListWatch() *cache.ListWatch {
 
 			return v, nil
 		},
-		WatchFunc: func(options api.ListOptions) (watch.Interface, error) {
-			r.logger.Log("debug", "executing the reconciler's watch function", "event", "watch")
+		WatchFunc: func(options apismetav1.ListOptions) (watch.Interface, error) {
+			r.logger.Log("debug", "executing Extensionsthe reconciler's watch function", "event", "watch")
 
 			req := r.kubernetesClient.Core().RESTClient().Get().AbsPath(r.watchEndpoint)
 			stream, err := req.Stream()

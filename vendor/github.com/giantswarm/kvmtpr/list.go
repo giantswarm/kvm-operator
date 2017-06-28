@@ -1,13 +1,13 @@
 package kvmtpr
 
 import (
-	"k8s.io/client-go/pkg/api/unversioned"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // List represents a list of custom objects.
 type List struct {
-	unversioned.TypeMeta `json:",inline"`
-	unversioned.ListMeta `json:"metadata,omitempty"`
+	apismetav1.TypeMeta `json:",inline"`
+	apismetav1.ListMeta `json:"metadata,omitempty"`
 
 	Items []*CustomObject `json:"items" yaml:"items"`
 }

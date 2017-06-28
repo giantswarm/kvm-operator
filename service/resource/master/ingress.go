@@ -3,10 +3,9 @@ package master
 import (
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
-	"k8s.io/client-go/pkg/util/intstr"
 
 	"github.com/giantswarm/kvm-operator/service/resource"
 )
@@ -19,11 +18,11 @@ func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error)
 
 	ingresses := []*extensionsv1.Ingress{
 		{
-			TypeMeta: apiunversioned.TypeMeta{
+			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "Ingress",
 				APIVersion: "extensions/v1beta",
 			},
-			ObjectMeta: apiv1.ObjectMeta{
+			ObjectMeta: apismetav1.ObjectMeta{
 				Name: "etcd",
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(*customObject),
@@ -63,11 +62,11 @@ func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error)
 			},
 		},
 		{
-			TypeMeta: apiunversioned.TypeMeta{
+			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "Ingress",
 				APIVersion: "extensions/v1beta",
 			},
-			ObjectMeta: apiv1.ObjectMeta{
+			ObjectMeta: apismetav1.ObjectMeta{
 				Name: "api",
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(*customObject),

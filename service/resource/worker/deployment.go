@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
@@ -27,11 +27,11 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 		capabilities := customObject.Spec.KVM.Workers[i]
 
 		deployment := &extensionsv1.Deployment{
-			TypeMeta: apiunversioned.TypeMeta{
+			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
 				APIVersion: "extensions/v1beta",
 			},
-			ObjectMeta: apiv1.ObjectMeta{
+			ObjectMeta: apismetav1.ObjectMeta{
 				Name: "worker-" + workerNode.ID,
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(*customObject),
@@ -46,7 +46,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				},
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
-					ObjectMeta: apiv1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "worker",
 						Labels: map[string]string{
 							"cluster":  resource.ClusterID(*customObject),

@@ -1,9 +1,6 @@
 package: github.com/giantswarm/kvmtpr
 import:
 - package: k8s.io/client-go
-  version: ~2.0.0-alpha.1
-  subpackages:
-  - pkg/api/unversioned
-  - pkg/api/v1
+  version: 3.0.0-beta.0
 - package: github.com/giantswarm/clustertpr
   version: master

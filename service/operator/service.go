@@ -6,6 +6,7 @@ import (
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/operatorkit/tpr"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
@@ -44,11 +45,28 @@ func New(config Config) (*Service, error) {
 		return nil, microerror.MaskAnyf(invalidConfigError, "config.Reconciler must not be empty")
 	}
 
+	var newTPR *tpr.TPR
+	{
+		c := tpr.DefaultConfig()
+		c.K8sClient = config.KubernetesClient
+		c.Logger = config.Logger
+		c.Description = kvmtpr.Description
+		c.Name = kvmtpr.Name
+		c.Version = kvmtpr.VersionV1
+
+		var err error
+		newTPR, err = tpr.New(c)
+		if err != nil {
+			return nil, microerror.MaskAnyf(err, "creating TPR util for "+kvmtpr.Name)
+		}
+	}
+
 	newService := &Service{
 		// Dependencies.
 		kubernetesClient: config.KubernetesClient,
 		logger:           config.Logger,
 		reconciler:       config.Reconciler,
+		tpr:              newTPR,
 
 		// Internals
 		bootOnce: sync.Once{},
@@ -63,6 +81,7 @@ type Service struct {
 	kubernetesClient *kubernetes.Clientset
 	logger           micrologger.Logger
 	reconciler       *k8sreconciler.Reconciler
+	tpr              *tpr.TPR
 
 	// Internals.
 	bootOnce sync.Once

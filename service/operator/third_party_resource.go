@@ -5,19 +5,18 @@ import (
 
 	"github.com/giantswarm/kvmtpr"
 	"github.com/prometheus/client_golang/prometheus"
-	"k8s.io/client-go/pkg/api/errors"
-	"k8s.io/client-go/pkg/api/unversioned"
-	"k8s.io/client-go/pkg/api/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
 
 var (
 	ClusterThirdPartyResource = v1beta1.ThirdPartyResource{
-		TypeMeta: unversioned.TypeMeta{
+		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "ThirdPartyResource",
 			APIVersion: "extensions/v1beta1",
 		},
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: apismetav1.ObjectMeta{
 			Name: kvmtpr.Name,
 		},
 		Description: "A specification of a Kubernetes cluster",
@@ -47,10 +46,10 @@ func (s *Service) createClusterResource() error {
 
 	s.logger.Log("debug", "creating cluster resource")
 	var err error
-	if _, err = tprClient.Create(&ClusterThirdPartyResource); err != nil && !errors.IsAlreadyExists(err) {
+	if _, err = tprClient.Create(&ClusterThirdPartyResource); err != nil && !apierrors.IsAlreadyExists(err) {
 		return err
 	}
-	if errors.IsAlreadyExists(err) {
+	if apierrors.IsAlreadyExists(err) {
 		s.logger.Log("debug", "cluster resource already exists")
 	} else {
 		s.logger.Log("debug", "cluster resource created")

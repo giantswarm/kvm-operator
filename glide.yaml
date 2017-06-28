@@ -4,19 +4,6 @@ import:
   version: ~0.8.0
   subpackages:
   - prometheus
-- package: k8s.io/client-go
-  version: ~2.0.0-alpha.0
-  subpackages:
-  - kubernetes
-  - pkg/api
-  - pkg/api/errors
-  - pkg/api/unversioned
-  - pkg/api/v1
-  - pkg/apis/extensions/v1beta1
-  - pkg/runtime
-  - pkg/watch
-  - rest
-  - tools/cache
 - package: github.com/golang/protobuf
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
 - package: google.golang.org/grpc
