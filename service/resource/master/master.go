@@ -1,13 +1,10 @@
 package master
 
 import (
-	"encoding/json"
-
 	"github.com/giantswarm/kvm-operator/service/resource/flannel"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/pkg/api"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -113,17 +110,12 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		}
 	}
 
-	var podAffinity string
+	var podAffinity *apiv1.Affinity
 	{
-		pa, err := s.newPodAfinity(obj)
+		podAffinity, err = s.newPodAfinity(obj)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
-		marshalled, err := json.Marshal(pa)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		podAffinity = string(marshalled)
 	}
 
 	var newDeployments []*extensionsv1.Deployment
@@ -133,7 +125,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 			return nil, microerror.MaskAny(err)
 		}
 		for i, _ := range newDeployments {
-			newDeployments[i].Spec.Template.Annotations[api.AffinityAnnotationKey] = podAffinity
+			newDeployments[i].Spec.Template.Spec.Affinity = podAffinity
 			newDeployments[i].Spec.Template.Spec.InitContainers = append(flannelInitContainers, initContainers...)
 			newDeployments[i].Spec.Template.Spec.Containers = append(flannelContainers, newDeployments[i].Spec.Template.Spec.Containers...)
 			newDeployments[i].Spec.Template.Spec.Volumes = append(flannelVolumes, newDeployments[i].Spec.Template.Spec.Volumes...)
