@@ -6,8 +6,9 @@ import (
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	certkit "github.com/giantswarm/operatorkit/secret/cert"
-	"k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/runtime"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/resource"
 )
@@ -86,7 +87,7 @@ func (s *Service) GetForDelete(obj interface{}) ([]runtime.Object, error) {
 // as structure being injected into the template execution to interpolate
 // variables. prefix can be either "master" or "worker" and is used to prefix
 // the configmap name.
-func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string, params cloudconfig.Params, prefix string) (*v1.ConfigMap, error) {
+func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string, params cloudconfig.Params, prefix string) (*apiv1.ConfigMap, error) {
 	var err error
 
 	var newCloudConfig *cloudconfig.CloudConfig
@@ -102,10 +103,10 @@ func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string
 		}
 	}
 
-	var newConfigMap *v1.ConfigMap
+	var newConfigMap *apiv1.ConfigMap
 	{
-		newConfigMap = &v1.ConfigMap{
-			ObjectMeta: v1.ObjectMeta{
+		newConfigMap = &apiv1.ConfigMap{
+			ObjectMeta: apismetav1.ObjectMeta{
 				Name: resource.ConfigMapName(customObject, params.Node, prefix),
 				Labels: map[string]string{
 					"cluster":  resource.ClusterID(customObject),

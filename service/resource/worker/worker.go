@@ -6,10 +6,10 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource/flannel"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/pkg/api"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
-	"k8s.io/client-go/pkg/runtime"
 )
 
 // Config represents the configuration used to create a new service.

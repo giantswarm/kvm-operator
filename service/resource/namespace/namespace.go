@@ -4,9 +4,9 @@ import (
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
-	"k8s.io/client-go/pkg/api/unversioned"
-	"k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/runtime"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/resource"
 )
@@ -80,12 +80,12 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
-	newNamespace := &v1.Namespace{
-		TypeMeta: unversioned.TypeMeta{
+	newNamespace := &apiv1.Namespace{
+		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "Namespace",
 			APIVersion: "v1",
 		},
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: apismetav1.ObjectMeta{
 			Name: resource.ClusterNamespace(*customObject),
 			Labels: map[string]string{
 				"cluster":  resource.ClusterID(*customObject),

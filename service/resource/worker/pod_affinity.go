@@ -4,8 +4,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/api"
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
 )
 
 func (s *Service) newPodAfinity(obj interface{}) (*api.Affinity, error) {
@@ -18,11 +18,11 @@ func (s *Service) newPodAfinity(obj interface{}) (*api.Affinity, error) {
 		PodAntiAffinity: &api.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []api.PodAffinityTerm{
 				{
-					LabelSelector: &apiunversioned.LabelSelector{
-						MatchExpressions: []apiunversioned.LabelSelectorRequirement{
+					LabelSelector: &apismetav1.LabelSelector{
+						MatchExpressions: []apismetav1.LabelSelectorRequirement{
 							{
 								Key:      "app",
-								Operator: apiunversioned.LabelSelectorOpIn,
+								Operator: apismetav1.LabelSelectorOpIn,
 								Values: []string{
 									"master",
 									"worker",

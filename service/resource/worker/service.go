@@ -3,9 +3,9 @@ package worker
 import (
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/pkg/util/intstr"
 
 	"github.com/giantswarm/kvm-operator/service/resource"
 )
@@ -19,11 +19,11 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 	// TODO maybe add one service per worker?
 
 	service := &apiv1.Service{
-		TypeMeta: apiunversioned.TypeMeta{
+		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
-		ObjectMeta: apiv1.ObjectMeta{
+		ObjectMeta: apismetav1.ObjectMeta{
 			Name: "worker",
 			Labels: map[string]string{
 				"cluster":  resource.ClusterID(*customObject),

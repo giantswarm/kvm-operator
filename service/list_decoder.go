@@ -3,9 +3,10 @@ package service
 import (
 	"encoding/json"
 
+	"k8s.io/apimachinery/pkg/runtime"
+
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
-	"k8s.io/client-go/pkg/runtime"
 )
 
 type listDecoder struct{}

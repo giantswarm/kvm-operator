@@ -3,7 +3,7 @@ package master
 import (
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
-	apiunversioned "k8s.io/client-go/pkg/api/unversioned"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/resource"
@@ -16,11 +16,11 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 	}
 
 	service := &apiv1.Service{
-		TypeMeta: apiunversioned.TypeMeta{
+		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
-		ObjectMeta: apiv1.ObjectMeta{
+		ObjectMeta: apismetav1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
 				"cluster":  resource.ClusterID(*customObject),

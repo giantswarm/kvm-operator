@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvmtpr"
@@ -87,7 +88,7 @@ func (s *Service) Check(ctx context.Context, request Request) (*Response, error)
 		healthCheckRequestTime.Set(float64(time.Since(start) / time.Millisecond))
 	}()
 
-	_, err := s.kubernetesClient.Extensions().ThirdPartyResources().Get(kvmtpr.Name)
+	_, err := s.kubernetesClient.Extensions().ThirdPartyResources().Get(kvmtpr.Name, apismetav1.GetOptions{})
 	if err != nil {
 		healthCheckRequests.WithLabelValues("failed").Inc()
 		return nil, microerror.MaskAny(err)
