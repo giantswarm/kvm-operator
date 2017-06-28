@@ -126,8 +126,8 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		}
 		for i, _ := range newDeployments {
 			newDeployments[i].Spec.Template.Spec.Affinity = podAffinity
-			newDeployments[i].Spec.Template.Spec.InitContainers = append(flannelInitContainers, initContainers...)
 			newDeployments[i].Spec.Template.Spec.Containers = append(flannelContainers, newDeployments[i].Spec.Template.Spec.Containers...)
+			newDeployments[i].Spec.Template.Spec.InitContainers = append(flannelInitContainers, initContainers...)
 			newDeployments[i].Spec.Template.Spec.Volumes = append(flannelVolumes, newDeployments[i].Spec.Template.Spec.Volumes...)
 		}
 	}
