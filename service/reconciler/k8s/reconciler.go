@@ -5,11 +5,11 @@ import (
 
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/v1"
 	apisbatchv1 "k8s.io/client-go/pkg/apis/batch/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -158,7 +158,7 @@ func (r *Reconciler) GetAddFunc() func(obj interface{}) {
 				r.logger.Log("error", fmt.Sprintf("unknown runtime object type '%T'", t), "event", "create")
 			}
 
-			if errors.IsAlreadyExists(err) {
+			if apierrors.IsAlreadyExists(err) {
 				// Resource already being created, all good.
 			} else if err != nil {
 				r.logger.Log("error", err.Error(), "event", "create")
@@ -225,7 +225,7 @@ func (r *Reconciler) GetDeleteFunc() func(obj interface{}) {
 				r.logger.Log("error", fmt.Sprintf("unknown runtime object type '%T'", t), "event", "delete")
 			}
 
-			if errors.IsNotFound(err) {
+			if apierrors.IsNotFound(err) {
 				// Resource already being deleted, all good.
 			} else if err != nil {
 				r.logger.Log("error", err.Error(), "event", "delete")
