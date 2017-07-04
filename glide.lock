@@ -1,5 +1,5 @@
 hash: eed91a27cd33539ddfd055adaf56e5d0a4f5ba83ed707130a27a3e5876ddf681
-updated: 2017-06-28T17:31:54.68864103+02:00
+updated: 2017-07-04T20:23:50.833853+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -64,7 +64,7 @@ imports:
   - node
   - vault
 - name: github.com/giantswarm/k8scloudconfig
-  version: ed919200762570562901a769245ad8ae76e4b4f7
+  version: 266a3f7485a933209f086df6550532eef2b289d3
 - name: github.com/giantswarm/kvmtpr
   version: 4ca674677f55dc68d48b1fd604edd26141587853
   subpackages:
@@ -114,7 +114,7 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/operatorkit
-  version: 777ee67a73149d036dce36506af61417f77742da
+  version: 54cb87efc9746a21e774edeefe51fb674c51a723
   subpackages:
   - secret/cert
   - tpr
@@ -213,7 +213,7 @@ imports:
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 822d4a1f8edcbcbc71e8d1fd6527b12331a6d0ad
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
