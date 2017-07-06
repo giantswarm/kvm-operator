@@ -10,6 +10,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
+	"github.com/giantswarm/certificatetpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	"github.com/spf13/viper"
@@ -24,7 +25,6 @@ import (
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
 	"github.com/giantswarm/kvm-operator/service/version"
-	certkit "github.com/giantswarm/operatorkit/secret/cert"
 )
 
 const (
@@ -120,12 +120,12 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var certWatcher *certkit.Service
+	var certWatcher *certificatetpr.Service
 	{
-		certConfig := certkit.DefaultConfig()
+		certConfig := certificatetpr.DefaultConfig()
 		certConfig.K8sClient = kubernetesClient
 		certConfig.Logger = config.Logger
-		certWatcher, err = certkit.New(certConfig)
+		certWatcher, err = certificatetpr.New(certConfig)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
