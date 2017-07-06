@@ -1,10 +1,9 @@
-package cert
+package certificatetpr
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/giantswarm/certificatetpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -66,10 +65,10 @@ type Service struct {
 
 // SearchCerts watches for all secrets of a cluster  and returns it as
 // assets bundle.
-func (s *Service) SearchCerts(clusterID string) (certificatetpr.AssetsBundle, error) {
-	assetsBundle := make(certificatetpr.AssetsBundle)
+func (s *Service) SearchCerts(clusterID string) (AssetsBundle, error) {
+	assetsBundle := make(AssetsBundle)
 
-	for _, componentName := range certificatetpr.ClusterComponents {
+	for _, componentName := range ClusterComponents {
 		ab, err := s.SearchCertsForComponent(clusterID, componentName.String())
 		if err != nil {
 			return nil, microerror.MaskAny(err)
@@ -85,7 +84,7 @@ func (s *Service) SearchCerts(clusterID string) (certificatetpr.AssetsBundle, er
 
 // SearchCertsForComponent watches for secrets of a single cluster component and
 // returns it as assets bundle.
-func (s *Service) SearchCertsForComponent(clusterID, componentName string) (certificatetpr.AssetsBundle, error) {
+func (s *Service) SearchCertsForComponent(clusterID, componentName string) (AssetsBundle, error) {
 	// TODO we should also do a list. In case the secrets have already been
 	// created we might miss them with only watching.
 	watcher, err := s.k8sClient.Core().Secrets(api.NamespaceDefault).Watch(apismetav1.ListOptions{
@@ -93,9 +92,9 @@ func (s *Service) SearchCertsForComponent(clusterID, componentName string) (cert
 		// clusterID.
 		LabelSelector: fmt.Sprintf(
 			"%s=%s, %s=%s",
-			certificatetpr.ComponentLabel,
+			ComponentLabel,
 			componentName,
-			certificatetpr.ClusterIDLabel,
+			ClusterIDLabel,
 			clusterID,
 		),
 	})
@@ -103,7 +102,7 @@ func (s *Service) SearchCertsForComponent(clusterID, componentName string) (cert
 		return nil, microerror.MaskAny(err)
 	}
 
-	assetsBundle := make(certificatetpr.AssetsBundle)
+	assetsBundle := make(AssetsBundle)
 
 	defer watcher.Stop()
 	for {
@@ -116,19 +115,19 @@ func (s *Service) SearchCertsForComponent(clusterID, componentName string) (cert
 			switch event.Type {
 			case watch.Added:
 				secret := event.Object.(*v1.Secret)
-				component := certificatetpr.ClusterComponent(secret.Labels[certificatetpr.ComponentLabel])
+				component := ClusterComponent(secret.Labels[ComponentLabel])
 
-				if !certificatetpr.ValidComponent(component, certificatetpr.ClusterComponents) {
+				if !ValidComponent(component, ClusterComponents) {
 					return nil, microerror.MaskAnyf(secretsRetrievalFailedError, "unknown clusterComponent %s", component)
 				}
 
-				for _, assetType := range certificatetpr.TLSAssetTypes {
+				for _, assetType := range TLSAssetTypes {
 					asset, ok := secret.Data[assetType.String()]
 					if !ok {
 						return nil, microerror.MaskAnyf(secretsRetrievalFailedError, "malformed secret was missing %v asset", assetType)
 					}
 
-					assetsBundle[certificatetpr.AssetsBundleKey{component, assetType}] = asset
+					assetsBundle[AssetsBundleKey{component, assetType}] = asset
 				}
 
 				return assetsBundle, nil

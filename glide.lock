@@ -1,5 +1,5 @@
-hash: eed91a27cd33539ddfd055adaf56e5d0a4f5ba83ed707130a27a3e5876ddf681
-updated: 2017-07-04T20:23:50.833853+02:00
+hash: 00b1fd20eeeb4e9ac5a341aaf2f832a1e7fac5885add1ef507c39841e07c38fa
+updated: 2017-07-06T16:45:22.343691838+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -38,7 +38,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/certificatetpr
-  version: 3fbc91e72cc9eb1acd9f53b844d1ccbbe52163ba
+  version: 4422a7a8a4024736bd7913a323f2294fe6150314
 - name: github.com/giantswarm/clustertpr
   version: e7fdf931e1699bc9480aaf6d27664b539889918e
   subpackages:
@@ -114,9 +114,8 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/operatorkit
-  version: 54cb87efc9746a21e774edeefe51fb674c51a723
+  version: 063627d7798d59bfa84f521d2802dbf7a9765d4c
   subpackages:
-  - secret/cert
   - tpr
 - name: github.com/go-kit/kit
   version: f66b0e13579bfc5a48b9e2a94b1209c107ea1f41
@@ -207,7 +206,7 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 0866df4b85a18d652b6965be022d007cdf076822
+  version: fb369f752a7f8b880c4a5199af7bfcb8aaaabaa4
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
@@ -393,6 +392,7 @@ imports:
   - pkg/apis/storage/install
   - pkg/apis/storage/v1
   - pkg/apis/storage/v1beta1
+  - pkg/meta/v1
   - pkg/util
   - pkg/util/parsers
   - pkg/version
