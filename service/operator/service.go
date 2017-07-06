@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/giantswarm/kvmtpr"
@@ -89,9 +90,15 @@ type Service struct {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		if err := s.createClusterResource(); err != nil {
-			panic(err)
+		err := s.tpr.CreateAndWait()
+		if tpr.IsAlreadyExists(err) {
+			s.logger.Log("debug", "third party resource already exists")
+		} else if err != nil {
+			s.logger.Log("error", fmt.Sprintf("%#v", err))
+			return
 		}
+
+		s.logger.Log("debug", "starting list/watch")
 
 		_, clusterInformer := cache.NewInformer(
 			s.reconciler.GetListWatch(),
@@ -103,7 +110,6 @@ func (s *Service) Boot() {
 			},
 		)
 
-		s.logger.Log("debug", "starting list/watch")
 		clusterInformer.Run(nil)
 	})
 }
