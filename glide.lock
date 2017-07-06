@@ -1,5 +1,5 @@
-hash: 00b1fd20eeeb4e9ac5a341aaf2f832a1e7fac5885add1ef507c39841e07c38fa
-updated: 2017-07-06T16:45:22.343691838+02:00
+hash: 075775f4dfe7e76ae0d43279d1ad530a96da961169fc12eb4c28b3669dad7032
+updated: 2017-07-06T17:55:19.165938114+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -29,7 +29,7 @@ imports:
   - digest
   - reference
 - name: github.com/emicklei/go-restful
-  version: 09691a3b6378b740595c1002f40c34dd5f218a22
+  version: 777bb3f19bcafe2575ffb2a3e46af92509ae9594
   subpackages:
   - log
   - swagger
@@ -38,7 +38,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/certificatetpr
-  version: 4422a7a8a4024736bd7913a323f2294fe6150314
+  version: 66eb917cb3e250992271ba44eacf93942e777cc0
 - name: github.com/giantswarm/clustertpr
   version: e7fdf931e1699bc9480aaf6d27664b539889918e
   subpackages:
@@ -114,7 +114,7 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/operatorkit
-  version: 063627d7798d59bfa84f521d2802dbf7a9765d4c
+  version: 7af6dc5a75bf865bf1dec080d26dc009d88b5b0b
   subpackages:
   - tpr
 - name: github.com/go-kit/kit
@@ -206,13 +206,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: fb369f752a7f8b880c4a5199af7bfcb8aaaabaa4
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -283,7 +283,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 - name: k8s.io/apimachinery
   version: 75b8dd260ef0469d96d578705a87cffd0e09dab8
   subpackages:
