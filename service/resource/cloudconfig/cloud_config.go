@@ -1,11 +1,11 @@
 package cloudconfig
 
 import (
+	"github.com/giantswarm/certificatetpr"
 	cloudconfig "github.com/giantswarm/k8scloudconfig"
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
-	certkit "github.com/giantswarm/operatorkit/secret/cert"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -21,7 +21,7 @@ const (
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
-	CertWatcher *certkit.Service
+	CertWatcher *certificatetpr.Service
 	Logger      micrologger.Logger
 }
 
@@ -57,7 +57,7 @@ func New(config Config) (*Service, error) {
 // Service implements the cloud config service.
 type Service struct {
 	// Dependencies.
-	certWatcher *certkit.Service
+	certWatcher *certificatetpr.Service
 	logger      micrologger.Logger
 }
 

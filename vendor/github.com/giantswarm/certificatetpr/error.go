@@ -1,4 +1,4 @@
-package cert
+package certificatetpr
 
 import (
 	"github.com/juju/errgo"

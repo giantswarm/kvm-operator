@@ -40,3 +40,5 @@ import:
   version: master
 - package: github.com/giantswarm/operatorkit
   version: master
+- package: github.com/emicklei/go-restful
+  version: 1.2.0
