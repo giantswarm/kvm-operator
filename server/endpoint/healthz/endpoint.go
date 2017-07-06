@@ -1,13 +1,13 @@
 package healthz
 
 import (
+	"context"
 	"net/http"
 
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	kitendpoint "github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
-	"golang.org/x/net/context"
 
 	"github.com/giantswarm/kvm-operator/server/middleware"
 	"github.com/giantswarm/kvm-operator/service"

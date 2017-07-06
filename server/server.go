@@ -3,6 +3,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 	"sync"
 
@@ -10,7 +11,6 @@ import (
 	micrologger "github.com/giantswarm/microkit/logger"
 	microserver "github.com/giantswarm/microkit/server"
 	kithttp "github.com/go-kit/kit/transport/http"
-	"golang.org/x/net/context"
 
 	"github.com/giantswarm/kvm-operator/server/endpoint"
 	"github.com/giantswarm/kvm-operator/server/middleware"
