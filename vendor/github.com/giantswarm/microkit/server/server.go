@@ -3,6 +3,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
 	"github.com/tylerb/graceful"
-	"golang.org/x/net/context"
 
 	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
@@ -271,7 +271,6 @@ func (s *server) Boot() {
 
 					// Now we execute the actual go-kit endpoint handler.
 					kithttp.NewServer(
-						ctx,
 						wrappedEndpoint,
 						wrappedDecoder,
 						wrappedEncoder,
@@ -375,15 +374,12 @@ func (s *server) newErrorEncoderWrapper() kithttp.ErrorEncoder {
 		s.errorEncoder(ctx, responseError, rw)
 
 		// Log the error and its errgo trace. This is really useful for debugging.
-		errDomain := errorDomain(serverError)
-		errMessage := errorMessage(serverError)
-		errTrace := errorTrace(serverError)
-		s.logger.Log("error", map[string]string{"domain": errDomain, "message": errMessage, "trace": errTrace})
+		s.logger.Log("error", serverError.Error(), "trace", errorTrace(serverError))
 
 		// Emit metrics about the occured errors. That way we can feed our
 		// instrumentation stack to have nice dashboards to get a picture about the
 		// general system health.
-		errorTotal.WithLabelValues(errDomain).Inc()
+		errorTotal.WithLabelValues().Inc()
 
 		// Write the actual response body in case no response was already written
 		// inside the error encoder.
@@ -515,10 +511,8 @@ func (s *server) newEndpointWrapper(e Endpoint) kitendpoint.Endpoint {
 func (s *server) newNotFoundHandler() http.Handler {
 	return http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Log the error and its message. This is really useful for debugging.
-		errDomain := errorDomain(nil)
 		errMessage := fmt.Sprintf("not found: %s %s", r.Method, r.URL.Path)
-		errTrace := ""
-		s.logger.Log("error", map[string]string{"domain": errDomain, "message": errMessage, "trace": errTrace})
+		s.logger.Log("error", errMessage, "trace", "")
 
 		// This defered callback will be executed at the very end of the request.
 		defer func(t time.Time) {
@@ -529,7 +523,7 @@ func (s *server) newNotFoundHandler() http.Handler {
 			endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
 			endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
 
-			errorTotal.WithLabelValues(errDomain).Inc()
+			errorTotal.WithLabelValues().Inc()
 		}(time.Now())
 
 		// Write the actual response body.

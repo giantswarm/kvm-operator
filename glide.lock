@@ -1,5 +1,5 @@
-hash: 075775f4dfe7e76ae0d43279d1ad530a96da961169fc12eb4c28b3669dad7032
-updated: 2017-07-06T17:55:19.165938114+02:00
+hash: e6d76c0ca6ec688c83640991061e3d59ff7759391be7650146851cf8ba841ec7
+updated: 2017-07-06T18:45:38.832833414+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -8,7 +8,7 @@ imports:
 - name: github.com/cenkalti/backoff
   version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
 - name: github.com/coreos/etcd
-  version: 8ba2897a21e4fc51b298ca553d251318425f93ae
+  version: 61fc123e7a8b14a0a258aa3f5c4159861b1ec2e7
   subpackages:
   - auth/authpb
   - client
@@ -17,8 +17,13 @@ imports:
   - etcdserver/etcdserverpb
   - mvcc/mvccpb
   - pkg/pathutil
-  - pkg/tlsutil
+  - pkg/srv
   - pkg/types
+  - version
+- name: github.com/coreos/go-semver
+  version: 8ab6407b697782a06568d4b7f1db25550ec2e4c6
+  subpackages:
+  - semver
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
@@ -29,7 +34,7 @@ imports:
   - digest
   - reference
 - name: github.com/emicklei/go-restful
-  version: 777bb3f19bcafe2575ffb2a3e46af92509ae9594
+  version: 09691a3b6378b740595c1002f40c34dd5f218a22
   subpackages:
   - log
   - swagger
@@ -91,7 +96,7 @@ imports:
   - kvm/node
   - kvm/ntp
 - name: github.com/giantswarm/microkit
-  version: 1ac51fb9905e0c7ab5a8d12fec127c6fbfd75aac
+  version: d17ad626d65cf57fe8ff0396b79ff6ff26889fd7
   subpackages:
   - command
   - command/daemon
@@ -118,7 +123,7 @@ imports:
   subpackages:
   - tpr
 - name: github.com/go-kit/kit
-  version: f66b0e13579bfc5a48b9e2a94b1209c107ea1f41
+  version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
   - endpoint
   - log
@@ -145,7 +150,6 @@ imports:
 - name: github.com/golang/protobuf
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
-  - jsonpb
   - proto
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
@@ -153,14 +157,6 @@ imports:
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
-- name: github.com/grpc-ecosystem/go-grpc-prometheus
-  version: 6b7015e65d366bf3f19b2b2a000a831940f0f7e0
-- name: github.com/grpc-ecosystem/grpc-gateway
-  version: 84398b94e188ee336f307779b57b3aa91af7063c
-  subpackages:
-  - runtime
-  - runtime/internal
-  - utilities
 - name: github.com/hashicorp/hcl
   version: 392dba7d905ed5d04a5794ba89f558b27e2ba1ca
   subpackages:
@@ -245,7 +241,6 @@ imports:
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
   - context
-  - context/ctxhttp
   - http2
   - http2/hpack
   - idna
@@ -257,9 +252,10 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 2910a502d2bf9e43193af9d68ca516529614eed3
+  version: 4ee4af566555f5fbe026368b75596286a312663a
   subpackages:
   - cases
+  - internal
   - internal/tag
   - language
   - runes

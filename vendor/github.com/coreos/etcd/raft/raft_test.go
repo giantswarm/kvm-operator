@@ -1246,6 +1246,55 @@ func TestHandleHeartbeatResp(t *testing.T) {
 	}
 }
 
+// TestRaftFreesReadOnlyMem ensures raft will free read request from
+// readOnly readIndexQueue and pendingReadIndex map.
+// related issue: https://github.com/coreos/etcd/issues/7571
+func TestRaftFreesReadOnlyMem(t *testing.T) {
+	sm := newTestRaft(1, []uint64{1, 2}, 5, 1, NewMemoryStorage())
+	sm.becomeCandidate()
+	sm.becomeLeader()
+	sm.raftLog.commitTo(sm.raftLog.lastIndex())
+
+	ctx := []byte("ctx")
+
+	// leader starts linearizable read request.
+	// more info: raft dissertation 6.4, step 2.
+	sm.Step(pb.Message{From: 2, Type: pb.MsgReadIndex, Entries: []pb.Entry{{Data: ctx}}})
+	msgs := sm.readMessages()
+	if len(msgs) != 1 {
+		t.Fatalf("len(msgs) = %d, want 1", len(msgs))
+	}
+	if msgs[0].Type != pb.MsgHeartbeat {
+		t.Fatalf("type = %v, want MsgHeartbeat", msgs[0].Type)
+	}
+	if !bytes.Equal(msgs[0].Context, ctx) {
+		t.Fatalf("Context = %v, want %v", msgs[0].Context, ctx)
+	}
+	if len(sm.readOnly.readIndexQueue) != 1 {
+		t.Fatalf("len(readIndexQueue) = %v, want 1", len(sm.readOnly.readIndexQueue))
+	}
+	if len(sm.readOnly.pendingReadIndex) != 1 {
+		t.Fatalf("len(pendingReadIndex) = %v, want 1", len(sm.readOnly.pendingReadIndex))
+	}
+	if _, ok := sm.readOnly.pendingReadIndex[string(ctx)]; !ok {
+		t.Fatalf("can't find context %v in pendingReadIndex ", ctx)
+	}
+
+	// heartbeat responses from majority of followers (1 in this case)
+	// acknowledge the authority of the leader.
+	// more info: raft dissertation 6.4, step 3.
+	sm.Step(pb.Message{From: 2, Type: pb.MsgHeartbeatResp, Context: ctx})
+	if len(sm.readOnly.readIndexQueue) != 0 {
+		t.Fatalf("len(readIndexQueue) = %v, want 0", len(sm.readOnly.readIndexQueue))
+	}
+	if len(sm.readOnly.pendingReadIndex) != 0 {
+		t.Fatalf("len(pendingReadIndex) = %v, want 0", len(sm.readOnly.pendingReadIndex))
+	}
+	if _, ok := sm.readOnly.pendingReadIndex[string(ctx)]; ok {
+		t.Fatalf("found context %v in pendingReadIndex, want none", ctx)
+	}
+}
+
 // TestMsgAppRespWaitReset verifies the resume behavior of a leader
 // MsgAppResp.
 func TestMsgAppRespWaitReset(t *testing.T) {
@@ -1856,6 +1905,81 @@ func TestReadOnlyOptionLeaseWithoutCheckQuorum(t *testing.T) {
 	}
 }
 
+// TestReadOnlyForNewLeader ensures that a leader only accepts MsgReadIndex message
+// when it commits at least one log entry at it term.
+func TestReadOnlyForNewLeader(t *testing.T) {
+	nodeConfigs := []struct {
+		id            uint64
+		committed     uint64
+		applied       uint64
+		compact_index uint64
+	}{
+		{1, 1, 1, 0},
+		{2, 2, 2, 2},
+		{3, 2, 2, 2},
+	}
+	peers := make([]stateMachine, 0)
+	for _, c := range nodeConfigs {
+		storage := NewMemoryStorage()
+		storage.Append([]pb.Entry{{Index: 1, Term: 1}, {Index: 2, Term: 1}})
+		storage.SetHardState(pb.HardState{Term: 1, Commit: c.committed})
+		if c.compact_index != 0 {
+			storage.Compact(c.compact_index)
+		}
+		cfg := newTestConfig(c.id, []uint64{1, 2, 3}, 10, 1, storage)
+		cfg.Applied = c.applied
+		raft := newRaft(cfg)
+		peers = append(peers, raft)
+	}
+	nt := newNetwork(peers...)
+
+	// Drop MsgApp to forbid peer a to commit any log entry at its term after it becomes leader.
+	nt.ignore(pb.MsgApp)
+	// Force peer a to become leader.
+	nt.send(pb.Message{From: 1, To: 1, Type: pb.MsgHup})
+
+	sm := nt.peers[1].(*raft)
+	if sm.state != StateLeader {
+		t.Fatalf("state = %s, want %s", sm.state, StateLeader)
+	}
+
+	// Ensure peer a drops read only request.
+	var windex uint64 = 4
+	wctx := []byte("ctx")
+	nt.send(pb.Message{From: 1, To: 1, Type: pb.MsgReadIndex, Entries: []pb.Entry{{Data: wctx}}})
+	if len(sm.readStates) != 0 {
+		t.Fatalf("len(readStates) = %d, want zero", len(sm.readStates))
+	}
+
+	nt.recover()
+
+	// Force peer a to commit a log entry at its term
+	for i := 0; i < sm.heartbeatTimeout; i++ {
+		sm.tick()
+	}
+	nt.send(pb.Message{From: 1, To: 1, Type: pb.MsgProp, Entries: []pb.Entry{{}}})
+	if sm.raftLog.committed != 4 {
+		t.Fatalf("committed = %d, want 4", sm.raftLog.committed)
+	}
+	lastLogTerm := sm.raftLog.zeroTermOnErrCompacted(sm.raftLog.term(sm.raftLog.committed))
+	if lastLogTerm != sm.Term {
+		t.Fatalf("last log term = %d, want %d", lastLogTerm, sm.Term)
+	}
+
+	// Ensure peer a accepts read only request after it commits a entry at its term.
+	nt.send(pb.Message{From: 1, To: 1, Type: pb.MsgReadIndex, Entries: []pb.Entry{{Data: wctx}}})
+	if len(sm.readStates) != 1 {
+		t.Fatalf("len(readStates) = %d, want 1", len(sm.readStates))
+	}
+	rs := sm.readStates[0]
+	if rs.Index != windex {
+		t.Fatalf("readIndex = %d, want %d", rs.Index, windex)
+	}
+	if !bytes.Equal(rs.RequestCtx, wctx) {
+		t.Fatalf("requestCtx = %v, want %v", rs.RequestCtx, wctx)
+	}
+}
+
 func TestLeaderAppResp(t *testing.T) {
 	// initial progress: match = 0; next = 3
 	tests := []struct {
@@ -2438,6 +2562,41 @@ func TestAddNode(t *testing.T) {
 	wnodes := []uint64{1, 2}
 	if !reflect.DeepEqual(nodes, wnodes) {
 		t.Errorf("nodes = %v, want %v", nodes, wnodes)
+	}
+}
+
+// TestAddNodeCheckQuorum tests that addNode does not trigger a leader election
+// immediately when checkQuorum is set.
+func TestAddNodeCheckQuorum(t *testing.T) {
+	r := newTestRaft(1, []uint64{1}, 10, 1, NewMemoryStorage())
+	r.pendingConf = true
+	r.checkQuorum = true
+
+	r.becomeCandidate()
+	r.becomeLeader()
+
+	for i := 0; i < r.electionTimeout-1; i++ {
+		r.tick()
+	}
+
+	r.addNode(2)
+
+	// This tick will reach electionTimeout, which triggers a quorum check.
+	r.tick()
+
+	// Node 1 should still be the leader after a single tick.
+	if r.state != StateLeader {
+		t.Errorf("state = %v, want %v", r.state, StateLeader)
+	}
+
+	// After another electionTimeout ticks without hearing from node 2,
+	// node 1 should step down.
+	for i := 0; i < r.electionTimeout; i++ {
+		r.tick()
+	}
+
+	if r.state != StateFollower {
+		t.Errorf("state = %v, want %v", r.state, StateFollower)
 	}
 }
 
