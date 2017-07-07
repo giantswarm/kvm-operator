@@ -1,5 +1,5 @@
-hash: 5137a82d1f4a316b9b430a29529d5f78de80dd34997c53a5994dc2a7abd68a67
-updated: 2017-06-28T16:39:02.562535437+02:00
+hash: 4491ae03719a3724f385fb31fb262b1e72288ba12f44052037d1713323d1cf1f
+updated: 2017-07-07T10:47:32.35374609+02:00
 imports:
 - name: github.com/emicklei/go-restful
   version: 09691a3b6378b740595c1002f40c34dd5f218a22
@@ -103,6 +103,4 @@ imports:
   - pkg/util/wait
   - pkg/watch
   - third_party/forked/golang/reflect
-- name: k8s.io/client-go
-  version: 3627aeb7d4f6ade38f995d2c923e459146493c7e
 testImports: []

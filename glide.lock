@@ -1,5 +1,5 @@
-hash: e6d76c0ca6ec688c83640991061e3d59ff7759391be7650146851cf8ba841ec7
-updated: 2017-07-07T09:20:42.825844366+02:00
+hash: c5c8433b7423ca145389b633b88810445ca19f7a9cdae62e0c75817c4eabb612
+updated: 2017-07-07T11:18:24.195481742+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -71,7 +71,7 @@ imports:
 - name: github.com/giantswarm/k8scloudconfig
   version: 266a3f7485a933209f086df6550532eef2b289d3
 - name: github.com/giantswarm/kvmtpr
-  version: 4ca674677f55dc68d48b1fd604edd26141587853
+  version: 3a281b79aba822108198de82b7c48a554da78d63
   subpackages:
   - kvm
   - kvm/dns
@@ -96,7 +96,7 @@ imports:
   - kvm/node
   - kvm/ntp
 - name: github.com/giantswarm/microkit
-  version: f1a9bd157e644334b903b5b87fddab3e0b37db0d
+  version: b6bf741b5c34be4fff51d944f973318d8b078284
   subpackages:
   - command
   - command/daemon
@@ -148,7 +148,7 @@ imports:
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
-  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  version: 8616e8ee5e20a1704615e6c8d7afcdac06087a67
   subpackages:
   - proto
 - name: github.com/google/gofuzz
@@ -222,11 +222,11 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 4c05eb1145f16d0e6bb4a3e1b6d769f4713cb41f
+  version: 8c6fa02d2225de0f9bdcb7ca912556f68d172d8c
 - name: github.com/spf13/jwalterweatherman
   version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
-  version: 08b1a584251b5b62f458943640fc8ebd4d50aaa5
+  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/spf13/viper
   version: c1de95864d73a5465492829d7cb2dd422b19ac96
 - name: github.com/tylerb/graceful
@@ -235,8 +235,6 @@ imports:
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
   - codec
-- name: github.com/ventu-io/go-shortid
-  version: 6c56cef5189ca1b3d5ef01dc07f4d611dfc0bb33
 - name: golang.org/x/net
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:

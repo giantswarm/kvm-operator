@@ -4,10 +4,8 @@ import:
   version: ~0.8.0
   subpackages:
   - prometheus
-- package: github.com/ventu-io/go-shortid
-  version: ^1.0.0
 - package: github.com/giantswarm/microkit
-  version: kit
+  version: master
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/k8scloudconfig
@@ -16,11 +14,7 @@ import:
   version: master
 - package: github.com/giantswarm/operatorkit
   version: master
-- package: github.com/spf13/viper
-  version: master
 # The following versions have to be pinned for several version conflicts in
 # multiple dependencies.
-- package: github.com/golang/protobuf
-  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
 - package: google.golang.org/grpc
   version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
