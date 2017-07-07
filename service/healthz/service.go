@@ -1,6 +1,7 @@
 package healthz
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	"github.com/prometheus/client_golang/prometheus"
-	"golang.org/x/net/context"
 )
 
 var (

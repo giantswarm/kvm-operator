@@ -4,34 +4,8 @@ import:
   version: ~0.8.0
   subpackages:
   - prometheus
-- package: github.com/golang/protobuf
-  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
-- package: google.golang.org/grpc
-  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
-  subpackages:
-  - codes
-  - credentials
-  - grpclog
-  - internal
-  - metadata
-  - naming
-  - peer
-  - transport
-- package: github.com/ventu-io/go-shortid
-  version: ^1.0.0
 - package: github.com/giantswarm/microkit
   version: master
-# The versions of pflag and cobra were previously indicated by
-# kubernetes/client-go, but due to continuously appearing errors on upgrades, we
-# decided to pin them by ourselves.
-- package: github.com/spf13/cobra
-  version: 4c05eb1145f16d0e6bb4a3e1b6d769f4713cb41f
-- package: github.com/spf13/pflag
-  version: 08b1a584251b5b62f458943640fc8ebd4d50aaa5
-- package: github.com/spf13/viper
-  version: master
-- package: github.com/coreos/etcd
-  version: 3.1.0
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/k8scloudconfig
@@ -40,5 +14,7 @@ import:
   version: master
 - package: github.com/giantswarm/operatorkit
   version: master
-- package: github.com/emicklei/go-restful
-  version: 1.2.0
+# The following versions have to be pinned for several version conflicts in
+# multiple dependencies.
+- package: google.golang.org/grpc
+  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0

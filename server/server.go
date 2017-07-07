@@ -3,6 +3,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 	"sync"
 
@@ -10,7 +11,6 @@ import (
 	micrologger "github.com/giantswarm/microkit/logger"
 	microserver "github.com/giantswarm/microkit/server"
 	kithttp "github.com/go-kit/kit/transport/http"
-	"golang.org/x/net/context"
 
 	"github.com/giantswarm/kvm-operator/server/endpoint"
 	"github.com/giantswarm/kvm-operator/server/middleware"
@@ -115,22 +115,11 @@ func (s *server) Shutdown() {
 
 func (s *server) newErrorEncoder() kithttp.ErrorEncoder {
 	return func(ctx context.Context, err error, w http.ResponseWriter) {
-		switch e := err.(type) {
-		case kithttp.Error:
-			err = e.Err
+		rErr := err.(microserver.ResponseError)
+		uErr := rErr.Underlying()
 
-			switch e.Domain {
-			case kithttp.DomainEncode:
-				w.WriteHeader(http.StatusBadRequest)
-			case kithttp.DomainDecode:
-				w.WriteHeader(http.StatusBadRequest)
-			case kithttp.DomainDo:
-				w.WriteHeader(http.StatusBadRequest)
-			default:
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-		default:
-			w.WriteHeader(http.StatusInternalServerError)
-		}
+		rErr.SetCode(microserver.CodeInternalError)
+		rErr.SetMessage(uErr.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
