@@ -1,5 +1,5 @@
 hash: e6d76c0ca6ec688c83640991061e3d59ff7759391be7650146851cf8ba841ec7
-updated: 2017-07-06T18:45:38.832833414+02:00
+updated: 2017-07-07T09:20:42.825844366+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -96,7 +96,7 @@ imports:
   - kvm/node
   - kvm/ntp
 - name: github.com/giantswarm/microkit
-  version: d17ad626d65cf57fe8ff0396b79ff6ff26889fd7
+  version: f1a9bd157e644334b903b5b87fddab3e0b37db0d
   subpackages:
   - command
   - command/daemon

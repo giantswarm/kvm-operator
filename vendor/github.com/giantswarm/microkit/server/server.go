@@ -219,12 +219,6 @@ func (s *server) Boot() {
 	s.bootOnce.Do(func() {
 		s.router.NotFoundHandler = s.newNotFoundHandler()
 
-		// Combine all options this server defines.
-		options := []kithttp.ServerOption{
-			kithttp.ServerBefore(s.requestFuncs...),
-			kithttp.ServerErrorEncoder(s.newErrorEncoderWrapper()),
-		}
-
 		// We go through all endpoints this server defines and register them to the
 		// router.
 		for _, e := range s.endpoints {
@@ -268,6 +262,25 @@ func (s *server) Boot() {
 					wrappedDecoder := s.newDecoderWrapper(e, responseWriter)
 					wrappedEndpoint := s.newEndpointWrapper(e)
 					wrappedEncoder := s.newEncoderWrapper(e, responseWriter)
+
+					// Combine all options this server defines. Since the interface of the
+					// go-kit server changed to not accept a context anymore we have to
+					// work around the context injection by injecting our context via the
+					// very first request function.
+					//
+					// NOTE this is rather an ugly hack and should be revisited. It would
+					// probably make sense to start decoupling from the go-kit code since
+					// there haven't been any benefits from its implementation, but only
+					// from its design ideas. Also note that some of the design ideas
+					// dictated by go-kit do not align with our own ideas and often stood
+					// in our way of making things work how they should be.
+					options := []kithttp.ServerOption{
+						kithttp.ServerBefore(func(context.Context, *http.Request) context.Context {
+							return ctx
+						}),
+						kithttp.ServerBefore(s.requestFuncs...),
+						kithttp.ServerErrorEncoder(s.newErrorEncoderWrapper()),
+					}
 
 					// Now we execute the actual go-kit endpoint handler.
 					kithttp.NewServer(
