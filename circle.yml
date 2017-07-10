@@ -15,6 +15,7 @@ test:
 
 deployment:
   master:
-    branch: master
+    #branch: master
+    branch: extract-flannel
     commands:
       - ./architect deploy
