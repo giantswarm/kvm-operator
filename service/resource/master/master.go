@@ -78,14 +78,6 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	var err error
 	var runtimeObjects []runtime.Object
 
-	var initContainers []apiv1.Container
-	{
-		initContainers, err = s.newInitContainers(obj)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-	}
-
 	var flannelContainers []apiv1.Container
 	{
 		flannelContainers, err = s.flannel.Containers(obj)
@@ -127,7 +119,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		for i, _ := range newDeployments {
 			newDeployments[i].Spec.Template.Spec.Affinity = podAffinity
 			newDeployments[i].Spec.Template.Spec.Containers = append(flannelContainers, newDeployments[i].Spec.Template.Spec.Containers...)
-			newDeployments[i].Spec.Template.Spec.InitContainers = append(flannelInitContainers, initContainers...)
+			newDeployments[i].Spec.Template.Spec.InitContainers = flannelInitContainers
 			newDeployments[i].Spec.Template.Spec.Volumes = append(flannelVolumes, newDeployments[i].Spec.Template.Spec.Volumes...)
 		}
 	}
