@@ -1,4 +1,4 @@
-apiVersion: "kvm.cluster.giantswarm.io/v1"
+apiVersion: "cluster.giantswarm.io/v1"
 kind: Kvm
 metadata:
   name: test
@@ -6,7 +6,7 @@ spec:
   cluster:
 
     calico:
-      cidr: "16"
+      cidr: 16
       subnet: "192.168.0.0"
 
     cluster:
