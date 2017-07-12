@@ -17,5 +17,7 @@ import:
   version: master
 # The following versions have to be pinned for several version conflicts in
 # multiple dependencies.
+- package: github.com/emicklei/go-restful/swagger
+  version: 09691a3b6378b740595c1002f40c34dd5f218a22
 - package: google.golang.org/grpc
   version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
