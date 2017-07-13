@@ -12,12 +12,17 @@ import:
 - package: github.com/giantswarm/k8scloudconfig
   version: 266a3f7485a933209f086df6550532eef2b289d3
 - package: github.com/giantswarm/kvmtpr
-  version: master
+  #version: master
+  version: extract-flannel
 - package: github.com/giantswarm/operatorkit
-  version: master
+  version: client-go-v4
 # The following versions have to be pinned for several version conflicts in
 # multiple dependencies.
 - package: github.com/emicklei/go-restful/swagger
   version: 09691a3b6378b740595c1002f40c34dd5f218a22
 - package: google.golang.org/grpc
   version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
+# TODO: this comes form client-go. We should pin all client-go deps inside
+# operatorkit, so they are respected by glide
+- package: k8s.io/apimachinery
+  version: 75b8dd260ef0469d96d578705a87cffd0e09dab8

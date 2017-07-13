@@ -1,5 +1,5 @@
-hash: 46cfc3459229df3373afcf75535d619cc1abce2ad13413daf43ae8816076632b
-updated: 2017-07-12T17:47:39.7595968+02:00
+hash: c39690866ec3dc437607c1a841ca30442c0b8e533427a97f4be19a227338283a
+updated: 2017-07-13T11:47:41.794106048+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -71,30 +71,16 @@ imports:
 - name: github.com/giantswarm/k8scloudconfig
   version: 266a3f7485a933209f086df6550532eef2b289d3
 - name: github.com/giantswarm/kvmtpr
-  version: 3a281b79aba822108198de82b7c48a554da78d63
+  version: 9260ed6ef7970e1fecbe281dcbd29a77c938580b
   subpackages:
   - kvm
-  - kvm/dns
   - kvm/endpointupdater
   - kvm/endpointupdater/docker
-  - kvm/flannel
-  - kvm/flannel/client
-  - kvm/flannel/docker
   - kvm/k8skvm
   - kvm/k8skvm/docker
   - kvm/kubectl
   - kvm/kubectl/googleapi
-  - kvm/network
-  - kvm/network/bridge
-  - kvm/network/bridge/docker
-  - kvm/network/config
-  - kvm/network/config/docker
-  - kvm/network/iptables
-  - kvm/network/iptables/docker
-  - kvm/network/openssl
-  - kvm/network/openssl/docker
   - kvm/node
-  - kvm/ntp
 - name: github.com/giantswarm/microkit
   version: b6bf741b5c34be4fff51d944f973318d8b078284
   subpackages:
