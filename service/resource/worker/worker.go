@@ -1,7 +1,6 @@
 package worker
 
 import (
-	"github.com/giantswarm/kvm-operator/service/resource/flannel"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -12,8 +11,7 @@ import (
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
-	Logger  micrologger.Logger
-	Flannel *flannel.Service
+	Logger micrologger.Logger
 }
 
 // DefaultConfig provides a default configuration to create a new service by
@@ -21,8 +19,7 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		Logger:  nil,
-		Flannel: nil,
+		Logger: nil,
 	}
 }
 
@@ -32,14 +29,10 @@ func New(config Config) (*Service, error) {
 	if config.Logger == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "config.Logger must not be empty")
 	}
-	if config.Flannel == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.Flannel must not be empty")
-	}
 
 	newService := &Service{
 		// Dependencies.
-		logger:  config.Logger,
-		flannel: config.Flannel,
+		logger: config.Logger,
 	}
 
 	return newService, nil
@@ -48,8 +41,7 @@ func New(config Config) (*Service, error) {
 // Service implements the worker service.
 type Service struct {
 	// Dependencies.
-	logger  micrologger.Logger
-	flannel *flannel.Service
+	logger micrologger.Logger
 }
 
 // GetForCreate returns the Kubernetes runtime object for the worker resource
@@ -77,30 +69,6 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	var err error
 	var runtimeObjects []runtime.Object
 
-	var flannelContainers []apiv1.Container
-	{
-		flannelContainers, err = s.flannel.Containers(obj)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-	}
-
-	var flannelInitContainers []apiv1.Container
-	{
-		flannelInitContainers, err = s.flannel.InitContainers(obj)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-	}
-
-	var flannelVolumes []apiv1.Volume
-	{
-		flannelVolumes, err = s.flannel.Volumes(obj)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-	}
-
 	var podAffinity *apiv1.Affinity
 	{
 		podAffinity, err = s.newPodAfinity(obj)
@@ -117,9 +85,6 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		}
 		for i, _ := range newDeployments {
 			newDeployments[i].Spec.Template.Spec.Affinity = podAffinity
-			newDeployments[i].Spec.Template.Spec.Containers = append(flannelContainers, newDeployments[i].Spec.Template.Spec.Containers...)
-			newDeployments[i].Spec.Template.Spec.InitContainers = flannelInitContainers
-			newDeployments[i].Spec.Template.Spec.Volumes = append(flannelVolumes, newDeployments[i].Spec.Template.Spec.Volumes...)
 		}
 	}
 

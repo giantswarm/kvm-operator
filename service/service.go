@@ -20,7 +20,6 @@ import (
 	"github.com/giantswarm/kvm-operator/service/operator"
 	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
 	cloudconfigresource "github.com/giantswarm/kvm-operator/service/resource/cloudconfig"
-	flannelservice "github.com/giantswarm/kvm-operator/service/resource/flannel"
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
@@ -144,24 +143,11 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var flannel *flannelservice.Service
-	{
-		flannelConfig := flannelservice.DefaultConfig()
-
-		flannelConfig.Logger = config.Logger
-
-		flannel, err = flannelservice.New(flannelConfig)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-	}
-
 	var masterResource k8sreconciler.Resource
 	{
 		masterConfig := masterresource.DefaultConfig()
 
 		masterConfig.Logger = config.Logger
-		masterConfig.Flannel = flannel
 
 		masterResource, err = masterresource.New(masterConfig)
 		if err != nil {
@@ -186,7 +172,6 @@ func New(config Config) (*Service, error) {
 		workerConfig := workerresource.DefaultConfig()
 
 		workerConfig.Logger = config.Logger
-		workerConfig.Flannel = flannel
 
 		workerResource, err = workerresource.New(workerConfig)
 		if err != nil {
