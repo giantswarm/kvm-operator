@@ -12,10 +12,9 @@ import:
 - package: github.com/giantswarm/k8scloudconfig
   version: 266a3f7485a933209f086df6550532eef2b289d3
 - package: github.com/giantswarm/kvmtpr
-  #version: master
-  version: extract-flannel
+  version: master
 - package: github.com/giantswarm/operatorkit
-  version: client-go-v4
+  version: master
 # The following versions have to be pinned for several version conflicts in
 # multiple dependencies.
 - package: github.com/emicklei/go-restful/swagger

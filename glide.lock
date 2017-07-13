@@ -1,5 +1,5 @@
-hash: c39690866ec3dc437607c1a841ca30442c0b8e533427a97f4be19a227338283a
-updated: 2017-07-13T11:47:41.794106048+02:00
+hash: e09b8f8af3b679139be88a45528380ed6010baec842dbd36ac5e025c3b76c225
+updated: 2017-07-13T19:07:32.577534357+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -71,7 +71,7 @@ imports:
 - name: github.com/giantswarm/k8scloudconfig
   version: 266a3f7485a933209f086df6550532eef2b289d3
 - name: github.com/giantswarm/kvmtpr
-  version: 9260ed6ef7970e1fecbe281dcbd29a77c938580b
+  version: 41ec6b7a31e611c9a9326eec1d1c53f7948e39fc
   subpackages:
   - kvm
   - kvm/endpointupdater
