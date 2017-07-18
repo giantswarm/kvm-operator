@@ -6,22 +6,22 @@ import:
   - prometheus
 - package: github.com/giantswarm/microkit
   version: master
+# This verison is required by etcd, but docker/distribution uses an ancient
+# one.
+# microkit <- etcd
+# operatokir <- client-go <- docker/distribution
+- package: google.golang.org/grpc
+  version: v1.2.1
+- package: github.com/giantswarm/operatorkit
+  version: master
+# This version is required by client-go.
+# operatorkit <- client-go
+- package: github.com/golang/protobuf/proto
+  version: 4bd1920723d7b7c925de087aa32e2187708897f7
 - package: github.com/giantswarm/certificatetpr
+  version: master
+- package: github.com/giantswarm/kvmtpr
   version: master
 # Pinned to the version before kubeadm.
 - package: github.com/giantswarm/k8scloudconfig
   version: 266a3f7485a933209f086df6550532eef2b289d3
-- package: github.com/giantswarm/kvmtpr
-  version: master
-- package: github.com/giantswarm/operatorkit
-  version: master
-# The following versions have to be pinned for several version conflicts in
-# multiple dependencies.
-- package: github.com/emicklei/go-restful/swagger
-  version: 09691a3b6378b740595c1002f40c34dd5f218a22
-- package: google.golang.org/grpc
-  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
-# TODO: this comes form client-go. We should pin all client-go deps inside
-# operatorkit, so they are respected by glide
-- package: k8s.io/apimachinery
-  version: 75b8dd260ef0469d96d578705a87cffd0e09dab8
