@@ -23,7 +23,7 @@ spec:
             path: config.yml
       containers:
       - name: kvm-operator
-        image: quay.io/giantswarm/kvm-operator:{{ .SHA }}
+        image: quay.io/giantswarm/kvm-operator:[[ .SHA ]]
         args:
         - daemon
         - --config.dirs=/var/run/kvm-operator/configmap/
