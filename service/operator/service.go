@@ -7,19 +7,19 @@ import (
 	"github.com/giantswarm/kvmtpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/operatorkit/operator"
 	"github.com/giantswarm/operatorkit/tpr"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
-
-	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
 )
 
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
-	KubernetesClient *kubernetes.Clientset
-	Logger           micrologger.Logger
-	Reconciler       *k8sreconciler.Reconciler
+	K8sClient *kubernetes.Clientset
+	Logger    micrologger.Logger
+	Resources []operator.Resource
 }
 
 // DefaultConfig provides a default configuration to create a new service by
@@ -27,35 +27,38 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		KubernetesClient: nil,
-		Logger:           nil,
-		Reconciler:       nil,
+		K8sClient: nil,
+		Logger:    nil,
+		Resources: nil,
 	}
 }
 
 // New creates a new configured service.
 func New(config Config) (*Service, error) {
 	// Dependencies.
-	if config.KubernetesClient == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.Kubernetes client must not be empty")
+	if config.K8sClient == nil {
+		return nil, microerror.MaskAnyf(invalidConfigError, "config.K8sClient must not be empty")
 	}
 	if config.Logger == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "config.Logger must not be empty")
 	}
-	if config.Reconciler == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.Reconciler must not be empty")
+	if len(config.Resources) == 0 {
+		return nil, microerror.MaskAnyf(invalidConfigError, "config.Resources must not be empty")
 	}
+
+	var err error
 
 	var newTPR *tpr.TPR
 	{
 		c := tpr.DefaultConfig()
-		c.K8sClient = config.KubernetesClient
+
+		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
+
 		c.Description = kvmtpr.Description
 		c.Name = kvmtpr.Name
 		c.Version = kvmtpr.VersionV1
 
-		var err error
 		newTPR, err = tpr.New(c)
 		if err != nil {
 			return nil, microerror.MaskAnyf(err, "creating TPR util for "+kvmtpr.Name)
@@ -64,13 +67,13 @@ func New(config Config) (*Service, error) {
 
 	newService := &Service{
 		// Dependencies.
-		kubernetesClient: config.KubernetesClient,
-		logger:           config.Logger,
-		reconciler:       config.Reconciler,
-		tpr:              newTPR,
+		logger:    config.Logger,
+		resources: config.Resources,
 
 		// Internals
 		bootOnce: sync.Once{},
+		mutex:    sync.Mutex{},
+		tpr:      newTPR,
 	}
 
 	return newService, nil
@@ -79,13 +82,13 @@ func New(config Config) (*Service, error) {
 // Service implements the service.
 type Service struct {
 	// Dependencies.
-	kubernetesClient *kubernetes.Clientset
-	logger           micrologger.Logger
-	reconciler       *k8sreconciler.Reconciler
-	tpr              *tpr.TPR
+	logger    micrologger.Logger
+	resources []operator.Resource
 
 	// Internals.
 	bootOnce sync.Once
+	mutex    sync.Mutex
+	tpr      *tpr.TPR
 }
 
 func (s *Service) Boot() {
@@ -100,16 +103,49 @@ func (s *Service) Boot() {
 
 		s.logger.Log("debug", "starting list/watch")
 
-		_, clusterInformer := cache.NewInformer(
-			s.reconciler.GetListWatch(),
-			&kvmtpr.CustomObject{},
-			0,
-			cache.ResourceEventHandlerFuncs{
-				AddFunc:    s.reconciler.GetAddFunc(),
-				DeleteFunc: s.reconciler.GetDeleteFunc(),
-			},
-		)
+		newResourceEventHandler := &cache.ResourceEventHandlerFuncs{
+			AddFunc:    s.addFunc,
+			DeleteFunc: s.deleteFunc,
+		}
+		newZeroObjectFactory := &tpr.ZeroObjectFactoryFuncs{
+			NewObjectFunc:     func() runtime.Object { return &kvmtpr.CustomObject{} },
+			NewObjectListFunc: func() runtime.Object { return &kvmtpr.List{} },
+		}
 
-		clusterInformer.Run(nil)
+		s.tpr.NewInformer(newResourceEventHandler, newZeroObjectFactory).Run(nil)
 	})
+}
+
+func (s *Service) addFunc(obj interface{}) {
+	// We lock the addFunc/deleteFunc to make sure only one addFunc/deleteFunc is
+	// executed at a time. addFunc/deleteFunc is not thread safe. This is
+	// important because the source of truth for the kvm-operator are Kubernetes
+	// resources. In case we would run the operator logic in parallel, we would
+	// run into race conditions.
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	s.logger.Log("debug", "executing the operator's addFunc")
+
+	err := operator.ProcessCreate(obj, s.resources...)
+	if err != nil {
+		s.logger.Log("error", fmt.Sprintf("%#v", err), "event", "create")
+	}
+}
+
+func (s *Service) deleteFunc(obj interface{}) {
+	// We lock the addFunc/deleteFunc to make sure only one addFunc/deleteFunc is
+	// executed at a time. addFunc/deleteFunc is not thread safe. This is
+	// important because the source of truth for the kvm-operator are Kubernetes
+	// resources. In case we would run the operator logic in parallel, we would
+	// run into race conditions.
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	s.logger.Log("debug", "executing the operator's deleteFunc")
+
+	err := operator.ProcessDelete(obj, s.resources...)
+	if err != nil {
+		s.logger.Log("error", fmt.Sprintf("%#v", err), "event", "delete")
+	}
 }

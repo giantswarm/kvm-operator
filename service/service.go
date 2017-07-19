@@ -13,13 +13,14 @@ import (
 	"github.com/giantswarm/certificatetpr"
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
+	operatorkitoperator "github.com/giantswarm/operatorkit/operator"
 	"github.com/spf13/viper"
 
 	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
-	k8sreconciler "github.com/giantswarm/kvm-operator/service/reconciler/k8s"
 	cloudconfigresource "github.com/giantswarm/kvm-operator/service/resource/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/resource/legacy"
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
@@ -130,7 +131,7 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var cloudConfigResource k8sreconciler.Resource
+	var cloudConfigResource legacy.Resource
 	{
 		cloudConfigConfig := cloudconfigresource.DefaultConfig()
 
@@ -143,7 +144,7 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var masterResource k8sreconciler.Resource
+	var masterResource legacy.Resource
 	{
 		masterConfig := masterresource.DefaultConfig()
 
@@ -155,7 +156,7 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var namespaceResource k8sreconciler.Resource
+	var namespaceResource legacy.Resource
 	{
 		namespaceConfig := namespaceresource.DefaultConfig()
 
@@ -167,7 +168,7 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var workerResource k8sreconciler.Resource
+	var workerResource legacy.Resource
 	{
 		workerConfig := workerresource.DefaultConfig()
 
@@ -179,18 +180,16 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var newReconciler *k8sreconciler.Reconciler
+	var legacyResource *legacy.Reconciler
 	{
-		newConfig := k8sreconciler.DefaultConfig()
+		newConfig := legacy.DefaultConfig()
 
 		// Dependencies.
 		newConfig.KubernetesClient = kubernetesClient
-		newConfig.ListDecoder = &listDecoder{}
 		newConfig.Logger = config.Logger
 
 		// Settings.
-		newConfig.ListEndpoint = ListAPIEndpoint
-		newConfig.Resources = []k8sreconciler.Resource{
+		newConfig.Resources = []legacy.Resource{
 			// Note that the namespace resource is special since the creation of the
 			// cluster namespace has to be done before any other resource can be
 			// created inside of it. The current reconciliation is synchronous and
@@ -206,9 +205,8 @@ func New(config Config) (*Service, error) {
 			masterResource,
 			workerResource,
 		}
-		newConfig.WatchEndpoint = WatchAPIEndpoint
 
-		newReconciler, err = k8sreconciler.New(newConfig)
+		legacyResource, err = legacy.New(newConfig)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
@@ -231,9 +229,11 @@ func New(config Config) (*Service, error) {
 	{
 		operatorConfig := operator.DefaultConfig()
 
-		operatorConfig.KubernetesClient = kubernetesClient
+		operatorConfig.K8sClient = kubernetesClient
 		operatorConfig.Logger = config.Logger
-		operatorConfig.Reconciler = newReconciler
+		operatorConfig.Resources = []operatorkitoperator.Resource{
+			legacyResource,
+		}
 
 		operatorService, err = operator.New(operatorConfig)
 		if err != nil {
