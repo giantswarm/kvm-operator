@@ -1,6 +1,6 @@
 package: github.com/giantswarm/kvmtpr
 import:
-- package: k8s.io/apimachinery
+- package: github.com/giantswarm/operatorkit
   version: master
 - package: github.com/giantswarm/clustertpr
   version: master
