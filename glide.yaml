@@ -24,4 +24,4 @@ import:
   version: master
 # Pinned to the version before kubeadm.
 - package: github.com/giantswarm/k8scloudconfig
-  version: 266a3f7485a933209f086df6550532eef2b289d3
+  version: structure

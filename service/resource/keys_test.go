@@ -5,19 +5,18 @@ import (
 	"testing"
 
 	"github.com/giantswarm/clustertpr"
-	"github.com/giantswarm/clustertpr/cluster"
-	"github.com/giantswarm/clustertpr/customer"
+	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 )
 
 func TestClusterID(t *testing.T) {
 	expectedID := "test-cluster"
 
-	cluster := clustertpr.Cluster{
-		Cluster: cluster.Cluster{
+	cluster := clustertpr.Spec{
+		Cluster: spec.Cluster{
 			ID: expectedID,
 		},
-		Customer: customer.Customer{
+		Customer: spec.Customer{
 			ID: "test-customer",
 		},
 	}
@@ -36,11 +35,11 @@ func TestClusterID(t *testing.T) {
 func TestClusterCustomer(t *testing.T) {
 	expectedID := "test-customer"
 
-	cluster := clustertpr.Cluster{
-		Cluster: cluster.Cluster{
+	cluster := clustertpr.Spec{
+		Cluster: spec.Cluster{
 			ID: "test-cluster",
 		},
-		Customer: customer.Customer{
+		Customer: spec.Customer{
 			ID: expectedID,
 		},
 	}
