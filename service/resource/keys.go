@@ -5,7 +5,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/giantswarm/clustertpr/node"
+	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 )
 
@@ -29,7 +29,7 @@ func ClusterNamespace(customObject kvmtpr.CustomObject) string {
 	return ClusterID(customObject)
 }
 
-func ConfigMapName(customObject kvmtpr.CustomObject, node node.Node, prefix string) string {
+func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 

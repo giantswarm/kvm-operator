@@ -6,6 +6,6 @@ import (
 )
 
 type Spec struct {
-	Cluster clustertpr.Cluster `json:"cluster" yaml:"cluster"`
-	KVM     spec.KVM           `json:"kvm" yaml:"kvm"`
+	Cluster clustertpr.Spec `json:"cluster" yaml:"cluster"`
+	KVM     spec.KVM        `json:"kvm" yaml:"kvm"`
 }
