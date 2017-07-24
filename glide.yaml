@@ -22,6 +22,5 @@ import:
   version: master
 - package: github.com/giantswarm/kvmtpr
   version: master
-# Pinned to the version before kubeadm.
 - package: github.com/giantswarm/k8scloudconfig
-  version: structure
+  version: master

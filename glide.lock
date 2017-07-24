@@ -1,5 +1,5 @@
-hash: 71040acfcffd5d49e81ce582931d3411f29e27329e6cca9ce619f61cf52da8f3
-updated: 2017-07-24T18:01:23.264472777+02:00
+hash: 069d6dd1aaf9f57dd6845bc8dbb07a424e1952e771d0288c6c15147fea28cacc
+updated: 2017-07-24T18:19:56.134931022+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -54,7 +54,7 @@ imports:
   - spec/kubernetes/kubectl
   - spec/kubernetes/networksetup
 - name: github.com/giantswarm/k8scloudconfig
-  version: 8a01d06bd37cf50b9049d4155576a76907fff1c2
+  version: 797bc2b9449f48960da36fd41d938c7db4f76fa0
 - name: github.com/giantswarm/kvmtpr
   version: c0bfd7c848c3784b03901c627e135c4bd3410569
   subpackages:
@@ -170,13 +170,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 3e6a7635bac6573d43f49f97b47eb9bda195dba8
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
