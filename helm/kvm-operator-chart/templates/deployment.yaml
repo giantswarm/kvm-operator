@@ -45,4 +45,4 @@ spec:
             cpu: 250m
             memory: 250Mi
       imagePullSecrets:
-      - name: giantswarm-registry
+      - name: kvm-operator-pull-secret
