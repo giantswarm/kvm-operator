@@ -1,8 +1,10 @@
 hash: 069d6dd1aaf9f57dd6845bc8dbb07a424e1952e771d0288c6c15147fea28cacc
-updated: 2017-07-24T18:19:56.134931022+02:00
+updated: 2017-07-27T12:21:25.912075193+02:00
 imports:
+- name: bitbucket.org/ww/goautoneg
+  version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: github.com/beorn7/perks
-  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
   - quantile
 - name: github.com/cenkalti/backoff
@@ -54,7 +56,7 @@ imports:
   - spec/kubernetes/kubectl
   - spec/kubernetes/networksetup
 - name: github.com/giantswarm/k8scloudconfig
-  version: 797bc2b9449f48960da36fd41d938c7db4f76fa0
+  version: abbec1404a3da3f268923dc3276e97605cd9838b
 - name: github.com/giantswarm/kvmtpr
   version: c0bfd7c848c3784b03901c627e135c4bd3410569
   subpackages:
@@ -153,7 +155,7 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
@@ -166,19 +168,16 @@ imports:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: 6f3806018612930941127f2a7c6c453ba2c527d2
+  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
+  version: ffe929a3f4c4faeaa10f2b9535c2b1be3ad15650
   subpackages:
   - expfmt
-  - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a1dba9ce8baed984a2495b658c82687f8157b98f
-  subpackages:
-  - xfs
+  version: 454a56f35412459b5e684fd5ec0f9211b94f002a
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
@@ -190,7 +189,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 90fc11bbc0a789c29272c21b5ff9e93db183f8dc
+  version: 34594c771f2c18301dc152640ad40ece28795373
 - name: github.com/spf13/jwalterweatherman
   version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
@@ -249,7 +248,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 25c4ec802a7d637f88d584ab26798e94ad14c13b
+  version: f7716cbe52baa25d2e9b0d0da546fcf909fc16b4
 - name: k8s.io/apimachinery
   version: 85ace5365f33b16fc735c866a12e3c765b9700f2
   subpackages:
