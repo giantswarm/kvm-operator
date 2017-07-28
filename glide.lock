@@ -1,10 +1,8 @@
 hash: 069d6dd1aaf9f57dd6845bc8dbb07a424e1952e771d0288c6c15147fea28cacc
-updated: 2017-07-27T12:21:25.912075193+02:00
+updated: 2017-07-28T14:17:20.754838049+02:00
 imports:
-- name: bitbucket.org/ww/goautoneg
-  version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: github.com/beorn7/perks
-  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
+  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/cenkalti/backoff
@@ -56,7 +54,7 @@ imports:
   - spec/kubernetes/kubectl
   - spec/kubernetes/networksetup
 - name: github.com/giantswarm/k8scloudconfig
-  version: abbec1404a3da3f268923dc3276e97605cd9838b
+  version: eae0e4cd5bd5211c6e14fc460fdf6d7c1d76b49e
 - name: github.com/giantswarm/kvmtpr
   version: c0bfd7c848c3784b03901c627e135c4bd3410569
   subpackages:
@@ -64,8 +62,10 @@ imports:
   - spec/kvm
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
+- name: github.com/giantswarm/microerror
+  version: 7bf6a0a6d24b1e3a03af3ed3a8e3531d792ea3e3
 - name: github.com/giantswarm/microkit
-  version: c2f273484a749a94402dc3cfbd02913f57995484
+  version: 4e085764fbe2e0301e2065bbb01d74847e47c4cc
   subpackages:
   - command
   - command/daemon
@@ -87,8 +87,10 @@ imports:
   - transaction
   - transaction/context/id
   - transaction/context/tracked
+- name: github.com/giantswarm/micrologger
+  version: 97740d3352f783c3b774db8bab314deff165f43b
 - name: github.com/giantswarm/operatorkit
-  version: 2ed2153269a30dc8331b2fca4b6a314dad02f9b6
+  version: 9002173eba12892f2c193ad2c33ea7dca291e8de
   subpackages:
   - operator
   - tpr
@@ -155,7 +157,7 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
+  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
@@ -168,16 +170,19 @@ imports:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  version: 6f3806018612930941127f2a7c6c453ba2c527d2
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: ffe929a3f4c4faeaa10f2b9535c2b1be3ad15650
+  version: 3e6a7635bac6573d43f49f97b47eb9bda195dba8
   subpackages:
   - expfmt
+  - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 454a56f35412459b5e684fd5ec0f9211b94f002a
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
+  subpackages:
+  - xfs
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
@@ -248,7 +253,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: f7716cbe52baa25d2e9b0d0da546fcf909fc16b4
+  version: 25c4ec802a7d637f88d584ab26798e94ad14c13b
 - name: k8s.io/apimachinery
   version: 85ace5365f33b16fc735c866a12e3c765b9700f2
   subpackages:
