@@ -1094,7 +1094,7 @@ coreos:
       -v /:/rootfs:ro \
       -v /sys:/sys:ro \
       -v /dev:/dev:rw \
-      -v /var/log/pods:/var/log/pods:rw \
+      -v /var/log:/var/log:rw \
       -v /run/calico/:/run/calico/:rw \
       -v /run/docker/:/run/docker/:rw \
       -v /run/docker.sock:/run/docker.sock:rw \
@@ -1528,7 +1528,7 @@ coreos:
       -v /:/rootfs:ro \
       -v /sys:/sys:ro \
       -v /dev:/dev:rw \
-      -v /var/log/pods:/var/log/pods:rw \
+      -v /var/log:/var/log:rw \
       -v /run/calico/:/run/calico/:rw \
       -v /run/docker/:/run/docker/:rw \
       -v /run/docker.sock:/run/docker.sock:rw \
