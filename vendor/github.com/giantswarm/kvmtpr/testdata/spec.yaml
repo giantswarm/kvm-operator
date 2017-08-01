@@ -35,6 +35,8 @@ cluster:
       docker:
         image: quay.io/giantswarm/hyperkube
     ingressController:
+      docker:
+        image: quay.io/giantswarm/nginx-ingress-controller
       domain: ingress.giantswarm.io
       wildcardDomain: '*.giantswarm.io'
       insecurePort: 30010
