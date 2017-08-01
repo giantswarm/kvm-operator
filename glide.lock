@@ -1,5 +1,5 @@
 hash: 069d6dd1aaf9f57dd6845bc8dbb07a424e1952e771d0288c6c15147fea28cacc
-updated: 2017-07-28T14:17:20.754838049+02:00
+updated: 2017-08-01T14:24:13.614927214+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -45,18 +45,19 @@ imports:
 - name: github.com/giantswarm/certificatetpr
   version: 4621214c8364e0fc8234013911211e384bfd3ddf
 - name: github.com/giantswarm/clustertpr
-  version: 9eeb968a00813525e4a8addb158e802320119aef
+  version: e00ef3f59c4d55ce1a2cf70b7739e34a0604d748
   subpackages:
   - spec
   - spec/docker
   - spec/kubernetes
   - spec/kubernetes/hyperkube
+  - spec/kubernetes/ingress
   - spec/kubernetes/kubectl
   - spec/kubernetes/networksetup
 - name: github.com/giantswarm/k8scloudconfig
-  version: eae0e4cd5bd5211c6e14fc460fdf6d7c1d76b49e
+  version: 3f295cf51350030d407d247daa2c7f7cf085efe0
 - name: github.com/giantswarm/kvmtpr
-  version: c0bfd7c848c3784b03901c627e135c4bd3410569
+  version: a79379f8e927e45539581ba7df73843f5cfa0574
   subpackages:
   - spec
   - spec/kvm
@@ -90,7 +91,7 @@ imports:
 - name: github.com/giantswarm/micrologger
   version: 97740d3352f783c3b774db8bab314deff165f43b
 - name: github.com/giantswarm/operatorkit
-  version: 9002173eba12892f2c193ad2c33ea7dca291e8de
+  version: be4331cdb2d518c233732b54a21093ae05231c84
   subpackages:
   - operator
   - tpr
@@ -174,13 +175,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 3e6a7635bac6573d43f49f97b47eb9bda195dba8
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -194,7 +195,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 34594c771f2c18301dc152640ad40ece28795373
+  version: b26b538f693051ac6518e65672de3144ce3fbedc
 - name: github.com/spf13/jwalterweatherman
   version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag

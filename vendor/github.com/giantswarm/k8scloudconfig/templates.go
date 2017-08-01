@@ -666,7 +666,7 @@ write_files:
         spec:
           containers:
           - name: nginx-ingress-controller
-            image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.11
+            image: {{.Cluster.Kubernetes.IngressController.Docker.Image}}
             args:
             - /nginx-ingress-controller
             - --default-backend-service=$(POD_NAMESPACE)/default-http-backend

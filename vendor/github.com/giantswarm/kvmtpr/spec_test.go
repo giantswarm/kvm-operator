@@ -12,6 +12,7 @@ import (
 	clustertprdocker "github.com/giantswarm/clustertpr/spec/docker"
 	clustertprkubernetes "github.com/giantswarm/clustertpr/spec/kubernetes"
 	clustertprkuberneteshyperkube "github.com/giantswarm/clustertpr/spec/kubernetes/hyperkube"
+	clustertprkubernetesingress "github.com/giantswarm/clustertpr/spec/kubernetes/ingress"
 	clustertprkuberneteskubectl "github.com/giantswarm/clustertpr/spec/kubernetes/kubectl"
 	clustertprkubernetesnetworksetup "github.com/giantswarm/clustertpr/spec/kubernetes/networksetup"
 	spec "github.com/giantswarm/kvmtpr/spec"
@@ -73,6 +74,9 @@ func TestSpecYamlEncoding(t *testing.T) {
 					},
 				},
 				IngressController: clustertprkubernetes.IngressController{
+					Docker: clustertprkubernetesingress.Docker{
+						Image: "quay.io/giantswarm/nginx-ingress-controller",
+					},
 					Domain:         "ingress.giantswarm.io",
 					WildcardDomain: "*.giantswarm.io",
 					InsecurePort:   30010,

@@ -25,14 +25,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 )
 
 type levelFlag string
 
 // String implements flag.Value.
 func (f levelFlag) String() string {
-	return fmt.Sprintf("%q", origLogger.Level.String())
+	return fmt.Sprintf("%q", string(f))
 }
 
 // Set implements flag.Value.
@@ -46,10 +46,10 @@ func (f levelFlag) Set(level string) error {
 }
 
 // setSyslogFormatter is nil if the target architecture does not support syslog.
-var setSyslogFormatter func(logger, string, string) error
+var setSyslogFormatter func(string, string) error
 
 // setEventlogFormatter is nil if the target OS does not support Eventlog (i.e., is not Windows).
-var setEventlogFormatter func(logger, string, bool) error
+var setEventlogFormatter func(string, bool) error
 
 func setJSONFormatter() {
 	origLogger.Formatter = &logrus.JSONFormatter{}
@@ -65,7 +65,45 @@ func (f logFormatFlag) String() string {
 
 // Set implements flag.Value.
 func (f logFormatFlag) Set(format string) error {
-	return baseLogger.SetFormat(format)
+	u, err := url.Parse(format)
+	if err != nil {
+		return err
+	}
+	if u.Scheme != "logger" {
+		return fmt.Errorf("invalid scheme %s", u.Scheme)
+	}
+	jsonq := u.Query().Get("json")
+	if jsonq == "true" {
+		setJSONFormatter()
+	}
+
+	switch u.Opaque {
+	case "syslog":
+		if setSyslogFormatter == nil {
+			return fmt.Errorf("system does not support syslog")
+		}
+		appname := u.Query().Get("appname")
+		facility := u.Query().Get("local")
+		return setSyslogFormatter(appname, facility)
+	case "eventlog":
+		if setEventlogFormatter == nil {
+			return fmt.Errorf("system does not support eventlog")
+		}
+		name := u.Query().Get("name")
+		debugAsInfo := false
+		debugAsInfoRaw := u.Query().Get("debugAsInfo")
+		if parsedDebugAsInfo, err := strconv.ParseBool(debugAsInfoRaw); err == nil {
+			debugAsInfo = parsedDebugAsInfo
+		}
+		return setEventlogFormatter(name, debugAsInfo)
+	case "stdout":
+		origLogger.Out = os.Stdout
+	case "stderr":
+		origLogger.Out = os.Stderr
+	default:
+		return fmt.Errorf("unsupported logger %q", u.Opaque)
+	}
+	return nil
 }
 
 func init() {
@@ -112,9 +150,6 @@ type Logger interface {
 	Fatalf(string, ...interface{})
 
 	With(key string, value interface{}) Logger
-
-	SetFormat(string) error
-	SetLevel(string) error
 }
 
 type logger struct {
@@ -198,58 +233,6 @@ func (l logger) Fatalln(args ...interface{}) {
 // Fatalf logs a message at level Fatal on the standard logger.
 func (l logger) Fatalf(format string, args ...interface{}) {
 	l.sourced().Fatalf(format, args...)
-}
-
-func (l logger) SetLevel(level string) error {
-	lvl, err := logrus.ParseLevel(level)
-	if err != nil {
-		return err
-	}
-
-	l.entry.Logger.Level = lvl
-	return nil
-}
-
-func (l logger) SetFormat(format string) error {
-	u, err := url.Parse(format)
-	if err != nil {
-		return err
-	}
-	if u.Scheme != "logger" {
-		return fmt.Errorf("invalid scheme %s", u.Scheme)
-	}
-	jsonq := u.Query().Get("json")
-	if jsonq == "true" {
-		setJSONFormatter()
-	}
-
-	switch u.Opaque {
-	case "syslog":
-		if setSyslogFormatter == nil {
-			return fmt.Errorf("system does not support syslog")
-		}
-		appname := u.Query().Get("appname")
-		facility := u.Query().Get("local")
-		return setSyslogFormatter(l, appname, facility)
-	case "eventlog":
-		if setEventlogFormatter == nil {
-			return fmt.Errorf("system does not support eventlog")
-		}
-		name := u.Query().Get("name")
-		debugAsInfo := false
-		debugAsInfoRaw := u.Query().Get("debugAsInfo")
-		if parsedDebugAsInfo, err := strconv.ParseBool(debugAsInfoRaw); err == nil {
-			debugAsInfo = parsedDebugAsInfo
-		}
-		return setEventlogFormatter(l, name, debugAsInfo)
-	case "stdout":
-		l.entry.Logger.Out = os.Stdout
-	case "stderr":
-		l.entry.Logger.Out = os.Stderr
-	default:
-		return fmt.Errorf("unsupported logger %q", u.Opaque)
-	}
-	return nil
 }
 
 // sourced adds a source field to the logger that contains
