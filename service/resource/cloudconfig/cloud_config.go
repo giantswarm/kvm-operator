@@ -4,8 +4,8 @@ import (
 	"github.com/giantswarm/certificatetpr"
 	cloudconfig "github.com/giantswarm/k8scloudconfig"
 	"github.com/giantswarm/kvmtpr"
-	microerror "github.com/giantswarm/microkit/error"
-	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -39,10 +39,10 @@ func DefaultConfig() Config {
 func New(config Config) (*Service, error) {
 	// Dependencies.
 	if config.CertWatcher == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.CertWatcher must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.CertWatcher must not be empty")
 	}
 	if config.Logger == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 
 	newService := &Service{
@@ -66,7 +66,7 @@ type Service struct {
 func (s *Service) GetForCreate(obj interface{}) ([]runtime.Object, error) {
 	ros, err := s.newRuntimeObjects(obj)
 	if err != nil {
-		return nil, microerror.MaskAny(err)
+		return nil, microerror.Mask(err)
 	}
 
 	return ros, nil
@@ -94,12 +94,12 @@ func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string
 	{
 		newCloudConfig, err = cloudconfig.NewCloudConfig(template, params)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 
 		err = newCloudConfig.ExecuteTemplate()
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -128,12 +128,12 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 
 	customObject, ok := obj.(*kvmtpr.CustomObject)
 	if !ok {
-		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
 	certs, err := s.certWatcher.SearchCerts(customObject.Spec.Cluster.Cluster.ID)
 	if err != nil {
-		return nil, microerror.MaskAny(err)
+		return nil, microerror.Mask(err)
 	}
 
 	for _, mn := range customObject.Spec.Cluster.Masters {
@@ -150,7 +150,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 
 		cm, err := s.newConfigMap(*customObject, cloudconfig.MasterTemplate, params, "master")
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 
 		runtimeObjects = append(runtimeObjects, cm)
@@ -170,7 +170,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 
 		cm, err := s.newConfigMap(*customObject, cloudconfig.WorkerTemplate, params, "worker")
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 
 		runtimeObjects = append(runtimeObjects, cm)

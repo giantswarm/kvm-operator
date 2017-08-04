@@ -65,6 +65,12 @@ type logger struct {
 	Logger kitlog.Logger
 }
 
+func (l *logger) With(keyvals ...interface{}) Logger {
+	return &logger{
+		Logger: kitlog.With(l.Logger, keyvals...),
+	}
+}
+
 func (l *logger) Log(keyvals ...interface{}) error {
 	return l.Logger.Log(keyvals...)
 }

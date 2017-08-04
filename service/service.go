@@ -11,9 +11,10 @@ import (
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/certificatetpr"
-	microerror "github.com/giantswarm/microkit/error"
-	micrologger "github.com/giantswarm/microkit/logger"
-	operatorkitoperator "github.com/giantswarm/operatorkit/operator"
+	"github.com/giantswarm/microendpoint/service/version"
+	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/operatorkit/framework"
 	"github.com/spf13/viper"
 
 	"github.com/giantswarm/kvm-operator/flag"
@@ -24,7 +25,6 @@ import (
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
-	"github.com/giantswarm/kvm-operator/service/version"
 )
 
 const (
@@ -69,7 +69,7 @@ func DefaultConfig() Config {
 func New(config Config) (*Service, error) {
 	// Dependencies.
 	if config.Logger == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
 	}
 	config.Logger.Log("debug", fmt.Sprintf("creating kvm-operator with config: %#v", config))
 
@@ -84,7 +84,7 @@ func New(config Config) (*Service, error) {
 			config.Logger.Log("debug", "creating in-cluster config")
 			restConfig, err = rest.InClusterConfig()
 			if err != nil {
-				return nil, microerror.MaskAny(err)
+				return nil, microerror.Mask(err)
 			}
 
 			if address != "" {
@@ -93,7 +93,7 @@ func New(config Config) (*Service, error) {
 			}
 		} else {
 			if address == "" {
-				return nil, microerror.MaskAnyf(invalidConfigError, "kubernetes address must not be empty")
+				return nil, microerror.Maskf(invalidConfigError, "kubernetes address must not be empty")
 			}
 
 			config.Logger.Log("debug", "creating out-cluster config")
@@ -101,7 +101,7 @@ func New(config Config) (*Service, error) {
 			// Kubernetes listen URL.
 			u, err := url.Parse(address)
 			if err != nil {
-				return nil, microerror.MaskAny(err)
+				return nil, microerror.Mask(err)
 			}
 
 			restConfig = &rest.Config{
@@ -116,7 +116,7 @@ func New(config Config) (*Service, error) {
 
 		kubernetesClient, err = kubernetes.NewForConfig(restConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -127,7 +127,7 @@ func New(config Config) (*Service, error) {
 		certConfig.Logger = config.Logger
 		certWatcher, err = certificatetpr.New(certConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -140,7 +140,7 @@ func New(config Config) (*Service, error) {
 
 		cloudConfigResource, err = cloudconfigresource.New(cloudConfigConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -152,7 +152,7 @@ func New(config Config) (*Service, error) {
 
 		masterResource, err = masterresource.New(masterConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -164,7 +164,7 @@ func New(config Config) (*Service, error) {
 
 		namespaceResource, err = namespaceresource.New(namespaceConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -176,7 +176,19 @@ func New(config Config) (*Service, error) {
 
 		workerResource, err = workerresource.New(workerConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var operatorFramework *framework.Framework
+	{
+		frameworkConfig := framework.DefaultConfig()
+
+		frameworkConfig.Logger = config.Logger
+
+		operatorFramework, err = framework.New(frameworkConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -208,7 +220,7 @@ func New(config Config) (*Service, error) {
 
 		legacyResource, err = legacy.New(newConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -221,7 +233,7 @@ func New(config Config) (*Service, error) {
 
 		healthzService, err = healthz.New(healthzConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -231,13 +243,14 @@ func New(config Config) (*Service, error) {
 
 		operatorConfig.K8sClient = kubernetesClient
 		operatorConfig.Logger = config.Logger
-		operatorConfig.Resources = []operatorkitoperator.Resource{
+		operatorConfig.OperatorFramework = operatorFramework
+		operatorConfig.Resources = []framework.Resource{
 			legacyResource,
 		}
 
 		operatorService, err = operator.New(operatorConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -252,7 +265,7 @@ func New(config Config) (*Service, error) {
 
 		versionService, err = version.New(versionConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
