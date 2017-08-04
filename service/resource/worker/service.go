@@ -2,7 +2,7 @@ package worker
 
 import (
 	"github.com/giantswarm/kvmtpr"
-	microerror "github.com/giantswarm/microkit/error"
+	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -13,7 +13,7 @@ import (
 func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 	customObject, ok := obj.(*kvmtpr.CustomObject)
 	if !ok {
-		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
 	// TODO maybe add one service per worker?

@@ -3,7 +3,7 @@ package worker
 import (
 	"github.com/giantswarm/kvm-operator/service/resource"
 	"github.com/giantswarm/kvmtpr"
-	microerror "github.com/giantswarm/microkit/error"
+	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
@@ -11,7 +11,7 @@ import (
 func (s *Service) newPodAfinity(obj interface{}) (*apiv1.Affinity, error) {
 	customObject, ok := obj.(*kvmtpr.CustomObject)
 	if !ok {
-		return nil, microerror.MaskAnyf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
 	}
 
 	podAffinity := &apiv1.Affinity{

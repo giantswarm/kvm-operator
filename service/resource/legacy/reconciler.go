@@ -1,8 +1,8 @@
 package legacy
 
 import (
-	microerror "github.com/giantswarm/microkit/error"
-	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -42,15 +42,15 @@ func DefaultConfig() Config {
 func New(config Config) (*Reconciler, error) {
 	// Dependencies.
 	if config.KubernetesClient == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.KubernetesClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.KubernetesClient must not be empty")
 	}
 	if config.Logger == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 
 	// Settings.
 	if len(config.Resources) == 0 {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.Resources must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.Resources must not be empty")
 	}
 
 	newReconciler := &Reconciler{
@@ -100,7 +100,7 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 	for _, res := range r.resources {
 		ros, err := res.GetForCreate(obj)
 		if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 
 		for _, ro := range ros {
@@ -114,7 +114,7 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 	}
 
 	if namespace == nil {
-		return microerror.MaskAnyf(executionFailedError, "namespace must not be empty")
+		return microerror.Maskf(executionFailedError, "namespace must not be empty")
 	}
 
 	for _, ro := range runtimeObjects {
@@ -134,13 +134,13 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 		case *v1.Service:
 			_, err = r.kubernetesClient.Core().Services(namespace.Name).Create(t)
 		default:
-			return microerror.MaskAnyf(executionFailedError, "unknown type '%T'", t)
+			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}
 
 		if apierrors.IsAlreadyExists(err) {
 			// Resource already being created, all good.
 		} else if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 	}
 
@@ -156,7 +156,7 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 	for _, res := range r.resources {
 		ros, err := res.GetForDelete(obj)
 		if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 
 		for _, ro := range ros {
@@ -170,7 +170,7 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 	}
 
 	if namespace == nil {
-		return microerror.MaskAnyf(executionFailedError, "namespace must not be empty")
+		return microerror.Maskf(executionFailedError, "namespace must not be empty")
 	}
 
 	for _, ro := range runtimeObjects {
@@ -190,13 +190,13 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 		case *v1.Service:
 			err = r.kubernetesClient.Core().Services(namespace.Name).Delete(t.Name, nil)
 		default:
-			return microerror.MaskAnyf(executionFailedError, "unknown type '%T'", t)
+			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}
 
 		if apierrors.IsNotFound(err) {
 			// Resource already being deleted, all good.
 		} else if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 	}
 

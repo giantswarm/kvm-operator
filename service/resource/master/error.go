@@ -1,19 +1,17 @@
 package master
 
-import (
-	"github.com/juju/errgo"
-)
+import "github.com/giantswarm/microerror"
 
-var invalidConfigError = errgo.New("invalid config")
+var invalidConfigError = microerror.New("invalid config")
 
 // IsInvalidConfig asserts invalidConfigError.
 func IsInvalidConfig(err error) bool {
-	return errgo.Cause(err) == invalidConfigError
+	return microerror.Cause(err) == invalidConfigError
 }
 
-var wrongTypeError = errgo.New("wrong type")
+var wrongTypeError = microerror.New("wrong type")
 
 // IsWrongTypeError asserts wrongTypeError.
 func IsWrongTypeError(err error) bool {
-	return errgo.Cause(err) == wrongTypeError
+	return microerror.Cause(err) == wrongTypeError
 }

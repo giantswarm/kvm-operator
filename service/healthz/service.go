@@ -9,8 +9,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvmtpr"
-	microerror "github.com/giantswarm/microkit/error"
-	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -54,10 +54,10 @@ func DefaultConfig() Config {
 func New(config Config) (*Service, error) {
 	// Dependencies.
 	if config.KubernetesClient == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "kubernetes client must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "kubernetes client must not be empty")
 	}
 	if config.Logger == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
 	}
 
 	newService := &Service{
@@ -91,7 +91,7 @@ func (s *Service) Check(ctx context.Context, request Request) (*Response, error)
 	_, err := s.kubernetesClient.Extensions().ThirdPartyResources().Get(kvmtpr.Name, apismetav1.GetOptions{})
 	if err != nil {
 		healthCheckRequests.WithLabelValues("failed").Inc()
-		return nil, microerror.MaskAny(err)
+		return nil, microerror.Mask(err)
 	}
 
 	healthCheckRequests.WithLabelValues("successful").Inc()

@@ -1,8 +1,8 @@
 package worker
 
 import (
-	microerror "github.com/giantswarm/microkit/error"
-	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 	"k8s.io/apimachinery/pkg/runtime"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -27,7 +27,7 @@ func DefaultConfig() Config {
 func New(config Config) (*Service, error) {
 	// Dependencies.
 	if config.Logger == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 
 	newService := &Service{
@@ -49,7 +49,7 @@ type Service struct {
 func (s *Service) GetForCreate(obj interface{}) ([]runtime.Object, error) {
 	ros, err := s.newRuntimeObjects(obj)
 	if err != nil {
-		return nil, microerror.MaskAny(err)
+		return nil, microerror.Mask(err)
 	}
 
 	return ros, nil
@@ -73,7 +73,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	{
 		podAffinity, err = s.newPodAfinity(obj)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -81,9 +81,9 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	{
 		newDeployments, err = s.newDeployments(obj)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
-		for i, _ := range newDeployments {
+		for i := range newDeployments {
 			newDeployments[i].Spec.Template.Spec.Affinity = podAffinity
 		}
 	}
@@ -92,7 +92,7 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 	{
 		newService, err = s.newService(obj)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
