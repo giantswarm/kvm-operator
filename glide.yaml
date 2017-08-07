@@ -2,9 +2,21 @@ package: github.com/giantswarm/kvm-operator
 import:
 - package: github.com/prometheus/client_golang
   version: ~0.8.0
-  subpackages:
-  - prometheus
 - package: github.com/giantswarm/microkit
+  version: master
+- package: github.com/giantswarm/operatorkit
+  version: master
+- package: github.com/giantswarm/certificatetpr
+  version: master
+- package: github.com/giantswarm/kvmtpr
+  version: master
+- package: github.com/giantswarm/k8scloudconfig
+  version: master
+- package: github.com/giantswarm/microendpoint
+  version: master
+- package: github.com/giantswarm/microerror
+  version: master
+- package: github.com/giantswarm/micrologger
   version: master
 # This verison is required by etcd, but docker/distribution uses an ancient
 # one.
@@ -12,15 +24,7 @@ import:
 # operatokir <- client-go <- docker/distribution
 - package: google.golang.org/grpc
   version: v1.2.1
-- package: github.com/giantswarm/operatorkit
-  version: master
 # This version is required by client-go.
 # operatorkit <- client-go
 - package: github.com/golang/protobuf/proto
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
-- package: github.com/giantswarm/certificatetpr
-  version: master
-- package: github.com/giantswarm/kvmtpr
-  version: master
-- package: github.com/giantswarm/k8scloudconfig
-  version: master

@@ -73,11 +73,11 @@ func (e *Endpoint) Encoder() kithttp.EncodeResponseFunc {
 	return func(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		rs, ok := response.(healthz.Responses)
+		rs, ok := response.([]healthz.Response)
 		if !ok {
-			return microerror.Maskf(wrongTypeError, "expected '%T' got '%T'", healthz.Responses{}, response)
+			return microerror.Maskf(wrongTypeError, "expected '%T' got '%T'", []healthz.Response{}, response)
 		}
-		if rs.HasFailed() {
+		if healthz.Responses(rs).HasFailed() {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
