@@ -3,12 +3,18 @@ package legacy
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/operatorkit/framework"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
 	apisbatchv1 "k8s.io/client-go/pkg/apis/batch/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
+)
+
+const (
+	// Name is the identifier of the resource.
+	Name = "legacy"
 )
 
 // Config represents the configuration used to create a new reconciler.
@@ -89,6 +95,10 @@ func (r *Reconciler) GetCreateState(obj, currentState, desiredState interface{})
 
 func (r *Reconciler) GetDeleteState(obj, currentState, desiredState interface{}) (interface{}, error) {
 	return nil, nil
+}
+
+func (r *Reconciler) Name() string {
+	return Name
 }
 
 func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
@@ -201,4 +211,8 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 	}
 
 	return nil
+}
+
+func (r *Reconciler) Underlying() framework.Resource {
+	return r
 }
