@@ -14,8 +14,8 @@ import (
 // Config represents the configuration used to create a new reconciler.
 type Config struct {
 	// Dependencies.
-	KubernetesClient *kubernetes.Clientset
-	Logger           micrologger.Logger
+	K8sClient kubernetes.Interface
+	Logger    micrologger.Logger
 
 	// Settings.
 	// Resources is the list of resources to be processed during creation and
@@ -30,8 +30,8 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		KubernetesClient: nil,
-		Logger:           nil,
+		K8sClient: nil,
+		Logger:    nil,
 
 		// Settings.
 		Resources: nil,
@@ -41,8 +41,8 @@ func DefaultConfig() Config {
 // New creates a new configured reconciler.
 func New(config Config) (*Reconciler, error) {
 	// Dependencies.
-	if config.KubernetesClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.KubernetesClient must not be empty")
+	if config.K8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
@@ -55,8 +55,8 @@ func New(config Config) (*Reconciler, error) {
 
 	newReconciler := &Reconciler{
 		// Dependencies.
-		kubernetesClient: config.KubernetesClient,
-		logger:           config.Logger,
+		k8sClient: config.K8sClient,
+		logger:    config.Logger,
 
 		// Settings
 		resources: config.Resources,
@@ -68,8 +68,8 @@ func New(config Config) (*Reconciler, error) {
 // Reconciler implements the reconciler.
 type Reconciler struct {
 	// Dependencies.
-	kubernetesClient *kubernetes.Clientset
-	logger           micrologger.Logger
+	k8sClient kubernetes.Interface
+	logger    micrologger.Logger
 
 	// Settings.
 	resources []Resource
@@ -122,17 +122,17 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 
 		switch t := ro.(type) {
 		case *v1.ConfigMap:
-			_, err = r.kubernetesClient.Core().ConfigMaps(namespace.Name).Create(t)
+			_, err = r.k8sClient.Core().ConfigMaps(namespace.Name).Create(t)
 		case *v1beta1.Deployment:
-			_, err = r.kubernetesClient.Extensions().Deployments(namespace.Name).Create(t)
+			_, err = r.k8sClient.Extensions().Deployments(namespace.Name).Create(t)
 		case *v1beta1.Ingress:
-			_, err = r.kubernetesClient.Extensions().Ingresses(namespace.Name).Create(t)
+			_, err = r.k8sClient.Extensions().Ingresses(namespace.Name).Create(t)
 		case *apisbatchv1.Job:
-			_, err = r.kubernetesClient.BatchV1().Jobs(namespace.Name).Create(t)
+			_, err = r.k8sClient.BatchV1().Jobs(namespace.Name).Create(t)
 		case *v1.Namespace:
-			_, err = r.kubernetesClient.Core().Namespaces().Create(t)
+			_, err = r.k8sClient.Core().Namespaces().Create(t)
 		case *v1.Service:
-			_, err = r.kubernetesClient.Core().Services(namespace.Name).Create(t)
+			_, err = r.k8sClient.Core().Services(namespace.Name).Create(t)
 		default:
 			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}
@@ -178,17 +178,17 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 
 		switch t := ro.(type) {
 		case *v1.ConfigMap:
-			err = r.kubernetesClient.Core().ConfigMaps(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Core().ConfigMaps(namespace.Name).Delete(t.Name, nil)
 		case *v1beta1.Deployment:
-			err = r.kubernetesClient.Extensions().Deployments(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Extensions().Deployments(namespace.Name).Delete(t.Name, nil)
 		case *v1beta1.Ingress:
-			err = r.kubernetesClient.Extensions().Ingresses(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Extensions().Ingresses(namespace.Name).Delete(t.Name, nil)
 		case *apisbatchv1.Job:
-			err = r.kubernetesClient.BatchV1().Jobs(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.BatchV1().Jobs(namespace.Name).Delete(t.Name, nil)
 		case *v1.Namespace:
-			err = r.kubernetesClient.Core().Namespaces().Delete(t.Name, nil)
+			err = r.k8sClient.Core().Namespaces().Delete(t.Name, nil)
 		case *v1.Service:
-			err = r.kubernetesClient.Core().Services(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Core().Services(namespace.Name).Delete(t.Name, nil)
 		default:
 			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}

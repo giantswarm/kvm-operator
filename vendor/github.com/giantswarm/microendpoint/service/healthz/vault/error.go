@@ -1,4 +1,4 @@
-package healthz
+package vault
 
 import "github.com/giantswarm/microerror"
 

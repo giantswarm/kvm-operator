@@ -17,7 +17,7 @@ import (
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
-	K8sClient         *kubernetes.Clientset
+	K8sClient         kubernetes.Interface
 	Logger            micrologger.Logger
 	OperatorFramework *framework.Framework
 	Resources         []framework.Resource

@@ -1,7 +1,7 @@
 package tls
 
 type TLS struct {
-	CaFile  string
+	CAFile  string
 	CrtFile string
 	KeyFile string
 }

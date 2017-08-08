@@ -4,16 +4,15 @@ package service
 
 import (
 	"fmt"
-	"net/url"
 	"sync"
 
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/operatorkit/client/k8s"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/spf13/viper"
 
@@ -75,46 +74,17 @@ func New(config Config) (*Service, error) {
 
 	var err error
 
-	var kubernetesClient *kubernetes.Clientset
+	var k8sClient kubernetes.Interface
 	{
-		var restConfig *rest.Config
-		address := config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
+		k8sConfig := k8s.DefaultConfig()
+		k8sConfig.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
+		k8sConfig.Logger = config.Logger
+		k8sConfig.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
+		k8sConfig.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
+		k8sConfig.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
+		k8sConfig.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
 
-		if config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster) {
-			config.Logger.Log("debug", "creating in-cluster config")
-			restConfig, err = rest.InClusterConfig()
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			if address != "" {
-				config.Logger.Log("debug", "using explicit api server")
-				restConfig.Host = address
-			}
-		} else {
-			if address == "" {
-				return nil, microerror.Maskf(invalidConfigError, "kubernetes address must not be empty")
-			}
-
-			config.Logger.Log("debug", "creating out-cluster config")
-
-			// Kubernetes listen URL.
-			u, err := url.Parse(address)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			restConfig = &rest.Config{
-				Host: u.String(),
-				TLSClientConfig: rest.TLSClientConfig{
-					CAFile:   config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CaFile),
-					CertFile: config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile),
-					KeyFile:  config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile),
-				},
-			}
-		}
-
-		kubernetesClient, err = kubernetes.NewForConfig(restConfig)
+		k8sClient, err = k8s.NewClient(k8sConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -123,7 +93,7 @@ func New(config Config) (*Service, error) {
 	var certWatcher *certificatetpr.Service
 	{
 		certConfig := certificatetpr.DefaultConfig()
-		certConfig.K8sClient = kubernetesClient
+		certConfig.K8sClient = k8sClient
 		certConfig.Logger = config.Logger
 		certWatcher, err = certificatetpr.New(certConfig)
 		if err != nil {
@@ -197,7 +167,7 @@ func New(config Config) (*Service, error) {
 		newConfig := legacy.DefaultConfig()
 
 		// Dependencies.
-		newConfig.KubernetesClient = kubernetesClient
+		newConfig.K8sClient = k8sClient
 		newConfig.Logger = config.Logger
 
 		// Settings.
@@ -228,8 +198,8 @@ func New(config Config) (*Service, error) {
 	{
 		healthzConfig := healthz.DefaultConfig()
 
+		healthzConfig.K8sClient = k8sClient
 		healthzConfig.Logger = config.Logger
-		healthzConfig.KubernetesClient = kubernetesClient
 
 		healthzService, err = healthz.New(healthzConfig)
 		if err != nil {
@@ -241,7 +211,7 @@ func New(config Config) (*Service, error) {
 	{
 		operatorConfig := operator.DefaultConfig()
 
-		operatorConfig.K8sClient = kubernetesClient
+		operatorConfig.K8sClient = k8sClient
 		operatorConfig.Logger = config.Logger
 		operatorConfig.OperatorFramework = operatorFramework
 		operatorConfig.Resources = []framework.Resource{

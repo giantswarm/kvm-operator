@@ -1,12 +1,10 @@
-hash: 069d6dd1aaf9f57dd6845bc8dbb07a424e1952e771d0288c6c15147fea28cacc
-updated: 2017-08-04T15:12:01.478687897+02:00
+hash: 034c3a489bd0008afb1fa97a2c3b66f4f8cf5c8e496291aa0029ccb05614fa56
+updated: 2017-08-07T16:03:33.206620526+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
-- name: github.com/cenk/backoff
-  version: 61153c768f31ee5f130071d08fc82b85208528de
 - name: github.com/cenkalti/backoff
   version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
 - name: github.com/coreos/etcd
@@ -66,9 +64,12 @@ imports:
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
 - name: github.com/giantswarm/microendpoint
-  version: d07c9d13ff8895ca358a7e69af344dcbb18ddffe
+  version: fb3e124643cfb364625089c39a59393f8cfdf647
   subpackages:
+  - endpoint/healthz
   - endpoint/version
+  - service/healthz
+  - service/healthz/k8s
   - service/version
 - name: github.com/giantswarm/microerror
   version: 5ade94eb4ee35ef72eb9382228470caeddb29989
@@ -94,9 +95,9 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/micrologger
-  version: 3fc80a5b178fd25a757c8bbe54599b21b11a1110
+  version: 8a69b2ab80ba2d0bd40d609206518fefacfc8fdf
 - name: github.com/giantswarm/operatorkit
-  version: eb43a99a26b6dabf17e39b5006924308f9e78bf5
+  version: 2f2c2942ed86d1fd6def7f7367b19031883047db
   subpackages:
   - framework
   - tpr
@@ -180,13 +181,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 61f87aac8082fa8c3c5655c7608d7478d46ac2ad
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -259,7 +260,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: 25c4ec802a7d637f88d584ab26798e94ad14c13b
 - name: k8s.io/apimachinery
   version: 85ace5365f33b16fc735c866a12e3c765b9700f2
   subpackages:
