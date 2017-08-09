@@ -1,4 +1,4 @@
-package resource
+package key
 
 import (
 	"net"
@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/kvmtpr"
 )
 
-func TestClusterID(t *testing.T) {
+func Test_ClusterID(t *testing.T) {
 	expectedID := "test-cluster"
 
 	cluster := clustertpr.Spec{
@@ -32,7 +32,7 @@ func TestClusterID(t *testing.T) {
 	}
 }
 
-func TestClusterCustomer(t *testing.T) {
+func Test_ClusterCustomer(t *testing.T) {
 	expectedID := "test-customer"
 
 	cluster := clustertpr.Spec{

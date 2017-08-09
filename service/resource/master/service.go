@@ -1,12 +1,11 @@
 package master
 
 import (
+	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-
-	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
@@ -23,8 +22,8 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: "master",
 			Labels: map[string]string{
-				"cluster":  resource.ClusterID(*customObject),
-				"customer": resource.ClusterCustomer(*customObject),
+				"cluster":  key.ClusterID(*customObject),
+				"customer": key.ClusterCustomer(*customObject),
 				"app":      "master",
 			},
 		},

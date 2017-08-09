@@ -1,14 +1,13 @@
 package namespace
 
 import (
+	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-
-	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 // Config represents the configuration used to create a new service.
@@ -86,10 +85,10 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: resource.ClusterNamespace(*customObject),
+			Name: key.ClusterNamespace(*customObject),
 			Labels: map[string]string{
-				"cluster":  resource.ClusterID(*customObject),
-				"customer": resource.ClusterCustomer(*customObject),
+				"cluster":  key.ClusterID(*customObject),
+				"customer": key.ClusterCustomer(*customObject),
 			},
 		},
 	}

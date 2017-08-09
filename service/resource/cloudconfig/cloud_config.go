@@ -3,14 +3,13 @@ package cloudconfig
 import (
 	"github.com/giantswarm/certificatetpr"
 	cloudconfig "github.com/giantswarm/k8scloudconfig"
+	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-
-	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 const (
@@ -107,10 +106,10 @@ func (s *Service) newConfigMap(customObject kvmtpr.CustomObject, template string
 	{
 		newConfigMap = &apiv1.ConfigMap{
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: resource.ConfigMapName(customObject, params.Node, prefix),
+				Name: key.ConfigMapName(customObject, params.Node, prefix),
 				Labels: map[string]string{
-					"cluster":  resource.ClusterID(customObject),
-					"customer": resource.ClusterCustomer(customObject),
+					"cluster":  key.ClusterID(customObject),
+					"customer": key.ClusterCustomer(customObject),
 				},
 			},
 			Data: map[string]string{
