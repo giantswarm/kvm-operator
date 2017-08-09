@@ -1,13 +1,12 @@
 package master
 
 import (
+	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
-
-	"github.com/giantswarm/kvm-operator/service/resource"
 )
 
 func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error) {
@@ -25,8 +24,8 @@ func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error)
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: "etcd",
 				Labels: map[string]string{
-					"cluster":  resource.ClusterID(*customObject),
-					"customer": resource.ClusterCustomer(*customObject),
+					"cluster":  key.ClusterID(*customObject),
+					"customer": key.ClusterCustomer(*customObject),
 					"app":      "master",
 				},
 				Annotations: map[string]string{
@@ -69,8 +68,8 @@ func (s *Service) newIngresses(obj interface{}) ([]*extensionsv1.Ingress, error)
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: "api",
 				Labels: map[string]string{
-					"cluster":  resource.ClusterID(*customObject),
-					"customer": resource.ClusterCustomer(*customObject),
+					"cluster":  key.ClusterID(*customObject),
+					"customer": key.ClusterCustomer(*customObject),
 					"app":      "master",
 				},
 				Annotations: map[string]string{

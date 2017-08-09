@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"github.com/giantswarm/kvm-operator/service/resource"
+	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,7 +31,7 @@ func (s *Service) newPodAfinity(obj interface{}) (*apiv1.Affinity, error) {
 						},
 					},
 					TopologyKey: "kubernetes.io/hostname",
-					Namespaces:  []string{resource.ClusterID(*customObject)},
+					Namespaces:  []string{key.ClusterID(*customObject)},
 				},
 			},
 		},
