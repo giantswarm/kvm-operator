@@ -210,7 +210,6 @@ func (r *Resource) ProcessDeleteState(obj, del interface{}) error {
 	}
 
 	// Delete the config maps in the Kubernetes API.
-
 	if namespaceToDelete != nil {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the namespace in the Kubernetes API")
 
