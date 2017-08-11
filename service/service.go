@@ -101,7 +101,7 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var cloudConfigResource legacy.Resource
+	var cloudConfigResource framework.Resource
 	{
 		cloudConfigConfig := cloudconfigresource.DefaultConfig()
 
@@ -178,12 +178,6 @@ func New(config Config) (*Service, error) {
 			// processes resources in a series. This is why the namespace resource has
 			// to be registered first.
 			namespaceResource,
-			// Note that the cloud config resource is special since the creation of
-			// configmaps has to be done before any pod can make use of it. The
-			// current reconciliation is synchronous and processes resources in a
-			// series. This is why the cloud config resource has to be registered
-			// second.
-			cloudConfigResource,
 			masterResource,
 			workerResource,
 		}
@@ -215,6 +209,8 @@ func New(config Config) (*Service, error) {
 		operatorConfig.Logger = config.Logger
 		operatorConfig.OperatorFramework = operatorFramework
 		operatorConfig.Resources = []framework.Resource{
+			// TODO namespace resource
+			cloudConfigResource,
 			legacyResource,
 		}
 
