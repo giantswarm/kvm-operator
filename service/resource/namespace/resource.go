@@ -216,7 +216,7 @@ func (r *Resource) ProcessDeleteState(obj, del interface{}) error {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the namespace in the Kubernetes API")
 
 		err = r.k8sClient.CoreV1().Namespaces().Delete(namespaceToDelete.Name, &apismetav1.DeleteOptions{})
-		if apierrors.IsAlreadyExists(err) {
+		if apierrors.IsNotFound(err) {
 			// fall through
 		} else if err != nil {
 			return microerror.Mask(err)
