@@ -81,7 +81,7 @@ func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
 	}
 
 	if namespace == nil {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "dit not found the namespace in the Kubernetes API")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "did not found the namespace in the Kubernetes API")
 	} else {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found the namespace in the Kubernetes API")
 	}
