@@ -95,7 +95,7 @@ func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "making up the new namespace")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new namespace")
 
 	// Make up the desired state of the namespace to have a reference of data how
 	// it should be.
@@ -113,7 +113,7 @@ func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
 		},
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "made up the new namespace")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computed the new namespace")
 
 	return namespace, nil
 }
