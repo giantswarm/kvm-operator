@@ -44,19 +44,19 @@ func Test_Resource_Namespace_GetDesiredState(t *testing.T) {
 	}
 
 	var err error
-	var newResoure *Resource
+	var newResource *Resource
 	{
 		resourceConfig := DefaultConfig()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
-		newResoure, err = New(resourceConfig)
+		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
 	}
 
 	for i, tc := range testCases {
-		result, err := newResoure.GetDesiredState(tc.Obj)
+		result, err := newResource.GetDesiredState(tc.Obj)
 		if err != nil {
 			t.Fatal("case", i+1, "expected", nil, "got", err)
 		}
@@ -154,19 +154,19 @@ func Test_Resource_Namespace_GetCreateState(t *testing.T) {
 	}
 
 	var err error
-	var newResoure *Resource
+	var newResource *Resource
 	{
 		resourceConfig := DefaultConfig()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
-		newResoure, err = New(resourceConfig)
+		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
 	}
 
 	for i, tc := range testCases {
-		result, err := newResoure.GetCreateState(tc.Obj, tc.Cur, tc.Des)
+		result, err := newResource.GetCreateState(tc.Obj, tc.Cur, tc.Des)
 		if err != nil {
 			t.Fatal("case", i+1, "expected", nil, "got", err)
 		}
@@ -270,19 +270,19 @@ func Test_Resource_Namespace_GetDeleteState(t *testing.T) {
 	}
 
 	var err error
-	var newResoure *Resource
+	var newResource *Resource
 	{
 		resourceConfig := DefaultConfig()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
-		newResoure, err = New(resourceConfig)
+		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
 	}
 
 	for i, tc := range testCases {
-		result, err := newResoure.GetDeleteState(tc.Obj, tc.Cur, tc.Des)
+		result, err := newResource.GetDeleteState(tc.Obj, tc.Cur, tc.Des)
 		if err != nil {
 			t.Fatal("case", i+1, "expected", nil, "got", err)
 		}
