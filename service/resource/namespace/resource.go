@@ -184,7 +184,6 @@ func (r *Resource) ProcessCreateState(obj, cre interface{}) error {
 		return microerror.Mask(err)
 	}
 
-	// Create the config maps in the Kubernetes API.
 	if namespaceToCreate != nil {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating the namespace in the Kubernetes API")
 
@@ -213,7 +212,6 @@ func (r *Resource) ProcessDeleteState(obj, del interface{}) error {
 		return microerror.Mask(err)
 	}
 
-	// Delete the config maps in the Kubernetes API.
 	if namespaceToDelete != nil {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the namespace in the Kubernetes API")
 
