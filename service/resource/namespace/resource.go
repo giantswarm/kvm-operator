@@ -123,11 +123,11 @@ func (r *Resource) GetCreateState(obj, cur, des interface{}) (interface{}, error
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	currentNamespace, err := interfaceToNamespace(cur)
+	currentNamespace, err := toNamespace(cur)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredNamespace, err := interfaceToNamespace(des)
+	desiredNamespace, err := toNamespace(des)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -149,11 +149,11 @@ func (r *Resource) GetDeleteState(obj, cur, des interface{}) (interface{}, error
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	currentNamespace, err := interfaceToNamespace(cur)
+	currentNamespace, err := toNamespace(cur)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredNamespace, err := interfaceToNamespace(des)
+	desiredNamespace, err := toNamespace(des)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -179,7 +179,7 @@ func (r *Resource) ProcessCreateState(obj, cre interface{}) error {
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	namespaceToCreate, err := interfaceToNamespace(cre)
+	namespaceToCreate, err := toNamespace(cre)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -207,7 +207,7 @@ func (r *Resource) ProcessDeleteState(obj, del interface{}) error {
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	namespaceToDelete, err := interfaceToNamespace(del)
+	namespaceToDelete, err := toNamespace(del)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -244,7 +244,7 @@ func interfaceToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
 	return customObject, nil
 }
 
-func interfaceToNamespace(v interface{}) (*apiv1.Namespace, error) {
+func toNamespace(v interface{}) (*apiv1.Namespace, error) {
 	if v == nil {
 		return nil, nil
 	}
