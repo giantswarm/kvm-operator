@@ -633,37 +633,28 @@ write_files:
         prometheus.io/port: '10254'
         prometheus.io/scrape: 'true'
     spec:
-      replicas: 3
+      replicas: {{len .Cluster.Workers}}
       strategy:
         type: RollingUpdate
         rollingUpdate:
-          maxUnavailable: 2
+          maxUnavailable: 1
       template:
         metadata:
           labels:
             k8s-app: nginx-ingress-controller
-          annotations:
-            scheduler.alpha.kubernetes.io/affinity: >
-              {
-                "podAntiAffinity": {
-                  "preferredDuringSchedulingIgnoredDuringExecution": [
-                    {
-                      "labelSelector": {
-                        "matchExpressions": [
-                          {
-                            "key": "k8s-app",
-                            "operator": "In",
-                            "values": ["nginx-ingress-controller"]
-                          }
-                        ]
-                      },
-                      "topologyKey": "kubernetes.io/hostname",
-                      "weight": 100
-                    }
-                  ]
-                }
-              }
         spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                      - key: k8s-app
+                        operator: In
+                        values:
+                        - nginx-ingress-controller
+                  topologyKey: kubernetes.io/hostname
           containers:
           - name: nginx-ingress-controller
             image: {{.Cluster.Kubernetes.IngressController.Docker.Image}}
@@ -958,6 +949,7 @@ coreos:
       content: |
         [Service]
         Environment="DOCKER_CGROUPS=--exec-opt native.cgroupdriver=cgroupfs {{.Cluster.Docker.Daemon.ExtraArgs}}"
+        Environment="DOCKER_OPT_BIP=--bip={{.Cluster.Docker.Daemon.CIDR}}"
   - name: k8s-setup-network-env.service
     enable: true
     command: start
@@ -1022,6 +1014,7 @@ coreos:
           --trusted-ca-file /etc/etcd/server-ca.pem \
           --cert-file /etc/etcd/server-crt.pem \
           --key-file /etc/etcd/server-key.pem\
+          --client-cert-auth=true \
           --peer-trusted-ca-file /etc/etcd/server-ca.pem \
           --peer-cert-file /etc/etcd/server-crt.pem \
           --peer-key-file /etc/etcd/server-key.pem \
@@ -1446,6 +1439,7 @@ coreos:
       content: |
         [Service]
         Environment="DOCKER_CGROUPS=--exec-opt native.cgroupdriver=cgroupfs {{.Cluster.Docker.Daemon.ExtraArgs}}"
+        Environment="DOCKER_OPT_BIP=--bip={{.Cluster.Docker.Daemon.CIDR}}"
   - name: k8s-setup-network-env.service
     enable: true
     command: start
