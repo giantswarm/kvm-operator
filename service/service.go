@@ -130,6 +130,7 @@ func New(config Config) (*Service, error) {
 	{
 		namespaceConfig := namespaceresource.DefaultConfig()
 
+		namespaceConfig.K8sClient = k8sClient
 		namespaceConfig.Logger = config.Logger
 
 		namespaceResource, err = namespaceresource.New(namespaceConfig)
