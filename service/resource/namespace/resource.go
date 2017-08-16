@@ -72,18 +72,18 @@ func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "looking for the namespace in the Kubernetes API")
 
 	// Lookup the current state of the namespace.
-	namespaceName := key.ClusterNamespace(customObject)
-	namespace, err := r.k8sClient.CoreV1().Namespaces().Get(namespaceName, apismetav1.GetOptions{})
-	if apierrors.IsNotFound(err) {
-		// fall through
-	} else if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	if namespace == nil {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "did not found the namespace in the Kubernetes API")
-	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found the namespace in the Kubernetes API")
+	var namespace *apiv1.Namespace
+	{
+		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(key.ClusterNamespace(customObject), apismetav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "did not found the namespace in the Kubernetes API")
+			// fall through
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		} else {
+			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found the namespace in the Kubernetes API")
+			namespace = manifest
+		}
 	}
 
 	return namespace, nil
