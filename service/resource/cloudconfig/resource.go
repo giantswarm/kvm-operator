@@ -81,67 +81,72 @@ func New(config Config) (*Resource, error) {
 }
 
 func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "looking for config maps in the Kubernetes API", "operation", "GetCurrentState")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "looking for config maps in the Kubernetes API")
 
 	// Lookup the current state of the configmaps.
-	var currentConfigMaps []*apiv1.ConfigMap
+	var configMaps []*apiv1.ConfigMap
 
 	namespace := key.ClusterNamespace(customObject)
 	configMapNames := getConfigMapNames(customObject)
 
 	for _, name := range configMapNames {
-		configMap, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Get(name, apismetav1.GetOptions{})
-		if err != nil {
+		manifest, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Get(name, apismetav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "did not found a config map in the Kubernetes API")
+			// fall through
+		} else if err != nil {
 			return nil, microerror.Mask(err)
+		} else {
+			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found a config map in the Kubernetes API")
+			configMaps = append(configMaps, manifest)
 		}
-		currentConfigMaps = append(currentConfigMaps, configMap)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps in the Kubernetes API", len(currentConfigMaps)))
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps in the Kubernetes API", len(configMaps)))
 
-	return currentConfigMaps, nil
+	return configMaps, nil
 }
 
 func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "making up new config maps", "operation", "GetDesiredState")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new config maps")
 
-	// Lookup the desired state of the config maps to have a reference of data how
-	// it should be.
-	desiredConfigMaps, err := r.newConfigMaps(customObject)
+	// Compute the desired state of the config maps to have a reference of data
+	// how it should be.
+	configMaps, err := r.newConfigMaps(customObject)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("made up %d config maps", len(desiredConfigMaps)), "operation", "GetDesiredState")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("computed the %d new config maps", len(configMaps)))
 
-	return desiredConfigMaps, nil
+	return configMaps, nil
 }
 
-func (r *Resource) GetCreateState(obj, cur, des interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) GetCreateState(obj, currentState, desiredState interface{}) (interface{}, error) {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	currentConfigMaps, err := interfaceToConfigMaps(cur)
+	currentConfigMaps, err := toConfigMaps(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredConfigMaps, err := interfaceToConfigMaps(des)
+	desiredConfigMaps, err := toConfigMaps(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps to create", "operation", "GetCreateState")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be created")
 
 	// Find anything which is in the desired state but not in the current state.
 	// This lets us drive the current state towards the desired state, because
@@ -149,10 +154,11 @@ func (r *Resource) GetCreateState(obj, cur, des interface{}) (interface{}, error
 	// in the current and the desired state we check if their data is equal. If
 	// the data differs the config map is supposed to be updated to bring the
 	// current state into the desired state.
-	configMapsToCreate := currentConfigMaps
+	var configMaps []*apiv1.ConfigMap
+
 	for _, desiredConfigMap := range desiredConfigMaps {
 		if !containsConfigMap(currentConfigMaps, desiredConfigMap) {
-			configMapsToCreate = append(configMapsToCreate, desiredConfigMap)
+			configMaps = append(configMaps, desiredConfigMap)
 		} else {
 			currentConfigMap, err := getConfigMapByName(currentConfigMaps, desiredConfigMap.Name)
 			if err != nil {
@@ -160,43 +166,44 @@ func (r *Resource) GetCreateState(obj, cur, des interface{}) (interface{}, error
 			}
 
 			if !reflect.DeepEqual(desiredConfigMap.Data, currentConfigMap.Data) {
-				configMapsToCreate = append(configMapsToCreate, desiredConfigMap)
+				configMaps = append(configMaps, desiredConfigMap)
 			}
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps to create", len(configMapsToCreate)), "operation", "GetCreateState")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be created", len(configMaps)))
 
-	return configMapsToCreate, nil
+	return configMaps, nil
 }
 
-func (r *Resource) GetDeleteState(obj, cur, des interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (interface{}, error) {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	currentConfigMaps, err := interfaceToConfigMaps(cur)
+	currentConfigMaps, err := toConfigMaps(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredConfigMaps, err := interfaceToConfigMaps(des)
+	desiredConfigMaps, err := toConfigMaps(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps to delete", "operation", "GetDeleteState")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be deleted")
 
 	// Find anything which is in the current state but not in the desired state.
 	// This lets us drive the current state towards the desired state, because
 	// everything we find here is supposed to be deleted.
 	var configMapsToDelete []*apiv1.ConfigMap
+
 	for _, currentConfigMap := range currentConfigMaps {
 		if !containsConfigMap(desiredConfigMaps, currentConfigMap) {
 			configMapsToDelete = append(configMapsToDelete, currentConfigMap)
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps to delete", len(configMapsToDelete)), "operation", "GetDeleteState")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToDelete)))
 
 	return configMapsToDelete, nil
 }
@@ -205,61 +212,66 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func (r *Resource) ProcessCreateState(obj, cre interface{}) error {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) ProcessCreateState(obj, createState interface{}) error {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	configMapsToCreate, err := interfaceToConfigMaps(cre)
+	configMapsToCreate, err := toConfigMaps(createState)
 	if err != nil {
 		return microerror.Mask(err)
 	}
-
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating config maps in the Kubernetes API", "operation", "ProcessCreateState")
 
 	// Create the config maps in the Kubernetes API.
-	namespace := key.ClusterNamespace(customObject)
-	for _, configMap := range configMapsToCreate {
-		_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Create(configMap)
-		if apierrors.IsAlreadyExists(err) {
-			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Update(configMap)
-			if err != nil {
+	if configMapsToCreate != nil {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating the config maps in the Kubernetes API")
+
+		namespace := key.ClusterNamespace(customObject)
+		for _, configMap := range configMapsToCreate {
+			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Create(configMap)
+			if apierrors.IsAlreadyExists(err) {
+				// fall through
+			} else if err != nil {
 				return microerror.Mask(err)
 			}
-		} else if err != nil {
-			return microerror.Mask(err)
 		}
-	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created config maps in the Kubernetes API", "operation", "ProcessCreateState")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the config maps in the Kubernetes API")
+	} else {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do already exist in the Kubernetes API")
+	}
 
 	return nil
 }
 
-func (r *Resource) ProcessDeleteState(obj, del interface{}) error {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) ProcessDeleteState(obj, deleteState interface{}) error {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	configMapsToDelete, err := interfaceToConfigMaps(del)
+	configMapsToDelete, err := toConfigMaps(deleteState)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting config maps in the Kubernetes API", "operation", "ProcessDeleteState")
+	if configMapsToDelete != nil {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the config maps in the Kubernetes API")
 
-	// Create the config maps in the Kubernetes API.
-	namespace := key.ClusterNamespace(customObject)
-	for _, configMap := range configMapsToDelete {
-		err := r.k8sClient.CoreV1().ConfigMaps(namespace).Delete(configMap.Name, &apismetav1.DeleteOptions{})
-		if apierrors.IsNotFound(err) {
-			// fall through
-		} else if err != nil {
-			return microerror.Mask(err)
+		// Create the config maps in the Kubernetes API.
+		namespace := key.ClusterNamespace(customObject)
+		for _, configMap := range configMapsToDelete {
+			err := r.k8sClient.CoreV1().ConfigMaps(namespace).Delete(configMap.Name, &apismetav1.DeleteOptions{})
+			if apierrors.IsNotFound(err) {
+				// fall through
+			} else if err != nil {
+				return microerror.Mask(err)
+			}
 		}
-	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted config maps in the Kubernetes API", "operation", "ProcessDeleteState")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted the config maps in the Kubernetes API")
+	} else {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do not exist in the Kubernetes API")
+	}
 
 	return nil
 }
@@ -395,7 +407,7 @@ func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
 	return names
 }
 
-func interfaceToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
+func toCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
 	customObjectPointer, ok := v.(*kvmtpr.CustomObject)
 	if !ok {
 		return kvmtpr.CustomObject{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, v)
@@ -405,7 +417,11 @@ func interfaceToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
 	return customObject, nil
 }
 
-func interfaceToConfigMaps(v interface{}) ([]*apiv1.ConfigMap, error) {
+func toConfigMaps(v interface{}) ([]*apiv1.ConfigMap, error) {
+	if v == nil {
+		return nil, nil
+	}
+
 	configMaps, ok := v.([]*apiv1.ConfigMap)
 	if !ok {
 		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*apiv1.ConfigMap{}, v)
