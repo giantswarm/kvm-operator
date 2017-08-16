@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/giantswarm/kvm-operator/flag"
@@ -31,7 +32,7 @@ func main() {
 		loggerConfig.IOWriter = os.Stdout
 		newLogger, err = micrologger.New(loggerConfig)
 		if err != nil {
-			panic(err)
+			panic(fmt.Sprintf("%#v", err))
 		}
 	}
 
@@ -54,7 +55,7 @@ func main() {
 
 			newService, err = service.New(serviceConfig)
 			if err != nil {
-				panic(err)
+				panic(fmt.Sprintf("%#v", err))
 			}
 			go newService.Boot()
 		}
@@ -71,7 +72,7 @@ func main() {
 
 			newServer, err = server.New(serverConfig)
 			if err != nil {
-				panic(err)
+				panic(fmt.Sprintf("%#v", err))
 			}
 		}
 
@@ -93,7 +94,7 @@ func main() {
 
 		newCommand, err = command.New(commandConfig)
 		if err != nil {
-			panic(err)
+			panic(fmt.Sprintf("%#v", err))
 		}
 	}
 
