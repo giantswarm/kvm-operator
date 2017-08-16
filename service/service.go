@@ -126,10 +126,11 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var namespaceResource legacy.Resource
+	var namespaceResource framework.Resource
 	{
 		namespaceConfig := namespaceresource.DefaultConfig()
 
+		namespaceConfig.K8sClient = k8sClient
 		namespaceConfig.Logger = config.Logger
 
 		namespaceResource, err = namespaceresource.New(namespaceConfig)
@@ -172,12 +173,6 @@ func New(config Config) (*Service, error) {
 
 		// Settings.
 		newConfig.Resources = []legacy.Resource{
-			// Note that the namespace resource is special since the creation of the
-			// cluster namespace has to be done before any other resource can be
-			// created inside of it. The current reconciliation is synchronous and
-			// processes resources in a series. This is why the namespace resource has
-			// to be registered first.
-			namespaceResource,
 			masterResource,
 			workerResource,
 		}
@@ -209,7 +204,7 @@ func New(config Config) (*Service, error) {
 		operatorConfig.Logger = config.Logger
 		operatorConfig.OperatorFramework = operatorFramework
 		operatorConfig.Resources = []framework.Resource{
-			// TODO namespace resource
+			namespaceResource,
 			cloudConfigResource,
 			legacyResource,
 		}
