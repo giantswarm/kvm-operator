@@ -64,7 +64,7 @@ func New(config Config) (*Resource, error) {
 }
 
 func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -90,14 +90,14 @@ func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
 }
 
 func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new namespace")
 
-	// Make up the desired state of the namespace to have a reference of data how
+	// Compute the desired state of the namespace to have a reference of data how
 	// it should be.
 	namespace := &apiv1.Namespace{
 		TypeMeta: apismetav1.TypeMeta{
@@ -118,16 +118,16 @@ func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
 	return namespace, nil
 }
 
-func (r *Resource) GetCreateState(obj, cur, des interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) GetCreateState(obj, currentState, desiredState interface{}) (interface{}, error) {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	currentNamespace, err := toNamespace(cur)
+	currentNamespace, err := toNamespace(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredNamespace, err := toNamespace(des)
+	desiredNamespace, err := toNamespace(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -144,16 +144,16 @@ func (r *Resource) GetCreateState(obj, cur, des interface{}) (interface{}, error
 	return namespaceToCreate, nil
 }
 
-func (r *Resource) GetDeleteState(obj, cur, des interface{}) (interface{}, error) {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (interface{}, error) {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	currentNamespace, err := toNamespace(cur)
+	currentNamespace, err := toNamespace(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredNamespace, err := toNamespace(des)
+	desiredNamespace, err := toNamespace(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -174,12 +174,12 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func (r *Resource) ProcessCreateState(obj, cre interface{}) error {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) ProcessCreateState(obj, createState interface{}) error {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	namespaceToCreate, err := toNamespace(cre)
+	namespaceToCreate, err := toNamespace(createState)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -202,12 +202,12 @@ func (r *Resource) ProcessCreateState(obj, cre interface{}) error {
 	return nil
 }
 
-func (r *Resource) ProcessDeleteState(obj, del interface{}) error {
-	customObject, err := interfaceToCustomObject(obj)
+func (r *Resource) ProcessDeleteState(obj, deleteState interface{}) error {
+	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	namespaceToDelete, err := toNamespace(del)
+	namespaceToDelete, err := toNamespace(deleteState)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -234,7 +234,7 @@ func (r *Resource) Underlying() framework.Resource {
 	return r
 }
 
-func interfaceToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
+func toCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
 	customObjectPointer, ok := v.(*kvmtpr.CustomObject)
 	if !ok {
 		return kvmtpr.CustomObject{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, v)
