@@ -123,10 +123,6 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 		runtimeObjects = append(runtimeObjects, ros...)
 	}
 
-	if namespace == nil {
-		return microerror.Maskf(executionFailedError, "namespace must not be empty")
-	}
-
 	for _, ro := range runtimeObjects {
 		var err error
 
@@ -139,8 +135,6 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 			_, err = r.k8sClient.Extensions().Ingresses(namespace.Name).Create(t)
 		case *apisbatchv1.Job:
 			_, err = r.k8sClient.BatchV1().Jobs(namespace.Name).Create(t)
-		case *v1.Namespace:
-			_, err = r.k8sClient.Core().Namespaces().Create(t)
 		case *v1.Service:
 			_, err = r.k8sClient.Core().Services(namespace.Name).Create(t)
 		default:
@@ -179,10 +173,6 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 		runtimeObjects = append(runtimeObjects, ros...)
 	}
 
-	if namespace == nil {
-		return microerror.Maskf(executionFailedError, "namespace must not be empty")
-	}
-
 	for _, ro := range runtimeObjects {
 		var err error
 
@@ -195,8 +185,6 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 			err = r.k8sClient.Extensions().Ingresses(namespace.Name).Delete(t.Name, nil)
 		case *apisbatchv1.Job:
 			err = r.k8sClient.BatchV1().Jobs(namespace.Name).Delete(t.Name, nil)
-		case *v1.Namespace:
-			err = r.k8sClient.Core().Namespaces().Delete(t.Name, nil)
 		case *v1.Service:
 			err = r.k8sClient.Core().Services(namespace.Name).Delete(t.Name, nil)
 		default:
