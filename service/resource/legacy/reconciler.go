@@ -1,6 +1,8 @@
 package legacy
 
 import (
+	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -102,10 +104,15 @@ func (r *Reconciler) Name() string {
 }
 
 func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
+	customObject, ok := obj.(*kvmtpr.CustomObject)
+	if !ok {
+		return microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
+	}
+	namespace := key.ClusterNamespace(*customObject)
+
 	r.logger.Log("debug", "executing the reconciler's add function", "event", "create")
 
 	var runtimeObjects []runtime.Object
-	var namespace *v1.Namespace
 
 	for _, res := range r.resources {
 		ros, err := res.GetForCreate(obj)
@@ -113,18 +120,7 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 			return microerror.Mask(err)
 		}
 
-		for _, ro := range ros {
-			switch t := ro.(type) {
-			case *v1.Namespace:
-				namespace = t
-			}
-		}
-
 		runtimeObjects = append(runtimeObjects, ros...)
-	}
-
-	if namespace == nil {
-		return microerror.Maskf(executionFailedError, "namespace must not be empty")
 	}
 
 	for _, ro := range runtimeObjects {
@@ -132,17 +128,15 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 
 		switch t := ro.(type) {
 		case *v1.ConfigMap:
-			_, err = r.k8sClient.Core().ConfigMaps(namespace.Name).Create(t)
+			_, err = r.k8sClient.Core().ConfigMaps(namespace).Create(t)
 		case *v1beta1.Deployment:
-			_, err = r.k8sClient.Extensions().Deployments(namespace.Name).Create(t)
+			_, err = r.k8sClient.Extensions().Deployments(namespace).Create(t)
 		case *v1beta1.Ingress:
-			_, err = r.k8sClient.Extensions().Ingresses(namespace.Name).Create(t)
+			_, err = r.k8sClient.Extensions().Ingresses(namespace).Create(t)
 		case *apisbatchv1.Job:
-			_, err = r.k8sClient.BatchV1().Jobs(namespace.Name).Create(t)
-		case *v1.Namespace:
-			_, err = r.k8sClient.Core().Namespaces().Create(t)
+			_, err = r.k8sClient.BatchV1().Jobs(namespace).Create(t)
 		case *v1.Service:
-			_, err = r.k8sClient.Core().Services(namespace.Name).Create(t)
+			_, err = r.k8sClient.Core().Services(namespace).Create(t)
 		default:
 			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}
@@ -158,10 +152,15 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 }
 
 func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
+	customObject, ok := obj.(*kvmtpr.CustomObject)
+	if !ok {
+		return microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
+	}
+	namespace := key.ClusterNamespace(*customObject)
+
 	r.logger.Log("debug", "executing the reconciler's delete function", "event", "delete")
 
 	var runtimeObjects []runtime.Object
-	var namespace *v1.Namespace
 
 	for _, res := range r.resources {
 		ros, err := res.GetForDelete(obj)
@@ -169,18 +168,7 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 			return microerror.Mask(err)
 		}
 
-		for _, ro := range ros {
-			switch t := ro.(type) {
-			case *v1.Namespace:
-				namespace = t
-			}
-		}
-
 		runtimeObjects = append(runtimeObjects, ros...)
-	}
-
-	if namespace == nil {
-		return microerror.Maskf(executionFailedError, "namespace must not be empty")
 	}
 
 	for _, ro := range runtimeObjects {
@@ -188,17 +176,15 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 
 		switch t := ro.(type) {
 		case *v1.ConfigMap:
-			err = r.k8sClient.Core().ConfigMaps(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Core().ConfigMaps(namespace).Delete(t.Name, nil)
 		case *v1beta1.Deployment:
-			err = r.k8sClient.Extensions().Deployments(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Extensions().Deployments(namespace).Delete(t.Name, nil)
 		case *v1beta1.Ingress:
-			err = r.k8sClient.Extensions().Ingresses(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Extensions().Ingresses(namespace).Delete(t.Name, nil)
 		case *apisbatchv1.Job:
-			err = r.k8sClient.BatchV1().Jobs(namespace.Name).Delete(t.Name, nil)
-		case *v1.Namespace:
-			err = r.k8sClient.Core().Namespaces().Delete(t.Name, nil)
+			err = r.k8sClient.BatchV1().Jobs(namespace).Delete(t.Name, nil)
 		case *v1.Service:
-			err = r.k8sClient.Core().Services(namespace.Name).Delete(t.Name, nil)
+			err = r.k8sClient.Core().Services(namespace).Delete(t.Name, nil)
 		default:
 			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}
