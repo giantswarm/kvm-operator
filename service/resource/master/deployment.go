@@ -58,6 +58,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 					},
 					Spec: apiv1.PodSpec{
 						HostNetwork: true,
+						NodeSelector: map[string]string{
+							"role": "master",
+						},
 						Volumes: []apiv1.Volume{
 							{
 								Name: "cloud-config",
