@@ -1,49 +1,53 @@
-package vault
+package microstorage
 
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	vaultapi "github.com/hashicorp/vault/api"
+	"github.com/giantswarm/microstorage"
 
 	"github.com/giantswarm/microendpoint/service/healthz"
 )
 
 const (
 	// Description describes which functionality this health check implements.
-	Description = "Ensure Vault API availability."
+	Description = "Ensure microstorage availability."
 	// Name is the identifier of the health check. This can be used for emitting
 	// metrics.
-	Name = "vault"
+	Name = "microstorage"
 	// SuccessMessage is the message returned in case the health check did not
 	// fail.
 	SuccessMessage = "all good"
 	// Timeout is the time being waited until timing out health check, which
 	// renders its result unsuccessful.
-	Timeout = 5 * time.Second
+	Timeout = 10 * time.Second
+)
+
+const (
+	HealthCheckKey   = "microstorage-health-check-key"
+	HealthCheckValue = "microstorage-health-check-value"
 )
 
 // Config represents the configuration used to create a healthz service.
 type Config struct {
 	// Dependencies.
-	Logger      micrologger.Logger
-	VaultClient *vaultapi.Client
+	Logger  micrologger.Logger
+	Storage microstorage.Storage
 
 	// Settings.
 	Timeout time.Duration
 }
 
-// DefaultConfig provides a default configuration to create a new healthz
-// service by best effort.
+// DefaultConfig provides a default configuration to create a new healthz service
+// by best effort.
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		Logger:      nil,
-		VaultClient: nil,
+		Logger:  nil,
+		Storage: nil,
 
 		// Settings.
 		Timeout: Timeout,
@@ -53,8 +57,8 @@ func DefaultConfig() Config {
 // Service implements the healthz service interface.
 type Service struct {
 	// Dependencies.
-	logger      micrologger.Logger
-	vaultClient *vaultapi.Client
+	logger  micrologger.Logger
+	storage microstorage.Storage
 
 	// Settings.
 	timeout time.Duration
@@ -64,10 +68,10 @@ type Service struct {
 func New(config Config) (*Service, error) {
 	// Dependencies.
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
-	if config.VaultClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "vault client must not be empty")
+	if config.Storage == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.Storage must not be empty")
 	}
 
 	// Settings.
@@ -77,8 +81,8 @@ func New(config Config) (*Service, error) {
 
 	newService := &Service{
 		// Dependencies.
-		logger:      config.Logger,
-		vaultClient: config.VaultClient,
+		logger:  config.Logger,
+		storage: config.Storage,
 
 		// Settings.
 		timeout: config.Timeout,
@@ -87,9 +91,7 @@ func New(config Config) (*Service, error) {
 	return newService, nil
 }
 
-// GetHealthz implements the health check for Vault. It does this by listing the
-// mounts for the sys backend. This checks that the we can connect to the Vault
-// API and that the Vault token is valid.
+// GetHealthz implements the health check for Kubernetes.
 func (s *Service) GetHealthz(ctx context.Context) (healthz.Response, error) {
 	failed := false
 	message := SuccessMessage
@@ -97,19 +99,11 @@ func (s *Service) GetHealthz(ctx context.Context) (healthz.Response, error) {
 		ch := make(chan string, 1)
 
 		go func() {
-			_, err := s.vaultClient.Sys().ListMounts()
+			err := s.getHealthzWithError(ctx)
 			if err != nil {
-				if strings.Contains(err.Error(), "permission denied") {
-					setVaultPermissionDenied()
-				} else {
-					setVaultUnknownError()
-				}
-
 				ch <- err.Error()
 				return
 			}
-
-			setVaultOK()
 			ch <- ""
 		}()
 
@@ -133,4 +127,21 @@ func (s *Service) GetHealthz(ctx context.Context) (healthz.Response, error) {
 	}
 
 	return response, nil
+}
+
+func (s *Service) getHealthzWithError(ctx context.Context) error {
+	err := s.storage.Put(ctx, HealthCheckKey, HealthCheckValue)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	v, err := s.storage.Search(ctx, HealthCheckKey)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+	if v != HealthCheckValue {
+		return microerror.Maskf(executionFailedError, "expected health check value '%s' got '%s'", HealthCheckValue, v)
+	}
+
+	return nil
 }

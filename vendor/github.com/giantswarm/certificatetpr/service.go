@@ -20,25 +20,26 @@ const (
 	WatchTimeOut = 90 * time.Second
 )
 
-// Config represents the configuration used to create a service.
-type Config struct {
+// ServiceConfig represents the configuration used to create a certificate TPR
+// service.
+type ServiceConfig struct {
 	// Dependencies.
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 }
 
-// DefaultConfig provides a default configuration to create a new service by
-// best effort.
-func DefaultConfig() Config {
-	return Config{
+// DefaultServiceConfig provides a default configuration to create a new
+// certificate TPR service by best effort.
+func DefaultServiceConfig() ServiceConfig {
+	return ServiceConfig{
 		// Dependencies.
 		K8sClient: nil,
 		Logger:    nil,
 	}
 }
 
-// New creates a new configured service.
-func New(config Config) (*Service, error) {
+// NewService creates a new configured certificate TPR service.
+func NewService(config ServiceConfig) (*Service, error) {
 	// Dependencies.
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
@@ -56,7 +57,7 @@ func New(config Config) (*Service, error) {
 	return newService, nil
 }
 
-// Service implements the version service interface.
+// Service implements the certificate TPR service.
 type Service struct {
 	// Dependencies.
 	k8sClient kubernetes.Interface
