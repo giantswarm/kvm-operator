@@ -359,16 +359,6 @@ func containsConfigMap(list []*apiv1.ConfigMap, item *apiv1.ConfigMap) bool {
 	return false
 }
 
-func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap, error) {
-	for _, l := range list {
-		if l.Name == name {
-			return l, nil
-		}
-	}
-
-	return nil, microerror.Maskf(notFoundError, "could not find config map '%s'", name)
-}
-
 func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
 	var names []string
 

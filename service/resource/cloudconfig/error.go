@@ -9,13 +9,6 @@ func IsInvalidConfig(err error) bool {
 	return microerror.Cause(err) == invalidConfigError
 }
 
-var notFoundError = microerror.New("not found")
-
-// IsNotFound asserts notFoundError.
-func IsNotFound(err error) bool {
-	return microerror.Cause(err) == notFoundError
-}
-
 var wrongTypeError = microerror.New("wrong type")
 
 // IsWrongTypeError asserts wrongTypeError.
