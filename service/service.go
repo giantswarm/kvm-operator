@@ -90,12 +90,12 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var certWatcher *certificatetpr.Service
+	var certWatcher certificatetpr.Searcher
 	{
-		certConfig := certificatetpr.DefaultConfig()
+		certConfig := certificatetpr.DefaultServiceConfig()
 		certConfig.K8sClient = k8sClient
 		certConfig.Logger = config.Logger
-		certWatcher, err = certificatetpr.New(certConfig)
+		certWatcher, err = certificatetpr.NewService(certConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

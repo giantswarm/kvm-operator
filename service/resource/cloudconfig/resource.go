@@ -2,7 +2,6 @@ package cloudconfig
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/giantswarm/certificatetpr"
 	cloudconfig "github.com/giantswarm/k8scloudconfig"
@@ -31,7 +30,7 @@ const (
 // Config represents the configuration used to create a new cloud config resource.
 type Config struct {
 	// Dependencies.
-	CertWatcher *certificatetpr.Service
+	CertWatcher certificatetpr.Searcher
 	K8sClient   kubernetes.Interface
 	Logger      micrologger.Logger
 }
@@ -50,7 +49,7 @@ func DefaultConfig() Config {
 // Resource implements the cloud config resource.
 type Resource struct {
 	// Dependencies.
-	certWatcher *certificatetpr.Service
+	certWatcher certificatetpr.Searcher
 	k8sClient   kubernetes.Interface
 	logger      micrologger.Logger
 }
@@ -88,7 +87,6 @@ func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "looking for config maps in the Kubernetes API")
 
-	// Lookup the current state of the configmaps.
 	var configMaps []*apiv1.ConfigMap
 
 	namespace := key.ClusterNamespace(customObject)
@@ -120,8 +118,6 @@ func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new config maps")
 
-	// Compute the desired state of the config maps to have a reference of data
-	// how it should be.
 	configMaps, err := r.newConfigMaps(customObject)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -148,32 +144,17 @@ func (r *Resource) GetCreateState(obj, currentState, desiredState interface{}) (
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be created")
 
-	// Find anything which is in the desired state but not in the current state.
-	// This lets us drive the current state towards the desired state, because
-	// everything we find here is supposed to be created. In case a config map is
-	// in the current and the desired state we check if their data is equal. If
-	// the data differs the config map is supposed to be updated to bring the
-	// current state into the desired state.
-	var configMaps []*apiv1.ConfigMap
+	var configMapsToCreate []*apiv1.ConfigMap
 
 	for _, desiredConfigMap := range desiredConfigMaps {
 		if !containsConfigMap(currentConfigMaps, desiredConfigMap) {
-			configMaps = append(configMaps, desiredConfigMap)
-		} else {
-			currentConfigMap, err := getConfigMapByName(currentConfigMaps, desiredConfigMap.Name)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			if !reflect.DeepEqual(desiredConfigMap.Data, currentConfigMap.Data) {
-				configMaps = append(configMaps, desiredConfigMap)
-			}
+			configMapsToCreate = append(configMapsToCreate, desiredConfigMap)
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be created", len(configMaps)))
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be created", len(configMapsToCreate)))
 
-	return configMaps, nil
+	return configMapsToCreate, nil
 }
 
 func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (interface{}, error) {
@@ -192,13 +173,10 @@ func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be deleted")
 
-	// Find anything which is in the current state but not in the desired state.
-	// This lets us drive the current state towards the desired state, because
-	// everything we find here is supposed to be deleted.
 	var configMapsToDelete []*apiv1.ConfigMap
 
 	for _, currentConfigMap := range currentConfigMaps {
-		if !containsConfigMap(desiredConfigMaps, currentConfigMap) {
+		if containsConfigMap(desiredConfigMaps, currentConfigMap) {
 			configMapsToDelete = append(configMapsToDelete, currentConfigMap)
 		}
 	}
