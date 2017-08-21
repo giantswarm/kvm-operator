@@ -106,6 +106,7 @@ func New(config Config) (*Service, error) {
 		cloudConfigConfig := cloudconfigresource.DefaultConfig()
 
 		cloudConfigConfig.CertWatcher = certWatcher
+		cloudConfigConfig.K8sClient = k8sClient
 		cloudConfigConfig.Logger = config.Logger
 
 		cloudConfigResource, err = cloudconfigresource.New(cloudConfigConfig)
