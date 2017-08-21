@@ -90,18 +90,18 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var certWatcher *certificatetpr.Service
+	var certWatcher certificatetpr.Searcher
 	{
-		certConfig := certificatetpr.DefaultConfig()
+		certConfig := certificatetpr.DefaultServiceConfig()
 		certConfig.K8sClient = k8sClient
 		certConfig.Logger = config.Logger
-		certWatcher, err = certificatetpr.New(certConfig)
+		certWatcher, err = certificatetpr.NewService(certConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var cloudConfigResource legacy.Resource
+	var cloudConfigResource framework.Resource
 	{
 		cloudConfigConfig := cloudconfigresource.DefaultConfig()
 
@@ -173,12 +173,6 @@ func New(config Config) (*Service, error) {
 
 		// Settings.
 		newConfig.Resources = []legacy.Resource{
-			// Note that the cloud config resource is special since the creation of
-			// configmaps has to be done before any pod can make use of it. The
-			// current reconciliation is synchronous and processes resources in a
-			// series. This is why the cloud config resource has to be registered
-			// second.
-			cloudConfigResource,
 			masterResource,
 			workerResource,
 		}
@@ -211,6 +205,7 @@ func New(config Config) (*Service, error) {
 		operatorConfig.OperatorFramework = operatorFramework
 		operatorConfig.Resources = []framework.Resource{
 			namespaceResource,
+			cloudConfigResource,
 			legacyResource,
 		}
 
