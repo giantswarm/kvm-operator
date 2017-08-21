@@ -95,7 +95,7 @@ func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
 	for _, name := range configMapNames {
 		manifest, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Get(name, apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "did not found a config map in the Kubernetes API")
+			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "did not find a config map in the Kubernetes API")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
