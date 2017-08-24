@@ -3,6 +3,7 @@ package vault
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/giantswarm/microerror"
@@ -98,9 +99,17 @@ func (s *Service) GetHealthz(ctx context.Context) (healthz.Response, error) {
 		go func() {
 			_, err := s.vaultClient.Sys().ListMounts()
 			if err != nil {
+				if strings.Contains(err.Error(), "permission denied") {
+					setVaultPermissionDenied()
+				} else {
+					setVaultUnknownError()
+				}
+
 				ch <- err.Error()
 				return
 			}
+
+			setVaultOK()
 			ch <- ""
 		}()
 

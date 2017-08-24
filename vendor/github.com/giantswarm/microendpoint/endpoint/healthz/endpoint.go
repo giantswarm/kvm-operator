@@ -78,6 +78,12 @@ func (e *Endpoint) Encoder() kithttp.EncodeResponseFunc {
 			return microerror.Maskf(wrongTypeError, "expected '%T' got '%T'", []healthz.Response{}, response)
 		}
 		if healthz.Responses(rs).HasFailed() {
+			for _, r := range rs {
+				if r.Failed {
+					e.logger.Log("error", "health check failed", "healthCheckDescritpion", r.Description, "healthCheckMessage", r.Message)
+				}
+			}
+
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 

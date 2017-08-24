@@ -1,5 +1,5 @@
-hash: 034c3a489bd0008afb1fa97a2c3b66f4f8cf5c8e496291aa0029ccb05614fa56
-updated: 2017-08-15T13:27:11.465508375+02:00
+hash: 4c9a26f5dd22c848437f83e52428cea984cf307290731919d395fde315ca478b
+updated: 2017-08-21T12:26:00.164905822+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -43,9 +43,11 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/certificatetpr
-  version: a467108378cd4d0e5b0599f3f2122e70bcf70ba5
+  version: deb9963e88123d43dcdf5fd071e042734918ddf0
+  subpackages:
+  - certificatetprtest
 - name: github.com/giantswarm/clustertpr
-  version: 551aed2c01b543c30d60e10d8d16ae2afaa58d0d
+  version: 1ac2fe67efb012ab2ff0002769c0ae3463f3aa09
   subpackages:
   - spec
   - spec/docker
@@ -55,7 +57,7 @@ imports:
   - spec/kubernetes/kubectl
   - spec/kubernetes/networksetup
 - name: github.com/giantswarm/k8scloudconfig
-  version: 84b33017d15a2264cf4ca4c5a69eeebf4e59ae39
+  version: 0f742df8c5a3fa926430e5baeae41e231e064daa
 - name: github.com/giantswarm/kvmtpr
   version: f3763795bb9eb67fdc1f3f4e950c4d5914250c14
   subpackages:
@@ -64,7 +66,7 @@ imports:
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
 - name: github.com/giantswarm/microendpoint
-  version: fb3e124643cfb364625089c39a59393f8cfdf647
+  version: 70547070da4072138bb5161e80a164b0bac075cc
   subpackages:
   - endpoint/healthz
   - endpoint/version
@@ -74,7 +76,7 @@ imports:
 - name: github.com/giantswarm/microerror
   version: 5ade94eb4ee35ef72eb9382228470caeddb29989
 - name: github.com/giantswarm/microkit
-  version: 2d2b437193ccf7fc29e78d3654cfc6a305533001
+  version: 25d2ae70c7f70bbfc1bbab7592dd1fafe14d2910
   subpackages:
   - command
   - command/daemon
@@ -173,7 +175,7 @@ imports:
 - name: github.com/mitchellh/mapstructure
   version: d0303fe809921458f417bcf828397a65db30a7e4
 - name: github.com/pelletier/go-toml
-  version: 69d355db5304c0f7f809a2edc054553e7142f016
+  version: 4692b8f9babfc93db58cc592ba2689d8736781de
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -184,13 +186,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
+  version: 61f87aac8082fa8c3c5655c7608d7478d46ac2ad
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a1dba9ce8baed984a2495b658c82687f8157b98f
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -204,7 +206,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: cb731b898346822cc0c225c28550a8a29d93c732
+  version: 4a7b7e65864c064d48dce82efbbfed2bdc0bf2aa
 - name: github.com/spf13/jwalterweatherman
   version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
