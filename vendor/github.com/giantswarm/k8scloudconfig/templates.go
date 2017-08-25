@@ -1174,6 +1174,9 @@ coreos:
       --secure_port={{.Cluster.Kubernetes.API.SecurePort}} \
       --bind-address=${DEFAULT_IPV4} \
       --etcd-prefix={{.Cluster.Etcd.Prefix}} \
+      --profiling=false \
+      --repair-malformed-updates=false \
+      --service-account-lookup=true \
       --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass \
       --cloud-provider={{.Cluster.Kubernetes.CloudProvider}} \
       --service-cluster-ip-range={{.Cluster.Kubernetes.API.ClusterIPRange}} \
@@ -1219,6 +1222,9 @@ coreos:
       --logtostderr=true \
       --v=2 \
       --cloud-provider={{.Cluster.Kubernetes.CloudProvider}} \
+      --profiling=false \
+      --terminated-pod-gc-threshold=10 \
+      --use-service-account-credentials=true \
       --kubeconfig=/etc/kubernetes/config/controller-manager-kubeconfig.yml \
       --root-ca-file=/etc/kubernetes/ssl/apiserver-ca.pem \
       --service-account-private-key-file=/etc/kubernetes/ssl/service-account-key.pem
@@ -1251,6 +1257,7 @@ coreos:
       --master=https://{{.Cluster.Kubernetes.API.Domain}}:443 \
       --logtostderr=true \
       --v=2 \
+      --profiling=false \
       --kubeconfig=/etc/kubernetes/config/scheduler-kubeconfig.yml
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
       ExecStopPost=-/usr/bin/docker rm -f $NAME

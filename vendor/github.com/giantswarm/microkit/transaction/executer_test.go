@@ -6,10 +6,14 @@ import (
 	"testing"
 
 	transactionid "github.com/giantswarm/microkit/transaction/context/id"
+	"github.com/giantswarm/micrologger/microloggertest"
+	"github.com/giantswarm/microstorage/microstoragetest"
 )
 
 func Test_Executer_NoTransactionIDGiven(t *testing.T) {
 	config := DefaultExecuterConfig()
+	config.Logger = microloggertest.New()
+	config.Storage = microstoragetest.New()
 	newExecuter, err := NewExecuter(config)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
@@ -89,6 +93,8 @@ func Test_Executer_NoTransactionIDGiven(t *testing.T) {
 
 func Test_Executer_TransactionIDGiven(t *testing.T) {
 	config := DefaultExecuterConfig()
+	config.Logger = microloggertest.New()
+	config.Storage = microstoragetest.New()
 	newExecuter, err := NewExecuter(config)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
@@ -169,6 +175,8 @@ func Test_Executer_TransactionIDGiven(t *testing.T) {
 
 func Test_Executer_TransactionIDGiven_NoReplay(t *testing.T) {
 	config := DefaultExecuterConfig()
+	config.Logger = microloggertest.New()
+	config.Storage = microstoragetest.New()
 	newExecuter, err := NewExecuter(config)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
@@ -271,6 +279,8 @@ func Test_Executer_TransactionResult(t *testing.T) {
 
 	for i, tc := range tests {
 		config := DefaultExecuterConfig()
+		config.Logger = microloggertest.New()
+		config.Storage = microstoragetest.New()
 		newExecuter, err := NewExecuter(config)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
