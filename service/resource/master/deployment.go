@@ -76,7 +76,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Name: "etcd-data",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/", key.ClusterID(*customObject), "-k8s-master-vm/"),
+										Path: filepath.Join("/home/core/volumes/", key.ClusterID(*customObject), "k8s-master-vm/"),
 									},
 								},
 							},
