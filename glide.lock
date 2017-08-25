@@ -1,5 +1,5 @@
-hash: 4c9a26f5dd22c848437f83e52428cea984cf307290731919d395fde315ca478b
-updated: 2017-08-25T10:10:19.599534906+01:00
+hash: 8ae0fc7991d542feafc180cd93d59ee40bb883cd58369ec10a6626babc5216e7
+updated: 2017-08-25T10:47:37.238611051+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -40,7 +40,7 @@ imports:
   - spec/kubernetes/kubectl
   - spec/kubernetes/networksetup
 - name: github.com/giantswarm/k8scloudconfig
-  version: 7c9e08fd2ce62376d5a48b913f283fe4b2ed1a34
+  version: 5856b14ceac6f325247221cd58f9fc9aceb04356
 - name: github.com/giantswarm/kvmtpr
   version: f3763795bb9eb67fdc1f3f4e950c4d5914250c14
   subpackages:
