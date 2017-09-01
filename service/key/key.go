@@ -7,6 +7,8 @@ import (
 
 	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/haproxy-etcd-lb/.gobuild/src/k8s.io/kubernetes/staging/src/k8s.io/client-go/_vendor/github.com/coreos/go-oidc/key"
+	"path/filepath"
 )
 
 func ClusterCustomer(customObject kvmtpr.CustomObject) string {
@@ -36,7 +38,13 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 func VMNumber(ID int) string {
 	return fmt.Sprintf("%d", ID)
 }
+func PVCName(clusterID string, vmNumber string) string {
+	return "pvc-master-etcd-" + clusterID + "-" + vmNumber
+}
 
+func HostPathVolumeDir(clusterID string, vmNumber string) string {
+	return filepath.Join("/home/core/volumes/", clusterID, "k8s-master-vm"+vmNumber+"/")
+}
 func NetworkBridgeName(ID string) string {
 	return fmt.Sprintf("br-%s", ID)
 }

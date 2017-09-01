@@ -18,8 +18,6 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 	}
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
-
-		var etcdPVClaimName string = "pvc-master-etcd-" + key.ClusterID(*customObject) + "-" + key.VMNumber(i)
 		quantity, err := resource.ParseQuantity("15Gi")
 		if err != nil {
 			return nil, microerror.Maskf(err, "cant parse quantity")
@@ -31,7 +29,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 				APIVersion: "v1",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: etcdPVClaimName,
+				Name: key.PVCName(key.ClusterID(*customObject), key.VMNumber(i)),,
 				Labels: map[string]string{
 					"cluster":  key.ClusterID(*customObject),
 					"customer": key.ClusterCustomer(*customObject),

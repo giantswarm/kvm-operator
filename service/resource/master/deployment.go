@@ -32,23 +32,16 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					HostPath: &apiv1.HostPathVolumeSource{
-						Path: filepath.Join("/home/core/volumes/", key.ClusterID(*customObject), "k8s-master-vm"+key.VMNumber(i)+"/"),
+						Path: key.HostPathVolumeDir(key.ClusterID(*customObject), key.VMNumber(i)),
 					},
 				},
 			}
-
 		} else if customObject.Spec.KVM.K8sKVM.StorageType == "persistentVolume" {
-
-			var etcdPVClaimName string = "pvc-master-etcd-" + key.ClusterID(*customObject) + "-" + key.VMNumber(i)
-
 			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
-						ClaimName: etcdPVClaimName,
-					},
-					HostPath: &apiv1.HostPathVolumeSource{
-						Path: filepath.Join("/home/core/volumes/", key.ClusterID(*customObject), "k8s-master-vm/"),
+						ClaimName: key.PVCName(key.ClusterID(*customObject), key.VMNumber(i)),
 					},
 				},
 			}
