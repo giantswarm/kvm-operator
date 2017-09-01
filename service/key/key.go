@@ -33,6 +33,10 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
+func VMNumber(ID int) string {
+	return fmt.Sprintf("%d", ID)
+}
+
 func NetworkBridgeName(ID string) string {
 	return fmt.Sprintf("br-%s", ID)
 }

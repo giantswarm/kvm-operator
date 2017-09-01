@@ -26,6 +26,35 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		capabilities := customObject.Spec.KVM.Masters[i]
 
+		var etcdVolume apiv1.Volume
+		if customObject.Spec.KVM.K8sKVM.StorageType == "hostPath" {
+			etcdVolume = apiv1.Volume{
+				Name: "etcd-data",
+				VolumeSource: apiv1.VolumeSource{
+					HostPath: &apiv1.HostPathVolumeSource{
+						Path: filepath.Join("/home/core/volumes/", key.ClusterID(*customObject), "k8s-master-vm"+key.VMNumber(i)+"/"),
+					},
+				},
+			}
+
+		} else if customObject.Spec.KVM.K8sKVM.StorageType == "persistentVolume" {
+
+			var etcdPVClaimName string = "pvc-master-etcd-" + key.ClusterID(*customObject) + "-" + key.VMNumber(i)
+
+			etcdVolume = apiv1.Volume{
+				Name: "etcd-data",
+				VolumeSource: apiv1.VolumeSource{
+					PersistentVolumeClaim: apiv1.PersistentVolumeClaimVolumeSource{
+						ClaimName: etcdPVClaimName,
+					},
+					HostPath: &apiv1.HostPathVolumeSource{
+						Path: filepath.Join("/home/core/volumes/", key.ClusterID(*customObject), "k8s-master-vm/"),
+					},
+				},
+			}
+		} else {
+			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", customObject.Spec.KVM.K8sKVM.StorageType)
+		}
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
@@ -72,14 +101,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 									},
 								},
 							},
-							{
-								Name: "etcd-data",
-								VolumeSource: apiv1.VolumeSource{
-									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/volumes/", key.ClusterID(*customObject), "k8s-master-vm/"),
-									},
-								},
-							},
+							etcdVolume,
 							{
 								Name: "images",
 								VolumeSource: apiv1.VolumeSource{
