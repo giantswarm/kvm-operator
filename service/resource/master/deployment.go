@@ -44,7 +44,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
-					PersistentVolumeClaim: apiv1.PersistentVolumeClaimVolumeSource{
+					PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
 						ClaimName: etcdPVClaimName,
 					},
 					HostPath: &apiv1.HostPathVolumeSource{

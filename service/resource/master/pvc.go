@@ -20,8 +20,12 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 
 		var etcdPVClaimName string = "pvc-master-etcd-" + key.ClusterID(*customObject) + "-" + key.VMNumber(i)
+		quantity, err := resource.ParseQuantity("15Gi")
+		if err != nil {
+			return nil, microerror.Maskf(err, "cant parse quantity")
+		}
 
-		persistentVolumeClaim := apiv1.PersistentVolumeClaim{
+		persistentVolumeClaim := &apiv1.PersistentVolumeClaim{
 			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "PersistentVolumeClaim",
 				APIVersion: "v1",
@@ -39,7 +43,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 				AccessModes: apiv1.GetAccessModesFromString("ReadWriteOnce"),
 				Resources: apiv1.ResourceRequirements{
 					Requests: map[apiv1.ResourceName]resource.Quantity{
-						"Storage": "15Gi",
+						"Storage": quantity,
 					},
 				},
 			},
@@ -47,5 +51,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 
 		persistentVolumeClaims = append(persistentVolumeClaims, persistentVolumeClaim)
 	}
+
+	return persistentVolumeClaims, nil
 
 }
