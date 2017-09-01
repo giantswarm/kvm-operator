@@ -29,7 +29,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 				APIVersion: "v1",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.PVCName(key.ClusterID(*customObject), key.VMNumber(i)),,
+				Name: key.PVCName(key.ClusterID(*customObject), key.VMNumber(i)),
 				Labels: map[string]string{
 					"cluster":  key.ClusterID(*customObject),
 					"customer": key.ClusterCustomer(*customObject),
