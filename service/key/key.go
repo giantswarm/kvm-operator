@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/haproxy-etcd-lb/.gobuild/src/k8s.io/kubernetes/staging/src/k8s.io/client-go/_vendor/github.com/coreos/go-oidc/key"
 	"github.com/giantswarm/kvmtpr"
 	"path/filepath"
 )
