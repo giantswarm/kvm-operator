@@ -36,9 +36,9 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 					"app":      "master",
 					"node":     masterNode.ID,
 				},
-				 Annotations: map[string]string {
-					 "volume.beta.kubernetes.io/storage-class": "",
-				 },
+				Annotations: map[string]string{
+					"volume.beta.kubernetes.io/storage-class": "",
+				},
 			},
 			Spec: apiv1.PersistentVolumeClaimSpec{
 				AccessModes: []apiv1.PersistentVolumeAccessMode{apiv1.ReadWriteOnce},
