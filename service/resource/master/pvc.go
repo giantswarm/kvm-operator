@@ -41,7 +41,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 				AccessModes: []apiv1.PersistentVolumeAccessMode{apiv1.ReadWriteOnce},
 				Resources: apiv1.ResourceRequirements{
 					Requests: map[apiv1.ResourceName]resource.Quantity{
-						"Storage": quantity,
+						apiv1.ResourceStorage: quantity,
 					},
 				},
 			},
