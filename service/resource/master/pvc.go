@@ -37,7 +37,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 					"node":     masterNode.ID,
 				},
 				Annotations: map[string]string{
-					"volume.beta.kubernetes.io/storage-class": "",
+					"volume.beta.kubernetes.io/storage-class": "g8s-storage",
 				},
 			},
 			Spec: apiv1.PersistentVolumeClaimSpec{
