@@ -9,6 +9,11 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
+const (
+	etcdPVSize   = "15Gi"
+	storageClass = "g8s-storage"
+)
+
 func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []*apiv1.PersistentVolumeClaim
 
@@ -18,7 +23,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 	}
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
-		quantity, err := resource.ParseQuantity("15Gi")
+		quantity, err := resource.ParseQuantity(etcdPVSize)
 		if err != nil {
 			return nil, microerror.Maskf(err, "cant parse quantity")
 		}
@@ -37,7 +42,7 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 					"node":     masterNode.ID,
 				},
 				Annotations: map[string]string{
-					"volume.beta.kubernetes.io/storage-class": "g8s-storage",
+					"volume.beta.kubernetes.io/storage-class": storageClass,
 				},
 			},
 			Spec: apiv1.PersistentVolumeClaimSpec{
