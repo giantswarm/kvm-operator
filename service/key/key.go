@@ -38,7 +38,7 @@ func VMNumber(ID int) string {
 	return fmt.Sprintf("%d", ID)
 }
 func PVCName(clusterID string, vmNumber string) string {
-	return "pvc-master-etcd-" + clusterID + "-" + vmNumber
+	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
