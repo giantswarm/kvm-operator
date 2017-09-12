@@ -41,8 +41,8 @@ func PVCName(clusterID string, vmNumber string) string {
 	return "pvc-master-etcd-" + clusterID + "-" + vmNumber
 }
 
-func HostPathVolumeDir(clusterID string, vmNumber string) string {
-	return filepath.Join("/home/core/volumes/", clusterID, "k8s-master-vm"+vmNumber+"/")
+func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
+	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
 func NetworkBridgeName(ID string) string {
 	return fmt.Sprintf("br-%s", ID)

@@ -32,7 +32,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					HostPath: &apiv1.HostPathVolumeSource{
-						Path: key.HostPathVolumeDir(key.ClusterID(*customObject), key.VMNumber(i)),
+						Path: key.MasterHostPathVolumeDir(key.ClusterID(*customObject), key.VMNumber(i)),
 					},
 				},
 			}
