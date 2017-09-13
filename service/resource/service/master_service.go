@@ -1,30 +1,25 @@
-package master
+package service
 
 import (
-	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
-	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+
+	"github.com/giantswarm/kvm-operator/service/key"
 )
 
-func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
-	customObject, ok := obj.(*kvmtpr.CustomObject)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
-	}
-
+func newMasterService(customObject kvmtpr.CustomObject) *apiv1.Service {
 	service := &apiv1.Service{
 		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: "master",
+			Name: MasterID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(*customObject),
-				"customer": key.ClusterCustomer(*customObject),
-				"app":      "master",
+				"cluster":  key.ClusterID(customObject),
+				"customer": key.ClusterCustomer(customObject),
+				"app":      MasterID,
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -46,5 +41,5 @@ func (s *Service) newService(obj interface{}) (*apiv1.Service, error) {
 		},
 	}
 
-	return service, nil
+	return service
 }
