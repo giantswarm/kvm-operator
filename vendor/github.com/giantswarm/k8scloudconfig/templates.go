@@ -1134,9 +1134,15 @@ coreos:
     command: stop
     mask: true
   - name: locksmithd.service
+    enable: false
     command: stop
     mask: true
   - name: fleet.service
+    enable: false
+    mask: true
+    command: stop
+  - name: fleet.socket
+    enable: false
     mask: true
     command: stop
   - name: systemd-networkd-wait-online.service
@@ -1536,7 +1542,7 @@ coreos:
       -v /usr/lib/os-release:/etc/os-release \
       -v /usr/share/ca-certificates/:/etc/ssl/certs \
       -v /var/lib/docker/:/var/lib/docker:rw \
-      -v /var/lib/kubelet/:/var/lib/kubelet:rw,rslave \
+      -v /var/lib/kubelet/:/var/lib/kubelet:rw,shared \
       -v /etc/kubernetes/ssl/:/etc/kubernetes/ssl/ \
       -v /etc/kubernetes/config/:/etc/kubernetes/config/ \
       -v /etc/cni/net.d/:/etc/cni/net.d/ \

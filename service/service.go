@@ -5,9 +5,11 @@ package service
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/cenk/backoff"
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
@@ -211,10 +213,17 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var operatorBackOff *backoff.ExponentialBackOff
+	{
+		operatorBackOff = backoff.NewExponentialBackOff()
+		operatorBackOff.MaxElapsedTime = 5 * time.Minute
+	}
+
 	var operatorService *operator.Service
 	{
 		operatorConfig := operator.DefaultConfig()
 
+		operatorConfig.BackOff = operatorBackOff
 		operatorConfig.K8sClient = k8sClient
 		operatorConfig.Logger = config.Logger
 		operatorConfig.OperatorFramework = operatorFramework
