@@ -97,18 +97,9 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		}
 	}
 
-	var newService *apiv1.Service
-	{
-		newService, err = s.newService(obj)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	for _, i := range newIngresses {
 		runtimeObjects = append(runtimeObjects, i)
 	}
-	runtimeObjects = append(runtimeObjects, newService)
 	for _, d := range newDeployments {
 		runtimeObjects = append(runtimeObjects, d)
 	}
