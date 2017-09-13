@@ -137,6 +137,8 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 			_, err = r.k8sClient.BatchV1().Jobs(namespace).Create(t)
 		case *v1.Service:
 			_, err = r.k8sClient.Core().Services(namespace).Create(t)
+		case *v1.PersistentVolumeClaim:
+			_, err = r.k8sClient.Core().PersistentVolumeClaims(namespace).Create(t)
 		default:
 			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}
@@ -185,6 +187,8 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 			err = r.k8sClient.BatchV1().Jobs(namespace).Delete(t.Name, nil)
 		case *v1.Service:
 			err = r.k8sClient.Core().Services(namespace).Delete(t.Name, nil)
+		case *v1.PersistentVolumeClaim:
+			err = r.k8sClient.Core().PersistentVolumeClaims(namespace).Delete(t.Name, nil)
 		default:
 			return microerror.Maskf(executionFailedError, "unknown type '%T'", t)
 		}
