@@ -2,8 +2,11 @@ package operator
 
 import (
 	"fmt"
+	"os"
 	"sync"
+	"time"
 
+	"github.com/cenk/backoff"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -17,6 +20,7 @@ import (
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
+	BackOff           backoff.BackOff
 	K8sClient         kubernetes.Interface
 	Logger            micrologger.Logger
 	OperatorFramework *framework.Framework
@@ -28,6 +32,7 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
+		BackOff:           nil,
 		K8sClient:         nil,
 		Logger:            nil,
 		OperatorFramework: nil,
@@ -38,6 +43,9 @@ func DefaultConfig() Config {
 // New creates a new configured service.
 func New(config Config) (*Service, error) {
 	// Dependencies.
+	if config.BackOff == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.BackOff must not be empty")
+	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
@@ -72,6 +80,7 @@ func New(config Config) (*Service, error) {
 
 	newService := &Service{
 		// Dependencies.
+		backOff:           config.BackOff,
 		logger:            config.Logger,
 		operatorFramework: config.OperatorFramework,
 		resources:         config.Resources,
@@ -88,6 +97,7 @@ func New(config Config) (*Service, error) {
 // Service implements the service.
 type Service struct {
 	// Dependencies.
+	backOff           backoff.BackOff
 	logger            micrologger.Logger
 	operatorFramework *framework.Framework
 	resources         []framework.Resource
@@ -100,27 +110,49 @@ type Service struct {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		err := s.tpr.CreateAndWait()
-		if tpr.IsAlreadyExists(err) {
-			s.logger.Log("debug", "third party resource already exists")
-		} else if err != nil {
-			s.logger.Log("error", fmt.Sprintf("%#v", err))
-			return
+		o := func() error {
+			err := s.bootWithError()
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			return nil
 		}
 
-		s.logger.Log("debug", "starting list/watch")
-
-		newResourceEventHandler := &cache.ResourceEventHandlerFuncs{
-			AddFunc:    s.addFunc,
-			DeleteFunc: s.deleteFunc,
-		}
-		newZeroObjectFactory := &tpr.ZeroObjectFactoryFuncs{
-			NewObjectFunc:     func() runtime.Object { return &kvmtpr.CustomObject{} },
-			NewObjectListFunc: func() runtime.Object { return &kvmtpr.List{} },
+		n := func(err error, d time.Duration) {
+			s.logger.Log("warning", fmt.Sprintf("retrying operator boot due to error: %#v", microerror.Mask(err)))
 		}
 
-		s.tpr.NewInformer(newResourceEventHandler, newZeroObjectFactory).Run(nil)
+		err := backoff.RetryNotify(o, s.backOff, n)
+		if err != nil {
+			s.logger.Log("error", fmt.Sprintf("stop operator boot retries due to too many errors: %#v", microerror.Mask(err)))
+			os.Exit(1)
+		}
 	})
+}
+
+func (s *Service) bootWithError() error {
+	err := s.tpr.CreateAndWait()
+	if tpr.IsAlreadyExists(err) {
+		s.logger.Log("debug", "third party resource already exists")
+	} else if err != nil {
+		return microerror.Mask(err)
+	}
+
+	s.logger.Log("debug", "starting list/watch")
+
+	newResourceEventHandler := &cache.ResourceEventHandlerFuncs{
+		AddFunc:    s.addFunc,
+		DeleteFunc: s.deleteFunc,
+	}
+	newZeroObjectFactory := &tpr.ZeroObjectFactoryFuncs{
+		NewObjectFunc:     func() runtime.Object { return &kvmtpr.CustomObject{} },
+		NewObjectListFunc: func() runtime.Object { return &kvmtpr.List{} },
+	}
+
+	s.tpr.NewInformer(newResourceEventHandler, newZeroObjectFactory).Run(nil)
+
+	return nil
 }
 
 func (s *Service) addFunc(obj interface{}) {
