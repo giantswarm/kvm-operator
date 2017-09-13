@@ -97,17 +97,6 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		}
 	}
 
-	var newIngresses []*extensionsv1.Ingress
-	{
-		newIngresses, err = s.newIngresses(obj)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	for _, i := range newIngresses {
-		runtimeObjects = append(runtimeObjects, i)
-	}
 	for _, pvc := range newPersistentVolumeClaims {
 		runtimeObjects = append(runtimeObjects, pvc)
 	}
