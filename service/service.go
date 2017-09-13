@@ -22,6 +22,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
 	cloudconfigresource "github.com/giantswarm/kvm-operator/service/resource/cloudconfig"
+	ingressresource "github.com/giantswarm/kvm-operator/service/resource/ingress"
 	"github.com/giantswarm/kvm-operator/service/resource/legacy"
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
@@ -120,6 +121,19 @@ func New(config Config) (*Service, error) {
 		masterConfig.Logger = config.Logger
 
 		masterResource, err = masterresource.New(masterConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var ingressResource framework.Resource
+	{
+		ingressConfig := ingressresource.DefaultConfig()
+
+		ingressConfig.K8sClient = k8sClient
+		ingressConfig.Logger = config.Logger
+
+		ingressResource, err = ingressresource.New(ingressConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -225,6 +239,7 @@ func New(config Config) (*Service, error) {
 		operatorConfig.Resources = []framework.Resource{
 			namespaceResource,
 			cloudConfigResource,
+			ingressResource,
 			serviceResource,
 			legacyResource,
 		}
