@@ -29,11 +29,6 @@ import (
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
 )
 
-const (
-	ListAPIEndpoint  = "/apis/cluster.giantswarm.io/v1/kvms"
-	WatchAPIEndpoint = "/apis/cluster.giantswarm.io/v1/watch/kvms"
-)
-
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
