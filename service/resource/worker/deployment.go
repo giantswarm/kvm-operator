@@ -94,7 +94,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Command: []string{
 									"/bin/sh",
 									"-c",
-									"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.cluster.service=worker --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}; while true; do sleep inf; done",
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=${NETWORK_BRIDGE_NAME} --provider.kind=bridge --service.kubernetes.address=\"\" --service.kubernetes.cluster.namespace=${POD_NAMESPACE} --service.kubernetes.cluster.service=worker --service.kubernetes.inCluster=true --updater.pod.names=${POD_NAME}; while true; do sleep 1000000; done",
 								},
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
