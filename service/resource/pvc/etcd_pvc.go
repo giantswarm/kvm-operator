@@ -1,4 +1,4 @@
-package master
+package pvc
 
 import (
 	"github.com/giantswarm/kvm-operator/service/key"
@@ -10,22 +10,17 @@ import (
 )
 
 const (
-	etcdPVSize   = "15Gi"
-	storageClass = "g8s-storage"
+	// EtcdPVSize is the size the persistent volume for etcd is configured with.
+	EtcdPVSize = "15Gi"
 )
 
-func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.PersistentVolumeClaim, error) {
+func newEtcdPVCs(customObject kvmtpr.CustomObject) ([]*apiv1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []*apiv1.PersistentVolumeClaim
 
-	customObject, ok := obj.(*kvmtpr.CustomObject)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
-	}
-
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
-		quantity, err := resource.ParseQuantity(etcdPVSize)
+		quantity, err := resource.ParseQuantity(EtcdPVSize)
 		if err != nil {
-			return nil, microerror.Maskf(err, "cant parse quantity")
+			return nil, microerror.Mask(err)
 		}
 
 		persistentVolumeClaim := &apiv1.PersistentVolumeClaim{
@@ -34,19 +29,21 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 				APIVersion: "v1",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.PVCName(key.ClusterID(*customObject), key.VMNumber(i)),
+				Name: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 				Labels: map[string]string{
-					"cluster":  key.ClusterID(*customObject),
-					"customer": key.ClusterCustomer(*customObject),
-					"app":      "master",
+					"app":      MasterID,
+					"cluster":  key.ClusterID(customObject),
+					"customer": key.ClusterCustomer(customObject),
 					"node":     masterNode.ID,
 				},
 				Annotations: map[string]string{
-					"volume.beta.kubernetes.io/storage-class": storageClass,
+					"volume.beta.kubernetes.io/storage-class": StorageClass,
 				},
 			},
 			Spec: apiv1.PersistentVolumeClaimSpec{
-				AccessModes: []apiv1.PersistentVolumeAccessMode{apiv1.ReadWriteOnce},
+				AccessModes: []apiv1.PersistentVolumeAccessMode{
+					apiv1.ReadWriteOnce,
+				},
 				Resources: apiv1.ResourceRequirements{
 					Requests: map[apiv1.ResourceName]resource.Quantity{
 						apiv1.ResourceStorage: quantity,
@@ -59,5 +56,4 @@ func (s *Service) newPersistentVolumeClaims(obj interface{}) ([]*apiv1.Persisten
 	}
 
 	return persistentVolumeClaims, nil
-
 }

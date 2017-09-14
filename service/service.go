@@ -26,6 +26,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource/legacy"
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
+	pvcresource "github.com/giantswarm/kvm-operator/service/resource/pvc"
 	serviceresource "github.com/giantswarm/kvm-operator/service/resource/service"
 	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
 )
@@ -152,6 +153,19 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var pvcResource framework.Resource
+	{
+		pvcConfig := pvcresource.DefaultConfig()
+
+		pvcConfig.K8sClient = k8sClient
+		pvcConfig.Logger = config.Logger
+
+		pvcResource, err = pvcresource.New(pvcConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var serviceResource framework.Resource
 	{
 		serviceConfig := serviceresource.DefaultConfig()
@@ -240,6 +254,7 @@ func New(config Config) (*Service, error) {
 			namespaceResource,
 			cloudConfigResource,
 			ingressResource,
+			pvcResource,
 			serviceResource,
 			legacyResource,
 		}
