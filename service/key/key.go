@@ -5,9 +5,10 @@ import (
 	"net"
 	"strings"
 
+	"path/filepath"
+
 	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
-	"path/filepath"
 )
 
 func ClusterCustomer(customObject kvmtpr.CustomObject) string {
@@ -34,16 +35,14 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
-func VMNumber(ID int) string {
-	return fmt.Sprintf("%d", ID)
-}
-func PVCName(clusterID string, vmNumber string) string {
+func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
+
 func NetworkBridgeName(ID string) string {
 	return fmt.Sprintf("br-%s", ID)
 }
@@ -74,4 +73,8 @@ func NetworkNTPBlock(servers []net.IP) string {
 
 func NetworkEnvFilePath(ID string) string {
 	return fmt.Sprintf("/run/flannel/networks/%s.env", NetworkBridgeName(ID))
+}
+
+func VMNumber(ID int) string {
+	return fmt.Sprintf("%d", ID)
 }
