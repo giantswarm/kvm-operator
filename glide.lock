@@ -1,5 +1,5 @@
-hash: 4c9a26f5dd22c848437f83e52428cea984cf307290731919d395fde315ca478b
-updated: 2017-09-13T17:14:23.93131991+02:00
+hash: 034c3a489bd0008afb1fa97a2c3b66f4f8cf5c8e496291aa0029ccb05614fa56
+updated: 2017-09-14T18:35:20.064494392+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -32,7 +32,7 @@ imports:
   subpackages:
   - certificatetprtest
 - name: github.com/giantswarm/clustertpr
-  version: 1ac2fe67efb012ab2ff0002769c0ae3463f3aa09
+  version: 204c6262c75db8eddf6974c9373a42191db88a56
   subpackages:
   - spec
   - spec/docker
@@ -41,8 +41,9 @@ imports:
   - spec/kubernetes/ingress
   - spec/kubernetes/kubectl
   - spec/kubernetes/networksetup
+  - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 172f467982de9f3b765c9b63c43d9b817ff18b2b
+  version: 604b7f61d4f5b3bb91d5ec272531ea2baa64c5f9
 - name: github.com/giantswarm/kvmtpr
   version: c9a45dd6cf78ed1078d878427d399aede0c14f26
   subpackages:
@@ -51,7 +52,7 @@ imports:
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
 - name: github.com/giantswarm/microendpoint
-  version: 70547070da4072138bb5161e80a164b0bac075cc
+  version: f5682d1d6fe0eb963397fb7e0535c1794644efce
   subpackages:
   - endpoint/healthz
   - endpoint/version
@@ -61,7 +62,7 @@ imports:
 - name: github.com/giantswarm/microerror
   version: 5ade94eb4ee35ef72eb9382228470caeddb29989
 - name: github.com/giantswarm/microkit
-  version: 9c50baa91bd1639e41bc5510b215d9d0801f94ca
+  version: 6b235e750c3dddc4010b9b017642bb91ddd16245
   subpackages:
   - command
   - command/daemon
@@ -82,11 +83,11 @@ imports:
   subpackages:
   - microloggertest
 - name: github.com/giantswarm/microstorage
-  version: f5c68d40459f0021cf8266501b7d8615ea4ff641
+  version: e990a46ff7c9065f8d83c0a649cb1a6ef5d411d7
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 9c07028f0dd7fa029954f09dd1e1b073b7629bc1
+  version: ebba313a2a521c384192e0011959d58682220cb3
   subpackages:
   - client/k8s
   - framework
@@ -127,7 +128,7 @@ imports:
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
 - name: github.com/hashicorp/hcl
-  version: 8f6b1344a92ff8877cf24a5de9177bf7d0a2a187
+  version: 68e816d1c783414e79bc65b3994d9ab6b0a722ab
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -171,13 +172,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 2f17f4a9d485bf34b4bfaccc273805040e4f86c8
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
