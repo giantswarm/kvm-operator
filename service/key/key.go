@@ -35,6 +35,10 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
+func DeploymentName(prefix string, nodeID string) string {
+	return fmt.Sprintf("%s-%s", prefix, nodeID)
+}
+
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
@@ -73,6 +77,10 @@ func NetworkNTPBlock(servers []net.IP) string {
 
 func NetworkEnvFilePath(ID string) string {
 	return fmt.Sprintf("/run/flannel/networks/%s.env", NetworkBridgeName(ID))
+}
+
+func StorageType(customObject kvmtpr.CustomObject) string {
+	return customObject.Spec.KVM.K8sKVM.StorageType
 }
 
 func VMNumber(ID int) string {
