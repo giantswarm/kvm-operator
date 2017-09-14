@@ -40,7 +40,6 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 					"node":     workerNode.ID,
 				},
 			},
-
 			Spec: extensionsv1.DeploymentSpec{
 				Strategy: extensionsv1.DeploymentStrategy{
 					Type: extensionsv1.RecreateDeploymentStrategyType,
