@@ -57,6 +57,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 						Annotations: map[string]string{},
 					},
 					Spec: apiv1.PodSpec{
+						NodeSelector: map[string]string{
+							"role": "worker",
+						},
 						HostNetwork: true,
 						Volumes: []apiv1.Volume{
 							{
