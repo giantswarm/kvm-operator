@@ -78,14 +78,6 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		}
 	}
 
-	var newPersistentVolumeClaims []*apiv1.PersistentVolumeClaim
-	{
-		newPersistentVolumeClaims, err = s.newPersistentVolumeClaims(obj)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var newDeployments []*extensionsv1.Deployment
 	{
 		newDeployments, err = s.newDeployments(obj)
@@ -97,9 +89,6 @@ func (s *Service) newRuntimeObjects(obj interface{}) ([]runtime.Object, error) {
 		}
 	}
 
-	for _, pvc := range newPersistentVolumeClaims {
-		runtimeObjects = append(runtimeObjects, pvc)
-	}
 	for _, d := range newDeployments {
 		runtimeObjects = append(runtimeObjects, d)
 	}
