@@ -1,24 +1,20 @@
-package master
+package deployment
 
 import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
+
+	"github.com/giantswarm/kvm-operator/service/key"
 )
 
-func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, error) {
+func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Deployment, error) {
 	var deployments []*extensionsv1.Deployment
-
-	customObject, ok := obj.(*kvmtpr.CustomObject)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
-	}
 
 	privileged := true
 	replicas := int32(1)
@@ -32,7 +28,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					HostPath: &apiv1.HostPathVolumeSource{
-						Path: key.MasterHostPathVolumeDir(key.ClusterID(*customObject), key.VMNumber(i)),
+						Path: key.MasterHostPathVolumeDir(key.ClusterID(customObject), key.VMNumber(i)),
 					},
 				},
 			}
@@ -41,13 +37,14 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
-						ClaimName: key.EtcdPVCName(key.ClusterID(*customObject), key.VMNumber(i)),
+						ClaimName: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 					},
 				},
 			}
 		} else {
 			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", customObject.Spec.KVM.K8sKVM.StorageType)
 		}
+
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
@@ -56,9 +53,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: "master-" + masterNode.ID,
 				Labels: map[string]string{
-					"cluster":  key.ClusterID(*customObject),
-					"customer": key.ClusterCustomer(*customObject),
-					"app":      "master",
+					"cluster":  key.ClusterID(customObject),
+					"customer": key.ClusterCustomer(customObject),
+					"app":      MasterID,
 					"node":     masterNode.ID,
 				},
 			},
@@ -69,19 +66,20 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						GenerateName: "master",
+						GenerateName: MasterID,
 						Labels: map[string]string{
-							"cluster":  key.ClusterID(*customObject),
-							"customer": key.ClusterCustomer(*customObject),
-							"app":      "master",
+							"app":      MasterID,
+							"cluster":  key.ClusterID(customObject),
+							"customer": key.ClusterCustomer(customObject),
 							"node":     masterNode.ID,
 						},
 						Annotations: map[string]string{},
 					},
 					Spec: apiv1.PodSpec{
+						Affinity:    newMasterPodAfinity(customObject),
 						HostNetwork: true,
 						NodeSelector: map[string]string{
-							"role": "master",
+							"role": MasterID,
 						},
 						Volumes: []apiv1.Volume{
 							{
@@ -89,7 +87,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: key.ConfigMapName(*customObject, masterNode, "master"),
+											Name: key.ConfigMapName(customObject, masterNode, MasterID),
 										},
 									},
 								},
@@ -107,7 +105,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms", key.ClusterID(*customObject), masterNode.ID),
+										Path: filepath.Join("/home/core/vms", key.ClusterID(customObject), masterNode.ID),
 									},
 								},
 							},
@@ -128,7 +126,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Env: []apiv1.EnvVar{
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(key.ClusterID(*customObject)),
+										Value: key.NetworkBridgeName(key.ClusterID(customObject)),
 									},
 									{
 										Name: "POD_NAME",
@@ -158,7 +156,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 									Privileged: &privileged,
 								},
 								Args: []string{
-									"master",
+									MasterID,
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -180,7 +178,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 									},
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(key.ClusterID(*customObject)),
+										Value: key.NetworkBridgeName(key.ClusterID(customObject)),
 									},
 									{
 										Name: "MEMORY",
@@ -189,7 +187,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 									},
 									{
 										Name:  "ROLE",
-										Value: "master",
+										Value: MasterID,
 									},
 									{
 										Name:  "CLOUD_CONFIG_PATH",

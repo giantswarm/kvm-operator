@@ -1,4 +1,4 @@
-package master
+package deployment
 
 import "github.com/giantswarm/microerror"
 
