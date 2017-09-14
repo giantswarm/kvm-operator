@@ -182,6 +182,10 @@ func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (
 	return pvcsToDelete, nil
 }
 
+func (r *Resource) GetUpdateState(obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
+	return []*apiv1.PersistentVolumeClaim{}, []*apiv1.PersistentVolumeClaim{}, []*apiv1.PersistentVolumeClaim{}, nil
+}
+
 func (r *Resource) Name() string {
 	return Name
 }
@@ -245,6 +249,10 @@ func (r *Resource) ProcessDeleteState(obj, deleteState interface{}) error {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the PVCs do not exist in the Kubernetes API")
 	}
 
+	return nil
+}
+
+func (r *Resource) ProcessUpdateState(obj, updateState interface{}) error {
 	return nil
 }
 
