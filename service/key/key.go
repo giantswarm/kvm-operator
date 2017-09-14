@@ -75,6 +75,10 @@ func NetworkEnvFilePath(ID string) string {
 	return fmt.Sprintf("/run/flannel/networks/%s.env", NetworkBridgeName(ID))
 }
 
+func StorageType(customObject kvmtpr.CustomObject) string {
+	return customObject.Spec.KVM.K8sKVM.StorageType
+}
+
 func VMNumber(ID int) string {
 	return fmt.Sprintf("%d", ID)
 }

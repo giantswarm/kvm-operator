@@ -23,7 +23,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 		capabilities := customObject.Spec.KVM.Masters[i]
 
 		var etcdVolume apiv1.Volume
-		if customObject.Spec.KVM.K8sKVM.StorageType == "hostPath" {
+		if key.StorageType(customObject) == "hostPath" {
 			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
@@ -32,7 +32,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 					},
 				},
 			}
-		} else if customObject.Spec.KVM.K8sKVM.StorageType == "persistentVolume" {
+		} else if key.StorageType(customObject) == "persistentVolume" {
 			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
@@ -42,7 +42,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				},
 			}
 		} else {
-			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", customObject.Spec.KVM.K8sKVM.StorageType)
+			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.StorageType(customObject))
 		}
 
 		deployment := &extensionsv1.Deployment{
