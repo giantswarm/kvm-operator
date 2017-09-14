@@ -1,24 +1,19 @@
-package worker
+package deployment
 
 import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
-	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
+
+	"github.com/giantswarm/kvm-operator/service/key"
 )
 
-func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, error) {
+func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Deployment, error) {
 	var deployments []*extensionsv1.Deployment
-
-	customObject, ok := obj.(*kvmtpr.CustomObject)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, obj)
-	}
 
 	privileged := true
 	replicas := int32(1)
@@ -34,9 +29,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: "worker-" + workerNode.ID,
 				Labels: map[string]string{
-					"cluster":  key.ClusterID(*customObject),
-					"customer": key.ClusterCustomer(*customObject),
-					"app":      "worker",
+					"app":      WorkerID,
+					"cluster":  key.ClusterID(customObject),
+					"customer": key.ClusterCustomer(customObject),
 					"node":     workerNode.ID,
 				},
 			},
@@ -47,16 +42,17 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "worker",
+						Name: WorkerID,
 						Labels: map[string]string{
-							"cluster":  key.ClusterID(*customObject),
-							"customer": key.ClusterCustomer(*customObject),
-							"app":      "worker",
+							"cluster":  key.ClusterID(customObject),
+							"customer": key.ClusterCustomer(customObject),
+							"app":      WorkerID,
 							"node":     workerNode.ID,
 						},
 						Annotations: map[string]string{},
 					},
 					Spec: apiv1.PodSpec{
+						Affinity:    newWorkerPodAfinity(customObject),
 						HostNetwork: true,
 						Volumes: []apiv1.Volume{
 							{
@@ -64,7 +60,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: key.ConfigMapName(*customObject, workerNode, "worker"),
+											Name: key.ConfigMapName(customObject, workerNode, WorkerID),
 										},
 									},
 								},
@@ -81,7 +77,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms", key.ClusterID(*customObject), workerNode.ID),
+										Path: filepath.Join("/home/core/vms", key.ClusterID(customObject), workerNode.ID),
 									},
 								},
 							},
@@ -102,7 +98,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 								Env: []apiv1.EnvVar{
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(key.ClusterID(*customObject)),
+										Value: key.NetworkBridgeName(key.ClusterID(customObject)),
 									},
 									{
 										Name: "POD_NAME",
@@ -132,7 +128,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 									Privileged: &privileged,
 								},
 								Args: []string{
-									"worker",
+									WorkerID,
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -154,7 +150,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 									},
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(key.ClusterID(*customObject)),
+										Value: key.NetworkBridgeName(key.ClusterID(customObject)),
 									},
 									{
 										Name: "MEMORY",
@@ -163,7 +159,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 									},
 									{
 										Name:  "ROLE",
-										Value: "worker",
+										Value: WorkerID,
 									},
 									{
 										Name:  "CLOUD_CONFIG_PATH",

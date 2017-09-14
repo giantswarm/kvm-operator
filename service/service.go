@@ -7,8 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"k8s.io/client-go/kubernetes"
-
 	"github.com/cenk/backoff"
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/microendpoint/service/version"
@@ -17,18 +15,17 @@ import (
 	"github.com/giantswarm/operatorkit/client/k8s"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/spf13/viper"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
 	configmapresource "github.com/giantswarm/kvm-operator/service/resource/configmap"
+	deploymentresource "github.com/giantswarm/kvm-operator/service/resource/deployment"
 	ingressresource "github.com/giantswarm/kvm-operator/service/resource/ingress"
-	"github.com/giantswarm/kvm-operator/service/resource/legacy"
-	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
 	pvcresource "github.com/giantswarm/kvm-operator/service/resource/pvc"
 	serviceresource "github.com/giantswarm/kvm-operator/service/resource/service"
-	workerresource "github.com/giantswarm/kvm-operator/service/resource/worker"
 )
 
 // Config represents the configuration used to create a new service.
@@ -115,13 +112,14 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var masterResource legacy.Resource
+	var deploymentResource framework.Resource
 	{
-		masterConfig := masterresource.DefaultConfig()
+		deploymentConfig := deploymentresource.DefaultConfig()
 
-		masterConfig.Logger = config.Logger
+		deploymentConfig.K8sClient = k8sClient
+		deploymentConfig.Logger = config.Logger
 
-		masterResource, err = masterresource.New(masterConfig)
+		deploymentResource, err = deploymentresource.New(deploymentConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -179,18 +177,6 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var workerResource legacy.Resource
-	{
-		workerConfig := workerresource.DefaultConfig()
-
-		workerConfig.Logger = config.Logger
-
-		workerResource, err = workerresource.New(workerConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var operatorFramework *framework.Framework
 	{
 		frameworkConfig := framework.DefaultConfig()
@@ -198,26 +184,6 @@ func New(config Config) (*Service, error) {
 		frameworkConfig.Logger = config.Logger
 
 		operatorFramework, err = framework.New(frameworkConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var legacyResource *legacy.Reconciler
-	{
-		newConfig := legacy.DefaultConfig()
-
-		// Dependencies.
-		newConfig.K8sClient = k8sClient
-		newConfig.Logger = config.Logger
-
-		// Settings.
-		newConfig.Resources = []legacy.Resource{
-			masterResource,
-			workerResource,
-		}
-
-		legacyResource, err = legacy.New(newConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -242,6 +208,12 @@ func New(config Config) (*Service, error) {
 		operatorBackOff.MaxElapsedTime = 5 * time.Minute
 	}
 
+	// Here we create the operator service and configure resources that it can
+	// reconcile.
+	//
+	// NOTE that the order of the namespace and deployment resource is important.
+	// We have to start the namespace resource at first because all other
+	// resources are created within this namespace.
 	var operatorService *operator.Service
 	{
 		operatorConfig := operator.DefaultConfig()
@@ -252,11 +224,12 @@ func New(config Config) (*Service, error) {
 		operatorConfig.OperatorFramework = operatorFramework
 		operatorConfig.Resources = []framework.Resource{
 			namespaceResource,
+
 			configMapResource,
+			deploymentResource,
 			ingressResource,
 			pvcResource,
 			serviceResource,
-			legacyResource,
 		}
 
 		operatorService, err = operator.New(operatorConfig)
