@@ -10,7 +10,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
-	apisbatchv1 "k8s.io/client-go/pkg/apis/batch/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
 
@@ -131,10 +130,6 @@ func (r *Reconciler) ProcessCreateState(obj, createState interface{}) error {
 			_, err = r.k8sClient.Core().ConfigMaps(namespace).Create(t)
 		case *v1beta1.Deployment:
 			_, err = r.k8sClient.Extensions().Deployments(namespace).Create(t)
-		case *v1beta1.Ingress:
-			_, err = r.k8sClient.Extensions().Ingresses(namespace).Create(t)
-		case *apisbatchv1.Job:
-			_, err = r.k8sClient.BatchV1().Jobs(namespace).Create(t)
 		case *v1.PersistentVolumeClaim:
 			_, err = r.k8sClient.Core().PersistentVolumeClaims(namespace).Create(t)
 		default:
@@ -179,10 +174,6 @@ func (r *Reconciler) ProcessDeleteState(obj, deleteState interface{}) error {
 			err = r.k8sClient.Core().ConfigMaps(namespace).Delete(t.Name, nil)
 		case *v1beta1.Deployment:
 			err = r.k8sClient.Extensions().Deployments(namespace).Delete(t.Name, nil)
-		case *v1beta1.Ingress:
-			err = r.k8sClient.Extensions().Ingresses(namespace).Delete(t.Name, nil)
-		case *apisbatchv1.Job:
-			err = r.k8sClient.BatchV1().Jobs(namespace).Delete(t.Name, nil)
 		case *v1.PersistentVolumeClaim:
 			err = r.k8sClient.Core().PersistentVolumeClaims(namespace).Delete(t.Name, nil)
 		default:
