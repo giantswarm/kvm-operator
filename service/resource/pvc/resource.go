@@ -106,14 +106,20 @@ func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new PVCs")
+	var PVCs []*apiv1.PersistentVolumeClaim
 
-	PVCs, err := newEtcdPVCs(customObject)
-	if err != nil {
-		return nil, microerror.Mask(err)
+	if customObject.Spec.KVM.K8sKVM.StorageType == "persistentVolume" {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new PVCs")
+
+		PVCs, err = newEtcdPVCs(customObject)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("computed the %d new PVCs", len(PVCs)))
+	} else {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "not computing the new PVCs because storage type is not 'persistentVolume'")
 	}
-
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("computed the %d new PVCs", len(PVCs)))
 
 	return PVCs, nil
 }

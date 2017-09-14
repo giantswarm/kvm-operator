@@ -7,6 +7,8 @@ import (
 	"github.com/giantswarm/clustertpr"
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
+	kvmtprspec "github.com/giantswarm/kvmtpr/spec"
+	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -19,7 +21,8 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		ExpectedEtcdCount int
 	}{
 		// Test 1 ensures there is one PVC for each master when there is one master
-		// and one worker node in the custom object.
+		// and one worker node and storage type is 'persistentVolume' in the custom
+		// object.
 		{
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
@@ -32,6 +35,11 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 						},
 						Workers: []clustertprspec.Node{
 							{},
+						},
+					},
+					KVM: kvmtprspec.KVM{
+						K8sKVM: kvmtprspeckvm.K8sKVM{
+							StorageType: "persistentVolume",
 						},
 					},
 				},
@@ -40,7 +48,8 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		},
 
 		// Test 2 ensures there is one PVC for each master when there is one master
-		// and three worker nodes in the custom object.
+		// and three worker nodes and storage type is 'persistentVolume' in the
+		// custom object.
 		{
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
@@ -55,6 +64,11 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 							{},
 							{},
 							{},
+						},
+					},
+					KVM: kvmtprspec.KVM{
+						K8sKVM: kvmtprspeckvm.K8sKVM{
+							StorageType: "persistentVolume",
 						},
 					},
 				},
@@ -63,7 +77,8 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		},
 
 		// Test 3 ensures there is one PVC for each master when there are three
-		// master and three worker nodes in the custom object.
+		// master and three worker nodes and storage type is 'persistentVolume' in
+		// the custom object.
 		{
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
@@ -82,9 +97,101 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 							{},
 						},
 					},
+					KVM: kvmtprspec.KVM{
+						K8sKVM: kvmtprspeckvm.K8sKVM{
+							StorageType: "persistentVolume",
+						},
+					},
 				},
 			},
 			ExpectedEtcdCount: 3,
+		},
+
+		// Test 4 ensures there is no PVC for each master when there is one master
+		// and one worker node and storage type is 'hostPath' in the custom
+		// object.
+		{
+			Obj: &kvmtpr.CustomObject{
+				Spec: kvmtpr.Spec{
+					Cluster: clustertpr.Spec{
+						Cluster: clustertprspec.Cluster{
+							ID: "al9qy",
+						},
+						Masters: []clustertprspec.Node{
+							{},
+						},
+						Workers: []clustertprspec.Node{
+							{},
+						},
+					},
+					KVM: kvmtprspec.KVM{
+						K8sKVM: kvmtprspeckvm.K8sKVM{
+							StorageType: "hostPath",
+						},
+					},
+				},
+			},
+			ExpectedEtcdCount: 0,
+		},
+
+		// Test 5 ensures there is no PVC for each master when there is one master
+		// and three worker nodes and storage type is 'hostPath' in the
+		// custom object.
+		{
+			Obj: &kvmtpr.CustomObject{
+				Spec: kvmtpr.Spec{
+					Cluster: clustertpr.Spec{
+						Cluster: clustertprspec.Cluster{
+							ID: "al9qy",
+						},
+						Masters: []clustertprspec.Node{
+							{},
+						},
+						Workers: []clustertprspec.Node{
+							{},
+							{},
+							{},
+						},
+					},
+					KVM: kvmtprspec.KVM{
+						K8sKVM: kvmtprspeckvm.K8sKVM{
+							StorageType: "hostPath",
+						},
+					},
+				},
+			},
+			ExpectedEtcdCount: 0,
+		},
+
+		// Test 6 ensures there is no PVC for each master when there are three
+		// master and three worker nodes and storage type is 'hostPath' in
+		// the custom object.
+		{
+			Obj: &kvmtpr.CustomObject{
+				Spec: kvmtpr.Spec{
+					Cluster: clustertpr.Spec{
+						Cluster: clustertprspec.Cluster{
+							ID: "al9qy",
+						},
+						Masters: []clustertprspec.Node{
+							{},
+							{},
+							{},
+						},
+						Workers: []clustertprspec.Node{
+							{},
+							{},
+							{},
+						},
+					},
+					KVM: kvmtprspec.KVM{
+						K8sKVM: kvmtprspeckvm.K8sKVM{
+							StorageType: "hostPath",
+						},
+					},
+				},
+			},
+			ExpectedEtcdCount: 0,
 		},
 	}
 
