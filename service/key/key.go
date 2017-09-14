@@ -35,6 +35,10 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
+func DeploymentName(prefix string, nodeID string) string {
+	return fmt.Sprintf("%s-%s", prefix, nodeID)
+}
+
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }

@@ -51,7 +51,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: "master-" + masterNode.ID,
+				Name: key.DeploymentName(MasterID, masterNode.ID),
 				Labels: map[string]string{
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),

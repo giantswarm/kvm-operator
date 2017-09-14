@@ -268,12 +268,12 @@ func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bo
 func getDeploymentNames(customObject kvmtpr.CustomObject) []string {
 	var names []string
 
-	for _, node := range customObject.Spec.Cluster.Masters {
-		names = append(names, "master-"+node.ID)
+	for _, masterNode := range customObject.Spec.Cluster.Masters {
+		names = append(names, key.DeploymentName(MasterID, masterNode.ID))
 	}
 
-	for _, node := range customObject.Spec.Cluster.Workers {
-		names = append(names, "worker-"+node.ID)
+	for _, workerNode := range customObject.Spec.Cluster.Workers {
+		names = append(names, key.DeploymentName(WorkerID, workerNode.ID))
 	}
 
 	return names
