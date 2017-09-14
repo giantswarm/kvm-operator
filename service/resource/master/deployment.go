@@ -41,7 +41,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
-						ClaimName: key.PVCName(key.ClusterID(*customObject), key.VMNumber(i)),
+						ClaimName: key.EtcdPVCName(key.ClusterID(*customObject), key.VMNumber(i)),
 					},
 				},
 			}
