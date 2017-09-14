@@ -1,4 +1,4 @@
-package cloudconfig
+package configmap
 
 import (
 	"fmt"
@@ -22,12 +22,12 @@ const (
 	FilePermission = 0700
 	KeyUserData    = "user_data"
 	// Name is the identifier of the resource.
-	Name         = "cloudconfig"
+	Name         = "configmap"
 	PrefixMaster = "master"
 	PrefixWorker = "worker"
 )
 
-// Config represents the configuration used to create a new cloud config resource.
+// Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
 	CertWatcher certificatetpr.Searcher
@@ -35,7 +35,7 @@ type Config struct {
 	Logger      micrologger.Logger
 }
 
-// DefaultConfig provides a default configuration to create a new cloud config
+// DefaultConfig provides a default configuration to create a new config map
 // resource by best effort.
 func DefaultConfig() Config {
 	return Config{
@@ -46,7 +46,7 @@ func DefaultConfig() Config {
 	}
 }
 
-// Resource implements the cloud config resource.
+// Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
 	certWatcher certificatetpr.Searcher
@@ -54,7 +54,7 @@ type Resource struct {
 	logger      micrologger.Logger
 }
 
-// New creates a new configured cloud config resource.
+// New creates a new configured config map resource.
 func New(config Config) (*Resource, error) {
 	// Dependencies.
 	if config.CertWatcher == nil {

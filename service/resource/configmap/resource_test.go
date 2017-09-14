@@ -1,4 +1,4 @@
-package cloudconfig
+package configmap
 
 import (
 	"strings"

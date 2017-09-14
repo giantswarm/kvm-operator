@@ -21,7 +21,7 @@ import (
 	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
-	cloudconfigresource "github.com/giantswarm/kvm-operator/service/resource/cloudconfig"
+	configmapresource "github.com/giantswarm/kvm-operator/service/resource/configmap"
 	ingressresource "github.com/giantswarm/kvm-operator/service/resource/ingress"
 	"github.com/giantswarm/kvm-operator/service/resource/legacy"
 	masterresource "github.com/giantswarm/kvm-operator/service/resource/master"
@@ -101,15 +101,15 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var cloudConfigResource framework.Resource
+	var configMapResource framework.Resource
 	{
-		cloudConfigConfig := cloudconfigresource.DefaultConfig()
+		configMapConfig := configmapresource.DefaultConfig()
 
-		cloudConfigConfig.CertWatcher = certWatcher
-		cloudConfigConfig.K8sClient = k8sClient
-		cloudConfigConfig.Logger = config.Logger
+		configMapConfig.CertWatcher = certWatcher
+		configMapConfig.K8sClient = k8sClient
+		configMapConfig.Logger = config.Logger
 
-		cloudConfigResource, err = cloudconfigresource.New(cloudConfigConfig)
+		configMapResource, err = configmapresource.New(configMapConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -252,7 +252,7 @@ func New(config Config) (*Service, error) {
 		operatorConfig.OperatorFramework = operatorFramework
 		operatorConfig.Resources = []framework.Resource{
 			namespaceResource,
-			cloudConfigResource,
+			configMapResource,
 			ingressResource,
 			pvcResource,
 			serviceResource,
