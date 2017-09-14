@@ -108,7 +108,7 @@ func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
 
 	var PVCs []*apiv1.PersistentVolumeClaim
 
-	if customObject.Spec.KVM.K8sKVM.StorageType == "persistentVolume" {
+	if key.StorageType(customObject) == "persistentVolume" {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new PVCs")
 
 		PVCs, err = newEtcdPVCs(customObject)
