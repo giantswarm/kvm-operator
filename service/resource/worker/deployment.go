@@ -40,6 +40,7 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 					"node":     workerNode.ID,
 				},
 			},
+
 			Spec: extensionsv1.DeploymentSpec{
 				Strategy: extensionsv1.DeploymentStrategy{
 					Type: extensionsv1.RecreateDeploymentStrategyType,
@@ -57,6 +58,9 @@ func (s *Service) newDeployments(obj interface{}) ([]*extensionsv1.Deployment, e
 						Annotations: map[string]string{},
 					},
 					Spec: apiv1.PodSpec{
+						NodeSelector: map[string]string{
+							"role": "worker",
+						},
 						HostNetwork: true,
 						Volumes: []apiv1.Volume{
 							{
