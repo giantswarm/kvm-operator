@@ -61,11 +61,21 @@ func DefaultConfig() Config {
 	}
 }
 
+type Service struct {
+	// Dependencies.
+	Healthz  *healthz.Service
+	Operator *operator.Service
+	Version  *version.Service
+
+	// Internals.
+	bootOnce sync.Once
+}
+
 // New creates a new configured service object.
 func New(config Config) (*Service, error) {
 	// Dependencies.
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 	config.Logger.Log("debug", fmt.Sprintf("creating kvm-operator with config: %#v", config))
 
@@ -177,11 +187,26 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	// Here we create the operator framework and configure resources that it can
+	// reconcile.
+	//
+	// NOTE that the order of the namespace resource is important. We have to
+	// start the namespace resource at first because all other resources are
+	// created within this namespace.
 	var operatorFramework *framework.Framework
 	{
 		frameworkConfig := framework.DefaultConfig()
 
 		frameworkConfig.Logger = config.Logger
+		frameworkConfig.Resources = []framework.Resource{
+			namespaceResource,
+
+			configMapResource,
+			deploymentResource,
+			ingressResource,
+			pvcResource,
+			serviceResource,
+		}
 
 		operatorFramework, err = framework.New(frameworkConfig)
 		if err != nil {
@@ -208,12 +233,6 @@ func New(config Config) (*Service, error) {
 		operatorBackOff.MaxElapsedTime = 5 * time.Minute
 	}
 
-	// Here we create the operator service and configure resources that it can
-	// reconcile.
-	//
-	// NOTE that the order of the namespace and deployment resource is important.
-	// We have to start the namespace resource at first because all other
-	// resources are created within this namespace.
 	var operatorService *operator.Service
 	{
 		operatorConfig := operator.DefaultConfig()
@@ -222,15 +241,6 @@ func New(config Config) (*Service, error) {
 		operatorConfig.K8sClient = k8sClient
 		operatorConfig.Logger = config.Logger
 		operatorConfig.OperatorFramework = operatorFramework
-		operatorConfig.Resources = []framework.Resource{
-			namespaceResource,
-
-			configMapResource,
-			deploymentResource,
-			ingressResource,
-			pvcResource,
-			serviceResource,
-		}
 
 		operatorService, err = operator.New(operatorConfig)
 		if err != nil {
@@ -264,16 +274,6 @@ func New(config Config) (*Service, error) {
 	}
 
 	return newService, nil
-}
-
-type Service struct {
-	// Dependencies.
-	Healthz  *healthz.Service
-	Operator *operator.Service
-	Version  *version.Service
-
-	// Internals.
-	bootOnce sync.Once
 }
 
 func (s *Service) Boot() {
