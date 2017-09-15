@@ -14,7 +14,6 @@ import (
 	"github.com/giantswarm/operatorkit/tpr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 )
 
 // Config represents the configuration used to create a new service.
@@ -24,7 +23,6 @@ type Config struct {
 	K8sClient         kubernetes.Interface
 	Logger            micrologger.Logger
 	OperatorFramework *framework.Framework
-	Resources         []framework.Resource
 }
 
 // DefaultConfig provides a default configuration to create a new service by
@@ -36,7 +34,6 @@ func DefaultConfig() Config {
 		K8sClient:         nil,
 		Logger:            nil,
 		OperatorFramework: nil,
-		Resources:         nil,
 	}
 }
 
@@ -54,9 +51,6 @@ func New(config Config) (*Service, error) {
 	}
 	if config.OperatorFramework == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.OperatorFramework must not be empty")
-	}
-	if len(config.Resources) == 0 {
-		return nil, microerror.Maskf(invalidConfigError, "config.Resources must not be empty")
 	}
 
 	var err error
@@ -83,7 +77,6 @@ func New(config Config) (*Service, error) {
 		backOff:           config.BackOff,
 		logger:            config.Logger,
 		operatorFramework: config.OperatorFramework,
-		resources:         config.Resources,
 
 		// Internals
 		bootOnce: sync.Once{},
@@ -100,7 +93,6 @@ type Service struct {
 	backOff           backoff.BackOff
 	logger            micrologger.Logger
 	operatorFramework *framework.Framework
-	resources         []framework.Resource
 
 	// Internals.
 	bootOnce sync.Once
@@ -141,10 +133,8 @@ func (s *Service) bootWithError() error {
 
 	s.logger.Log("debug", "starting list/watch")
 
-	newResourceEventHandler := &cache.ResourceEventHandlerFuncs{
-		AddFunc:    s.addFunc,
-		DeleteFunc: s.deleteFunc,
-	}
+	newResourceEventHandler := s.operatorFramework.NewCacheResourceEventHandler()
+
 	newZeroObjectFactory := &tpr.ZeroObjectFactoryFuncs{
 		NewObjectFunc:     func() runtime.Object { return &kvmtpr.CustomObject{} },
 		NewObjectListFunc: func() runtime.Object { return &kvmtpr.List{} },
@@ -153,38 +143,4 @@ func (s *Service) bootWithError() error {
 	s.tpr.NewInformer(newResourceEventHandler, newZeroObjectFactory).Run(nil)
 
 	return nil
-}
-
-func (s *Service) addFunc(obj interface{}) {
-	// We lock the addFunc/deleteFunc to make sure only one addFunc/deleteFunc is
-	// executed at a time. addFunc/deleteFunc is not thread safe. This is
-	// important because the source of truth for the kvm-operator are Kubernetes
-	// resources. In case we would run the operator logic in parallel, we would
-	// run into race conditions.
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	s.logger.Log("debug", "executing the operator's addFunc")
-
-	err := s.operatorFramework.ProcessCreate(obj, s.resources)
-	if err != nil {
-		s.logger.Log("error", fmt.Sprintf("%#v", err), "event", "create")
-	}
-}
-
-func (s *Service) deleteFunc(obj interface{}) {
-	// We lock the addFunc/deleteFunc to make sure only one addFunc/deleteFunc is
-	// executed at a time. addFunc/deleteFunc is not thread safe. This is
-	// important because the source of truth for the kvm-operator are Kubernetes
-	// resources. In case we would run the operator logic in parallel, we would
-	// run into race conditions.
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	s.logger.Log("debug", "executing the operator's deleteFunc")
-
-	err := s.operatorFramework.ProcessDelete(obj, s.resources)
-	if err != nil {
-		s.logger.Log("error", fmt.Sprintf("%#v", err), "event", "delete")
-	}
 }
