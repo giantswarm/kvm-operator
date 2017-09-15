@@ -3,7 +3,7 @@ import:
 - package: github.com/prometheus/client_golang
   version: ~0.8.0
 - package: github.com/giantswarm/microkit
-  version: access-logging
+  version: master
 - package: github.com/giantswarm/operatorkit
   version: master
 - package: github.com/giantswarm/certificatetpr

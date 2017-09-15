@@ -1,5 +1,5 @@
-hash: fd4aaebba9301d21da0369291eb2f2919d5b90da90c88acc16a7c7ff96750dcf
-updated: 2017-09-14T19:39:33.162080022+02:00
+hash: 034c3a489bd0008afb1fa97a2c3b66f4f8cf5c8e496291aa0029ccb05614fa56
+updated: 2017-09-15T12:51:55.859229303+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -62,7 +62,7 @@ imports:
 - name: github.com/giantswarm/microerror
   version: 5ade94eb4ee35ef72eb9382228470caeddb29989
 - name: github.com/giantswarm/microkit
-  version: 7abc570fc0dfe1c95515d51ec4ef4716836b1db8
+  version: 4871f763488a16c5b7ea3c411bbd82cd5139e29a
   subpackages:
   - command
   - command/daemon
@@ -173,13 +173,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
+  version: 2f17f4a9d485bf34b4bfaccc273805040e4f86c8
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a1dba9ce8baed984a2495b658c82687f8157b98f
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
