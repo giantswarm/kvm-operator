@@ -1,6 +1,7 @@
 package ingress
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/giantswarm/kvmtpr"
@@ -68,7 +69,7 @@ func New(config Config) (*Resource, error) {
 	return newResource, nil
 }
 
-func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
+func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
 	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -102,7 +103,7 @@ func (r *Resource) GetCurrentState(obj interface{}) (interface{}, error) {
 	return ingresses, nil
 }
 
-func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
+func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
 	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -120,7 +121,7 @@ func (r *Resource) GetDesiredState(obj interface{}) (interface{}, error) {
 	return ingresses, nil
 }
 
-func (r *Resource) GetCreateState(obj, currentState, desiredState interface{}) (interface{}, error) {
+func (r *Resource) GetCreateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
 	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -149,7 +150,7 @@ func (r *Resource) GetCreateState(obj, currentState, desiredState interface{}) (
 	return ingressesToCreate, nil
 }
 
-func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (interface{}, error) {
+func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
 	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -178,7 +179,7 @@ func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (
 	return ingressesToDelete, nil
 }
 
-func (r *Resource) GetUpdateState(obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
+func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
 	return []*v1beta1.Ingress{}, []*v1beta1.Ingress{}, []*v1beta1.Ingress{}, nil
 }
 
@@ -186,7 +187,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func (r *Resource) ProcessCreateState(obj, createState interface{}) error {
+func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState interface{}) error {
 	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
@@ -217,7 +218,7 @@ func (r *Resource) ProcessCreateState(obj, createState interface{}) error {
 	return nil
 }
 
-func (r *Resource) ProcessDeleteState(obj, deleteState interface{}) error {
+func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState interface{}) error {
 	customObject, err := toCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
@@ -248,7 +249,7 @@ func (r *Resource) ProcessDeleteState(obj, deleteState interface{}) error {
 	return nil
 }
 
-func (r *Resource) ProcessUpdateState(obj, updateState interface{}) error {
+func (r *Resource) ProcessUpdateState(ctx context.Context, obj, updateState interface{}) error {
 	return nil
 }
 
