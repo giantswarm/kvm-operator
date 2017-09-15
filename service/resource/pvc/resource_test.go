@@ -1,6 +1,7 @@
 package pvc
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -208,7 +209,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetDesiredState(tc.Obj)
+		result, err := newResource.GetDesiredState(context.TODO(), tc.Obj)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
@@ -453,7 +454,7 @@ func Test_Resource_PVC_GetCreateState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetCreateState(tc.Obj, tc.CurrentState, tc.DesiredState)
+		result, err := newResource.GetCreateState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
@@ -746,7 +747,7 @@ func Test_Resource_PVC_GetDeleteState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetDeleteState(tc.Obj, tc.CurrentState, tc.DesiredState)
+		result, err := newResource.GetDeleteState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}

@@ -1,6 +1,7 @@
 package namespace
 
 import (
+	"context"
 	"testing"
 
 	"github.com/giantswarm/clustertpr"
@@ -56,7 +57,7 @@ func Test_Resource_Namespace_GetDesiredState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetDesiredState(tc.Obj)
+		result, err := newResource.GetDesiredState(context.TODO(), tc.Obj)
 		if err != nil {
 			t.Fatal("case", i+1, "expected", nil, "got", err)
 		}
@@ -166,7 +167,7 @@ func Test_Resource_Namespace_GetCreateState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetCreateState(tc.Obj, tc.Cur, tc.Des)
+		result, err := newResource.GetCreateState(context.TODO(), tc.Obj, tc.Cur, tc.Des)
 		if err != nil {
 			t.Fatal("case", i+1, "expected", nil, "got", err)
 		}
@@ -282,7 +283,7 @@ func Test_Resource_Namespace_GetDeleteState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetDeleteState(tc.Obj, tc.Cur, tc.Des)
+		result, err := newResource.GetDeleteState(context.TODO(), tc.Obj, tc.Cur, tc.Des)
 		if err != nil {
 			t.Fatal("case", i+1, "expected", nil, "got", err)
 		}
