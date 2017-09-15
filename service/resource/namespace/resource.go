@@ -171,7 +171,7 @@ func (r *Resource) GetDeleteState(obj, currentState, desiredState interface{}) (
 }
 
 func (r *Resource) GetUpdateState(obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
-	return []*apiv1.Namespace{}, []*apiv1.Namespace{}, []*apiv1.Namespace{}, nil
+	return *apiv1.Namespace{}, *apiv1.Namespace{}, *apiv1.Namespace{}, nil
 }
 
 func (r *Resource) Name() string {
