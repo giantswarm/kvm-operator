@@ -667,12 +667,12 @@ func Test_Resource_CloudConfig_GetDeleteState(t *testing.T) {
 
 func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 	testCases := []struct {
-		Obj                            interface{}
-		CurrentState                   interface{}
-		DesiredState                   interface{}
-		ExpectedConfigMapNamesToCreate []string
-		ExpectedConfigMapNamesToDelete []string
-		ExpectedConfigMapNamesToUpdate []string
+		Obj                        interface{}
+		CurrentState               interface{}
+		DesiredState               interface{}
+		ExpectedConfigMapsToCreate []*apiv1.ConfigMap
+		ExpectedConfigMapsToDelete []*apiv1.ConfigMap
+		ExpectedConfigMapsToUpdate []*apiv1.ConfigMap
 	}{
 		// Test 1, in case current state and desired state are empty the create,
 		// delete and update state should be empty.
@@ -686,11 +686,11 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:                   []*apiv1.ConfigMap{},
-			DesiredState:                   []*apiv1.ConfigMap{},
-			ExpectedConfigMapNamesToCreate: []string{},
-			ExpectedConfigMapNamesToDelete: []string{},
-			ExpectedConfigMapNamesToUpdate: []string{},
+			CurrentState:               []*apiv1.ConfigMap{},
+			DesiredState:               []*apiv1.ConfigMap{},
+			ExpectedConfigMapsToCreate: nil,
+			ExpectedConfigMapsToDelete: nil,
+			ExpectedConfigMapsToUpdate: nil,
 		},
 
 		// Test 2, in case current state and desired state are equal the create,
@@ -725,9 +725,9 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapNamesToCreate: []string{},
-			ExpectedConfigMapNamesToDelete: []string{},
-			ExpectedConfigMapNamesToUpdate: []string{},
+			ExpectedConfigMapsToCreate: nil,
+			ExpectedConfigMapsToDelete: nil,
+			ExpectedConfigMapsToUpdate: nil,
 		},
 
 		// Test 3, in case current state misses one item of desired state the delete
@@ -753,11 +753,18 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapNamesToCreate: []string{
-				"config-map-1",
+			ExpectedConfigMapsToCreate: []*apiv1.ConfigMap{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-1",
+					},
+					Data: map[string]string{
+						"key1": "val1",
+					},
+				},
 			},
-			ExpectedConfigMapNamesToDelete: []string{},
-			ExpectedConfigMapNamesToUpdate: []string{},
+			ExpectedConfigMapsToDelete: nil,
+			ExpectedConfigMapsToUpdate: nil,
 		},
 
 		// Test 4, in case current state contains two items and desired state is
@@ -801,11 +808,18 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapNamesToCreate: []string{},
-			ExpectedConfigMapNamesToDelete: []string{
-				"config-map-2",
+			ExpectedConfigMapsToCreate: nil,
+			ExpectedConfigMapsToDelete: []*apiv1.ConfigMap{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-2",
+					},
+					Data: map[string]string{
+						"key2": "val2",
+					},
+				},
 			},
-			ExpectedConfigMapNamesToUpdate: []string{},
+			ExpectedConfigMapsToUpdate: nil,
 		},
 
 		// Test 5, in case current state contains two items and desired state is
@@ -857,10 +871,17 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapNamesToCreate: []string{},
-			ExpectedConfigMapNamesToDelete: []string{},
-			ExpectedConfigMapNamesToUpdate: []string{
-				"config-map-2",
+			ExpectedConfigMapsToCreate: nil,
+			ExpectedConfigMapsToDelete: nil,
+			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-2",
+					},
+					Data: map[string]string{
+						"key2": "val2",
+					},
+				},
 			},
 		},
 	}
@@ -888,39 +909,26 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 		if !ok {
 			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, createState)
 		}
-		namesToCreate := toConfigMapNames(configMapsToCreate)
-		if !reflect.DeepEqual(namesToCreate, tc.ExpectedConfigMapNamesToCreate) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapNamesToCreate, namesToCreate)
+		if !reflect.DeepEqual(configMapsToCreate, tc.ExpectedConfigMapsToCreate) {
+			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToCreate, configMapsToCreate)
 		}
 
 		configMapsToDelete, ok := deleteState.([]*apiv1.ConfigMap)
 		if !ok {
 			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, deleteState)
 		}
-		namesToDelete := toConfigMapNames(configMapsToDelete)
-		if !reflect.DeepEqual(namesToDelete, tc.ExpectedConfigMapNamesToDelete) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapNamesToDelete, namesToDelete)
+		if !reflect.DeepEqual(configMapsToDelete, tc.ExpectedConfigMapsToDelete) {
+			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToDelete, configMapsToDelete)
 		}
 
 		configMapsToUpdate, ok := updateState.([]*apiv1.ConfigMap)
 		if !ok {
 			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, updateState)
 		}
-		namesToUpdate := toConfigMapNames(configMapsToUpdate)
-		if !reflect.DeepEqual(namesToUpdate, tc.ExpectedConfigMapNamesToUpdate) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapNamesToUpdate, namesToUpdate)
+		if !reflect.DeepEqual(configMapsToUpdate, tc.ExpectedConfigMapsToUpdate) {
+			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)
 		}
 	}
-}
-
-func toConfigMapNames(configMaps []*apiv1.ConfigMap) []string {
-	names := []string{}
-
-	for _, c := range configMaps {
-		names = append(names, c.Name)
-	}
-
-	return names
 }
 
 func testGetMasterCount(configMaps []*apiv1.ConfigMap) int {
