@@ -99,7 +99,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		if exists {
 			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "canceling reconciliation for custom object")
 
-			canceler <- struct{}{}
+			close(canceler)
 			return nil, nil
 		}
 	}
