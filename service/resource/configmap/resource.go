@@ -266,6 +266,15 @@ func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToCreate {
+			if configMap.Name == "worker-ntt2j-5t969" {
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("%#v\n", configMap.Data)
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+			}
 			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Create(configMap)
 			if apierrors.IsAlreadyExists(err) {
 				// fall through
@@ -298,6 +307,15 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 		// Create the config maps in the Kubernetes API.
 		namespace := key.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToDelete {
+			if configMap.Name == "worker-ntt2j-5t969" {
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("%#v\n", configMap.Data)
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+			}
 			err := r.k8sClient.CoreV1().ConfigMaps(namespace).Delete(configMap.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
@@ -330,6 +348,15 @@ func (r *Resource) ProcessUpdateState(ctx context.Context, obj, updateState inte
 		// Create the config maps in the Kubernetes API.
 		namespace := key.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToUpdate {
+			if configMap.Name == "worker-ntt2j-5t969" {
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("%#v\n", configMap.Data)
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+				fmt.Printf("\n")
+			}
 			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Update(configMap)
 			if err != nil {
 				return microerror.Mask(err)
@@ -475,15 +502,6 @@ func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
 }
 
 func isConfigMapModified(a, b *apiv1.ConfigMap) bool {
-	fmt.Printf("\n")
-	fmt.Printf("\n")
-	fmt.Printf("\n")
-	fmt.Printf("%#v\n", a.Data)
-	fmt.Printf("\n")
-	fmt.Printf("%#v\n", b.Data)
-	fmt.Printf("\n")
-	fmt.Printf("\n")
-	fmt.Printf("\n")
 	return !reflect.DeepEqual(a.Data, b.Data)
 }
 
