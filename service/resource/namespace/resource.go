@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/framework/cancelercontext"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -85,6 +86,17 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else {
 			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found the namespace in the Kubernetes API")
 			namespace = manifest
+		}
+	}
+
+	// In case the namespace is already terminating we do not need to do any
+	// further work. Then we cancel the reconciliation to prevent the current and
+	// any further resource from being processed.
+	if namespace.Status.Phase == "Terminating" {
+		canceler, exists := cancelercontext.FromContext(ctx)
+		if exists {
+			canceler <- struct{}{}
+			return nil, nil
 		}
 	}
 
