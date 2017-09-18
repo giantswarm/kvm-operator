@@ -225,7 +225,7 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 
 	var configMapsToUpdate []*apiv1.ConfigMap
 	{
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be deleted")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be updated")
 
 		for _, currentConfigMap := range currentConfigMaps {
 			desiredConfigMap, err := getConfigMapByName(desiredConfigMaps, currentConfigMap.Name)
