@@ -5,7 +5,7 @@ import:
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
-  version: master
+  version: precondition
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/kvmtpr
@@ -18,13 +18,3 @@ import:
   version: master
 - package: github.com/giantswarm/micrologger
   version: master
-# This verison is required by etcd, but docker/distribution uses an ancient
-# one.
-# microkit <- etcd
-# operatokir <- client-go <- docker/distribution
-- package: google.golang.org/grpc
-  version: v1.2.1
-# This version is required by client-go.
-# operatorkit <- client-go
-- package: github.com/golang/protobuf/proto
-  version: 4bd1920723d7b7c925de087aa32e2187708897f7
