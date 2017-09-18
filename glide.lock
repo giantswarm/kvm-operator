@@ -1,14 +1,14 @@
-hash: 302f1f936d7d4e381136a8cc99fca0821c6593b9d335e0eefe9f43c5c466be25
-updated: 2017-09-18T10:13:24.754989072+02:00
+hash: d871692aa354396393bff42e3b83fc9048091076011ed033ad2b6389f66a8171
+updated: 2017-09-18T11:12:47.486061381+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/cenk/backoff
-  version: 61153c768f31ee5f130071d08fc82b85208528de
+  version: 80e08cb804a3eb3e576876c777e957e874609a9a
 - name: github.com/cenkalti/backoff
-  version: 61153c768f31ee5f130071d08fc82b85208528de
+  version: 80e08cb804a3eb3e576876c777e957e874609a9a
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
@@ -88,7 +88,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: bbcca45027d8335a0e2204ddd130d7cd6e94c4b7
+  version: c576223965c9ab394378c2b2c0aec46afc767e5f
   subpackages:
   - client/k8s
   - framework
@@ -211,6 +211,7 @@ imports:
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
   - context
+  - context/ctxhttp
   - http2
   - http2/hpack
   - idna
