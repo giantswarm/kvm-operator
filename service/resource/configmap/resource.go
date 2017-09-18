@@ -475,6 +475,15 @@ func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
 }
 
 func isConfigMapModified(a, b *apiv1.ConfigMap) bool {
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("%#v\n", a.Data)
+	fmt.Printf("\n")
+	fmt.Printf("%#v\n", b.Data)
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("\n")
 	return !reflect.DeepEqual(a.Data, b.Data)
 }
 
