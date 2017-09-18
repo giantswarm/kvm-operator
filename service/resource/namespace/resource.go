@@ -93,8 +93,12 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// further work. Then we cancel the reconciliation to prevent the current and
 	// any further resource from being processed.
 	if namespace.Status.Phase == "Terminating" {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "namespace is in state 'Terminating'")
+
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
+			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "canceling reconciliation for custom object")
+
 			canceler <- struct{}{}
 			return nil, nil
 		}
