@@ -219,7 +219,7 @@ func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState inte
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the deployments in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do already exist in the Kubernetes API")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -250,7 +250,7 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted the deployments in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do not exist in the Kubernetes API")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
