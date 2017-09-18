@@ -202,7 +202,7 @@ func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState inte
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the namespace in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the namespace does already exist in the Kubernetes API")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the namespace does not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -230,7 +230,7 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted the namespace in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the namespace does not exist in the Kubernetes API")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the namespace does not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
