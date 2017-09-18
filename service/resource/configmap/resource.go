@@ -188,7 +188,7 @@ func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
-	return []*apiv1.ConfigMap{}, []*apiv1.ConfigMap{}, []*apiv1.ConfigMap{}, nil
+	return nil, nil, nil, nil
 }
 
 func (r *Resource) Name() string {
@@ -206,7 +206,7 @@ func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState inte
 	}
 
 	// Create the config maps in the Kubernetes API.
-	if configMapsToCreate != nil {
+	if len(configMapsToCreate) != 0 {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating the config maps in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
@@ -221,7 +221,7 @@ func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState inte
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the config maps in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do already exist in the Kubernetes API")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -237,7 +237,7 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 		return microerror.Mask(err)
 	}
 
-	if configMapsToDelete != nil {
+	if len(configMapsToDelete) != 0 {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the config maps in the Kubernetes API")
 
 		// Create the config maps in the Kubernetes API.
@@ -253,7 +253,7 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted the config maps in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do not exist in the Kubernetes API")
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
