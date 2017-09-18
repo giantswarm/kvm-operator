@@ -236,7 +236,7 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 			}
 
 			if isConfigMapModified(desiredConfigMap, currentConfigMap) {
-				configMapsToUpdate = append(configMapsToUpdate, currentConfigMap)
+				configMapsToUpdate = append(configMapsToUpdate, desiredConfigMap)
 			}
 		}
 
