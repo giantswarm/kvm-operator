@@ -240,7 +240,7 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToUpdate)))
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be updated", len(configMapsToUpdate)))
 	}
 
 	return configMapsToCreate, configMapsToDelete, configMapsToUpdate, nil
