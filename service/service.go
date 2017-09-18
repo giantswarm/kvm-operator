@@ -14,6 +14,9 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8s"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/framework/logresource"
+	"github.com/giantswarm/operatorkit/framework/metricsresource"
+	"github.com/giantswarm/operatorkit/framework/retryresource"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/kubernetes"
 
@@ -187,18 +190,20 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	// Here we create the operator framework and configure resources that it can
-	// reconcile.
+	// We create the list of resources and wrap each resource around some common
+	// resources like metrics and retry resources.
+	//
+	// NOTE that the retry resources wrap the underlying resources first. The
+	// wrapped resources are then wrapped around the metrics resource. That way
+	// the metrics also consider execution times and execution attempts including
+	// retries.
 	//
 	// NOTE that the order of the namespace resource is important. We have to
 	// start the namespace resource at first because all other resources are
 	// created within this namespace.
-	var operatorFramework *framework.Framework
+	var resources []framework.Resource
 	{
-		frameworkConfig := framework.DefaultConfig()
-
-		frameworkConfig.Logger = config.Logger
-		frameworkConfig.Resources = []framework.Resource{
+		resources = []framework.Resource{
 			namespaceResource,
 
 			configMapResource,
@@ -207,6 +212,36 @@ func New(config Config) (*Service, error) {
 			pvcResource,
 			serviceResource,
 		}
+
+		logWrapConfig := logresource.DefaultWrapConfig()
+		logWrapConfig.Logger = config.Logger
+		resources, err = logresource.Wrap(resources, logWrapConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		retryWrapConfig := retryresource.DefaultWrapConfig()
+		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.NewExponentialBackOff() }
+		retryWrapConfig.Logger = config.Logger
+		resources, err = retryresource.Wrap(resources, retryWrapConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		metricsWrapConfig := metricsresource.DefaultWrapConfig()
+		metricsWrapConfig.Namespace = config.Name
+		resources, err = metricsresource.Wrap(resources, metricsWrapConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var operatorFramework *framework.Framework
+	{
+		frameworkConfig := framework.DefaultConfig()
+
+		frameworkConfig.Logger = config.Logger
+		frameworkConfig.Resources = resources
 
 		operatorFramework, err = framework.New(frameworkConfig)
 		if err != nil {
