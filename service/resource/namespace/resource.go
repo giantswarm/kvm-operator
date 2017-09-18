@@ -173,7 +173,7 @@ func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
-	return &apiv1.Namespace{}, &apiv1.Namespace{}, &apiv1.Namespace{}, nil
+	return nil, nil, nil, nil
 }
 
 func (r *Resource) Name() string {
