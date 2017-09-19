@@ -77,7 +77,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// the expected order until it gets canceled.
 		{
 			ProcessMethod: ProcessCreate,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{
 					CancelingStep: "GetCurrentState",
@@ -118,7 +118,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// resource gets canceled.
 		{
 			ProcessMethod: ProcessCreate,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{
 					CancelingStep: "GetCreateState",
@@ -141,7 +141,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// resource gets canceled.
 		{
 			ProcessMethod: ProcessCreate,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{},
 				&testResource{
@@ -223,7 +223,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// the expected order until it gets canceled.
 		{
 			ProcessMethod: ProcessDelete,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{
 					CancelingStep: "GetCurrentState",
@@ -264,7 +264,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// resource gets canceled.
 		{
 			ProcessMethod: ProcessDelete,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{
 					CancelingStep: "GetDeleteState",
@@ -287,7 +287,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// resource gets canceled.
 		{
 			ProcessMethod: ProcessDelete,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{},
 				&testResource{
@@ -375,7 +375,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// the expected order until it gets canceled.
 		{
 			ProcessMethod: ProcessUpdate,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{
 					CancelingStep: "GetCurrentState",
@@ -418,7 +418,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// resource gets canceled.
 		{
 			ProcessMethod: ProcessUpdate,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{
 					CancelingStep: "GetUpdateState",
@@ -441,7 +441,7 @@ func Test_Framework_ProcessCreate_ResourceOrder(t *testing.T) {
 		// resource gets canceled.
 		{
 			ProcessMethod: ProcessUpdate,
-			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{}, 1)),
+			Ctx:           cancelercontext.NewContext(context.Background(), make(chan struct{})),
 			Resources: []Resource{
 				&testResource{},
 				&testResource{
@@ -506,7 +506,7 @@ func (r *testResource) GetCurrentState(ctx context.Context, obj interface{}) (in
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil, nil
 		}
 	}
@@ -525,7 +525,7 @@ func (r *testResource) GetDesiredState(ctx context.Context, obj interface{}) (in
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil, nil
 		}
 	}
@@ -544,7 +544,7 @@ func (r *testResource) GetCreateState(ctx context.Context, obj, currentState, de
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil, nil
 		}
 	}
@@ -563,7 +563,7 @@ func (r *testResource) GetDeleteState(ctx context.Context, obj, currentState, de
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil, nil
 		}
 	}
@@ -582,7 +582,7 @@ func (r *testResource) GetUpdateState(ctx context.Context, obj, currentState, de
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil, nil, nil, nil
 		}
 	}
@@ -605,7 +605,7 @@ func (r *testResource) ProcessCreateState(ctx context.Context, obj, createState 
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil
 		}
 	}
@@ -624,7 +624,7 @@ func (r *testResource) ProcessDeleteState(ctx context.Context, obj, deleteState 
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil
 		}
 	}
@@ -643,7 +643,7 @@ func (r *testResource) ProcessUpdateState(ctx context.Context, obj, updateState 
 	if r.CancelingStep == m {
 		canceler, exists := cancelercontext.FromContext(ctx)
 		if exists {
-			canceler <- struct{}{}
+			close(canceler)
 			return nil
 		}
 	}
