@@ -5,7 +5,7 @@ import:
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
-  version: updateallowedcontext
+  version: master
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/kvmtpr
