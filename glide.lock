@@ -1,5 +1,5 @@
 hash: d871692aa354396393bff42e3b83fc9048091076011ed033ad2b6389f66a8171
-updated: 2017-09-18T11:12:47.486061381+02:00
+updated: 2017-09-20T10:06:24.981463518+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -43,7 +43,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 604b7f61d4f5b3bb91d5ec272531ea2baa64c5f9
+  version: 3c3a45797239ff6f1c9f58b9d70bc73de9e674f2
 - name: github.com/giantswarm/kvmtpr
   version: c9a45dd6cf78ed1078d878427d399aede0c14f26
   subpackages:
@@ -88,11 +88,14 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: c576223965c9ab394378c2b2c0aec46afc767e5f
+  version: ec70f42e57563dfca027005badca2a6ff06d0258
   subpackages:
   - client/k8s
   - framework
   - framework/cancelercontext
+  - framework/logresource
+  - framework/metricsresource
+  - framework/retryresource
   - tpr
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
@@ -211,7 +214,6 @@ imports:
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
   - context
-  - context/ctxhttp
   - http2
   - http2/hpack
   - idna

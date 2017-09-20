@@ -73,9 +73,9 @@ func (f *Framework) AddFunc(obj interface{}) {
 	defer f.mutex.Unlock()
 
 	ctx := context.Background()
-	ctx = cancelercontext.NewContext(ctx, make(chan struct{}, 1))
+	ctx = cancelercontext.NewContext(ctx, make(chan struct{}))
 
-	f.logger.Log("debug", "executing the operator's create function")
+	f.logger.Log("action", "start", "component", "operatorkit", "function", "ProcessCreate")
 
 	err := ProcessCreate(ctx, obj, f.resources)
 	if err != nil {
@@ -83,9 +83,9 @@ func (f *Framework) AddFunc(obj interface{}) {
 		return
 	}
 
-	f.logger.Log("debug", "executed the operator's create function")
+	f.logger.Log("action", "end", "component", "operatorkit", "function", "ProcessCreate")
 
-	f.logger.Log("debug", "executing the operator's update function")
+	f.logger.Log("action", "start", "component", "operatorkit", "function", "ProcessUpdate")
 
 	err = ProcessUpdate(ctx, obj, f.resources)
 	if err != nil {
@@ -93,7 +93,7 @@ func (f *Framework) AddFunc(obj interface{}) {
 		return
 	}
 
-	f.logger.Log("debug", "executed the operator's update function")
+	f.logger.Log("action", "end", "component", "operatorkit", "function", "ProcessUpdate")
 }
 
 // DeleteFunc executes the framework's ProcessDelete function.
@@ -107,9 +107,9 @@ func (f *Framework) DeleteFunc(obj interface{}) {
 	defer f.mutex.Unlock()
 
 	ctx := context.Background()
-	ctx = cancelercontext.NewContext(ctx, make(chan struct{}, 1))
+	ctx = cancelercontext.NewContext(ctx, make(chan struct{}))
 
-	f.logger.Log("debug", "executing the operator's delete function")
+	f.logger.Log("action", "start", "component", "operatorkit", "function", "ProcessDelete")
 
 	err := ProcessDelete(ctx, obj, f.resources)
 	if err != nil {
@@ -117,7 +117,7 @@ func (f *Framework) DeleteFunc(obj interface{}) {
 		return
 	}
 
-	f.logger.Log("debug", "executed the operator's delete function")
+	f.logger.Log("action", "end", "component", "operatorkit", "function", "ProcessDelete")
 }
 
 // NewCacheResourceEventHandler returns the framework's event handler for the
