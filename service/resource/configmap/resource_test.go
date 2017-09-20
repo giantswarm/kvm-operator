@@ -11,8 +11,6 @@ import (
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/operatorkit/framework/updateallowedcontext"
-	"github.com/giantswarm/operatorkit/framework/updatenecessarycontext"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -672,13 +670,9 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 		Obj                        interface{}
 		CurrentState               interface{}
 		DesiredState               interface{}
-		SetCtxUpdateAllowed        bool
-		SetCtxUpdateNecessary      bool
 		ExpectedConfigMapsToCreate []*apiv1.ConfigMap
 		ExpectedConfigMapsToDelete []*apiv1.ConfigMap
 		ExpectedConfigMapsToUpdate []*apiv1.ConfigMap
-		ExpectedCtxUpdateAllowed   bool
-		ExpectedCtxUpdateNecessary bool
 	}{
 		// Test 1, in case current state and desired state are empty the create,
 		// delete and update state should be empty.
@@ -694,13 +688,9 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 			},
 			CurrentState:               []*apiv1.ConfigMap{},
 			DesiredState:               []*apiv1.ConfigMap{},
-			SetCtxUpdateAllowed:        true,
-			SetCtxUpdateNecessary:      false,
 			ExpectedConfigMapsToCreate: nil,
 			ExpectedConfigMapsToDelete: nil,
 			ExpectedConfigMapsToUpdate: nil,
-			ExpectedCtxUpdateAllowed:   true,
-			ExpectedCtxUpdateNecessary: false,
 		},
 
 		// Test 2, in case current state and desired state are equal the create,
@@ -735,13 +725,9 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			SetCtxUpdateAllowed:        true,
-			SetCtxUpdateNecessary:      false,
 			ExpectedConfigMapsToCreate: nil,
 			ExpectedConfigMapsToDelete: nil,
 			ExpectedConfigMapsToUpdate: nil,
-			ExpectedCtxUpdateAllowed:   true,
-			ExpectedCtxUpdateNecessary: false,
 		},
 
 		// Test 3, in case current state misses one item of desired state the delete
@@ -767,8 +753,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			SetCtxUpdateAllowed:   true,
-			SetCtxUpdateNecessary: false,
 			ExpectedConfigMapsToCreate: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
@@ -781,8 +765,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 			},
 			ExpectedConfigMapsToDelete: nil,
 			ExpectedConfigMapsToUpdate: nil,
-			ExpectedCtxUpdateAllowed:   true,
-			ExpectedCtxUpdateNecessary: false,
 		},
 
 		// Test 4, in case current state contains two items and desired state is
@@ -826,8 +808,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			SetCtxUpdateAllowed:        true,
-			SetCtxUpdateNecessary:      false,
 			ExpectedConfigMapsToCreate: nil,
 			ExpectedConfigMapsToDelete: []*apiv1.ConfigMap{
 				{
@@ -840,8 +820,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 				},
 			},
 			ExpectedConfigMapsToUpdate: nil,
-			ExpectedCtxUpdateAllowed:   true,
-			ExpectedCtxUpdateNecessary: false,
 		},
 
 		// Test 5, in case current state contains two items and desired state is
@@ -893,8 +871,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			SetCtxUpdateAllowed:        true,
-			SetCtxUpdateNecessary:      false,
 			ExpectedConfigMapsToCreate: nil,
 			ExpectedConfigMapsToDelete: nil,
 			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
@@ -907,67 +883,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedCtxUpdateAllowed:   true,
-			ExpectedCtxUpdateNecessary: true,
-		},
-
-		// Test 6, in case current state contains two items and desired state is
-		// contains the same state but one object is modified internally the update
-		// state should NOT contain the the modified item from the current state
-		// when updates are not allowed.
-		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-					},
-				},
-			},
-			CurrentState: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-2",
-					},
-					Data: map[string]string{
-						"key2": "val2-modified",
-					},
-				},
-			},
-			DesiredState: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-2",
-					},
-					Data: map[string]string{
-						"key2": "val2",
-					},
-				},
-			},
-			SetCtxUpdateAllowed:        false,
-			SetCtxUpdateNecessary:      false,
-			ExpectedConfigMapsToCreate: nil,
-			ExpectedConfigMapsToDelete: nil,
-			ExpectedConfigMapsToUpdate: nil,
-			ExpectedCtxUpdateAllowed:   false,
-			ExpectedCtxUpdateNecessary: false,
 		},
 	}
 
@@ -985,19 +900,7 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		ctx := context.Background()
-
-		ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-		ctx = updatenecessarycontext.NewContext(ctx, make(chan struct{}))
-
-		if tc.SetCtxUpdateAllowed {
-			updateallowedcontext.SetUpdateAllowed(ctx)
-		}
-		if tc.SetCtxUpdateNecessary {
-			updatenecessarycontext.SetUpdateNecessary(ctx)
-		}
-
-		createState, deleteState, updateState, err := newResource.GetUpdateState(ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
+		createState, deleteState, updateState, err := newResource.GetUpdateState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
@@ -1024,15 +927,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 		}
 		if !reflect.DeepEqual(configMapsToUpdate, tc.ExpectedConfigMapsToUpdate) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)
-		}
-
-		isUpdateAllowed := updateallowedcontext.IsUpdateAllowed(ctx)
-		if isUpdateAllowed != tc.ExpectedCtxUpdateAllowed {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedCtxUpdateAllowed, isUpdateAllowed)
-		}
-		isUpdateNecessary := updatenecessarycontext.IsUpdateNecessary(ctx)
-		if isUpdateNecessary != tc.ExpectedCtxUpdateNecessary {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedCtxUpdateNecessary, isUpdateNecessary)
 		}
 	}
 }

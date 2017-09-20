@@ -3,6 +3,7 @@ package deployment
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
@@ -14,6 +15,7 @@ import (
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
 	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/resource/configmap/configmapnamescontext"
 )
 
 const (
@@ -187,7 +189,83 @@ func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
-	return nil, nil, nil, nil
+	customObject, err := toCustomObject(obj)
+	if err != nil {
+		return nil, nil, nil, microerror.Mask(err)
+	}
+	currentDeployments, err := toDeployments(currentState)
+	if err != nil {
+		return nil, nil, nil, microerror.Mask(err)
+	}
+	desiredDeployments, err := toDeployments(desiredState)
+	if err != nil {
+		return nil, nil, nil, microerror.Mask(err)
+	}
+
+	var deploymentsToCreate interface{}
+	{
+		deploymentsToCreate, err = r.GetCreateState(ctx, obj, currentState, desiredState)
+		if err != nil {
+			return nil, nil, nil, microerror.Mask(err)
+		}
+	}
+
+	var deploymentsToDelete []*v1beta1.Deployment
+	{
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which deployments have to be deleted")
+
+		for _, currentDeployment := range currentDeployments {
+			if !containsDeployment(desiredDeployments, currentDeployment) {
+				deploymentsToDelete = append(deploymentsToDelete, currentDeployment)
+			}
+		}
+
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
+	}
+
+	var deploymentsToUpdate []*v1beta1.Deployment
+	{
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which deployments have to be updated")
+
+		// Check if config maps of deployments changed. In case they did, add the
+		// deployments to the list of deployments intended to be updated.
+		ch, ok := configmapnamescontext.FromContext(ctx)
+		if ok {
+			for configMapName := range ch {
+				desiredDeployment, err := getDeploymentByConfigMapName(desiredDeployments, configMapName)
+				if err != nil {
+					return nil, nil, nil, microerror.Mask(err)
+				}
+				deploymentsToUpdate = append(deploymentsToUpdate, desiredDeployment)
+			}
+		}
+
+		// Check if deployments changed. In case they did, add the deployments to
+		// the list of deployments intended to be updated, but only in case they are
+		// not already being tracked.
+		for _, currentDeployment := range currentDeployments {
+			desiredDeployment, err := getDeploymentByName(desiredDeployments, currentDeployment.Name)
+			if IsNotFound(err) {
+				continue
+			} else if err != nil {
+				return nil, nil, nil, microerror.Mask(err)
+			}
+
+			if !isDeploymentModified(desiredDeployment, currentDeployment) {
+				continue
+			}
+
+			if containsDeployment(deploymentsToUpdate, desiredDeployment) {
+				continue
+			}
+
+			deploymentsToUpdate = append(deploymentsToUpdate, desiredDeployment)
+		}
+
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be updated", len(deploymentsToUpdate)))
+	}
+
+	return deploymentsToCreate, deploymentsToDelete, deploymentsToUpdate, nil
 }
 
 func (r *Resource) Name() string {
@@ -274,6 +352,28 @@ func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bo
 	return false
 }
 
+func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Deployment, error) {
+	for _, l := range list {
+		if l.Name == name {
+			return l, nil
+		}
+	}
+
+	return nil, microerror.Mask(notFoundError)
+}
+
+func getDeploymentByConfigMapName(list []*v1beta1.Deployment, name string) (*v1beta1.Deployment, error) {
+	for _, l := range list {
+		for _, v := range l.Spec.Template.Spec.Volumes {
+			if v.VolumeSource.ConfigMap.LocalObjectReference.Name == name {
+				return l, nil
+			}
+		}
+	}
+
+	return nil, microerror.Mask(notFoundError)
+}
+
 func getDeploymentNames(customObject kvmtpr.CustomObject) []string {
 	var names []string
 
@@ -286,6 +386,10 @@ func getDeploymentNames(customObject kvmtpr.CustomObject) []string {
 	}
 
 	return names
+}
+
+func isDeploymentModified(a, b *v1beta1.Deployment) bool {
+	return !reflect.DeepEqual(a.Spec.Template.Spec, b.Spec.Template.Spec)
 }
 
 func toCustomObject(v interface{}) (kvmtpr.CustomObject, error) {

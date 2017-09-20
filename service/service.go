@@ -3,6 +3,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -24,6 +25,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/operator"
 	configmapresource "github.com/giantswarm/kvm-operator/service/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/resource/configmap/configmapnamescontext"
 	deploymentresource "github.com/giantswarm/kvm-operator/service/resource/deployment"
 	ingressresource "github.com/giantswarm/kvm-operator/service/resource/ingress"
 	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
@@ -236,10 +238,16 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	frameworkInitializer := func(ctx context.Context, obj interface{}) (context.Context, error) {
+		ctx = configmapnamescontext.NewContext(ctx, configmapnamescontext.NewChannel(obj))
+		return ctx, nil
+	}
+
 	var operatorFramework *framework.Framework
 	{
 		frameworkConfig := framework.DefaultConfig()
 
+		frameworkConfig.Initializer = frameworkInitializer
 		frameworkConfig.Logger = config.Logger
 		frameworkConfig.Resources = resources
 
