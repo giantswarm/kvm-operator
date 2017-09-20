@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/cancelercontext"
+	"github.com/giantswarm/operatorkit/framework/canceledcontext"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -95,11 +95,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	if namespace != nil && namespace.Status.Phase == "Terminating" {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "namespace is in state 'Terminating'")
 
-		canceler, exists := cancelercontext.FromContext(ctx)
-		if exists {
+		canceledcontext.SetCanceled(ctx)
+		if canceledcontext.IsCanceled(ctx) {
 			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "canceling reconciliation for custom object")
 
-			close(canceler)
 			return nil, nil
 		}
 	}
