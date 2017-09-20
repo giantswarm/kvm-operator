@@ -31,6 +31,10 @@ import (
 	serviceresource "github.com/giantswarm/kvm-operator/service/resource/service"
 )
 
+const (
+	ResourceRetries uint64 = 3
+)
+
 // Config represents the configuration used to create a new service.
 type Config struct {
 	// Dependencies.
@@ -221,7 +225,7 @@ func New(config Config) (*Service, error) {
 		}
 
 		retryWrapConfig := retryresource.DefaultWrapConfig()
-		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), 3) }
+		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
 		retryWrapConfig.Logger = config.Logger
 		resources, err = retryresource.Wrap(resources, retryWrapConfig)
 		if err != nil {
