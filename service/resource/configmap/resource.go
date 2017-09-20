@@ -242,7 +242,7 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 			}
 		}
 
-		if configMapsToUpdate != nil {
+		if len(configMapsToUpdate) != 0 {
 			updatenecessarycontext.SetUpdateNecessary(ctx)
 		}
 
