@@ -221,7 +221,7 @@ func New(config Config) (*Service, error) {
 		}
 
 		retryWrapConfig := retryresource.DefaultWrapConfig()
-		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.NewExponentialBackOff() }
+		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), 3) }
 		retryWrapConfig.Logger = config.Logger
 		resources, err = retryresource.Wrap(resources, retryWrapConfig)
 		if err != nil {
