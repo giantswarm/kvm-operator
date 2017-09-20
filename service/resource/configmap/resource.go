@@ -3,6 +3,7 @@ package configmap
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/giantswarm/certificatetpr"
 	cloudconfig "github.com/giantswarm/k8scloudconfig"
@@ -10,6 +11,8 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/framework/updateallowedcontext"
+	"github.com/giantswarm/operatorkit/framework/updatenecessarycontext"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -188,7 +191,67 @@ func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
-	return nil, nil, nil, nil
+	customObject, err := toCustomObject(obj)
+	if err != nil {
+		return nil, nil, nil, microerror.Mask(err)
+	}
+	currentConfigMaps, err := toConfigMaps(currentState)
+	if err != nil {
+		return nil, nil, nil, microerror.Mask(err)
+	}
+	desiredConfigMaps, err := toConfigMaps(desiredState)
+	if err != nil {
+		return nil, nil, nil, microerror.Mask(err)
+	}
+
+	var configMapsToCreate interface{}
+	{
+		configMapsToCreate, err = r.GetCreateState(ctx, obj, currentState, desiredState)
+		if err != nil {
+			return nil, nil, nil, microerror.Mask(err)
+		}
+	}
+
+	var configMapsToDelete []*apiv1.ConfigMap
+	{
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be deleted")
+
+		for _, currentConfigMap := range currentConfigMaps {
+			if !containsConfigMap(desiredConfigMaps, currentConfigMap) {
+				configMapsToDelete = append(configMapsToDelete, currentConfigMap)
+			}
+		}
+
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToDelete)))
+	}
+
+	var configMapsToUpdate []*apiv1.ConfigMap
+	if updateallowedcontext.IsUpdateAllowed(ctx) {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be updated")
+
+		for _, currentConfigMap := range currentConfigMaps {
+			desiredConfigMap, err := getConfigMapByName(desiredConfigMaps, currentConfigMap.Name)
+			if IsNotFound(err) {
+				continue
+			} else if err != nil {
+				return nil, nil, nil, microerror.Mask(err)
+			}
+
+			if isConfigMapModified(desiredConfigMap, currentConfigMap) {
+				configMapsToUpdate = append(configMapsToUpdate, desiredConfigMap)
+			}
+		}
+
+		if len(configMapsToUpdate) != 0 {
+			updatenecessarycontext.SetUpdateNecessary(ctx)
+		}
+
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be updated", len(configMapsToUpdate)))
+	} else {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "not computing update state because the config maps are not allowed to be updated")
+	}
+
+	return configMapsToCreate, configMapsToDelete, configMapsToUpdate, nil
 }
 
 func (r *Resource) Name() string {
@@ -260,6 +323,32 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 }
 
 func (r *Resource) ProcessUpdateState(ctx context.Context, obj, updateState interface{}) error {
+	customObject, err := toCustomObject(obj)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+	configMapsToUpdate, err := toConfigMaps(updateState)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	if len(configMapsToUpdate) != 0 {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "updating the config maps in the Kubernetes API")
+
+		// Create the config maps in the Kubernetes API.
+		namespace := key.ClusterNamespace(customObject)
+		for _, configMap := range configMapsToUpdate {
+			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Update(configMap)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "updated the config maps in the Kubernetes API")
+	} else {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do not need to be updated in the Kubernetes API")
+	}
+
 	return nil
 }
 
@@ -359,13 +448,22 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 }
 
 func containsConfigMap(list []*apiv1.ConfigMap, item *apiv1.ConfigMap) bool {
+	_, err := getConfigMapByName(list, item.Name)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap, error) {
 	for _, l := range list {
-		if l.Name == item.Name {
-			return true
+		if l.Name == name {
+			return l, nil
 		}
 	}
 
-	return false
+	return nil, microerror.Mask(notFoundError)
 }
 
 func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
@@ -382,6 +480,10 @@ func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
 	}
 
 	return names
+}
+
+func isConfigMapModified(a, b *apiv1.ConfigMap) bool {
+	return !reflect.DeepEqual(a.Data, b.Data)
 }
 
 func toCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
