@@ -11,6 +11,11 @@ import (
 	"github.com/giantswarm/kvmtpr"
 )
 
+const (
+	PrefixMaster = "master"
+	PrefixWorker = "worker"
+)
+
 func ClusterCustomer(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.Cluster.Customer.ID
 }
@@ -33,6 +38,22 @@ func ClusterNamespace(customObject kvmtpr.CustomObject) string {
 
 func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
+}
+
+func ConfigMapNames(customObject kvmtpr.CustomObject) []string {
+	var names []string
+
+	for _, node := range customObject.Spec.Cluster.Masters {
+		name := ConfigMapName(customObject, node, PrefixMaster)
+		names = append(names, name)
+	}
+
+	for _, node := range customObject.Spec.Cluster.Workers {
+		name := ConfigMapName(customObject, node, PrefixWorker)
+		names = append(names, name)
+	}
+
+	return names
 }
 
 func DeploymentName(prefix string, nodeID string) string {
