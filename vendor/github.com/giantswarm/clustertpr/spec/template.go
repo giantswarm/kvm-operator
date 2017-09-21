@@ -1,5 +1,5 @@
 package spec
 
-type K8sCloudConfig struct {
+type Template struct {
 	Version string `json:"version" yaml:"version"`
 }

@@ -1,5 +1,5 @@
-hash: 6015403bcb67e343cf61732a9baf5a6d0f4bd05fe84c8aa5dcd8485fbdce44ca
-updated: 2017-09-21T15:23:03.462010145+02:00
+hash: cc7012ed10d780531ac76ddbeb1c238a0c56a62e81438c072db70e9d9a331178
+updated: 2017-09-21T16:38:23.665958927+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -32,7 +32,7 @@ imports:
   subpackages:
   - certificatetprtest
 - name: github.com/giantswarm/clustertpr
-  version: 635f4957f231c0e5f1efa8bbbf741a14da510715
+  version: 075be5351cd205f51ebb9c48225f1c6faa3139d8
   subpackages:
   - spec
   - spec/docker
@@ -218,6 +218,7 @@ imports:
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
   - context
+  - context/ctxhttp
   - http2
   - http2/hpack
   - idna
