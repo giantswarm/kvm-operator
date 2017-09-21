@@ -26,9 +26,7 @@ const (
 	FilePermission = 0700
 	KeyUserData    = "user_data"
 	// Name is the identifier of the resource.
-	Name         = "configmap"
-	PrefixMaster = "master"
-	PrefixWorker = "worker"
+	Name = "configmap"
 )
 
 // Config represents the configuration used to create a new config map resource.
@@ -94,7 +92,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var configMaps []*apiv1.ConfigMap
 
 	namespace := key.ClusterNamespace(customObject)
-	configMapNames := getConfigMapNames(customObject)
+	configMapNames := key.ConfigMapNames(customObject)
 
 	for _, name := range configMapNames {
 		manifest, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Get(name, apismetav1.GetOptions{})
@@ -416,7 +414,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			params.Node = node
 		}
 
-		configMap, err := r.newConfigMap(customObject, cloudconfig.MasterTemplate, params, PrefixMaster)
+		configMap, err := r.newConfigMap(customObject, cloudconfig.MasterTemplate, params, key.PrefixMaster)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -436,7 +434,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			params.Node = node
 		}
 
-		configMap, err := r.newConfigMap(customObject, cloudconfig.WorkerTemplate, params, PrefixWorker)
+		configMap, err := r.newConfigMap(customObject, cloudconfig.WorkerTemplate, params, key.PrefixWorker)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -464,22 +462,6 @@ func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap,
 	}
 
 	return nil, microerror.Mask(notFoundError)
-}
-
-func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, node := range customObject.Spec.Cluster.Masters {
-		name := key.ConfigMapName(customObject, node, PrefixMaster)
-		names = append(names, name)
-	}
-
-	for _, node := range customObject.Spec.Cluster.Workers {
-		name := key.ConfigMapName(customObject, node, PrefixWorker)
-		names = append(names, name)
-	}
-
-	return names
 }
 
 func isConfigMapModified(a, b *apiv1.ConfigMap) bool {
