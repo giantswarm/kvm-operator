@@ -243,7 +243,14 @@ func New(config Config) (*Service, error) {
 	}
 
 	frameworkInitializer := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		ctx = configmapnamescontext.NewContext(ctx, configmapnamescontext.NewChannel(obj))
+		{
+			ch, err := configmapnamescontext.NewChannel(obj)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+			ctx = configmapnamescontext.NewContext(ctx, ch)
+		}
+
 		return ctx, nil
 	}
 

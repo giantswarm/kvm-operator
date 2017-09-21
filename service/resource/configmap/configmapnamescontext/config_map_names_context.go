@@ -6,6 +6,7 @@ import (
 	"context"
 
 	servicekey "github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/microerror"
 )
 
 const (
@@ -22,8 +23,15 @@ type key string
 // configmapnamescontext.FromContext instead of using this key directly.
 var configMapNamesKey key = "configmapnames"
 
-func NewChannel(obj interface{}) chan string {
-	return make(chan string, len(servicekey.ConfigMapNames(servicekey.ToCustomObject(obj))))
+func NewChannel(obj interface{}) (chan string, error) {
+	customObject, err := servicekey.ToCustomObject(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	ch := make(chan string, len(servicekey.ConfigMapNames(customObject)))
+
+	return ch, nil
 }
 
 // NewContext returns a new context.Context that carries value v.
