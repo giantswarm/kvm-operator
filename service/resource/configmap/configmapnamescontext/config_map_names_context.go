@@ -5,8 +5,6 @@ package configmapnamescontext
 import (
 	"context"
 
-	"github.com/giantswarm/kvmtpr"
-
 	servicekey "github.com/giantswarm/kvm-operator/service/key"
 )
 
@@ -25,7 +23,7 @@ type key string
 var configMapNamesKey key = "configmapnames"
 
 func NewChannel(obj interface{}) chan string {
-	return make(chan string, len(getConfigMapNames(toCustomObject(obj))))
+	return make(chan string, len(servicekey.ConfigMapNames(servicekey.ToCustomObject(obj))))
 }
 
 // NewContext returns a new context.Context that carries value v.
@@ -41,30 +39,4 @@ func NewContext(ctx context.Context, v chan string) context.Context {
 func FromContext(ctx context.Context) (chan string, bool) {
 	v, ok := ctx.Value(configMapNamesKey).(chan string)
 	return v, ok
-}
-
-func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, node := range customObject.Spec.Cluster.Masters {
-		name := servicekey.ConfigMapName(customObject, node, PrefixMaster)
-		names = append(names, name)
-	}
-
-	for _, node := range customObject.Spec.Cluster.Workers {
-		name := servicekey.ConfigMapName(customObject, node, PrefixWorker)
-		names = append(names, name)
-	}
-
-	return names
-}
-
-func toCustomObject(v interface{}) kvmtpr.CustomObject {
-	customObjectPointer, ok := v.(*kvmtpr.CustomObject)
-	if !ok {
-		return kvmtpr.CustomObject{}
-	}
-	customObject := *customObjectPointer
-
-	return customObject
 }
