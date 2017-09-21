@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -70,7 +69,7 @@ func New(config Config) (*Resource, error) {
 }
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -104,7 +103,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 }
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -122,7 +121,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 }
 
 func (r *Resource) GetCreateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -151,7 +150,7 @@ func (r *Resource) GetCreateState(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -188,7 +187,7 @@ func (r *Resource) Name() string {
 }
 
 func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState interface{}) error {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -219,7 +218,7 @@ func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState inte
 }
 
 func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState interface{}) error {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -265,16 +264,6 @@ func containsIngress(list []*v1beta1.Ingress, item *v1beta1.Ingress) bool {
 	}
 
 	return false
-}
-
-func toCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
-	customObjectPointer, ok := v.(*kvmtpr.CustomObject)
-	if !ok {
-		return kvmtpr.CustomObject{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, v)
-	}
-	customObject := *customObjectPointer
-
-	return customObject, nil
 }
 
 func toIngresses(v interface{}) ([]*v1beta1.Ingress, error) {
