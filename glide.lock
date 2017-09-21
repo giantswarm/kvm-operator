@@ -1,5 +1,5 @@
-hash: d871692aa354396393bff42e3b83fc9048091076011ed033ad2b6389f66a8171
-updated: 2017-09-20T11:59:13.39708+02:00
+hash: 6015403bcb67e343cf61732a9baf5a6d0f4bd05fe84c8aa5dcd8485fbdce44ca
+updated: 2017-09-21T15:23:03.462010145+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -32,7 +32,7 @@ imports:
   subpackages:
   - certificatetprtest
 - name: github.com/giantswarm/clustertpr
-  version: 204c6262c75db8eddf6974c9373a42191db88a56
+  version: 635f4957f231c0e5f1efa8bbbf741a14da510715
   subpackages:
   - spec
   - spec/docker
@@ -43,7 +43,9 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 0f57b2b556a19766a7b63fbfa3928eb1aa9d31b9
+  version: 80db71c3fb1d19f8f91d3b8d2d0c5d6aefdbcd8d
+  subpackages:
+  - v_0_1_0
 - name: github.com/giantswarm/kvmtpr
   version: c9a45dd6cf78ed1078d878427d399aede0c14f26
   subpackages:
@@ -216,7 +218,6 @@ imports:
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
   - context
-  - context/ctxhttp
   - http2
   - http2/hpack
   - idna
