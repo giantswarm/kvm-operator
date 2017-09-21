@@ -3,7 +3,7 @@ package cloudconfig
 import (
 	"github.com/giantswarm/certificatetpr"
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/k8scloudconfig/v_0_1_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_0_1_0"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 )
@@ -11,7 +11,7 @@ import (
 func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node) (string, error) {
 	var err error
 
-	var params v_0_1_0.Params
+	var params k8scloudconfig.Params
 	{
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &v_0_1_0MasterExtension{
@@ -20,9 +20,9 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 		params.Node = node
 	}
 
-	var newCloudConfig *v_0_1_0.CloudConfig
+	var newCloudConfig *k8scloudconfig.CloudConfig
 	{
-		newCloudConfig, err = v_0_1_0.NewCloudConfig(v_0_1_0.MasterTemplate, params)
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.MasterTemplate, params)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
@@ -40,8 +40,8 @@ type v_0_1_0MasterExtension struct {
 	certs certificatetpr.AssetsBundle
 }
 
-func (e *v_0_1_0MasterExtension) Files() ([]v_0_1_0.FileAsset, error) {
-	filesMeta := []v_0_1_0.FileMetadata{
+func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{
 			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.CA}]),
@@ -139,15 +139,15 @@ func (e *v_0_1_0MasterExtension) Files() ([]v_0_1_0.FileAsset, error) {
 		},
 	}
 
-	var newFiles []v_0_1_0.FileAsset
+	var newFiles []k8scloudconfig.FileAsset
 
 	for _, fm := range filesMeta {
-		c, err := v_0_1_0.RenderAssetContent(fm.AssetContent, nil)
+		c, err := k8scloudconfig.RenderAssetContent(fm.AssetContent, nil)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		fileAsset := v_0_1_0.FileAsset{
+		fileAsset := k8scloudconfig.FileAsset{
 			Metadata: fm,
 			Content:  c,
 		}
@@ -158,8 +158,8 @@ func (e *v_0_1_0MasterExtension) Files() ([]v_0_1_0.FileAsset, error) {
 	return newFiles, nil
 }
 
-func (e *v_0_1_0MasterExtension) Units() ([]v_0_1_0.UnitAsset, error) {
-	unitsMeta := []v_0_1_0.UnitMetadata{
+func (e *v_0_1_0MasterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
+	unitsMeta := []k8scloudconfig.UnitMetadata{
 		// Mount etcd volume when directory first accessed
 		// This automount is workaround for
 		// https://bugzilla.redhat.com/show_bug.cgi?id=1184122
@@ -192,15 +192,15 @@ WantedBy=multi-user.target
 		},
 	}
 
-	var newUnits []v_0_1_0.UnitAsset
+	var newUnits []k8scloudconfig.UnitAsset
 
 	for _, fm := range unitsMeta {
-		c, err := v_0_1_0.RenderAssetContent(fm.AssetContent, nil)
+		c, err := k8scloudconfig.RenderAssetContent(fm.AssetContent, nil)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		unitAsset := v_0_1_0.UnitAsset{
+		unitAsset := k8scloudconfig.UnitAsset{
 			Metadata: fm,
 			Content:  c,
 		}
@@ -211,6 +211,6 @@ WantedBy=multi-user.target
 	return newUnits, nil
 }
 
-func (e *v_0_1_0MasterExtension) VerbatimSections() []v_0_1_0.VerbatimSection {
+func (e *v_0_1_0MasterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
 	return nil
 }
