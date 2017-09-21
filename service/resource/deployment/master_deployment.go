@@ -22,8 +22,17 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		capabilities := customObject.Spec.KVM.Masters[i]
 
+		storageType := key.StorageType(customObject)
+
+		// During migration, some TPOs do not have storage type set.
+		// This specifies a default, until all TPOs have the correct storage type set.
+		// tl;dr - this shouldn't be here. If all TPOs have storageType, remove it.
+		if storageType == "" {
+			storageType = "hostPath"
+		}
+
 		var etcdVolume apiv1.Volume
-		if key.StorageType(customObject) == "hostPath" {
+		if storageType == "hostPath" {
 			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
@@ -32,7 +41,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 					},
 				},
 			}
-		} else if key.StorageType(customObject) == "persistentVolume" {
+		} else if storageType == "persistentVolume" {
 			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
@@ -44,7 +53,6 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 		} else {
 			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.StorageType(customObject))
 		}
-
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
