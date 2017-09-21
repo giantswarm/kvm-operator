@@ -3,12 +3,17 @@ package key
 import (
 	"fmt"
 	"net"
-	"strings"
-
 	"path/filepath"
+	"strings"
 
 	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/microerror"
+)
+
+const (
+	PrefixMaster = "master"
+	PrefixWorker = "worker"
 )
 
 func ClusterCustomer(customObject kvmtpr.CustomObject) string {
@@ -33,6 +38,22 @@ func ClusterNamespace(customObject kvmtpr.CustomObject) string {
 
 func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
+}
+
+func ConfigMapNames(customObject kvmtpr.CustomObject) []string {
+	var names []string
+
+	for _, node := range customObject.Spec.Cluster.Masters {
+		name := ConfigMapName(customObject, node, PrefixMaster)
+		names = append(names, name)
+	}
+
+	for _, node := range customObject.Spec.Cluster.Workers {
+		name := ConfigMapName(customObject, node, PrefixWorker)
+		names = append(names, name)
+	}
+
+	return names
 }
 
 func DeploymentName(prefix string, nodeID string) string {
@@ -81,6 +102,16 @@ func NetworkEnvFilePath(ID string) string {
 
 func StorageType(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
+}
+
+func ToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
+	customObjectPointer, ok := v.(*kvmtpr.CustomObject)
+	if !ok {
+		return kvmtpr.CustomObject{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, v)
+	}
+	customObject := *customObjectPointer
+
+	return customObject, nil
 }
 
 func VMNumber(ID int) string {

@@ -25,9 +25,7 @@ const (
 	FilePermission = 0700
 	KeyUserData    = "user_data"
 	// Name is the identifier of the resource.
-	Name         = "configmap"
-	PrefixMaster = "master"
-	PrefixWorker = "worker"
+	Name = "configmap"
 )
 
 // Config represents the configuration used to create a new config map resource.
@@ -83,7 +81,7 @@ func New(config Config) (*Resource, error) {
 }
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -93,7 +91,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var configMaps []*apiv1.ConfigMap
 
 	namespace := key.ClusterNamespace(customObject)
-	configMapNames := getConfigMapNames(customObject)
+	configMapNames := key.ConfigMapNames(customObject)
 
 	for _, name := range configMapNames {
 		manifest, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Get(name, apismetav1.GetOptions{})
@@ -114,7 +112,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 }
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -132,7 +130,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 }
 
 func (r *Resource) GetCreateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -161,7 +159,7 @@ func (r *Resource) GetCreateState(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -190,7 +188,7 @@ func (r *Resource) GetDeleteState(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, nil, nil, microerror.Mask(err)
 	}
@@ -261,7 +259,7 @@ func (r *Resource) Name() string {
 }
 
 func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState interface{}) error {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -293,7 +291,7 @@ func (r *Resource) ProcessCreateState(ctx context.Context, obj, createState inte
 }
 
 func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState interface{}) error {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -325,7 +323,7 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 }
 
 func (r *Resource) ProcessUpdateState(ctx context.Context, obj, updateState interface{}) error {
-	customObject, err := toCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -418,7 +416,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			params.Node = node
 		}
 
-		configMap, err := r.newConfigMap(customObject, cloudconfig.MasterTemplate, params, PrefixMaster)
+		configMap, err := r.newConfigMap(customObject, cloudconfig.MasterTemplate, params, key.PrefixMaster)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -438,7 +436,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			params.Node = node
 		}
 
-		configMap, err := r.newConfigMap(customObject, cloudconfig.WorkerTemplate, params, PrefixWorker)
+		configMap, err := r.newConfigMap(customObject, cloudconfig.WorkerTemplate, params, key.PrefixWorker)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -468,34 +466,8 @@ func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap,
 	return nil, microerror.Mask(notFoundError)
 }
 
-func getConfigMapNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, node := range customObject.Spec.Cluster.Masters {
-		name := key.ConfigMapName(customObject, node, PrefixMaster)
-		names = append(names, name)
-	}
-
-	for _, node := range customObject.Spec.Cluster.Workers {
-		name := key.ConfigMapName(customObject, node, PrefixWorker)
-		names = append(names, name)
-	}
-
-	return names
-}
-
 func isConfigMapModified(a, b *apiv1.ConfigMap) bool {
 	return !reflect.DeepEqual(a.Data, b.Data)
-}
-
-func toCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
-	customObjectPointer, ok := v.(*kvmtpr.CustomObject)
-	if !ok {
-		return kvmtpr.CustomObject{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, v)
-	}
-	customObject := *customObjectPointer
-
-	return customObject, nil
 }
 
 func toConfigMaps(v interface{}) ([]*apiv1.ConfigMap, error) {
