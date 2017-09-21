@@ -1,5 +1,5 @@
-hash: cc7012ed10d780531ac76ddbeb1c238a0c56a62e81438c072db70e9d9a331178
-updated: 2017-09-21T16:38:23.665958927+02:00
+hash: 1f93a988f99d095d637c9eec56d45ba3613f2f131f27097fee15d36515f7ccba
+updated: 2017-09-21T17:28:07.928368222+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -47,7 +47,7 @@ imports:
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/kvmtpr
-  version: c9a45dd6cf78ed1078d878427d399aede0c14f26
+  version: db7fe6a3a8e6d9ce3b7a07684d9af75b03e79343
   subpackages:
   - spec
   - spec/kvm
@@ -218,7 +218,6 @@ imports:
   version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
   subpackages:
   - context
-  - context/ctxhttp
   - http2
   - http2/hpack
   - idna
