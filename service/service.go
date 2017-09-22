@@ -22,6 +22,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/service/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/healthz"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 	"github.com/giantswarm/kvm-operator/service/operator"
@@ -117,11 +118,24 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var ccService *cloudconfig.CloudConfig
+	{
+		ccServiceConfig := cloudconfig.DefaultConfig()
+
+		ccServiceConfig.Logger = config.Logger
+
+		ccService, err = cloudconfig.New(ccServiceConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var configMapResource framework.Resource
 	{
 		configMapConfig := configmapresource.DefaultConfig()
 
 		configMapConfig.CertWatcher = certWatcher
+		configMapConfig.CloudConfig = ccService
 		configMapConfig.K8sClient = k8sClient
 		configMapConfig.Logger = config.Logger
 

@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/giantswarm/certificatetpr"
-	cloudconfig "github.com/giantswarm/k8scloudconfig"
+	clustertprspec "github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -16,14 +16,13 @@ import (
 	"k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
+	"github.com/giantswarm/kvm-operator/service/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 const (
-	FileOwner      = "root:root"
-	FilePermission = 0700
-	KeyUserData    = "user_data"
+	KeyUserData = "user_data"
 	// Name is the identifier of the resource.
 	Name = "configmap"
 )
@@ -32,6 +31,7 @@ const (
 type Config struct {
 	// Dependencies.
 	CertWatcher certificatetpr.Searcher
+	CloudConfig *cloudconfig.CloudConfig
 	K8sClient   kubernetes.Interface
 	Logger      micrologger.Logger
 }
@@ -42,6 +42,7 @@ func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
 		CertWatcher: nil,
+		CloudConfig: nil,
 		K8sClient:   nil,
 		Logger:      nil,
 	}
@@ -51,6 +52,7 @@ func DefaultConfig() Config {
 type Resource struct {
 	// Dependencies.
 	certWatcher certificatetpr.Searcher
+	cloudConfig *cloudconfig.CloudConfig
 	k8sClient   kubernetes.Interface
 	logger      micrologger.Logger
 }
@@ -60,6 +62,9 @@ func New(config Config) (*Resource, error) {
 	// Dependencies.
 	if config.CertWatcher == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.CertWatcher must not be empty")
+	}
+	if config.CloudConfig == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.CloudConfig must not be empty")
 	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
@@ -71,6 +76,7 @@ func New(config Config) (*Resource, error) {
 	newService := &Resource{
 		// Dependencies.
 		certWatcher: config.CertWatcher,
+		cloudConfig: config.CloudConfig,
 		k8sClient:   config.K8sClient,
 		logger: config.Logger.With(
 			"resource", Name,
@@ -356,34 +362,19 @@ func (r *Resource) Underlying() framework.Resource {
 // as structure being injected into the template execution to interpolate
 // variables. prefix can be either "master" or "worker" and is used to prefix
 // the configmap name.
-func (r *Resource) newConfigMap(customObject kvmtpr.CustomObject, template string, params cloudconfig.Params, prefix string) (*apiv1.ConfigMap, error) {
-	var err error
-
-	var newCloudConfig *cloudconfig.CloudConfig
-	{
-		newCloudConfig, err = cloudconfig.NewCloudConfig(template, params)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		err = newCloudConfig.ExecuteTemplate()
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
+func (r *Resource) newConfigMap(customObject kvmtpr.CustomObject, template string, node clustertprspec.Node, prefix string) (*apiv1.ConfigMap, error) {
 	var newConfigMap *apiv1.ConfigMap
 	{
 		newConfigMap = &apiv1.ConfigMap{
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.ConfigMapName(customObject, params.Node, prefix),
+				Name: key.ConfigMapName(customObject, node, prefix),
 				Labels: map[string]string{
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),
 				},
 			},
 			Data: map[string]string{
-				KeyUserData: newCloudConfig.Base64(),
+				KeyUserData: template,
 			},
 		}
 	}
@@ -400,18 +391,12 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 	}
 
 	for _, node := range customObject.Spec.Cluster.Masters {
-		newExtension := &MasterExtension{
-			certs: certs,
+		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
 
-		var params cloudconfig.Params
-		{
-			params.Cluster = customObject.Spec.Cluster
-			params.Extension = newExtension
-			params.Node = node
-		}
-
-		configMap, err := r.newConfigMap(customObject, cloudconfig.MasterTemplate, params, key.PrefixMaster)
+		configMap, err := r.newConfigMap(customObject, template, node, key.PrefixMaster)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -420,18 +405,12 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 	}
 
 	for _, node := range customObject.Spec.Cluster.Workers {
-		newExtension := &WorkerExtension{
-			certs: certs,
+		template, err := r.cloudConfig.NewWorkerTemplate(customObject, certs, node)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
 
-		var params cloudconfig.Params
-		{
-			params.Cluster = customObject.Spec.Cluster
-			params.Extension = newExtension
-			params.Node = node
-		}
-
-		configMap, err := r.newConfigMap(customObject, cloudconfig.WorkerTemplate, params, key.PrefixWorker)
+		configMap, err := r.newConfigMap(customObject, template, node, key.PrefixWorker)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

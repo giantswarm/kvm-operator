@@ -1,108 +1,138 @@
-package configmap
+package cloudconfig
 
 import (
 	"github.com/giantswarm/certificatetpr"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig"
+	clustertprspec "github.com/giantswarm/clustertpr/spec"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_0_1_0"
+	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 )
 
-type MasterExtension struct {
+func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node) (string, error) {
+	var err error
+
+	var params k8scloudconfig.Params
+	{
+		params.Cluster = customObject.Spec.Cluster
+		params.Extension = &v_0_1_0MasterExtension{
+			certs: certs,
+		}
+		params.Node = node
+	}
+
+	var newCloudConfig *k8scloudconfig.CloudConfig
+	{
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.MasterTemplate, params)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+
+		err = newCloudConfig.ExecuteTemplate()
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+	}
+
+	return newCloudConfig.Base64(), nil
+}
+
+type v_0_1_0MasterExtension struct {
 	certs certificatetpr.AssetsBundle
 }
 
-func (me *MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.CA}]),
 			Path:         "/etc/kubernetes/ssl/apiserver-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.Crt}]),
 			Path:         "/etc/kubernetes/ssl/apiserver-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.Key}]),
 			Path:         "/etc/kubernetes/ssl/apiserver-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Calico client.
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.CA}]),
 			Path:         "/etc/kubernetes/ssl/calico/client-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Crt}]),
 			Path:         "/etc/kubernetes/ssl/calico/client-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Key}]),
 			Path:         "/etc/kubernetes/ssl/calico/client-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Etcd client.
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
 			Path:         "/etc/kubernetes/ssl/etcd/client-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
 			Path:         "/etc/kubernetes/ssl/etcd/client-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
 			Path:         "/etc/kubernetes/ssl/etcd/client-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Etcd server.
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
 			Path:         "/etc/kubernetes/ssl/etcd/server-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
 			Path:         "/etc/kubernetes/ssl/etcd/server-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
 			Path:         "/etc/kubernetes/ssl/etcd/server-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Service account.
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.CA}]),
 			Path:         "/etc/kubernetes/ssl/service-account-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.Crt}]),
 			Path:         "/etc/kubernetes/ssl/service-account-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(me.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.Key}]),
 			Path:         "/etc/kubernetes/ssl/service-account-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
@@ -128,7 +158,7 @@ func (me *MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	return newFiles, nil
 }
 
-func (me *MasterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
+func (e *v_0_1_0MasterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 	unitsMeta := []k8scloudconfig.UnitMetadata{
 		// Mount etcd volume when directory first accessed
 		// This automount is workaround for
@@ -181,6 +211,6 @@ WantedBy=multi-user.target
 	return newUnits, nil
 }
 
-func (me *MasterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
+func (e *v_0_1_0MasterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
 	return nil
 }
