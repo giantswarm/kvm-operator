@@ -1,9 +1,13 @@
-package cloudconfig
+package v_0_1_0
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+)
+
+const (
+	testTemplate = `foo: {{.Foo}}`
 )
 
 type FakeParams struct {

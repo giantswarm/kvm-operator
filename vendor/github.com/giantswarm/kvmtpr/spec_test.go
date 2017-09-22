@@ -15,6 +15,7 @@ import (
 	clustertprkubernetesingress "github.com/giantswarm/clustertpr/spec/kubernetes/ingress"
 	clustertprkuberneteskubectl "github.com/giantswarm/clustertpr/spec/kubernetes/kubectl"
 	clustertprkubernetesnetworksetup "github.com/giantswarm/clustertpr/spec/kubernetes/networksetup"
+	clustertprkubernetesssh "github.com/giantswarm/clustertpr/spec/kubernetes/ssh"
 	spec "github.com/giantswarm/kvmtpr/spec"
 	kvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	endpointupdater "github.com/giantswarm/kvmtpr/spec/kvm/endpointupdater"
@@ -24,7 +25,6 @@ import (
 )
 
 func TestSpecYamlEncoding(t *testing.T) {
-
 	spec := Spec{
 		Cluster: clustertpr.Spec{
 			Calico: clustertprspec.Calico{
@@ -41,11 +41,8 @@ func TestSpecYamlEncoding(t *testing.T) {
 			},
 			Docker: clustertprspec.Docker{
 				Daemon: clustertprdocker.Daemon{
+					CIDR:      "16",
 					ExtraArgs: "--log-opt max-file=1",
-				},
-				ImageNamespace: "giantswarm",
-				Registry: clustertprdocker.Registry{
-					Endpoint: "http://giantswarm.io",
 				},
 			},
 			Etcd: clustertprspec.Etcd{
@@ -99,8 +96,11 @@ func TestSpecYamlEncoding(t *testing.T) {
 					},
 				},
 				SSH: clustertprkubernetes.SSH{
-					PublicKeys: []string{
-						"ssh-rsa AAAAB3NzaC1yc",
+					UserList: []clustertprkubernetesssh.User{
+						{
+							Name:      "xh3b4sd",
+							PublicKey: "ssh-rsa AAAAB3NzaC1yc",
+						},
 					},
 				},
 			},
@@ -113,6 +113,7 @@ func TestSpecYamlEncoding(t *testing.T) {
 				Address: "vault.giantswarm.io",
 				Token:   "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
 			},
+			Version: "0.0.1",
 			Workers: []clustertprspec.Node{
 				{
 					ID: "axx99",

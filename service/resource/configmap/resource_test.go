@@ -16,6 +16,8 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+
+	"github.com/giantswarm/kvm-operator/service/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
@@ -94,6 +96,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	{
 		resourceConfig := DefaultConfig()
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
+		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
@@ -348,6 +351,7 @@ func Test_Resource_CloudConfig_GetCreateState(t *testing.T) {
 	{
 		resourceConfig := DefaultConfig()
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
+		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
@@ -642,6 +646,7 @@ func Test_Resource_CloudConfig_GetDeleteState(t *testing.T) {
 	{
 		resourceConfig := DefaultConfig()
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
+		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
@@ -976,6 +981,7 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 	{
 		resourceConfig := DefaultConfig()
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
+		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)

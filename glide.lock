@@ -1,14 +1,14 @@
 hash: d871692aa354396393bff42e3b83fc9048091076011ed033ad2b6389f66a8171
-updated: 2017-09-20T11:59:13.39708+02:00
+updated: 2017-09-22T10:17:23.806407264+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/cenk/backoff
-  version: 80e08cb804a3eb3e576876c777e957e874609a9a
+  version: 61ba96c4d1002f22e06acb8e34a7650611125a63
 - name: github.com/cenkalti/backoff
-  version: 80e08cb804a3eb3e576876c777e957e874609a9a
+  version: 61ba96c4d1002f22e06acb8e34a7650611125a63
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
@@ -32,7 +32,7 @@ imports:
   subpackages:
   - certificatetprtest
 - name: github.com/giantswarm/clustertpr
-  version: 204c6262c75db8eddf6974c9373a42191db88a56
+  version: 34d49f599b2cc70af0d9c30b941a085aef772e64
   subpackages:
   - spec
   - spec/docker
@@ -43,9 +43,11 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 0f57b2b556a19766a7b63fbfa3928eb1aa9d31b9
+  version: 80db71c3fb1d19f8f91d3b8d2d0c5d6aefdbcd8d
+  subpackages:
+  - v_0_1_0
 - name: github.com/giantswarm/kvmtpr
-  version: c9a45dd6cf78ed1078d878427d399aede0c14f26
+  version: 8ada36b1a377707e8354ec1da990ec4fbbc372d1
   subpackages:
   - spec
   - spec/kvm
