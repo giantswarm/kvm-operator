@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/framework/updateallowedcontext"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -224,7 +225,7 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 	}
 
 	var deploymentsToUpdate []*v1beta1.Deployment
-	{
+	if updateallowedcontext.IsUpdateAllowed(ctx) {
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which deployments have to be updated")
 
 		// Check if config maps of deployments changed. In case they did, add the
@@ -263,6 +264,8 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 		}
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be updated", len(deploymentsToUpdate)))
+	} else {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "not computing update state because deployments are not allowed to be updated")
 	}
 
 	return deploymentsToCreate, deploymentsToDelete, deploymentsToUpdate, nil

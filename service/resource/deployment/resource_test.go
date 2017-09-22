@@ -13,6 +13,7 @@ import (
 	kvmtprspec "github.com/giantswarm/kvmtpr/spec"
 	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/micrologger/microloggertest"
+	"github.com/giantswarm/operatorkit/framework/updateallowedcontext"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -1035,11 +1036,161 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 5, in case current state contains two items and desired state is
+		// Test 5, in case current state contains two items and desired state
+		// contains the same state but one object is modified internally the update
+		// state should be empty in case updates are not allowed.
+		{
+			Ctx: context.TODO(),
+			Obj: &kvmtpr.CustomObject{
+				Spec: kvmtpr.Spec{
+					Cluster: clustertpr.Spec{
+						Cluster: clustertprspec.Cluster{
+							ID: "al9qy",
+						},
+					},
+				},
+			},
+			CurrentState: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-1",
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+								Volumes: []apiv1.Volume{
+									{
+										Name: "cloud-config",
+										VolumeSource: apiv1.VolumeSource{
+											ConfigMap: &apiv1.ConfigMapVolumeSource{
+												LocalObjectReference: apiv1.LocalObjectReference{
+													Name: "deployment-1-config-map-1",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2-modified",
+									},
+								},
+								Volumes: []apiv1.Volume{
+									{
+										Name: "cloud-config",
+										VolumeSource: apiv1.VolumeSource{
+											ConfigMap: &apiv1.ConfigMapVolumeSource{
+												LocalObjectReference: apiv1.LocalObjectReference{
+													Name: "deployment-2-config-map-2",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			DesiredState: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-1",
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+								Volumes: []apiv1.Volume{
+									{
+										Name: "cloud-config",
+										VolumeSource: apiv1.VolumeSource{
+											ConfigMap: &apiv1.ConfigMapVolumeSource{
+												LocalObjectReference: apiv1.LocalObjectReference{
+													Name: "deployment-1-config-map-1",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+								Volumes: []apiv1.Volume{
+									{
+										Name: "cloud-config",
+										VolumeSource: apiv1.VolumeSource{
+											ConfigMap: &apiv1.ConfigMapVolumeSource{
+												LocalObjectReference: apiv1.LocalObjectReference{
+													Name: "deployment-2-config-map-2",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ExpectedDeploymentsToCreate: nil,
+			ExpectedDeploymentsToDelete: nil,
+			ExpectedDeploymentsToUpdate: nil,
+		},
+
+		// Test 6, in case current state contains two items and desired state
 		// contains the same state but one object is modified internally the update
 		// state should contain the the modified item from the current state.
 		{
-			Ctx: context.TODO(),
+			Ctx: func() context.Context {
+				ctx := context.Background()
+
+				{
+					m := messagecontext.NewMessage()
+					m.ConfigMapNames = append(m.ConfigMapNames, "deployment-2-config-map-2")
+					ctx = messagecontext.NewContext(ctx, m)
+				}
+
+				{
+					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
+					updateallowedcontext.SetUpdateAllowed(ctx)
+				}
+
+				return ctx
+			}(),
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
 					Cluster: clustertpr.Spec{
@@ -1199,13 +1350,23 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 			},
 		},
 
-		// Test 6, same as 5 but ensuring the right deployments are computed as
+		// Test 7, same as 6 but ensuring the right deployments are computed as
 		// update state when correspondig config names have changed.
 		{
 			Ctx: func() context.Context {
-				m := messagecontext.NewMessage()
-				m.ConfigMapNames = append(m.ConfigMapNames, "deployment-2-config-map-2")
-				ctx := messagecontext.NewContext(context.Background(), m)
+				ctx := context.Background()
+
+				{
+					m := messagecontext.NewMessage()
+					m.ConfigMapNames = append(m.ConfigMapNames, "deployment-2-config-map-2")
+					ctx = messagecontext.NewContext(ctx, m)
+				}
+
+				{
+					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
+					updateallowedcontext.SetUpdateAllowed(ctx)
+				}
+
 				return ctx
 			}(),
 			Obj: &kvmtpr.CustomObject{
