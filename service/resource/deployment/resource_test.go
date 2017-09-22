@@ -1541,35 +1541,41 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 		}
 	}
 
-	for i, tc := range testCases {
+	for _, tc := range testCases {
 		createState, deleteState, updateState, err := newResource.GetUpdateState(tc.Ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
-			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
+			t.Fatalf("expected %#v got %#v", nil, err)
 		}
 
-		deploymentsToCreate, ok := createState.([]*v1beta1.Deployment)
-		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*v1beta1.Deployment{}, createState)
-		}
-		if !reflect.DeepEqual(deploymentsToCreate, tc.ExpectedDeploymentsToCreate) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedDeploymentsToCreate, deploymentsToCreate)
-		}
+		t.Run("deploymentsToCreate", func(t *testing.T) {
+			deploymentsToCreate, ok := createState.([]*v1beta1.Deployment)
+			if !ok {
+				t.Fatalf("expected %T got %T", []*v1beta1.Deployment{}, createState)
+			}
+			if !reflect.DeepEqual(deploymentsToCreate, tc.ExpectedDeploymentsToCreate) {
+				t.Fatalf("expected %#v got %#v", tc.ExpectedDeploymentsToCreate, deploymentsToCreate)
+			}
+		})
 
-		deploymentsToDelete, ok := deleteState.([]*v1beta1.Deployment)
-		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*v1beta1.Deployment{}, deleteState)
-		}
-		if !reflect.DeepEqual(deploymentsToDelete, tc.ExpectedDeploymentsToDelete) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedDeploymentsToDelete, deploymentsToDelete)
-		}
+		t.Run("deploymentsToDelete", func(t *testing.T) {
+			deploymentsToDelete, ok := deleteState.([]*v1beta1.Deployment)
+			if !ok {
+				t.Fatalf("expected %T got %T", []*v1beta1.Deployment{}, deleteState)
+			}
+			if !reflect.DeepEqual(deploymentsToDelete, tc.ExpectedDeploymentsToDelete) {
+				t.Fatalf("expected %#v got %#v", tc.ExpectedDeploymentsToDelete, deploymentsToDelete)
+			}
+		})
 
-		deploymentsToUpdate, ok := updateState.([]*v1beta1.Deployment)
-		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*v1beta1.Deployment{}, updateState)
-		}
-		if !reflect.DeepEqual(deploymentsToUpdate, tc.ExpectedDeploymentsToUpdate) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedDeploymentsToUpdate, deploymentsToUpdate)
-		}
+		t.Run("deploymentsToUpdate", func(t *testing.T) {
+			deploymentsToUpdate, ok := updateState.([]*v1beta1.Deployment)
+			if !ok {
+				t.Fatalf("expected %T got %T", []*v1beta1.Deployment{}, updateState)
+			}
+			if !reflect.DeepEqual(deploymentsToUpdate, tc.ExpectedDeploymentsToUpdate) {
+				t.Fatalf("expected %#v got %#v", tc.ExpectedDeploymentsToUpdate, deploymentsToUpdate)
+			}
+		})
 	}
 }
 
