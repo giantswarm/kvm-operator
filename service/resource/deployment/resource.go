@@ -338,6 +338,31 @@ func (r *Resource) ProcessDeleteState(ctx context.Context, obj, deleteState inte
 }
 
 func (r *Resource) ProcessUpdateState(ctx context.Context, obj, updateState interface{}) error {
+	customObject, err := key.ToCustomObject(obj)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+	deploymentsToUpdate, err := toDeployments(updateState)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	if len(deploymentsToUpdate) != 0 {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "updating the deployments in the Kubernetes API")
+
+		namespace := key.ClusterNamespace(customObject)
+		for _, deployment := range deploymentsToUpdate {
+			_, err := r.k8sClient.Extensions().Deployments(namespace).Update(deployment)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "updated the deployments in the Kubernetes API")
+	} else {
+		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do not need to be updated in the Kubernetes API")
+	}
+
 	return nil
 }
 
