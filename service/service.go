@@ -256,7 +256,7 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	contextInitializer := func(ctx context.Context, obj interface{}) (context.Context, error) {
+	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
 		ctx = messagecontext.NewContext(ctx, messagecontext.NewMessage())
 
 		return ctx, nil
@@ -266,7 +266,7 @@ func New(config Config) (*Service, error) {
 	{
 		frameworkConfig := framework.DefaultConfig()
 
-		frameworkConfig.Initializer = contextInitializer
+		frameworkConfig.InitCtxFunc = initCtxFunc
 		frameworkConfig.Logger = config.Logger
 		frameworkConfig.Resources = resources
 
