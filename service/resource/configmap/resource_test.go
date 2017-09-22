@@ -16,6 +16,7 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfig/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
@@ -672,16 +673,19 @@ func Test_Resource_CloudConfig_GetDeleteState(t *testing.T) {
 
 func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 	testCases := []struct {
-		Obj                        interface{}
-		CurrentState               interface{}
-		DesiredState               interface{}
-		ExpectedConfigMapsToCreate []*apiv1.ConfigMap
-		ExpectedConfigMapsToDelete []*apiv1.ConfigMap
-		ExpectedConfigMapsToUpdate []*apiv1.ConfigMap
+		Ctx                                  context.Context
+		Obj                                  interface{}
+		CurrentState                         interface{}
+		DesiredState                         interface{}
+		ExpectedConfigMapsToCreate           []*apiv1.ConfigMap
+		ExpectedConfigMapsToDelete           []*apiv1.ConfigMap
+		ExpectedConfigMapsToUpdate           []*apiv1.ConfigMap
+		ExpectedMessageContextConfigMapNames []string
 	}{
 		// Test 1, in case current state and desired state are empty the create,
 		// delete and update state should be empty.
 		{
+			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
 					Cluster: clustertpr.Spec{
@@ -691,16 +695,18 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:               []*apiv1.ConfigMap{},
-			DesiredState:               []*apiv1.ConfigMap{},
-			ExpectedConfigMapsToCreate: nil,
-			ExpectedConfigMapsToDelete: nil,
-			ExpectedConfigMapsToUpdate: nil,
+			CurrentState:                         []*apiv1.ConfigMap{},
+			DesiredState:                         []*apiv1.ConfigMap{},
+			ExpectedConfigMapsToCreate:           nil,
+			ExpectedConfigMapsToDelete:           nil,
+			ExpectedConfigMapsToUpdate:           nil,
+			ExpectedMessageContextConfigMapNames: nil,
 		},
 
 		// Test 2, in case current state and desired state are equal the create,
 		// delete and update state should be empty.
 		{
+			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
 					Cluster: clustertpr.Spec{
@@ -730,14 +736,16 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToCreate: nil,
-			ExpectedConfigMapsToDelete: nil,
-			ExpectedConfigMapsToUpdate: nil,
+			ExpectedConfigMapsToCreate:           nil,
+			ExpectedConfigMapsToDelete:           nil,
+			ExpectedConfigMapsToUpdate:           nil,
+			ExpectedMessageContextConfigMapNames: nil,
 		},
 
 		// Test 3, in case current state misses one item of desired state the delete
 		// state should not contain the missing item of the desired state.
 		{
+			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
 					Cluster: clustertpr.Spec{
@@ -768,14 +776,16 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToDelete: nil,
-			ExpectedConfigMapsToUpdate: nil,
+			ExpectedConfigMapsToDelete:           nil,
+			ExpectedConfigMapsToUpdate:           nil,
+			ExpectedMessageContextConfigMapNames: nil,
 		},
 
 		// Test 4, in case current state contains two items and desired state is
 		// missing one of them the delete state should contain the the missing item
 		// from the current state.
 		{
+			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
 					Cluster: clustertpr.Spec{
@@ -824,13 +834,15 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToUpdate: nil,
+			ExpectedConfigMapsToUpdate:           nil,
+			ExpectedMessageContextConfigMapNames: nil,
 		},
 
 		// Test 5, in case current state contains two items and desired state is
 		// contains the same state but one object is modified internally the update
 		// state should contain the the modified item from the current state.
 		{
+			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
 				Spec: kvmtpr.Spec{
 					Cluster: clustertpr.Spec{
@@ -888,6 +900,73 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
+			ExpectedMessageContextConfigMapNames: nil,
+		},
+
+		// Test 6, same as 5 but ensuring the right config map names are written to
+		// the message context.
+		{
+			Ctx: messagecontext.NewContext(context.Background(), messagecontext.NewMessage()),
+			Obj: &kvmtpr.CustomObject{
+				Spec: kvmtpr.Spec{
+					Cluster: clustertpr.Spec{
+						Cluster: clustertprspec.Cluster{
+							ID: "al9qy",
+						},
+					},
+				},
+			},
+			CurrentState: []*apiv1.ConfigMap{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-1",
+					},
+					Data: map[string]string{
+						"key1": "val1",
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-2",
+					},
+					Data: map[string]string{
+						"key2": "val2-modified",
+					},
+				},
+			},
+			DesiredState: []*apiv1.ConfigMap{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-1",
+					},
+					Data: map[string]string{
+						"key1": "val1",
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-2",
+					},
+					Data: map[string]string{
+						"key2": "val2",
+					},
+				},
+			},
+			ExpectedConfigMapsToCreate: nil,
+			ExpectedConfigMapsToDelete: nil,
+			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "config-map-2",
+					},
+					Data: map[string]string{
+						"key2": "val2",
+					},
+				},
+			},
+			ExpectedMessageContextConfigMapNames: []string{
+				"config-map-2",
+			},
 		},
 	}
 
@@ -906,7 +985,7 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		createState, deleteState, updateState, err := newResource.GetUpdateState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
+		createState, deleteState, updateState, err := newResource.GetUpdateState(tc.Ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
