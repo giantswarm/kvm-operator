@@ -109,13 +109,11 @@ func TestSpecYamlEncoding(t *testing.T) {
 					ID: "fyz88",
 				},
 			},
-			Template: clustertprspec.Template{
-				Version: "0.0.1",
-			},
 			Vault: clustertprspec.Vault{
 				Address: "vault.giantswarm.io",
 				Token:   "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
 			},
+			Version: "0.0.1",
 			Workers: []clustertprspec.Node{
 				{
 					ID: "axx99",

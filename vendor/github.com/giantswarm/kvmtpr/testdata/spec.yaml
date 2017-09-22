@@ -56,11 +56,10 @@ cluster:
         publicKey: ssh-rsa AAAAB3NzaC1yc
   masters:
   - id: fyz88
-  template:
-    version: 0.0.1
   vault:
     address: vault.giantswarm.io
     token: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  version: 0.0.1
   workers:
   - id: axx99
   - id: cdd88

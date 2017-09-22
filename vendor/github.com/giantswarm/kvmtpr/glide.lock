@@ -1,12 +1,12 @@
-hash: 5950ab3f5fbc74692dd6263f738982c25e97bc22af296efd089db12b9a207d14
-updated: 2017-09-21T17:14:36.08233795+02:00
+hash: 87d708ab11affdd93b0fb31a9dd61fa95ed650e5173b428fa0f5d01821dc4129
+updated: 2017-09-22T10:08:11.110807972+02:00
 imports:
 - name: github.com/emicklei/go-restful
   version: 09691a3b6378b740595c1002f40c34dd5f218a22
   subpackages:
   - log
 - name: github.com/giantswarm/clustertpr
-  version: 075be5351cd205f51ebb9c48225f1c6faa3139d8
+  version: 34d49f599b2cc70af0d9c30b941a085aef772e64
   subpackages:
   - spec
   - spec/docker
@@ -112,4 +112,4 @@ testImports:
   - assert
   - require
 - name: gopkg.in/yaml.v2
-  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
