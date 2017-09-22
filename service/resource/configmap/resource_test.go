@@ -1013,6 +1013,13 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 		if !reflect.DeepEqual(configMapsToUpdate, tc.ExpectedConfigMapsToUpdate) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)
 		}
+
+		m, ok := messagecontext.FromContext(tc.Ctx)
+		if ok {
+			if !reflect.DeepEqual(m.ConfigMapNames, tc.ExpectedMessageContextConfigMapNames) {
+				t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedMessageContextConfigMapNames, m.ConfigMapNames)
+			}
+		}
 	}
 }
 
