@@ -56,13 +56,13 @@ func (c *CloudConfig) NewMasterTemplate(customObject kvmtpr.CustomObject, certs 
 	var err error
 
 	// TODO remove defaulting as soon as custom objects are configured.
-	if customObject.Spec.Cluster.Template.Version == "" {
-		customObject.Spec.Cluster.Template.Version = string(cloudconfig.V_0_1_0)
+	if customObject.Spec.Cluster.Version == "" {
+		customObject.Spec.Cluster.Version = string(cloudconfig.V_0_1_0)
 	}
 
 	var template string
 
-	switch customObject.Spec.Cluster.Template.Version {
+	switch customObject.Spec.Cluster.Version {
 	case string(cloudconfig.V_0_1_0):
 		template, err = v_0_1_0MasterTemplate(customObject, certs, node)
 		if err != nil {
@@ -70,7 +70,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject kvmtpr.CustomObject, certs 
 		}
 
 	default:
-		return "", microerror.Maskf(notFoundError, "k8scloudconfig version '%s'", customObject.Spec.Cluster.Template.Version)
+		return "", microerror.Maskf(notFoundError, "k8scloudconfig version '%s'", customObject.Spec.Cluster.Version)
 	}
 
 	return template, nil
@@ -82,13 +82,13 @@ func (c *CloudConfig) NewWorkerTemplate(customObject kvmtpr.CustomObject, certs 
 	var err error
 
 	// TODO remove defaulting as soon as custom objects are configured.
-	if customObject.Spec.Cluster.Template.Version == "" {
-		customObject.Spec.Cluster.Template.Version = string(cloudconfig.V_0_1_0)
+	if customObject.Spec.Cluster.Version == "" {
+		customObject.Spec.Cluster.Version = string(cloudconfig.V_0_1_0)
 	}
 
 	var template string
 
-	switch customObject.Spec.Cluster.Template.Version {
+	switch customObject.Spec.Cluster.Version {
 	case string(cloudconfig.V_0_1_0):
 		template, err = v_0_1_0WorkerTemplate(customObject, certs, node)
 		if err != nil {
@@ -96,7 +96,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject kvmtpr.CustomObject, certs 
 		}
 
 	default:
-		return "", microerror.Maskf(notFoundError, "k8scloudconfig version '%s'", customObject.Spec.Cluster.Template.Version)
+		return "", microerror.Maskf(notFoundError, "k8scloudconfig version '%s'", customObject.Spec.Cluster.Version)
 	}
 
 	return template, nil
