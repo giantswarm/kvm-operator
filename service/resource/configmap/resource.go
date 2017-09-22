@@ -17,7 +17,7 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/key"
-	"github.com/giantswarm/kvm-operator/service/resource/configmap/configmapnamescontext"
+	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 const (
@@ -226,8 +226,6 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 	{
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be updated")
 
-		namesChannel, namesChannelExists := configmapnamescontext.FromContext(ctx)
-
 		for _, currentConfigMap := range currentConfigMaps {
 			desiredConfigMap, err := getConfigMapByName(desiredConfigMaps, currentConfigMap.Name)
 			if IsNotFound(err) {
@@ -237,15 +235,12 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 			}
 
 			if isConfigMapModified(desiredConfigMap, currentConfigMap) {
-				if namesChannelExists {
-					namesChannel <- desiredConfigMap.Name
+				m, ok := messagecontext.FromContext(ctx)
+				if ok {
+					m.ConfigMapNames = append(m.ConfigMapNames, desiredConfigMap.Name)
 				}
 				configMapsToUpdate = append(configMapsToUpdate, desiredConfigMap)
 			}
-		}
-
-		if namesChannelExists {
-			close(namesChannel)
 		}
 
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be updated", len(configMapsToUpdate)))

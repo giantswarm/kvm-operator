@@ -15,7 +15,7 @@ import (
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
 	"github.com/giantswarm/kvm-operator/service/key"
-	"github.com/giantswarm/kvm-operator/service/resource/configmap/configmapnamescontext"
+	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 const (
@@ -229,10 +229,10 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 
 		// Check if config maps of deployments changed. In case they did, add the
 		// deployments to the list of deployments intended to be updated.
-		ch, ok := configmapnamescontext.FromContext(ctx)
+		m, ok := messagecontext.FromContext(ctx)
 		if ok {
-			for configMapName := range ch {
-				desiredDeployment, err := getDeploymentByConfigMapName(desiredDeployments, configMapName)
+			for _, name := range m.ConfigMapNames {
+				desiredDeployment, err := getDeploymentByConfigMapName(desiredDeployments, name)
 				if err != nil {
 					return nil, nil, nil, microerror.Mask(err)
 				}
