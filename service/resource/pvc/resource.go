@@ -17,7 +17,6 @@ import (
 )
 
 const (
-	MasterID = "master"
 	// Name is the identifier of the resource.
 	Name = "pvc"
 	// StorageClass is the storage class annotation persistent volume claims are

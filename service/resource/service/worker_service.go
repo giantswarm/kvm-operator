@@ -16,11 +16,11 @@ func newWorkerService(customObject kvmtpr.CustomObject) *apiv1.Service {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: WorkerID,
+			Name: key.WorkerID,
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),
 				"customer": key.ClusterCustomer(customObject),
-				"app":      WorkerID,
+				"app":      key.WorkerID,
 			},
 		},
 		Spec: apiv1.ServiceSpec{

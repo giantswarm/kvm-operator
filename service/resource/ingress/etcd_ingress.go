@@ -19,7 +19,7 @@ func newEtcdIngress(customObject kvmtpr.CustomObject) *extensionsv1.Ingress {
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),
 				"customer": key.ClusterCustomer(customObject),
-				"app":      MasterID,
+				"app":      key.MasterID,
 			},
 			Annotations: map[string]string{
 				"ingress.kubernetes.io/ssl-passthrough": "true",
@@ -42,7 +42,7 @@ func newEtcdIngress(customObject kvmtpr.CustomObject) *extensionsv1.Ingress {
 								{
 									Path: "/",
 									Backend: extensionsv1.IngressBackend{
-										ServiceName: MasterID,
+										ServiceName: key.MasterID,
 										ServicePort: intstr.FromInt(2379),
 									},
 								},

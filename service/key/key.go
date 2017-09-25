@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	PrefixMaster = "master"
-	PrefixWorker = "worker"
+	MasterID = "master"
+	WorkerID = "worker"
 )
 
 func ClusterCustomer(customObject kvmtpr.CustomObject) string {
@@ -36,12 +36,12 @@ func ConfigMapNames(customObject kvmtpr.CustomObject) []string {
 	var names []string
 
 	for _, node := range customObject.Spec.Cluster.Masters {
-		name := ConfigMapName(customObject, node, PrefixMaster)
+		name := ConfigMapName(customObject, node, MasterID)
 		names = append(names, name)
 	}
 
 	for _, node := range customObject.Spec.Cluster.Workers {
-		name := ConfigMapName(customObject, node, PrefixWorker)
+		name := ConfigMapName(customObject, node, WorkerID)
 		names = append(names, name)
 	}
 

@@ -17,10 +17,8 @@ import (
 )
 
 const (
-	MasterID = "master"
 	// Name is the identifier of the resource.
-	Name     = "deployment"
-	WorkerID = "worker"
+	Name = "deployment"
 )
 
 // Config represents the configuration used to create a new deployment resource.
@@ -278,11 +276,11 @@ func getDeploymentNames(customObject kvmtpr.CustomObject) []string {
 	var names []string
 
 	for _, masterNode := range customObject.Spec.Cluster.Masters {
-		names = append(names, key.DeploymentName(MasterID, masterNode.ID))
+		names = append(names, key.DeploymentName(key.MasterID, masterNode.ID))
 	}
 
 	for _, workerNode := range customObject.Spec.Cluster.Workers {
-		names = append(names, key.DeploymentName(WorkerID, workerNode.ID))
+		names = append(names, key.DeploymentName(key.WorkerID, workerNode.ID))
 	}
 
 	return names

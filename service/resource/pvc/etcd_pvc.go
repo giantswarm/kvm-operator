@@ -31,7 +31,7 @@ func newEtcdPVCs(customObject kvmtpr.CustomObject) ([]*apiv1.PersistentVolumeCla
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 				Labels: map[string]string{
-					"app":      MasterID,
+					"app":      key.MasterID,
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),
 					"node":     masterNode.ID,
