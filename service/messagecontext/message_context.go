@@ -15,10 +15,16 @@ type key string
 // this key directly.
 var messageKey key = "message"
 
+// Message is a communication structure used to transport information from one
+// resource to another. Messages move between resource during reconciliation
+// within the dispatched context.
 type Message struct {
+	// ConfigMapNames is a list of config map names filled by the config map
+	// resource and read by the deployment resource.
 	ConfigMapNames []string
 }
 
+// NewMessage returns a new communication structure used to apply to a context.
 func NewMessage() *Message {
 	return &Message{}
 }
