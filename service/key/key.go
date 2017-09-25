@@ -102,6 +102,16 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
+func PVCNames(customObject kvmtpr.CustomObject) []string {
+	var names []string
+
+	for i := range customObject.Spec.Cluster.Masters {
+		names = append(names, EtcdPVCName(ClusterID(customObject), VMNumber(i)))
+	}
+
+	return names
+}
+
 func StorageType(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }
