@@ -405,13 +405,13 @@ func Test_Resource_Deployment_GetCreateState(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		configMaps, ok := result.([]*v1beta1.Deployment)
+		deployments, ok := result.([]*v1beta1.Deployment)
 		if !ok {
 			t.Fatalf("case %d expected %T got %T", i+1, []*v1beta1.Deployment{}, result)
 		}
 
-		if len(configMaps) != len(tc.ExpectedDeploymentNames) {
-			t.Fatalf("case %d expected %d config maps got %d", i+1, len(tc.ExpectedDeploymentNames), len(configMaps))
+		if len(deployments) != len(tc.ExpectedDeploymentNames) {
+			t.Fatalf("case %d expected %d config maps got %d", i+1, len(tc.ExpectedDeploymentNames), len(deployments))
 		}
 	}
 }
@@ -698,13 +698,13 @@ func Test_Resource_Deployment_GetDeleteState(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		configMaps, ok := result.([]*v1beta1.Deployment)
+		deployments, ok := result.([]*v1beta1.Deployment)
 		if !ok {
 			t.Fatalf("case %d expected %T got %T", i+1, []*v1beta1.Deployment{}, result)
 		}
 
-		if len(configMaps) != len(tc.ExpectedDeploymentNames) {
-			t.Fatalf("case %d expected %d config maps got %d", i+1, len(tc.ExpectedDeploymentNames), len(configMaps))
+		if len(deployments) != len(tc.ExpectedDeploymentNames) {
+			t.Fatalf("case %d expected %d config maps got %d", i+1, len(tc.ExpectedDeploymentNames), len(deployments))
 		}
 	}
 }
