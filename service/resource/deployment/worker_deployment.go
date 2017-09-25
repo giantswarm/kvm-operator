@@ -93,7 +93,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Command: []string{
 									"/opt/k8s-endpoint-updater",
 									"update",
-									"--provider.bridge.name=" + key.NetworkBridgeName(key.ClusterID(customObject)),
+									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
 									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
 									"--service.kubernetes.cluster.service=" + WorkerID,
 									"--service.kubernetes.inCluster=true",
@@ -104,7 +104,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Env: []apiv1.EnvVar{
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(key.ClusterID(customObject)),
+										Value: key.NetworkBridgeName(customObject),
 									},
 									{
 										Name: "POD_NAME",
@@ -156,7 +156,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(key.ClusterID(customObject)),
+										Value: key.NetworkBridgeName(customObject),
 									},
 									{
 										Name: "MEMORY",
