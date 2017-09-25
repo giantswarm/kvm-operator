@@ -27,9 +27,9 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.DeploymentName(WorkerID, workerNode.ID),
+				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
 				Labels: map[string]string{
-					"app":      WorkerID,
+					"app":      key.WorkerID,
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),
 					"node":     workerNode.ID,
@@ -42,11 +42,11 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						Name: WorkerID,
+						Name: key.WorkerID,
 						Labels: map[string]string{
 							"cluster":  key.ClusterID(customObject),
 							"customer": key.ClusterCustomer(customObject),
-							"app":      WorkerID,
+							"app":      key.WorkerID,
 							"node":     workerNode.ID,
 						},
 						Annotations: map[string]string{},
@@ -60,7 +60,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: key.ConfigMapName(customObject, workerNode, WorkerID),
+											Name: key.ConfigMapName(customObject, workerNode, key.WorkerID),
 										},
 									},
 								},
@@ -92,7 +92,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									"update",
 									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
 									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
-									"--service.kubernetes.cluster.service=" + WorkerID,
+									"--service.kubernetes.cluster.service=" + key.WorkerID,
 									"--service.kubernetes.inCluster=true",
 								},
 								SecurityContext: &apiv1.SecurityContext{
@@ -131,7 +131,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									Privileged: &privileged,
 								},
 								Args: []string{
-									WorkerID,
+									key.WorkerID,
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -162,7 +162,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 									{
 										Name:  "ROLE",
-										Value: WorkerID,
+										Value: key.WorkerID,
 									},
 									{
 										Name:  "CLOUD_CONFIG_PATH",

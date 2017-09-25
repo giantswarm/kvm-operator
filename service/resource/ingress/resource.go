@@ -19,8 +19,7 @@ const (
 	APIID  = "api"
 	EtcdID = "etcd"
 	// Name is the identifier of the resource.
-	Name     = "ingress"
-	MasterID = "master"
+	Name = "ingress"
 )
 
 // Config represents the configuration used to create a new ingress resource.
