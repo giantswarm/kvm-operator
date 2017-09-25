@@ -60,8 +60,8 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
 
-func NetworkBridgeName(ID string) string {
-	return fmt.Sprintf("br-%s", ID)
+func NetworkBridgeName(customObject kvmtpr.CustomObject) string {
+	return fmt.Sprintf("br-%s", ClusterID(customObject))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {
