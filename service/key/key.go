@@ -20,16 +20,8 @@ func ClusterCustomer(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.Cluster.Customer.ID
 }
 
-func ClusterDomain(sub, clusterID, domain string) string {
-	return fmt.Sprintf("%s.%s.%s", sub, clusterID, domain)
-}
-
 func ClusterID(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.Cluster.Cluster.ID
-}
-
-func ClusterName(customObject kvmtpr.CustomObject) string {
-	return ClusterID(customObject)
 }
 
 func ClusterNamespace(customObject kvmtpr.CustomObject) string {
@@ -68,8 +60,8 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
 
-func NetworkBridgeName(ID string) string {
-	return fmt.Sprintf("br-%s", ID)
+func NetworkBridgeName(customObject kvmtpr.CustomObject) string {
+	return fmt.Sprintf("br-%s", ClusterID(customObject))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {
@@ -94,10 +86,6 @@ func NetworkNTPBlock(servers []net.IP) string {
 	ntpBlock := strings.Join(ntpBlockParts, "\n")
 
 	return ntpBlock
-}
-
-func NetworkEnvFilePath(ID string) string {
-	return fmt.Sprintf("/run/flannel/networks/%s.env", NetworkBridgeName(ID))
 }
 
 func StorageType(customObject kvmtpr.CustomObject) string {
