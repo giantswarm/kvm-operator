@@ -15,11 +15,11 @@ func newMasterService(customObject kvmtpr.CustomObject) *apiv1.Service {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: MasterID,
+			Name: key.MasterID,
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),
 				"customer": key.ClusterCustomer(customObject),
-				"app":      MasterID,
+				"app":      key.MasterID,
 			},
 		},
 		Spec: apiv1.ServiceSpec{

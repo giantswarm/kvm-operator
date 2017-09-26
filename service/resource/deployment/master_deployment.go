@@ -59,11 +59,11 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.DeploymentName(MasterID, masterNode.ID),
+				Name: key.DeploymentName(key.MasterID, masterNode.ID),
 				Labels: map[string]string{
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),
-					"app":      MasterID,
+					"app":      key.MasterID,
 					"node":     masterNode.ID,
 				},
 			},
@@ -74,9 +74,9 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						GenerateName: MasterID,
+						GenerateName: key.MasterID,
 						Labels: map[string]string{
-							"app":      MasterID,
+							"app":      key.MasterID,
 							"cluster":  key.ClusterID(customObject),
 							"customer": key.ClusterCustomer(customObject),
 							"node":     masterNode.ID,
@@ -87,7 +87,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 						Affinity:    newMasterPodAfinity(customObject),
 						HostNetwork: true,
 						NodeSelector: map[string]string{
-							"role": MasterID,
+							"role": key.MasterID,
 						},
 						Volumes: []apiv1.Volume{
 							{
@@ -95,7 +95,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: key.ConfigMapName(customObject, masterNode, MasterID),
+											Name: key.ConfigMapName(customObject, masterNode, key.MasterID),
 										},
 									},
 								},
@@ -128,7 +128,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									"update",
 									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
 									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
-									"--service.kubernetes.cluster.service=" + MasterID,
+									"--service.kubernetes.cluster.service=" + key.MasterID,
 									"--service.kubernetes.inCluster=true",
 								},
 								SecurityContext: &apiv1.SecurityContext{
@@ -143,7 +143,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									Privileged: &privileged,
 								},
 								Args: []string{
-									MasterID,
+									key.MasterID,
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -174,7 +174,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 									{
 										Name:  "ROLE",
-										Value: MasterID,
+										Value: key.MasterID,
 									},
 									{
 										Name:  "CLOUD_CONFIG_PATH",

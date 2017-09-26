@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -20,10 +19,8 @@ import (
 )
 
 const (
-	MasterID = "master"
 	// Name is the identifier of the resource.
-	Name     = "deployment"
-	WorkerID = "worker"
+	Name = "deployment"
 )
 
 // Config represents the configuration used to create a new deployment resource.
@@ -82,7 +79,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var deployments []*v1beta1.Deployment
 
 	namespace := key.ClusterNamespace(customObject)
-	deploymentNames := getDeploymentNames(customObject)
+	deploymentNames := key.DeploymentNames(customObject)
 
 	for _, name := range deploymentNames {
 		manifest, err := r.k8sClient.Extensions().Deployments(namespace).Get(name, apismetav1.GetOptions{})
@@ -400,20 +397,6 @@ func getDeploymentByConfigMapName(list []*v1beta1.Deployment, name string) (*v1b
 	}
 
 	return nil, microerror.Mask(notFoundError)
-}
-
-func getDeploymentNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, masterNode := range customObject.Spec.Cluster.Masters {
-		names = append(names, key.DeploymentName(MasterID, masterNode.ID))
-	}
-
-	for _, workerNode := range customObject.Spec.Cluster.Workers {
-		names = append(names, key.DeploymentName(WorkerID, workerNode.ID))
-	}
-
-	return names
 }
 
 func isDeploymentModified(a, b *v1beta1.Deployment) bool {

@@ -396,7 +396,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, key.PrefixMaster)
+		configMap, err := r.newConfigMap(customObject, template, node, key.MasterID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -410,7 +410,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, key.PrefixWorker)
+		configMap, err := r.newConfigMap(customObject, template, node, key.WorkerID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
