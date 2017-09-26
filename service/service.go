@@ -74,7 +74,7 @@ func DefaultConfig() Config {
 type Service struct {
 	// Dependencies.
 	Healthz  *healthz.Service
-	Operator *operator.Service
+	Operator *operator.Operator
 	Version  *version.Service
 
 	// Internals.
@@ -295,7 +295,7 @@ func New(config Config) (*Service, error) {
 		operatorBackOff.MaxElapsedTime = 5 * time.Minute
 	}
 
-	var operatorService *operator.Service
+	var operatorService *operator.Operator
 	{
 		operatorConfig := operator.DefaultConfig()
 
