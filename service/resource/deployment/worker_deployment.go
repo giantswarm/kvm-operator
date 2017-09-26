@@ -55,7 +55,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 						Affinity:    newWorkerPodAfinity(customObject),
 						HostNetwork: true,
 						NodeSelector: map[string]string{
-							"role": WorkerID,
+							"role": key.WorkerID,
 						},
 						Volumes: []apiv1.Volume{
 							{
