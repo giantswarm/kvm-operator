@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -77,7 +76,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var deployments []*v1beta1.Deployment
 
 	namespace := key.ClusterNamespace(customObject)
-	deploymentNames := getDeploymentNames(customObject)
+	deploymentNames := key.DeploymentNames(customObject)
 
 	for _, name := range deploymentNames {
 		manifest, err := r.k8sClient.Extensions().Deployments(namespace).Get(name, apismetav1.GetOptions{})
@@ -270,20 +269,6 @@ func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bo
 	}
 
 	return false
-}
-
-func getDeploymentNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, masterNode := range customObject.Spec.Cluster.Masters {
-		names = append(names, key.DeploymentName(key.MasterID, masterNode.ID))
-	}
-
-	for _, workerNode := range customObject.Spec.Cluster.Workers {
-		names = append(names, key.DeploymentName(key.WorkerID, workerNode.ID))
-	}
-
-	return names
 }
 
 func toDeployments(v interface{}) ([]*v1beta1.Deployment, error) {

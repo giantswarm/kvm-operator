@@ -52,6 +52,20 @@ func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
 }
 
+func DeploymentNames(customObject kvmtpr.CustomObject) []string {
+	var names []string
+
+	for _, masterNode := range customObject.Spec.Cluster.Masters {
+		names = append(names, DeploymentName(MasterID, masterNode.ID))
+	}
+
+	for _, workerNode := range customObject.Spec.Cluster.Workers {
+		names = append(names, DeploymentName(WorkerID, workerNode.ID))
+	}
+
+	return names
+}
+
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
@@ -86,6 +100,16 @@ func NetworkNTPBlock(servers []net.IP) string {
 	ntpBlock := strings.Join(ntpBlockParts, "\n")
 
 	return ntpBlock
+}
+
+func PVCNames(customObject kvmtpr.CustomObject) []string {
+	var names []string
+
+	for i := range customObject.Spec.Cluster.Masters {
+		names = append(names, EtcdPVCName(ClusterID(customObject), VMNumber(i)))
+	}
+
+	return names
 }
 
 func StorageType(customObject kvmtpr.CustomObject) string {
