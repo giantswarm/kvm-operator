@@ -17,9 +17,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name     = "service"
-	MasterID = "master"
-	WorkerID = "worker"
+	Name = "service"
 )
 
 // Config represents the configuration used to create a new service resource.
@@ -79,8 +77,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	namespace := key.ClusterNamespace(customObject)
 	serviceNames := []string{
-		MasterID,
-		WorkerID,
+		key.MasterID,
+		key.WorkerID,
 	}
 
 	for _, name := range serviceNames {

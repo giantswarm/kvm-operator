@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -17,7 +16,6 @@ import (
 )
 
 const (
-	MasterID = "master"
 	// Name is the identifier of the resource.
 	Name = "pvc"
 	// StorageClass is the storage class annotation persistent volume claims are
@@ -81,7 +79,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var PVCs []*apiv1.PersistentVolumeClaim
 
 	namespace := key.ClusterNamespace(customObject)
-	pvcNames := getPVCNames(customObject)
+	pvcNames := key.PVCNames(customObject)
 
 	for _, name := range pvcNames {
 		manifest, err := r.k8sClient.Core().PersistentVolumeClaims(namespace).Get(name, apismetav1.GetOptions{})
@@ -269,16 +267,6 @@ func containsPVC(list []*apiv1.PersistentVolumeClaim, item *apiv1.PersistentVolu
 	}
 
 	return false
-}
-
-func getPVCNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for i := range customObject.Spec.Cluster.Masters {
-		names = append(names, key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)))
-	}
-
-	return names
 }
 
 func toPVCs(v interface{}) ([]*apiv1.PersistentVolumeClaim, error) {

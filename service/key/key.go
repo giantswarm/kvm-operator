@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	PrefixMaster = "master"
-	PrefixWorker = "worker"
+	MasterID = "master"
+	WorkerID = "worker"
 )
 
 func ClusterCustomer(customObject kvmtpr.CustomObject) string {
@@ -36,12 +36,12 @@ func ConfigMapNames(customObject kvmtpr.CustomObject) []string {
 	var names []string
 
 	for _, node := range customObject.Spec.Cluster.Masters {
-		name := ConfigMapName(customObject, node, PrefixMaster)
+		name := ConfigMapName(customObject, node, MasterID)
 		names = append(names, name)
 	}
 
 	for _, node := range customObject.Spec.Cluster.Workers {
-		name := ConfigMapName(customObject, node, PrefixWorker)
+		name := ConfigMapName(customObject, node, WorkerID)
 		names = append(names, name)
 	}
 
@@ -50,6 +50,20 @@ func ConfigMapNames(customObject kvmtpr.CustomObject) []string {
 
 func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
+}
+
+func DeploymentNames(customObject kvmtpr.CustomObject) []string {
+	var names []string
+
+	for _, masterNode := range customObject.Spec.Cluster.Masters {
+		names = append(names, DeploymentName(MasterID, masterNode.ID))
+	}
+
+	for _, workerNode := range customObject.Spec.Cluster.Workers {
+		names = append(names, DeploymentName(WorkerID, workerNode.ID))
+	}
+
+	return names
 }
 
 func EtcdPVCName(clusterID string, vmNumber string) string {
@@ -86,6 +100,16 @@ func NetworkNTPBlock(servers []net.IP) string {
 	ntpBlock := strings.Join(ntpBlockParts, "\n")
 
 	return ntpBlock
+}
+
+func PVCNames(customObject kvmtpr.CustomObject) []string {
+	var names []string
+
+	for i := range customObject.Spec.Cluster.Masters {
+		names = append(names, EtcdPVCName(ClusterID(customObject), VMNumber(i)))
+	}
+
+	return names
 }
 
 func StorageType(customObject kvmtpr.CustomObject) string {
