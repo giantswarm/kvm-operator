@@ -11,8 +11,6 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/updateallowedcontext"
-	"github.com/giantswarm/operatorkit/framework/updatenecessarycontext"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -20,6 +18,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 const (
@@ -230,7 +229,7 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 	}
 
 	var configMapsToUpdate []*apiv1.ConfigMap
-	if updateallowedcontext.IsUpdateAllowed(ctx) {
+	{
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be updated")
 
 		for _, currentConfigMap := range currentConfigMaps {
@@ -242,17 +241,15 @@ func (r *Resource) GetUpdateState(ctx context.Context, obj, currentState, desire
 			}
 
 			if isConfigMapModified(desiredConfigMap, currentConfigMap) {
+				m, ok := messagecontext.FromContext(ctx)
+				if ok {
+					m.ConfigMapNames = append(m.ConfigMapNames, desiredConfigMap.Name)
+				}
 				configMapsToUpdate = append(configMapsToUpdate, desiredConfigMap)
 			}
 		}
 
-		if len(configMapsToUpdate) != 0 {
-			updatenecessarycontext.SetUpdateNecessary(ctx)
-		}
-
 		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be updated", len(configMapsToUpdate)))
-	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "not computing update state because the config maps are not allowed to be updated")
 	}
 
 	return configMapsToCreate, configMapsToDelete, configMapsToUpdate, nil
