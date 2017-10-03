@@ -18,6 +18,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework/logresource"
 	"github.com/giantswarm/operatorkit/framework/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/retryresource"
+	"github.com/giantswarm/operatorkit/informer"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/kubernetes"
 
@@ -262,15 +263,38 @@ func New(config Config) (*Service, error) {
 		return ctx, nil
 	}
 
+	var frameworkBackOff *backoff.ExponentialBackOff
+	{
+		frameworkBackOff = backoff.NewExponentialBackOff()
+		frameworkBackOff.MaxElapsedTime = 5 * time.Minute
+	}
+
 	var operatorFramework *framework.Framework
 	{
 		frameworkConfig := framework.DefaultConfig()
 
+		frameworkConfig.BackOff = frameworkBackOff
 		frameworkConfig.InitCtxFunc = initCtxFunc
 		frameworkConfig.Logger = config.Logger
 		frameworkConfig.Resources = resources
 
 		operatorFramework, err = framework.New(frameworkConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var newInformer *informer.Informer
+	{
+		informerConfig := informer.DefaultConfig()
+
+		informerConfig.BackOff = backoff.NewExponentialBackOff()
+		informerConfig.RestClient = k8sClient.Discovery().RESTClient()
+
+		informerConfig.RateWait = time.Second * 10
+		informerConfig.ResyncPeriod = time.Minute * 5
+
+		newInformer, err = informer.New(informerConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -300,6 +324,7 @@ func New(config Config) (*Service, error) {
 		operatorConfig := operator.DefaultConfig()
 
 		operatorConfig.BackOff = operatorBackOff
+		operatorConfig.Informer = newInformer
 		operatorConfig.K8sClient = k8sClient
 		operatorConfig.Logger = config.Logger
 		operatorConfig.OperatorFramework = operatorFramework

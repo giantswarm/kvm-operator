@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sync"
@@ -11,6 +12,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/operatorkit/tpr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -20,6 +22,7 @@ import (
 type Config struct {
 	// Dependencies.
 	BackOff           backoff.BackOff
+	Informer          *informer.Informer
 	K8sClient         kubernetes.Interface
 	Logger            micrologger.Logger
 	OperatorFramework *framework.Framework
@@ -31,6 +34,7 @@ func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
 		BackOff:           nil,
+		Informer:          nil,
 		K8sClient:         nil,
 		Logger:            nil,
 		OperatorFramework: nil,
@@ -41,6 +45,7 @@ func DefaultConfig() Config {
 type Operator struct {
 	// Dependencies.
 	backOff           backoff.BackOff
+	informer          *informer.Informer
 	logger            micrologger.Logger
 	operatorFramework *framework.Framework
 
@@ -55,6 +60,9 @@ func New(config Config) (*Operator, error) {
 	// Dependencies.
 	if config.BackOff == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.BackOff must not be empty")
+	}
+	if config.Informer == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.Informer must not be empty")
 	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
@@ -88,6 +96,7 @@ func New(config Config) (*Operator, error) {
 	newOperator := &Operator{
 		// Dependencies.
 		backOff:           config.BackOff,
+		informer:          config.Informer,
 		logger:            config.Logger,
 		operatorFramework: config.OperatorFramework,
 
@@ -133,14 +142,13 @@ func (o *Operator) bootWithError() error {
 
 	o.logger.Log("debug", "starting list/watch")
 
-	newResourceEventHandler := o.operatorFramework.NewCacheResourceEventHandler()
-
 	newZeroObjectFactory := &tpr.ZeroObjectFactoryFuncs{
 		NewObjectFunc:     func() runtime.Object { return &kvmtpr.CustomObject{} },
 		NewObjectListFunc: func() runtime.Object { return &kvmtpr.List{} },
 	}
 
-	o.tpr.NewInformer(newResourceEventHandler, newZeroObjectFactory).Run(nil)
+	deleteChan, updateChan, errChan := o.informer.Watch(context.TODO(), o.tpr.WatchEndpoint(""), newZeroObjectFactory)
+	o.operatorFramework.ProcessEvents(context.TODO(), deleteChan, updateChan, errChan)
 
 	return nil
 }
