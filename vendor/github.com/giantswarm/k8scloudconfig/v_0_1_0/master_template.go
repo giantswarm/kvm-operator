@@ -410,7 +410,7 @@ write_files:
             operator: "Exists"
           containers:
           - name: kubedns
-            image: gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.2
+            image: gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.5
             volumeMounts:
             - name: kube-dns-config
               mountPath: /kube-dns-config
@@ -464,7 +464,7 @@ write_files:
               initialDelaySeconds: 3
               timeoutSeconds: 5
           - name: dnsmasq
-            image: gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.2
+            image: gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.5
             livenessProbe:
               httpGet:
                 path: /healthcheck/dnsmasq
@@ -503,7 +503,7 @@ write_files:
             - name: kube-dns-config
               mountPath: /etc/k8s/dns/dnsmasq-nanny
           - name: sidecar
-            image: gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.2
+            image: gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.5
             livenessProbe:
               httpGet:
                 path: /metrics

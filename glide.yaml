@@ -5,12 +5,14 @@ import:
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
-  version: informer
+  version: master
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/kvmtpr
   version: master
 - package: github.com/giantswarm/k8scloudconfig
+  version: master
+- package: github.com/giantswarm/k8shealthz
   version: master
 - package: github.com/giantswarm/microendpoint
   version: master

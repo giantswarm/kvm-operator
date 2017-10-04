@@ -1,8 +1,8 @@
-hash: cd8bf19a8c41d0ab4950ac218e2b884a97a80d44fdb0e9a5976251be0eedcbc6
-updated: 2017-10-03T14:25:33.64260101+02:00
+hash: 73eb5acb2b74052e79b4edeb8c550d5b567465af0f719433031bf5fb34c84f56
+updated: 2017-10-04T12:23:39.903870259+02:00
 imports:
 - name: github.com/beorn7/perks
-  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
+  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/cenk/backoff
@@ -44,9 +44,11 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 0c80d8ffcb468e8bd658af73bebcfa9e2aa0aeaa
+  version: a8d733a91fd32efd88de41114d83d9678bb50eac
   subpackages:
   - v_0_1_0
+- name: github.com/giantswarm/k8shealthz
+  version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
   version: 7639997ea1e6b770028a71712097ea68655695b8
   subpackages:
@@ -55,12 +57,11 @@ imports:
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
 - name: github.com/giantswarm/microendpoint
-  version: 9f010eaa4a71fcaa4b211d77ce47c1e8e12c4094
+  version: 1ea4d8cd5f0167625f134c855ae42fc747191890
   subpackages:
   - endpoint/healthz
   - endpoint/version
   - service/healthz
-  - service/healthz/k8s
   - service/version
 - name: github.com/giantswarm/microerror
   version: 5ade94eb4ee35ef72eb9382228470caeddb29989
@@ -91,7 +92,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 3c56c31ed88dc071dee3accb80e88d9c939193e9
+  version: da881f7bb58462fa8b96f06edf0e751efd17f5fb
   subpackages:
   - client/k8s
   - framework
@@ -100,6 +101,7 @@ imports:
   - framework/metricsresource
   - framework/retryresource
   - framework/updateallowedcontext
+  - informer
   - tpr
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
@@ -172,7 +174,7 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
+  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
@@ -185,17 +187,17 @@ imports:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  version: 6f3806018612930941127f2a7c6c453ba2c527d2
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
+  version: 2f17f4a9d485bf34b4bfaccc273805040e4f86c8
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 65c1f6f8f0fc1e2185eb9863a3bc751496404259
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -203,7 +205,7 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/spf13/afero
-  version: ee1bd8ee15a1306d1f9201acc41ef39cd9f99a1b
+  version: 3de492c3cda9570c77bc1f495857bfbf4b760efd
   subpackages:
   - mem
 - name: github.com/spf13/cast
@@ -250,7 +252,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
 - name: k8s.io/apimachinery
   version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
