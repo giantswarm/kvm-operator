@@ -1,8 +1,8 @@
-hash: 87d708ab11affdd93b0fb31a9dd61fa95ed650e5173b428fa0f5d01821dc4129
-updated: 2017-09-22T10:08:11.110807972+02:00
+hash: 5950ab3f5fbc74692dd6263f738982c25e97bc22af296efd089db12b9a207d14
+updated: 2017-10-03T14:15:11.961143762+02:00
 imports:
 - name: github.com/emicklei/go-restful
-  version: 09691a3b6378b740595c1002f40c34dd5f218a22
+  version: ff4f55a206334ef123e4f79bbf348980da81ca46
   subpackages:
   - log
 - name: github.com/giantswarm/clustertpr
@@ -17,7 +17,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/operatorkit
-  version: 49ac418456193963d3c9e13c1a60e6e025eb665a
+  version: 098ab83dfc2da931425bb096283be24ab8572f7d
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -27,7 +27,7 @@ imports:
 - name: github.com/go-openapi/swag
   version: 1d0bd113de87027671077d3c71eb3ac5d7dbba72
 - name: github.com/gogo/protobuf
-  version: e18d7aa8f8c624c915db340349aad4c49b10d173
+  version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
   - proto
   - sortkeys
@@ -48,7 +48,7 @@ imports:
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: golang.org/x/net
-  version: e90d6d0afc4c315a0d87a568ae68577cc15149a0
+  version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
   subpackages:
   - http2
   - http2/hpack
@@ -70,7 +70,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: k8s.io/apimachinery
-  version: 85ace5365f33b16fc735c866a12e3c765b9700f2
+  version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
   - pkg/api/resource
   - pkg/apis/meta/v1
