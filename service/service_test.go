@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/micrologger/microloggertest"
 )
 
-func TestNew(t *testing.T) {
+func Test_Service_New(t *testing.T) {
 	tests := []struct {
 		config               func() Config
 		expectedErrorHandler func(error) bool
