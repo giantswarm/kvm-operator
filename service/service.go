@@ -18,6 +18,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework/logresource"
 	"github.com/giantswarm/operatorkit/framework/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/retryresource"
+	"github.com/giantswarm/operatorkit/informer"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/kubernetes"
 
@@ -283,6 +284,22 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var newInformer *informer.Informer
+	{
+		informerConfig := informer.DefaultConfig()
+
+		informerConfig.BackOff = backoff.NewExponentialBackOff()
+		informerConfig.RestClient = k8sClient.Discovery().RESTClient()
+
+		informerConfig.RateWait = time.Second * 10
+		informerConfig.ResyncPeriod = time.Minute * 5
+
+		newInformer, err = informer.New(informerConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var healthzService *healthz.Service
 	{
 		healthzConfig := healthz.DefaultConfig()
@@ -307,6 +324,7 @@ func New(config Config) (*Service, error) {
 		operatorConfig := operator.DefaultConfig()
 
 		operatorConfig.BackOff = operatorBackOff
+		operatorConfig.Informer = newInformer
 		operatorConfig.K8sClient = k8sClient
 		operatorConfig.Logger = config.Logger
 		operatorConfig.OperatorFramework = operatorFramework
