@@ -262,10 +262,17 @@ func New(config Config) (*Service, error) {
 		return ctx, nil
 	}
 
+	var frameworkBackOff *backoff.ExponentialBackOff
+	{
+		frameworkBackOff = backoff.NewExponentialBackOff()
+		frameworkBackOff.MaxElapsedTime = 5 * time.Minute
+	}
+
 	var operatorFramework *framework.Framework
 	{
 		frameworkConfig := framework.DefaultConfig()
 
+		frameworkConfig.BackOff = frameworkBackOff
 		frameworkConfig.InitCtxFunc = initCtxFunc
 		frameworkConfig.Logger = config.Logger
 		frameworkConfig.Resources = resources
