@@ -1,5 +1,5 @@
 hash: 73eb5acb2b74052e79b4edeb8c550d5b567465af0f719433031bf5fb34c84f56
-updated: 2017-10-04T12:23:39.903870259+02:00
+updated: 2017-10-05T11:49:37.124338+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -44,7 +44,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: a8d733a91fd32efd88de41114d83d9678bb50eac
+  version: 302a87e8db4886c8d59af35d0cc1321ea78d4ed1
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
@@ -211,7 +211,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 0dacccfbaabc71b872087c1719c5380d3e185173
+  version: d5bde60e022436203e377c47806e001418c16af3
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
@@ -252,7 +252,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/apimachinery
   version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
