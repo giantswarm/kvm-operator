@@ -10,8 +10,9 @@ import:
   version: master
 - package: github.com/giantswarm/kvmtpr
   version: master
+# Pinned to a version before RBAC magic came in.
 - package: github.com/giantswarm/k8scloudconfig
-  version: master
+  version: 2698afb73c5e231611fae787ec6e1ebe015c41c0
 - package: github.com/giantswarm/k8shealthz
   version: master
 - package: github.com/giantswarm/microendpoint

@@ -1129,16 +1129,16 @@ coreos:
       ExecStartPre=-/usr/bin/docker rm  $NAME
       ExecStartPre=-/usr/bin/docker pull $IMAGE
       ExecStart=/usr/bin/docker run \
-        -v /etc/giantswarm/g8s/ssl/etcd/:/etc/etcd \
+        -v /etc/kubernetes/ssl/etcd/:/etc/etcd \
         --net=host  \
         -e ETCDCTL_API=3 \
         --name $NAME \
         $IMAGE \
         etcdctl \
         --endpoints https://{{ .Cluster.Etcd.Domain }}:443 \
-        --cacert /etc/etcd/etcd-ca.pem \
-        --cert /etc/etcd/etcd.pem \
-        --key /etc/etcd/etcd-key.pem \
+        --cacert /etc/etcd/server-ca.pem \
+        --cert /etc/etcd/server-crt.pem \
+        --key /etc/etcd/server-key.pem \
         defrag
 
       [Install]
