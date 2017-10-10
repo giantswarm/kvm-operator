@@ -4,7 +4,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -84,17 +83,20 @@ type Service struct {
 
 // New creates a new configured service object.
 func New(config Config) (*Service, error) {
-	// Dependencies.
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
+	// Settings.
+	if config.Flag == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.Flag must not be empty")
 	}
-	config.Logger.Log("debug", fmt.Sprintf("creating kvm-operator with config: %#v", config))
+	if config.Viper == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.Viper must not be empty")
+	}
 
 	var err error
 
 	var k8sClient kubernetes.Interface
 	{
 		k8sConfig := k8s.DefaultConfig()
+
 		k8sConfig.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
 		k8sConfig.Logger = config.Logger
 		k8sConfig.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
@@ -250,7 +252,7 @@ func New(config Config) (*Service, error) {
 		}
 
 		metricsWrapConfig := metricsresource.DefaultWrapConfig()
-		metricsWrapConfig.Namespace = config.Name
+		metricsWrapConfig.Name = config.Name
 		resources, err = metricsresource.Wrap(resources, metricsWrapConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
