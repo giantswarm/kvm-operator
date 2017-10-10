@@ -1,5 +1,5 @@
 hash: 41e32331bf410cef32ea07389895931b545c7fc6b60d331140d3468aef154cfd
-updated: 2017-10-06T15:10:00.713580088+02:00
+updated: 2017-10-10T17:32:41.995079609+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
@@ -33,7 +33,7 @@ imports:
   subpackages:
   - certificatetprtest
 - name: github.com/giantswarm/clustertpr
-  version: 34d49f599b2cc70af0d9c30b941a085aef772e64
+  version: 6b89a787f157c5531d1c955c32b3c621f0d64c3a
   subpackages:
   - spec
   - spec/docker
@@ -92,7 +92,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 1317e4c15f237b13a5101a1f3167146d05b2e7a1
+  version: 6ed6f05e679d8c9d07e6176e138f89bdea3e24bc
   subpackages:
   - client/k8s
   - framework
@@ -147,7 +147,7 @@ imports:
   subpackages:
   - simplelru
 - name: github.com/hashicorp/hcl
-  version: 68e816d1c783414e79bc65b3994d9ab6b0a722ab
+  version: 42e33e2d55a0ff1d6263f738896ea8c13571a8d0
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -205,17 +205,17 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/spf13/afero
-  version: 3de492c3cda9570c77bc1f495857bfbf4b760efd
+  version: e67d870304c4bca21331b02f414f970df13aa694
   subpackages:
   - mem
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: e8e7fe03552f0645ccf4c507f38bcf88b1c2b2d6
+  version: 4d6af280c76ff7d266434f2dba207c4b75dfc076
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
-  version: 2c300e72a98b4351617d9b927d2d2860ece8ee24
+  version: a9789e855c7696159b7db0db7f440b449edf2b31
 - name: github.com/spf13/viper
   version: d9cca5ef33035202efb1586825bdbb15ff9ec3ba
 - name: github.com/tylerb/graceful
