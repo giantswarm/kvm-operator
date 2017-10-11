@@ -9,6 +9,7 @@ import (
 
 	"github.com/cenk/backoff"
 	"github.com/giantswarm/certificatetpr"
+	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -18,7 +19,9 @@ import (
 	"github.com/giantswarm/operatorkit/framework/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
+	"github.com/giantswarm/operatorkit/tpr"
 	"github.com/spf13/viper"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/flag"
@@ -286,12 +289,38 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var newTPR *tpr.TPR
+	{
+		c := tpr.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		c.Description = kvmtpr.Description
+		c.Name = kvmtpr.Name
+		c.Version = kvmtpr.VersionV1
+
+		newTPR, err = tpr.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var newWatcherFactory informer.WatcherFactory
+	{
+		zeroObjectFactory := &informer.ZeroObjectFactoryFuncs{
+			NewObjectFunc:     func() runtime.Object { return &kvmtpr.CustomObject{} },
+			NewObjectListFunc: func() runtime.Object { return &kvmtpr.List{} },
+		}
+		newWatcherFactory = informer.NewWatcherFactory(k8sClient.Discovery().RESTClient(), newTPR.WatchEndpoint(""), zeroObjectFactory)
+	}
+
 	var newInformer *informer.Informer
 	{
 		informerConfig := informer.DefaultConfig()
 
 		informerConfig.BackOff = backoff.NewExponentialBackOff()
-		informerConfig.RestClient = k8sClient.Discovery().RESTClient()
+		informerConfig.WatcherFactory = newWatcherFactory
 
 		informerConfig.RateWait = time.Second * 10
 		informerConfig.ResyncPeriod = time.Minute * 5
@@ -326,10 +355,10 @@ func New(config Config) (*Service, error) {
 		operatorConfig := operator.DefaultConfig()
 
 		operatorConfig.BackOff = operatorBackOff
+		operatorConfig.Framework = operatorFramework
 		operatorConfig.Informer = newInformer
-		operatorConfig.K8sClient = k8sClient
 		operatorConfig.Logger = config.Logger
-		operatorConfig.OperatorFramework = operatorFramework
+		operatorConfig.TPR = newTPR
 
 		operatorService, err = operator.New(operatorConfig)
 		if err != nil {

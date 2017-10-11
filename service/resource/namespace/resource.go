@@ -111,7 +111,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new namespace")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the desired namespace")
 
 	// Compute the desired state of the namespace to have a reference of data how
 	// it should be.
@@ -129,7 +129,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		},
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computed the new namespace")
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computed the desired namespace")
 
 	return namespace, nil
 }
