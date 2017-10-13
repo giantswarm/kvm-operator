@@ -6,9 +6,10 @@ import (
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_0_1_0"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/randomkeytpr"
 )
 
-func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node) (string, error) {
+func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node, keys randomkeytpr.CompactRandomKeyAssets) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
@@ -16,6 +17,7 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &v_0_1_0MasterExtension{
 			certs: certs,
+			keys:  keys,
 		}
 		params.Node = node
 	}
@@ -38,6 +40,7 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 
 type v_0_1_0MasterExtension struct {
 	certs certificatetpr.AssetsBundle
+	keys  randomkeytpr.CompactRandomKeyAssets
 }
 
 func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
@@ -136,6 +139,12 @@ func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			Path:         "/etc/kubernetes/ssl/service-account-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
+		},
+		{
+			AssetContent: e.keys.APIServerEncryptionKey,
+			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml.enc",
+			Owner:        FileOwner,
+			Permissions:  0644,
 		},
 	}
 

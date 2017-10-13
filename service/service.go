@@ -20,6 +20,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/operatorkit/tpr"
+	"github.com/giantswarm/randomkeytpr"
 	"github.com/spf13/viper"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -124,6 +125,17 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var keyWatcher randomkeytpr.Searcher
+	{
+		keyConfig := randomkeytpr.DefaultServiceConfig()
+		keyConfig.K8sClient = k8sClient
+		keyConfig.Logger = config.Logger
+		keyWatcher, err = randomkeytpr.NewService(keyConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var ccService *cloudconfig.CloudConfig
 	{
 		ccServiceConfig := cloudconfig.DefaultConfig()
@@ -143,6 +155,7 @@ func New(config Config) (*Service, error) {
 		configMapConfig.CertWatcher = certWatcher
 		configMapConfig.CloudConfig = ccService
 		configMapConfig.K8sClient = k8sClient
+		configMapConfig.KeyWatcher = keyWatcher
 		configMapConfig.Logger = config.Logger
 
 		configMapResource, err = configmapresource.New(configMapConfig)

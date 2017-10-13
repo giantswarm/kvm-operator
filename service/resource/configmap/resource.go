@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/randomkeytpr"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -33,6 +34,7 @@ type Config struct {
 	CertWatcher certificatetpr.Searcher
 	CloudConfig *cloudconfig.CloudConfig
 	K8sClient   kubernetes.Interface
+	KeyWatcher  randomkeytpr.Searcher
 	Logger      micrologger.Logger
 }
 
@@ -44,6 +46,7 @@ func DefaultConfig() Config {
 		CertWatcher: nil,
 		CloudConfig: nil,
 		K8sClient:   nil,
+		KeyWatcher:  nil,
 		Logger:      nil,
 	}
 }
@@ -54,6 +57,7 @@ type Resource struct {
 	certWatcher certificatetpr.Searcher
 	cloudConfig *cloudconfig.CloudConfig
 	k8sClient   kubernetes.Interface
+	keyWatcher  randomkeytpr.Searcher
 	logger      micrologger.Logger
 }
 
@@ -69,6 +73,9 @@ func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
+	if config.KeyWatcher == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.KeyWatcher must not be empty")
+	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
@@ -78,6 +85,7 @@ func New(config Config) (*Resource, error) {
 		certWatcher: config.CertWatcher,
 		cloudConfig: config.CloudConfig,
 		k8sClient:   config.K8sClient,
+		keyWatcher:  config.KeyWatcher,
 		logger: config.Logger.With(
 			"resource", Name,
 		),
@@ -390,8 +398,27 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 		return nil, microerror.Mask(err)
 	}
 
+	keys, err := r.keyWatcher.SearchKeys(customObject.Spec.Cluster.Cluster.ID)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	encryptionKey, ok := keys[randomkeytpr.EncryptionKey]
+	if !ok {
+		return nil, microerror.Maskf(notFoundError, "could not get encryption keys from secrets")
+	}
+
+	encryptionConfig, err := r.EncryptionConfig(string(encryptionKey))
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	compactKeys := randomkeytpr.CompactRandomKeyAssets{
+		APIServerEncryptionKey: encryptionConfig,
+	}
+
 	for _, node := range customObject.Spec.Cluster.Masters {
-		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node)
+		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node, compactKeys)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

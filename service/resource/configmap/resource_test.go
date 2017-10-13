@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/giantswarm/randomkeytpr/randomtprtest"
+
 	"github.com/giantswarm/certificatetpr/certificatetprtest"
 	"github.com/giantswarm/clustertpr"
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
@@ -97,6 +99,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.KeyWatcher = randomkeytprtest.NewService()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
 		if err != nil {
@@ -352,6 +355,7 @@ func Test_Resource_CloudConfig_GetCreateState(t *testing.T) {
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.KeyWatcher = randomkeytprtest.NewService()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
 		if err != nil {
@@ -647,6 +651,7 @@ func Test_Resource_CloudConfig_GetDeleteState(t *testing.T) {
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.KeyWatcher = randomkeytprtest.NewService()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
 		if err != nil {
@@ -977,6 +982,7 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.KeyWatcher = randomkeytprtest.NewService()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
 		if err != nil {
