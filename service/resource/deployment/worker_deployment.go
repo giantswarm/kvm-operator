@@ -54,6 +54,9 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 					Spec: apiv1.PodSpec{
 						Affinity:    newWorkerPodAfinity(customObject),
 						HostNetwork: true,
+						NodeSelector: map[string]string{
+							"role": key.WorkerID,
+						},
 						Volumes: []apiv1.Volume{
 							{
 								Name: "cloud-config",
