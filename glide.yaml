@@ -12,7 +12,7 @@ import:
   version: master
 # Pinned to a version before RBAC magic came in.
 - package: github.com/giantswarm/k8scloudconfig
-  version: 2698afb73c5e231611fae787ec6e1ebe015c41c0
+  version: master
 - package: github.com/giantswarm/k8shealthz
   version: master
 - package: github.com/giantswarm/microendpoint
@@ -20,4 +20,6 @@ import:
 - package: github.com/giantswarm/microerror
   version: master
 - package: github.com/giantswarm/micrologger
+  version: master
+- package: github.com/giantswarm/randomkeytpr
   version: master

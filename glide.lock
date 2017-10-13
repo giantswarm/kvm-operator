@@ -1,8 +1,8 @@
-hash: 41e32331bf410cef32ea07389895931b545c7fc6b60d331140d3468aef154cfd
-updated: 2017-10-10T17:32:41.995079609+02:00
+hash: f455fc36abb9624da2e2e4c1a584377514f8c922faee0330fa5046edf705fae4
+updated: 2017-10-13T08:43:59.571209741+02:00
 imports:
 - name: github.com/beorn7/perks
-  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
+  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/cenk/backoff
@@ -44,7 +44,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 2698afb73c5e231611fae787ec6e1ebe015c41c0
+  version: 7d46932eb7e895064a8c2d646123802669a24df9
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
@@ -92,7 +92,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 6ed6f05e679d8c9d07e6176e138f89bdea3e24bc
+  version: 53da8cd36ce876d8d3dfe9c0bada1b11d9758926
   subpackages:
   - client/k8s
   - framework
@@ -103,6 +103,8 @@ imports:
   - framework/updateallowedcontext
   - informer
   - tpr
+- name: github.com/giantswarm/randomkeytpr
+  version: cde692def8cce039a7469a846a78cfac255f9845
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -174,7 +176,7 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
+  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
@@ -191,13 +193,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
+  version: 1bab55dd05dbff384524a6a1c99006d9eb5f139b
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a1dba9ce8baed984a2495b658c82687f8157b98f
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -211,7 +213,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 4d6af280c76ff7d266434f2dba207c4b75dfc076
+  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
