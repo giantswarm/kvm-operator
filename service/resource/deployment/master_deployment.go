@@ -136,8 +136,9 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								},
 							},
 							{
-								Name:            "k8s-kvm",
-								Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
+								Name:  "k8s-kvm",
+								Image: "quay.io/giantswarm/k8s-kvm:8f8b52dc7fe685e3ea6a7fdaa9c90d8ba12fcf35",
+								//Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
@@ -166,6 +167,10 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
 										Value: key.NetworkBridgeName(customObject),
+									},
+									{
+										Name:  "NETWORK_TAP_NAME",
+										Value: key.NetworkTapName(customObject),
 									},
 									{
 										Name: "MEMORY",
