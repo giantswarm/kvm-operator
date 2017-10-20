@@ -78,6 +78,10 @@ func NetworkBridgeName(customObject kvmtpr.CustomObject) string {
 	return fmt.Sprintf("br-%s", ClusterID(customObject))
 }
 
+func NetworkTapName(customObject kvmtpr.CustomObject) string {
+	return fmt.Sprintf("tap-%s", ClusterID(customObject))
+}
+
 func NetworkDNSBlock(servers []net.IP) string {
 	var dnsBlockParts []string
 
