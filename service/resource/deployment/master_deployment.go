@@ -136,9 +136,8 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								},
 							},
 							{
-								Name:  "k8s-kvm",
-								Image: "quay.io/giantswarm/k8s-kvm:e5d26ceefa06e084de9833b913b55536487e7701",
-								//Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
+								Name:            "k8s-kvm",
+								Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,

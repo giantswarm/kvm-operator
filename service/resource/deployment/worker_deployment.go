@@ -159,6 +159,10 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 										Value: key.NetworkBridgeName(customObject),
 									},
 									{
+										Name:  "NETWORK_TAP_NAME",
+										Value: key.NetworkTapName(customObject),
+									},
+									{
 										Name: "MEMORY",
 										// TODO provide memory like disk as float64 and format here.
 										Value: capabilities.Memory,
