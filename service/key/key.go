@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
+	"strconv"
 )
 
 const (
@@ -104,6 +105,10 @@ func NetworkNTPBlock(servers []net.IP) string {
 	ntpBlock := strings.Join(ntpBlockParts, "\n")
 
 	return ntpBlock
+}
+
+func NodeRootFSDiskSize(disk float64) (string) {
+	return strconv.FormatFloat(disk,'f',0,64)+"Gi"
 }
 
 func PVCNames(customObject kvmtpr.CustomObject) []string {

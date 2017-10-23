@@ -4,11 +4,13 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/kvmtpr"
+	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
 	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/microerror"
 )
 
 func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Deployment, error) {
@@ -20,6 +22,10 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
 
+		diskSize, err := resource.ParseQuantity(key.NodeRootFSDiskSize(capabilities.Disk))
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
@@ -72,6 +78,14 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
 										Path: "/home/core/images/",
+									},
+								},
+							},
+							{
+								Name: "rootfs",
+								VolumeSource: apiv1.VolumeSource{
+									EmptyDir: &apiv1.EmptyDirVolumeSource{
+										SizeLimit: diskSize,
 									},
 								},
 							},
@@ -175,6 +189,10 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:      "images",
 										MountPath: "/usr/code/images/",
+									},
+									{
+										Name:      "rootfs",
+										MountPath: "/usr/code/rootfs/",
 									},
 								},
 							},

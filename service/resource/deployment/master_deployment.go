@@ -5,6 +5,7 @@ import (
 
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
+	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -21,6 +22,10 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		capabilities := customObject.Spec.KVM.Masters[i]
 
+		diskSize, err := resource.ParseQuantity(key.NodeRootFSDiskSize(capabilities.Disk))
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 		storageType := key.StorageType(customObject)
 
 		// During migration, some TPOs do not have storage type set.
@@ -108,6 +113,14 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 								},
 							},
+							{
+								Name: "rootfs",
+								VolumeSource: apiv1.VolumeSource{
+									EmptyDir: &apiv1.EmptyDirVolumeSource{
+										SizeLimit: diskSize,
+									},
+								},
+							},
 						},
 						Containers: []apiv1.Container{
 							{
@@ -188,6 +201,10 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:      "images",
 										MountPath: "/usr/code/images/",
+									},
+									{
+										Name:      "rootfs",
+										MountPath: "/usr/code/rootfs/",
 									},
 								},
 							},
