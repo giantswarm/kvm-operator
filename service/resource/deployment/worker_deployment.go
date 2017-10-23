@@ -76,14 +76,6 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 								},
 							},
-							{
-								Name: "rootfs",
-								VolumeSource: apiv1.VolumeSource{
-									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms", key.ClusterID(customObject), workerNode.ID),
-									},
-								},
-							},
 						},
 						Containers: []apiv1.Container{
 							{
@@ -184,10 +176,6 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:      "images",
 										MountPath: "/usr/code/images/",
-									},
-									{
-										Name:      "rootfs",
-										MountPath: "/usr/code/rootfs/",
 									},
 								},
 							},
