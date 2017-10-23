@@ -2,7 +2,6 @@ package deployment
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"

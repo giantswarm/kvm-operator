@@ -2,7 +2,6 @@ package deployment
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
