@@ -107,8 +107,8 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
-func NodeRootFSDiskSize(disk float64) (string) {
-	return strconv.FormatFloat(disk,'f',0,64)+"Gi"
+func NodeRootFSDiskSize(disk float64) string {
+	return strconv.FormatFloat(disk, 'f', 0, 64) + "Gi"
 }
 
 func PVCNames(customObject kvmtpr.CustomObject) []string {
