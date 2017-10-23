@@ -112,8 +112,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 							{
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
-									EmptyDir: &apiv1.EmptyDirVolumeSource{
-									},
+									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
 						},
