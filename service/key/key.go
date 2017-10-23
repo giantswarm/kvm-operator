@@ -9,7 +9,6 @@ import (
 	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
-	"strconv"
 )
 
 const (
