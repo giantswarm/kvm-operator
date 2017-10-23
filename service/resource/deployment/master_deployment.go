@@ -2,10 +2,10 @@ package deployment
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
+
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -112,9 +112,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 							{
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
-									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms", key.ClusterID(customObject), masterNode.ID),
-									},
+									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
 						},

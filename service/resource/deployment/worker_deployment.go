@@ -2,7 +2,6 @@ package deployment
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -79,9 +78,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 							{
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
-									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms", key.ClusterID(customObject), workerNode.ID),
-									},
+									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
 						},
