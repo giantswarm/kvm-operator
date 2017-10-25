@@ -8,13 +8,19 @@ import (
 
 	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
+	kvmtprkvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/microerror"
 )
 
 const (
-	MasterID = "master"
-	WorkerID = "worker"
+	MasterID         = "master"
+	NodeControllerID = "node-controller"
+	WorkerID         = "worker"
 )
+
+func ClusterAPIEndpoint(customObject kvmtpr.CustomObject) string {
+	return customObject.Spec.Cluster.Kubernetes.API.Domain
+}
 
 func ClusterCustomer(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.Cluster.Customer.ID
@@ -68,6 +74,13 @@ func DeploymentNames(customObject kvmtpr.CustomObject) []string {
 
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
+}
+
+func HasNodeController(customObject kvmtpr.CustomObject) bool {
+	if customObject.Spec.KVM.NodeController != (kvmtprkvm.NodeController{}) {
+		return true
+	}
+	return false
 }
 
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
