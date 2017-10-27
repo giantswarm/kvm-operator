@@ -1,0 +1,5 @@
+package: github.com/giantswarm/versionbundle
+import:
+- package: github.com/giantswarm/microerror
+  version: master
+- package: github.com/kylelemons/godebug/pretty

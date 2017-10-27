@@ -1,0 +1,12 @@
+hash: 5ae760bb57983502080800d0fb28e0db8c757b54ae7c1c9e477d677676ad1094
+updated: 2017-10-23T18:19:53.35602745+02:00
+imports:
+- name: github.com/giantswarm/microerror
+  version: 5ade94eb4ee35ef72eb9382228470caeddb29989
+- name: github.com/juju/errgo
+  version: 08cceb5d0b5331634b9826762a8fd53b29b86ad8
+- name: github.com/kylelemons/godebug
+  version: d65d576e9348f5982d7f6d83682b694e731a45c6
+  subpackages:
+  - pretty
+testImports: []
