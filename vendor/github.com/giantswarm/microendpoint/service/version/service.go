@@ -57,7 +57,7 @@ func New(config Config) (*Service, error) {
 	}
 
 	if len(config.VersionBundles) != 0 {
-		err := versionbundle.ValidateBundles(config.VersionBundles).Validate()
+		err := versionbundle.Bundles(config.VersionBundles).Validate()
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
