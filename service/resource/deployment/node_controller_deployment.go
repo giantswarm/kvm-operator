@@ -1,6 +1,8 @@
 package deployment
 
 import (
+	"fmt"
+
 	"github.com/giantswarm/kvmtpr"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -46,17 +48,13 @@ func newNodeControllerDeployment(customObject kvmtpr.CustomObject) (*extensionsv
 							Name:            key.NodeControllerID,
 							Image:           customObject.Spec.KVM.NodeController.Docker.Image,
 							ImagePullPolicy: apiv1.PullIfNotPresent,
+							Args: []string{
+								fmt.Sprintf("-cluster-api=%s", key.ClusterAPIEndpoint(customObject)),
+								fmt.Sprintf("-cluster-id=%s", key.ClusterID(customObject)),
+							},
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "PROVIDER_HOST_CLUSTER_NAMESPACE",
-									Value: key.ClusterID(customObject),
-								},
-								{
-									Name:  "GUEST_CLUSTER_API",
-									Value: key.ClusterAPIEndpoint(customObject),
-								},
-								{
-									Name:  "GUEST_CLUSTER_ID",
 									Value: key.ClusterID(customObject),
 								},
 							},
