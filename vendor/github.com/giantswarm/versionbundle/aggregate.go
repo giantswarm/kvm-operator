@@ -60,7 +60,7 @@ func Aggregate(bundles []Bundle) ([][]Bundle, error) {
 		aggregatedBundles = append(aggregatedBundles, newGroup)
 	}
 
-	err := ValidateAggregatedBundles(aggregatedBundles).Validate()
+	err := AggregatedBundles(aggregatedBundles).Validate()
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

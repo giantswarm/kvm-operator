@@ -12,6 +12,7 @@ import (
 	"github.com/giantswarm/kvmtpr"
 	kvmtprspec "github.com/giantswarm/kvmtpr/spec"
 	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
+	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/framework/updateallowedcontext"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,9 +24,10 @@ import (
 
 func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	testCases := []struct {
-		Obj                 interface{}
-		ExpectedMasterCount int
-		ExpectedWorkerCount int
+		Obj                   interface{}
+		ExpectedMasterCount   int
+		ExpectedNodeCtrlCount int
+		ExpectedWorkerCount   int
 	}{
 		// Test 1 ensures there is one deployment for master and worker each when there
 		// is one master and one worker node in the custom object.
@@ -56,8 +58,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedMasterCount: 1,
-			ExpectedWorkerCount: 1,
+			ExpectedMasterCount:   1,
+			ExpectedNodeCtrlCount: 0,
+			ExpectedWorkerCount:   1,
 		},
 
 		// Test 2 ensures there is one deployment for master and worker each when there
@@ -85,6 +88,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 						Masters: []kvmtprspeckvm.Node{
 							{},
 						},
+						NodeController: kvmtprspeckvm.NodeController{
+							Docker: nodecontroller.Docker{
+								Image: "123",
+							},
+						},
 						Workers: []kvmtprspeckvm.Node{
 							{},
 							{},
@@ -93,8 +101,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedMasterCount: 1,
-			ExpectedWorkerCount: 3,
+			ExpectedMasterCount:   1,
+			ExpectedNodeCtrlCount: 1,
+			ExpectedWorkerCount:   3,
 		},
 
 		// Test 3 ensures there is one deployment for master and worker each when there
@@ -126,6 +135,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							{},
 							{},
 						},
+						NodeController: kvmtprspeckvm.NodeController{
+							Docker: nodecontroller.Docker{
+								Image: "123",
+							},
+						},
 						Workers: []kvmtprspeckvm.Node{
 							{},
 							{},
@@ -134,8 +148,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedMasterCount: 3,
-			ExpectedWorkerCount: 3,
+			ExpectedMasterCount:   3,
+			ExpectedNodeCtrlCount: 1,
+			ExpectedWorkerCount:   3,
 		},
 	}
 
@@ -170,8 +185,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %d worker nodes got %d", i+1, tc.ExpectedWorkerCount, testGetWorkerCount(deployments))
 		}
 
-		if len(deployments) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount {
-			t.Fatalf("case %d expected %d nodes got %d", i+1, tc.ExpectedMasterCount+tc.ExpectedWorkerCount, len(deployments))
+		if len(deployments) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount {
+			t.Fatalf("case %d expected %d nodes got %d", i+1, tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount, len(deployments))
 		}
 	}
 }

@@ -1,5 +1,5 @@
 hash: cb090b02793142b273d85791b0339228c241c9b36e3798478c227123e31a44ee
-updated: 2017-10-26T16:57:00.617422528+02:00
+updated: 2017-10-27T16:53:52.365910271+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -50,14 +50,15 @@ imports:
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
-  version: 7639997ea1e6b770028a71712097ea68655695b8
+  version: accb353f46cbeecb5c7799e0411b3feb6bb40f47
   subpackages:
   - spec
   - spec/kvm
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
+  - spec/kvm/nodecontroller
 - name: github.com/giantswarm/microendpoint
-  version: fa4009a06327e78e88cd25e90bf95d611e304ce7
+  version: 3ad61884ce7869f637cf4cdf4ff0a35a9ef60d5d
   subpackages:
   - endpoint/healthz
   - endpoint/version
@@ -104,7 +105,7 @@ imports:
   - informer
   - tpr
 - name: github.com/giantswarm/versionbundle
-  version: 35ed2069ca1fa3086a747415830d852282467a79
+  version: 33129aa9036421b72ac122e0a8b643dc6b4454e5
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -254,7 +255,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/apimachinery
   version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
