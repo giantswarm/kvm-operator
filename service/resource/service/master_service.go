@@ -21,6 +21,9 @@ func newMasterService(customObject kvmtpr.CustomObject) *apiv1.Service {
 				"customer": key.ClusterCustomer(customObject),
 				"app":      key.MasterID,
 			},
+			Annotations: map[string]string{
+				"giantswarm.io/prometheus-cluster": key.ClusterID(customObject),
+			},
 		},
 		Spec: apiv1.ServiceSpec{
 			Type: apiv1.ServiceTypeLoadBalancer,
