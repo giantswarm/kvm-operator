@@ -13,6 +13,16 @@ import (
 // of multiple authorities are aggregated and grouped to reflect distributions.
 type Bundles []Bundle
 
+func (b Bundles) Contain(item Bundle) bool {
+	for _, bundle := range b {
+		if reflect.DeepEqual(bundle, item) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (b Bundles) Copy() Bundles {
 	raw, err := json.Marshal(b)
 	if err != nil {

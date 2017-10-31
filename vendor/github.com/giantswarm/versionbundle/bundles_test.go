@@ -7,6 +7,317 @@ import (
 	"time"
 )
 
+func Test_Bundles_Contains(t *testing.T) {
+	testCases := []struct {
+		Bundles        []Bundle
+		Bundle         Bundle
+		ExpectedResult bool
+	}{
+		// Test 0 ensures that a nil list and an empty bundle result in false.
+		{
+			Bundles:        nil,
+			Bundle:         Bundle{},
+			ExpectedResult: false,
+		},
+
+		// Test 1 is the same as 0 but with an empty list of bundles.
+		{
+			Bundles:        []Bundle{},
+			Bundle:         Bundle{},
+			ExpectedResult: false,
+		},
+
+		// Test 2 ensures a list containing one version bundle and a matching
+		// version bundle results in true.
+		{
+			Bundles: []Bundle{
+				{
+					Changelogs: []Changelog{
+						{
+							Component:   "calico",
+							Description: "Calico version updated.",
+							Kind:        "changed",
+						},
+					},
+					Components: []Component{
+						{
+							Name:    "calico",
+							Version: "1.1.0",
+						},
+						{
+							Name:    "kube-dns",
+							Version: "1.0.0",
+						},
+					},
+					Dependencies: []Dependency{},
+					Deprecated:   false,
+					Name:         "kubernetes-operator",
+					Time:         time.Unix(10, 5),
+					Version:      "0.1.0",
+					WIP:          false,
+				},
+			},
+			Bundle: Bundle{
+				Changelogs: []Changelog{
+					{
+						Component:   "calico",
+						Description: "Calico version updated.",
+						Kind:        "changed",
+					},
+				},
+				Components: []Component{
+					{
+						Name:    "calico",
+						Version: "1.1.0",
+					},
+					{
+						Name:    "kube-dns",
+						Version: "1.0.0",
+					},
+				},
+				Dependencies: []Dependency{},
+				Deprecated:   false,
+				Name:         "kubernetes-operator",
+				Time:         time.Unix(10, 5),
+				Version:      "0.1.0",
+				WIP:          false,
+			},
+			ExpectedResult: true,
+		},
+
+		// Test 3 ensures a list containing two version bundle and a matching
+		// version bundle results in true.
+		{
+			Bundles: []Bundle{
+				{
+					Changelogs: []Changelog{
+						{
+							Component:   "calico",
+							Description: "Calico version updated.",
+							Kind:        "changed",
+						},
+					},
+					Components: []Component{
+						{
+							Name:    "calico",
+							Version: "1.1.0",
+						},
+						{
+							Name:    "kube-dns",
+							Version: "1.0.0",
+						},
+					},
+					Dependencies: []Dependency{},
+					Deprecated:   false,
+					Name:         "kubernetes-operator",
+					Time:         time.Unix(10, 5),
+					Version:      "0.1.0",
+					WIP:          false,
+				},
+				{
+					Changelogs: []Changelog{
+						{
+							Component:   "calico",
+							Description: "Calico version updated.",
+							Kind:        "changed",
+						},
+					},
+					Components: []Component{
+						{
+							Name:    "calico",
+							Version: "1.2.0",
+						},
+						{
+							Name:    "kube-dns",
+							Version: "1.0.0",
+						},
+					},
+					Dependencies: []Dependency{},
+					Deprecated:   false,
+					Name:         "kubernetes-operator",
+					Time:         time.Unix(10, 5),
+					Version:      "0.2.0",
+					WIP:          false,
+				},
+			},
+			Bundle: Bundle{
+				Changelogs: []Changelog{
+					{
+						Component:   "calico",
+						Description: "Calico version updated.",
+						Kind:        "changed",
+					},
+				},
+				Components: []Component{
+					{
+						Name:    "calico",
+						Version: "1.2.0",
+					},
+					{
+						Name:    "kube-dns",
+						Version: "1.0.0",
+					},
+				},
+				Dependencies: []Dependency{},
+				Deprecated:   false,
+				Name:         "kubernetes-operator",
+				Time:         time.Unix(10, 5),
+				Version:      "0.2.0",
+				WIP:          false,
+			},
+			ExpectedResult: true,
+		},
+
+		// Test 4 ensures a list containing one version bundle and a version bundle
+		// that does not match results in false.
+		{
+			Bundles: []Bundle{
+				{
+					Changelogs: []Changelog{
+						{
+							Component:   "calico",
+							Description: "Calico version updated.",
+							Kind:        "changed",
+						},
+					},
+					Components: []Component{
+						{
+							Name:    "calico",
+							Version: "1.1.0",
+						},
+						{
+							Name:    "kube-dns",
+							Version: "1.0.0",
+						},
+					},
+					Dependencies: []Dependency{},
+					Deprecated:   false,
+					Name:         "kubernetes-operator",
+					Time:         time.Unix(10, 5),
+					Version:      "0.1.0",
+					WIP:          false,
+				},
+			},
+			Bundle: Bundle{
+				Changelogs: []Changelog{
+					{
+						Component:   "calico",
+						Description: "Calico version updated.",
+						Kind:        "changed",
+					},
+				},
+				Components: []Component{
+					{
+						Name:    "calico",
+						Version: "1.2.0",
+					},
+					{
+						Name:    "kube-dns",
+						Version: "1.0.0",
+					},
+				},
+				Dependencies: []Dependency{},
+				Deprecated:   false,
+				Name:         "kubernetes-operator",
+				Time:         time.Unix(10, 5),
+				Version:      "0.2.0",
+				WIP:          false,
+			},
+			ExpectedResult: false,
+		},
+
+		// Test 5 ensures a list containing two version bundle and a version bundle
+		// that does not match results in false.
+		{
+			Bundles: []Bundle{
+				{
+					Changelogs: []Changelog{
+						{
+							Component:   "calico",
+							Description: "Calico version updated.",
+							Kind:        "changed",
+						},
+					},
+					Components: []Component{
+						{
+							Name:    "calico",
+							Version: "1.1.0",
+						},
+						{
+							Name:    "kube-dns",
+							Version: "1.0.0",
+						},
+					},
+					Dependencies: []Dependency{},
+					Deprecated:   false,
+					Name:         "kubernetes-operator",
+					Time:         time.Unix(10, 5),
+					Version:      "0.1.0",
+					WIP:          false,
+				},
+				{
+					Changelogs: []Changelog{
+						{
+							Component:   "calico",
+							Description: "Calico version updated.",
+							Kind:        "changed",
+						},
+					},
+					Components: []Component{
+						{
+							Name:    "calico",
+							Version: "1.2.0",
+						},
+						{
+							Name:    "kube-dns",
+							Version: "1.0.0",
+						},
+					},
+					Dependencies: []Dependency{},
+					Deprecated:   false,
+					Name:         "kubernetes-operator",
+					Time:         time.Unix(10, 5),
+					Version:      "0.2.0",
+					WIP:          false,
+				},
+			},
+			Bundle: Bundle{
+				Changelogs: []Changelog{
+					{
+						Component:   "calico",
+						Description: "Calico version updated.",
+						Kind:        "changed",
+					},
+				},
+				Components: []Component{
+					{
+						Name:    "calico",
+						Version: "1.3.0",
+					},
+					{
+						Name:    "kube-dns",
+						Version: "1.0.0",
+					},
+				},
+				Dependencies: []Dependency{},
+				Deprecated:   false,
+				Name:         "kubernetes-operator",
+				Time:         time.Unix(10, 5),
+				Version:      "0.3.0",
+				WIP:          false,
+			},
+			ExpectedResult: false,
+		},
+	}
+
+	for i, tc := range testCases {
+		result := Bundles(tc.Bundles).Contain(tc.Bundle)
+		if result != tc.ExpectedResult {
+			t.Fatalf("test %d expected %#v got %#v", i, tc.ExpectedResult, result)
+		}
+	}
+}
+
 func Test_Bundles_Copy(t *testing.T) {
 	bundles := []Bundle{
 		{
