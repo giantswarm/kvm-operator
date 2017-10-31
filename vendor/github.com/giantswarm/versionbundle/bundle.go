@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coreos/go-semver/semver"
 	"github.com/giantswarm/microerror"
 )
 
@@ -49,6 +50,111 @@ type Bundle struct {
 	// WIP describes if a version bundle is being developed. Usage of a version
 	// bundle still being developed should be omitted.
 	WIP bool `json:"wip" yaml:"wip"`
+}
+
+func (b Bundle) IsMajorUpgrade(other Bundle) (bool, error) {
+	err := b.Validate()
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+	err = other.Validate()
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+
+	if b.Name != other.Name {
+		return false, microerror.Maskf(invalidBundleError, "bundle must be from the same authority")
+	}
+
+	bSemver := semver.New(b.Version)
+	otherSemver := semver.New(other.Version)
+	if bSemver.Compare(*otherSemver) >= 0 {
+		return false, nil
+	}
+
+	if bSemver.Major < otherSemver.Major {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (b Bundle) IsMinorUpgrade(other Bundle) (bool, error) {
+	err := b.Validate()
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+	err = other.Validate()
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+
+	if b.Name != other.Name {
+		return false, microerror.Maskf(invalidBundleError, "bundle must be from the same authority")
+	}
+
+	bSemver := semver.New(b.Version)
+	otherSemver := semver.New(other.Version)
+	if bSemver.Compare(*otherSemver) >= 0 {
+		return false, nil
+	}
+
+	isMajor, err := b.IsMajorUpgrade(other)
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+	if isMajor {
+		return false, nil
+	}
+
+	if bSemver.Minor < otherSemver.Minor {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (b Bundle) IsPatchUpgrade(other Bundle) (bool, error) {
+	err := b.Validate()
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+	err = other.Validate()
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+
+	if b.Name != other.Name {
+		return false, microerror.Maskf(invalidBundleError, "bundle must be from the same authority")
+	}
+
+	bSemver := semver.New(b.Version)
+	otherSemver := semver.New(other.Version)
+	if bSemver.Compare(*otherSemver) >= 0 {
+		return false, nil
+	}
+
+	isMajor, err := b.IsMajorUpgrade(other)
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+	if isMajor {
+		return false, nil
+	}
+
+	isMinor, err := b.IsMinorUpgrade(other)
+	if err != nil {
+		return false, microerror.Maskf(invalidBundleError, err.Error())
+	}
+	if isMinor {
+		return false, nil
+	}
+
+	if bSemver.Patch < otherSemver.Patch {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func (b Bundle) Validate() error {
