@@ -1,6 +1,10 @@
-hash: 5ae760bb57983502080800d0fb28e0db8c757b54ae7c1c9e477d677676ad1094
-updated: 2017-10-23T18:19:53.35602745+02:00
+hash: b5bccbf03e02fb87ee49db770c792da6d247e4cf5b713e514bc31c314afb0df3
+updated: 2017-10-27T14:57:04.740836597+02:00
 imports:
+- name: github.com/coreos/go-semver
+  version: 8ab6407b697782a06568d4b7f1db25550ec2e4c6
+  subpackages:
+  - semver
 - name: github.com/giantswarm/microerror
   version: 5ade94eb4ee35ef72eb9382228470caeddb29989
 - name: github.com/juju/errgo
@@ -8,5 +12,6 @@ imports:
 - name: github.com/kylelemons/godebug
   version: d65d576e9348f5982d7f6d83682b694e731a45c6
   subpackages:
+  - diff
   - pretty
 testImports: []
