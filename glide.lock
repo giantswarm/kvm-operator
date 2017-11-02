@@ -1,5 +1,5 @@
 hash: e4713821f0bf46fa425f80249a00a1db0fa6a90edacef7b0718078edf35188c8
-updated: 2017-11-01T16:31:56.768383996+02:00
+updated: 2017-11-02T13:44:17.95794792+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -48,7 +48,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 2d36dfc765690d59c17b64ce127565602f27596a
+  version: 78ff383e001e386147e826708d4337cc840a4433
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
@@ -89,7 +89,7 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/micrologger
-  version: 8a69b2ab80ba2d0bd40d609206518fefacfc8fdf
+  version: 954d1261928bbb50dc917c629edf0b71db6a1527
   subpackages:
   - microloggertest
 - name: github.com/giantswarm/microstorage
