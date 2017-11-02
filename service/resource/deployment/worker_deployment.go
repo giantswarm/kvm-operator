@@ -92,7 +92,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									"-c",
 									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + key.NetworkBridgeName(customObject) +
 										" --service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject) +
-										" --service.kubernetes.cluster.service=" + key.MasterID +
+										" --service.kubernetes.cluster.service=" + key.WorkerID +
 										" --service.kubernetes.inCluster=true" +
 										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
