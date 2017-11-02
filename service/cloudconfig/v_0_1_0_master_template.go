@@ -190,6 +190,16 @@ WantedBy=multi-user.target
 			Name:   "etc-kubernetes-data-etcd.mount",
 			Enable: false,
 		},
+		{
+			Name:    "iscsid.service",
+			Enable:  true,
+			Command: "start",
+		},
+		{
+			Name:    "multipathd.service",
+			Enable:  true,
+			Command: "start",
+		},
 	}
 
 	var newUnits []k8scloudconfig.UnitAsset
