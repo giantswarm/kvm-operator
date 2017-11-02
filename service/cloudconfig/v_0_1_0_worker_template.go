@@ -121,7 +121,36 @@ func (e *v_0_1_0WorkerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 }
 
 func (e *v_0_1_0WorkerExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
-	return nil, nil
+	unitsMeta := []k8scloudconfig.UnitMetadata{
+		{
+			Name:    "iscsid.service",
+			Enable:  true,
+			Command: "start",
+		},
+		{
+			Name:    "multipathd.service",
+			Enable:  true,
+			Command: "start",
+		},
+	}
+
+	var newUnits []k8scloudconfig.UnitAsset
+
+	for _, fm := range unitsMeta {
+		c, err := k8scloudconfig.RenderAssetContent(fm.AssetContent, nil)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		unitAsset := k8scloudconfig.UnitAsset{
+			Metadata: fm,
+			Content:  c,
+		}
+
+		newUnits = append(newUnits, unitAsset)
+	}
+
+	return newUnits, nil
 }
 
 func (e *v_0_1_0WorkerExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
