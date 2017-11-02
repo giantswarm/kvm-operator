@@ -122,13 +122,13 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Image:           customObject.Spec.KVM.EndpointUpdater.Docker.Image,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								Command: []string{
-									"/opt/k8s-endpoint-updater",
-									"update",
-									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
-									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
-									"--service.kubernetes.cluster.service=" + key.MasterID,
-									"--service.kubernetes.inCluster=true",
-									"--service.kubernetes.pod.name=${POD_NAME}",
+									"/bin/sh",
+									"-c",
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + key.NetworkBridgeName(customObject) +
+										" --service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject) +
+										" --service.kubernetes.cluster.service=" + key.MasterID +
+										" --service.kubernetes.inCluster=true" +
+										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
