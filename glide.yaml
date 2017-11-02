@@ -5,14 +5,15 @@ import:
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
-  version: master
+  version: 6ed6f05e679d8c9d07e6176e138f89bdea3e24bc
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/kvmtpr
   version: master
-# Pinned to a version before RBAC magic came in.
+# Pinned to a branch with disabled RBAC.
+# Make sure to rebase k8scloudconfig "kvm-operator-disable-rbac" with "master"
 - package: github.com/giantswarm/k8scloudconfig
-  version: 2698afb73c5e231611fae787ec6e1ebe015c41c0
+  version: kvm-operator-disable-rbac
 - package: github.com/giantswarm/k8shealthz
   version: master
 - package: github.com/giantswarm/microendpoint
@@ -20,4 +21,6 @@ import:
 - package: github.com/giantswarm/microerror
   version: master
 - package: github.com/giantswarm/micrologger
+  version: master
+- package: github.com/giantswarm/versionbundle
   version: master

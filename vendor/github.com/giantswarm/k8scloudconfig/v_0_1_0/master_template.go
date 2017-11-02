@@ -10,14 +10,164 @@ users:
        - "{{ $user.PublicKey }}"
 {{end}}
 write_files:
-- path: /srv/calico-policy-controller-sa.yaml
+- path: /srv/calico-ipip-pinger-sa.yaml
   owner: root
   permissions: 644
   content: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
-      name: calico-policy-controller
+      name: calico-ipip-pinger
+      namespace: kube-system
+- path: /srv/calico-ipip-pinger.yaml
+  owner: root
+  permissions: 644
+  content: |
+    apiVersion: extensions/v1beta1
+    kind: DaemonSet
+    metadata:
+      labels:
+        app: calico-ipip-pinger
+      name: calico-ipip-pinger
+      namespace: kube-system
+    spec:
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 1
+      template:
+        metadata:
+          labels:
+            app: calico-ipip-pinger
+        spec:
+          serviceAccountName: calico-ipip-pinger
+          containers:
+          - name: calico-ipip-pinger
+            image: quay.io/giantswarm/calico-ipip-pinger:0f197abe866c7c811e42534739148345cb3bded5
+            imagePullPolicy: Always
+            securityContext:
+              privileged: true
+            env:
+              # The location of the Calico etcd cluster.
+              - name: ETCD_ENDPOINTS
+                valueFrom:
+                  configMapKeyRef:
+                    name: calico-config
+                    key: etcd_endpoints
+              # Location of the CA certificate for etcd.
+              - name: ETCD_CA_CERT_FILE
+                valueFrom:
+                  configMapKeyRef:
+                    name: calico-config
+                    key: etcd_ca
+              # Location of the client key for etcd.
+              - name: ETCD_KEY_FILE
+                valueFrom:
+                  configMapKeyRef:
+                    name: calico-config
+                    key: etcd_key
+              # Location of the client certificate for etcd.
+              - name: ETCD_CERT_FILE
+                valueFrom:
+                  configMapKeyRef:
+                    name: calico-config
+                    key: etcd_cert
+            volumeMounts:
+              # Mount in the etcd TLS secrets.
+              - mountPath: /etc/kubernetes/ssl/etcd
+                name: etcd-certs
+          volumes:
+            # Mount in the etcd TLS secrets.
+            - name: etcd-certs
+              hostPath:
+                path: /etc/kubernetes/ssl/etcd
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/master
+            operator: Exists
+          hostNetwork: true
+          restartPolicy: Always
+- path: /srv/calico-node-controller-sa.yaml
+  owner: root
+  permissions: 644
+  content: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: calico-node-controller
+      namespace: kube-system
+- path: /srv/calico-node-controller.yaml
+  owner: root
+  permissions: 644
+  content: |
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    metadata:
+      name: calico-node-controller
+      namespace: kube-system
+      labels:
+        k8s-app: calico-node-controller
+    spec:
+      replicas: 1
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          name: calico-node-controller
+          namespace: kube-system
+          labels:
+            k8s-app: calico-node-controller
+        spec:
+          serviceAccountName: calico-node-controller
+          containers:
+            - name: calico-node-controller
+              image: quay.io/giantswarm/calico-node-controller
+              env:
+                # The location of the Calico etcd cluster.
+                - name: ETCD_ENDPOINTS
+                  valueFrom:
+                    configMapKeyRef:
+                      name: calico-config
+                      key: etcd_endpoints
+                # Location of the CA certificate for etcd.
+                - name: ETCD_CA_CERT_FILE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: calico-config
+                      key: etcd_ca
+                # Location of the client key for etcd.
+                - name: ETCD_KEY_FILE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: calico-config
+                      key: etcd_key
+                # Location of the client certificate for etcd.
+                - name: ETCD_CERT_FILE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: calico-config
+                      key: etcd_cert
+                # The location of the Kubernetes API.  Use the default Kubernetes
+                # service for API access.
+                - name: K8S_API
+                  value: "https://kubernetes.default:443"
+              volumeMounts:
+                # Mount in the etcd TLS secrets.
+                - mountPath: /etc/kubernetes/ssl/etcd
+                  name: etcd-certs
+          volumes:
+            # Mount in the etcd TLS secrets.
+            - name: etcd-certs
+              hostPath:
+                path: /etc/kubernetes/ssl/etcd
+- path: /srv/calico-kube-controllers-sa.yaml
+  owner: root
+  permissions: 644
+  content: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: calico-kube-controllers
       namespace: kube-system
 - path: /srv/calico-node-sa.yaml
   owner: root
@@ -32,12 +182,12 @@ write_files:
   owner: root
   permissions: 644
   content: |
-    # Calico Version v2.5.1
-    # https://docs.projectcalico.org/v2.5/releases#v2.5.1
+    # Calico Version v2.6.2
+    # https://docs.projectcalico.org/v2.6/releases#v2.6.2
     # This manifest includes the following component versions:
-    #   calico/node:v2.5.1
-    #   calico/cni:v1.10.0
-    #   calico/kube-policy-controller:v0.7.0
+    #   calico/node:v2.6.2
+    #   calico/cni:v1.11.0
+    #   calico/kube-controllers:v1.0.0
 
     # This ConfigMap is used to configure a self-hosted Calico installation.
     kind: ConfigMap
@@ -126,7 +276,7 @@ write_files:
             # container programs network policy and routes on each
             # host.
             - name: calico-node
-              image: quay.io/calico/node:v2.5.1
+              image: quay.io/calico/node:v2.6.2
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -215,7 +365,7 @@ write_files:
             # This container installs the Calico CNI binaries
             # and CNI network config file on each node.
             - name: install-cni
-              image: quay.io/calico/cni:v1.10.0
+              image: quay.io/calico/cni:v1.11.0
               command: ["/install-cni.sh"]
               env:
                 # The location of the Calico etcd cluster.
@@ -272,24 +422,21 @@ write_files:
             - name: cni-net-dir
               hostPath:
                path: /etc/cni/net.d
-- path: /srv/calico-policy-controller.yaml
+- path: /srv/calico-kube-controllers.yaml
   owner: root
   permissions: 644
   content: |
-    # This manifest deploys the Calico policy controller on Kubernetes.
-    # See https://github.com/projectcalico/k8s-policy
+    # This manifest deploys the Calico Kubernetes controllers.
+    # See https://github.com/projectcalico/kube-controllers
     apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
-      name: calico-policy-controller
+      name: calico-kube-controllers
       namespace: kube-system
       labels:
-        k8s-app: calico-policy
+        k8s-app: calico-kube-controllers
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
-        scheduler.alpha.kubernetes.io/tolerations: |
-          [{"key": "dedicated", "value": "master", "effect": "NoSchedule" },
-           {"key":"CriticalAddonsOnly", "operator":"Exists"}]
     spec:
       # The policy controller can only have a single active instance.
       replicas: 1
@@ -297,18 +444,24 @@ write_files:
         type: Recreate
       template:
         metadata:
-          name: calico-policy-controller
+          name: calico-kube-controllers
           namespace: kube-system
           labels:
-            k8s-app: calico-policy
+            k8s-app: calico-kube-controllers
         spec:
-          # The policy controller must run in the host network namespace so that
+          tolerations:
+          - key: node-role.kubernetes.io/master
+            operator: Exists
+            effect: NoSchedule
+          - key: CriticalAddonsOnly
+            operator: Exists
+          # The controllers must run in the host network namespace so that
           # it isn't governed by policy that would prevent it from working.
           hostNetwork: true
-          serviceAccountName: calico-policy-controller
+          serviceAccountName: calico-kube-controllers
           containers:
-            - name: calico-policy-controller
-              image: quay.io/calico/kube-policy-controller:v0.7.0
+            - name: calico-kube-controllers
+              image: quay.io/calico/kube-controllers:v1.0.0
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -334,7 +487,7 @@ write_files:
                     configMapKeyRef:
                       name: calico-config
                       key: etcd_cert
-                # The location of the Kubernetes API.  Use the default Kubernetes
+                # The location of the Kubernetes API. Use the default Kubernetes
                 # service for API access.
                 - name: K8S_API
                   value: "https://{{.Cluster.Kubernetes.API.Domain}}:443"
@@ -687,6 +840,7 @@ write_files:
                         values:
                         - nginx-ingress-controller
                   topologyKey: kubernetes.io/hostname
+          serviceAccountName: nginx-ingress-controller
           containers:
           - name: nginx-ingress-controller
             image: {{.Cluster.Kubernetes.IngressController.Docker.Image}}
@@ -746,6 +900,444 @@ write_files:
         targetPort: 443
       selector:
         k8s-app: nginx-ingress-controller
+- path: /srv/rbac_bindings.yaml
+  owner: root
+  permissions: 0644
+  content: |
+    ## User
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: giantswarm-admin
+    subjects:
+    - kind: User
+      name: {{.Cluster.Kubernetes.API.Domain}}
+      apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: cluster-admin
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    ## Worker
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: kubelet
+    subjects:
+    - kind: User
+      name: {{.Cluster.Kubernetes.Kubelet.Domain}}
+      apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: system:node
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: proxy
+    subjects:
+    - kind: User
+      name: {{.Cluster.Kubernetes.Kubelet.Domain}}
+      apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: system:node-proxier
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    ## Master
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: kube-controller-manager
+    subjects:
+    - kind: User
+      name: {{.Cluster.Kubernetes.API.Domain}}
+      apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: system:kube-controller-manager
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: kube-scheduler
+    subjects:
+    - kind: User
+      name: {{.Cluster.Kubernetes.API.Domain}}
+      apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: system:kube-scheduler
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    ## Calico
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: calico-kube-controllers
+    subjects:
+    - kind: ServiceAccount
+      name: calico-kube-controllers
+      namespace: kube-system
+    roleRef:
+      kind: ClusterRole
+      name: calico-kube-controllers
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: calico-node
+    subjects:
+    - kind: ServiceAccount
+      name: calico-node
+      namespace: kube-system
+    roleRef:
+      kind: ClusterRole
+      name: calico-node
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: calico-node-controller
+    subjects:
+    - kind: ServiceAccount
+      name: calico-node-controller
+      namespace: kube-system
+    roleRef:
+      kind: ClusterRole
+      name: calico-node-controller
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    ## DNS
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: kube-dns
+    subjects:
+    - kind: ServiceAccount
+      name: kube-dns
+      namespace: kube-system
+    roleRef:
+      kind: ClusterRole
+      name: system:kube-dns
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    ## IC
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: nginx-ingress-controller
+    subjects:
+    - kind: ServiceAccount
+      name: nginx-ingress-controller
+      namespace: kube-system
+    roleRef:
+      kind: ClusterRole
+      name: nginx-ingress-controller
+      apiGroup: rbac.authorization.k8s.io
+    ---
+    kind: RoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: nginx-ingress-controller
+      namespace: kube-system
+    subjects:
+    - kind: ServiceAccount
+      name: nginx-ingress-controller
+      namespace: kube-system
+    roleRef:
+      kind: Role
+      name: nginx-ingress-role
+      apiGroup: rbac.authorization.k8s.io
+- path: /srv/rbac_roles.yaml
+  owner: root
+  permissions: 0644
+  content: |
+    ## Calico
+    kind: ClusterRole
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: calico-kube-controllers
+      namespace: kube-system
+    rules:
+      - apiGroups:
+        - ""
+        - extensions
+        resources:
+          - pods
+          - namespaces
+          - networkpolicies
+        verbs:
+          - watch
+          - list
+    ---
+    kind: ClusterRole
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: calico-node
+      namespace: kube-system
+    rules:
+      - apiGroups: [""]
+        resources:
+          - pods
+          - nodes
+        verbs:
+          - get
+    ---
+    kind: ClusterRole
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    metadata:
+      name: calico-node-controller
+      namespace: kube-system
+    rules:
+      - apiGroups:
+        - ""
+        - extensions
+        resources:
+          - nodes
+        verbs:
+          - watch
+          - list
+    ---
+    ## IC
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: nginx-ingress-controller
+      namespace: kube-system
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRole
+    metadata:
+      name: nginx-ingress-controller
+      namespace: kube-system
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+          - endpoints
+          - nodes
+          - pods
+          - secrets
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resources:
+          - nodes
+        verbs:
+          - get
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - "extensions"
+        resources:
+          - ingresses
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resources:
+            - events
+        verbs:
+            - create
+            - patch
+      - apiGroups:
+          - "extensions"
+        resources:
+          - ingresses/status
+        verbs:
+          - update
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: Role
+    metadata:
+      name: nginx-ingress-role
+      namespace: kube-system
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+          - pods
+          - secrets
+          - namespaces
+        verbs:
+          - get
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        resourceNames:
+          # Defaults to "<election-id>-<ingress-class>"
+          # Here: "<ingress-controller-leader>-<nginx>"
+          # This has to be adapted if you change either parameter
+          # when launching the nginx-ingress-controller.
+          - "ingress-controller-leader-nginx"
+        verbs:
+          - get
+          - update
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - create
+      - apiGroups:
+          - ""
+        resources:
+          - endpoints
+        verbs:
+          - get
+          - create
+          - update
+- path: /srv/psp_policies.yaml
+  owner: root
+  permissions: 0644
+  content: |
+    apiVersion: extensions/v1beta1
+    kind: PodSecurityPolicy
+    metadata:
+      name: privileged
+    spec:
+      allowPrivilegeEscalation: true
+      fsGroup:
+        rule: RunAsAny
+      privileged: true
+      runAsUser:
+        rule: RunAsAny
+      seLinux:
+        rule: RunAsAny
+      supplementalGroups:
+        rule: RunAsAny
+      volumes:
+      - '*'
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true
+      hostPorts:
+      - min: 1
+        max: 65536
+    ---
+    apiVersion: extensions/v1beta1
+    kind: PodSecurityPolicy
+    metadata:
+      name: restricted
+    spec:
+      privileged: false
+      fsGroup:
+        rule: RunAsAny
+      runAsUser:
+        rule: RunAsAny
+      seLinux:
+        rule: RunAsAny
+      supplementalGroups:
+        rule: RunAsAny
+      volumes:
+      - 'emptyDir'
+      - 'secret'
+      - 'downwardAPI'
+      - 'configMap'
+      - 'persistentVolumeClaim'
+      - 'projected'
+      hostPID: false
+      hostIPC: false
+      hostNetwork: false
+- path: /srv/psp_roles.yaml
+  owner: root
+  permissions: 0644
+  content: |
+    # restrictedPSP grants access to use
+    # the restricted PSP.
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRole
+    metadata:
+      name: restricted-psp-user
+    rules:
+    - apiGroups:
+      - extensions
+      resources:
+      - podsecuritypolicies
+      resourceNames:
+      - restricted
+      verbs:
+      - use
+    ---
+    # privilegedPSP grants access to use the privileged
+    # PSP.
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRole
+    metadata:
+      name: privileged-psp-user
+    rules:
+    - apiGroups:
+      - extensions
+      resources:
+      - podsecuritypolicies
+      resourceNames:
+      - privileged
+      verbs:
+      - use
+- path: /srv/psp_binding.yaml
+  owner: root
+  permissions: 0644
+  content: |
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRoleBinding
+    metadata:
+        name: privileged-psp-users
+    subjects:
+    - kind: ServiceAccount
+      name: calico-node
+      namespace: kube-system
+    - kind: ServiceAccount
+      name: calico-kube-controllers
+      namespace: kube-system
+    - kind: ServiceAccount
+      name: calico-node-controller
+      namespace: kube-system
+    - kind: ServiceAccount
+      name: calico-ipip-pinger
+      namespace: kube-system
+    - kind: ServiceAccount
+      name: kube-dns
+      namespace: kube-system
+    - kind: ServiceAccount
+      name: nginx-ingress-controller
+      namespace: kube-system
+    roleRef:
+       apiGroup: rbac.authorization.k8s.io
+       kind: ClusterRole
+       name: privileged-psp-user
+    ---
+    # grants the restricted PSP role to
+    # the all authenticated users.
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: ClusterRoleBinding
+    metadata:
+        name: restricted-psp-users
+    subjects:
+    - kind: Group
+      apiGroup: rbac.authorization.k8s.io
+      name: system:authenticated
+    roleRef:
+       apiGroup: rbac.authorization.k8s.io
+       kind: ClusterRole
+       name: restricted-psp-user
 - path: /opt/wait-for-domains
   permissions: 0544
   content: |
@@ -764,15 +1356,38 @@ write_files:
   permissions: 0544
   content: |
       #!/bin/bash
-      KUBECTL={{.Cluster.Kubernetes.Kubectl.Docker.Image}}
+      # kubectl 1.8.1
+      KUBECTL=quay.io/giantswarm/docker-kubectl:1dc536ec6dc4597ba46769b3d5d6ce53a7e62038
 
       /usr/bin/docker pull $KUBECTL
 
       # wait for healthy master
       while [ "$(/usr/bin/docker run --net=host --rm $KUBECTL get cs | grep Healthy | wc -l)" -ne "3" ]; do sleep 1 && echo 'Waiting for healthy k8s'; done
 
+      # apply Security bootstrap (RBAC and PSP)
+      SECURITY_FILES="rbac_bindings.yaml rbac_roles.yaml psp_policies.yaml psp_roles.yaml psp_binding.yaml"
+
+      for manifest in $SECURITY_FILES
+      do
+          while
+              /usr/bin/docker run --net=host --rm -v /srv:/srv $KUBECTL apply -f /srv/$manifest
+              [ "$?" -ne "0" ]
+          do
+              echo "failed to apply /src/$manifest, retrying in 5 sec"
+              sleep 5s
+          done
+      done
+
       # apply calico CNI
-      CALICO_FILES="calico-configmap.yaml calico-node-sa.yaml calico-policy-controller-sa.yaml calico-ds.yaml calico-policy-controller.yaml"
+      CALICO_FILES="calico-configmap.yaml\
+       calico-node-sa.yaml\
+       calico-kube-controllers-sa.yaml\
+       calico-ds.yaml\
+       calico-kube-controllers.yaml\
+       calico-node-controller-sa.yaml\
+       calico-node-controller.yaml\
+       calico-ipip-pinger-sa.yaml\
+       calico-ipip-pinger.yaml"
 
       for manifest in $CALICO_FILES
       do
@@ -840,6 +1455,7 @@ write_files:
     - name: local
       cluster:
         certificate-authority: /etc/kubernetes/ssl/apiserver-ca.pem
+        server: https://{{.Cluster.Kubernetes.API.Domain}}
     contexts:
     - context:
         cluster: local
@@ -861,6 +1477,7 @@ write_files:
     - name: local
       cluster:
         certificate-authority: /etc/kubernetes/ssl/apiserver-ca.pem
+        server: https://{{.Cluster.Kubernetes.API.Domain}}
     contexts:
     - context:
         cluster: local
@@ -882,6 +1499,7 @@ write_files:
     - name: local
       cluster:
         certificate-authority: /etc/kubernetes/ssl/apiserver-ca.pem
+        server: https://{{.Cluster.Kubernetes.API.Domain}}
     contexts:
     - context:
         cluster: local
@@ -903,6 +1521,7 @@ write_files:
     - name: local
       cluster:
         certificate-authority: /etc/kubernetes/ssl/apiserver-ca.pem
+        server: https://{{.Cluster.Kubernetes.API.Domain}}
     contexts:
     - context:
         cluster: local
@@ -1020,6 +1639,7 @@ coreos:
       TimeoutStartSec=0
       ExecStart=/usr/bin/mkdir -p /etc/kubernetes/data/etcd
       ExecStart=/usr/bin/chown etcd:etcd /etc/kubernetes/data/etcd
+      ExecStart=/usr/bin/chmod -R 700 /etc/kubernetes/data/etcd
   - name: docker.service
     enable: true
     command: start
@@ -1168,13 +1788,12 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{.Cluster.Kubernetes.Hyperkube.Docker.Image}}"
+      Environment="IMAGE=quay.io/giantswarm/hyperkube:v1.8.1_coreos.0"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/docker pull $IMAGE
       ExecStartPre=-/usr/bin/docker stop -t 10 $NAME
       ExecStartPre=-/usr/bin/docker rm -f $NAME
-      ExecStartPre=/bin/sh -c "while ! curl --output /dev/null --silent --head --fail --cacert /etc/kubernetes/ssl/apiserver-ca.pem --cert /etc/kubernetes/ssl/apiserver-crt.pem --key /etc/kubernetes/ssl/apiserver-key.pem https://{{.Cluster.Kubernetes.API.Domain}}; do sleep 1 && echo 'Waiting for master'; done"
       ExecStart=/bin/sh -c "/usr/bin/docker run --rm --net=host --privileged=true \
       --name $NAME \
       -v /usr/share/ca-certificates:/etc/ssl/certs \
@@ -1182,7 +1801,6 @@ coreos:
       -v /etc/kubernetes/config/:/etc/kubernetes/config/ \
       $IMAGE \
       /hyperkube proxy \
-      --master=https://{{.Cluster.Kubernetes.API.Domain}} \
       --proxy-mode=iptables \
       --logtostderr=true \
       --kubeconfig=/etc/kubernetes/config/proxy-kubeconfig.yml \
@@ -1203,7 +1821,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{.Cluster.Kubernetes.Hyperkube.Docker.Image}}"
+      Environment="IMAGE=quay.io/giantswarm/hyperkube:v1.8.1_coreos.0"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/docker pull $IMAGE
@@ -1225,6 +1843,13 @@ coreos:
       -v /etc/kubernetes/config/:/etc/kubernetes/config/ \
       -v /etc/cni/net.d/:/etc/cni/net.d/ \
       -v /opt/cni/bin/:/opt/cni/bin/ \
+      -v /usr/sbin/iscsiadm:/usr/sbin/iscsiadm \
+      -v /etc/iscsi/:/etc/iscsi/ \
+      -v /dev/disk/by-path/:/dev/disk/by-path/ \
+      -v /dev/mapper/:/dev/mapper/ \
+      -v /usr/sbin/mkfs.xfs:/usr/sbin/mkfs.xfs \
+      -v /usr/lib64/libxfs.so.0:/usr/lib/libxfs.so.0 \
+      -v /usr/lib64/libxcmd.so.0:/usr/lib/libxcmd.so.0 \
       -e ETCD_CA_CERT_FILE=/etc/kubernetes/ssl/etcd/server-ca.pem \
       -e ETCD_CERT_FILE=/etc/kubernetes/ssl/etcd/server-crt.pem \
       -e ETCD_KEY_FILE=/etc/kubernetes/ssl/etcd/server-key.pem \
@@ -1234,7 +1859,6 @@ coreos:
       --address=${DEFAULT_IPV4} \
       --port={{.Cluster.Kubernetes.Kubelet.Port}} \
       --node-ip=${DEFAULT_IPV4} \
-      --api-servers=https://{{.Cluster.Kubernetes.API.Domain}} \
       --containerized \
       --enable-server \
       --logtostderr=true \
@@ -1290,7 +1914,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{.Cluster.Kubernetes.Hyperkube.Docker.Image}}"
+      Environment="IMAGE=quay.io/giantswarm/hyperkube:v1.8.1_coreos.0"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
@@ -1300,6 +1924,7 @@ coreos:
       ExecStart=/usr/bin/docker run --rm --name $NAME --net=host \
       -v /etc/kubernetes/ssl/:/etc/kubernetes/ssl/ \
       -v /etc/kubernetes/secrets/token_sign_key.pem:/etc/kubernetes/secrets/token_sign_key.pem \
+      -v /etc/kubernetes/encryption/:/etc/kubernetes/encryption \
       $IMAGE \
       /hyperkube apiserver \
       --allow_privileged=true \
@@ -1313,7 +1938,8 @@ coreos:
       --profiling=false \
       --repair-malformed-updates=false \
       --service-account-lookup=true \
-      --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass \
+      --authorization-mode=AlwaysAllow \
+      --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,PodSecurityPolicy \
       --cloud-provider={{.Cluster.Kubernetes.CloudProvider}} \
       --service-cluster-ip-range={{.Cluster.Kubernetes.API.ClusterIPRange}} \
       --etcd-servers=https://{{ .Cluster.Etcd.Domain }}:443 \
@@ -1346,7 +1972,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{.Cluster.Kubernetes.Hyperkube.Docker.Image}}"
+      Environment="IMAGE=quay.io/giantswarm/hyperkube:v1.8.1_coreos.0"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/docker pull $IMAGE
@@ -1358,7 +1984,6 @@ coreos:
       -v /etc/kubernetes/secrets/token_sign_key.pem:/etc/kubernetes/secrets/token_sign_key.pem \
       $IMAGE \
       /hyperkube controller-manager \
-      --master=https://{{.Cluster.Kubernetes.API.Domain}}:443 \
       --logtostderr=true \
       --v=2 \
       --cloud-provider={{.Cluster.Kubernetes.CloudProvider}} \
@@ -1383,7 +2008,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{.Cluster.Kubernetes.Hyperkube.Docker.Image}}"
+      Environment="IMAGE=quay.io/giantswarm/hyperkube:v1.8.1_coreos.0"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/docker pull $IMAGE
@@ -1394,7 +2019,6 @@ coreos:
       -v /etc/kubernetes/config/:/etc/kubernetes/config/ \
       $IMAGE \
       /hyperkube scheduler \
-      --master=https://{{.Cluster.Kubernetes.API.Domain}}:443 \
       --logtostderr=true \
       --v=2 \
       --profiling=false \

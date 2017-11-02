@@ -121,6 +121,14 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		}
 		deployments = append(deployments, workerDeployments...)
+
+		if key.HasNodeController(customObject) {
+			nodeControllerDeployment, err := newNodeControllerDeployment(customObject)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+			deployments = append(deployments, nodeControllerDeployment)
+		}
 	}
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("computed the %d new deployments", len(deployments)))

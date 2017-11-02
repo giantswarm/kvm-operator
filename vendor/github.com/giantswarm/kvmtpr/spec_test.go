@@ -18,8 +18,9 @@ import (
 	clustertprkubernetesssh "github.com/giantswarm/clustertpr/spec/kubernetes/ssh"
 	spec "github.com/giantswarm/kvmtpr/spec"
 	kvm "github.com/giantswarm/kvmtpr/spec/kvm"
-	endpointupdater "github.com/giantswarm/kvmtpr/spec/kvm/endpointupdater"
-	k8skvm "github.com/giantswarm/kvmtpr/spec/kvm/k8skvm"
+	"github.com/giantswarm/kvmtpr/spec/kvm/endpointupdater"
+	"github.com/giantswarm/kvmtpr/spec/kvm/k8skvm"
+	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
 	"github.com/kylelemons/godebug/pretty"
 	"github.com/stretchr/testify/require"
 )
@@ -140,6 +141,11 @@ func TestSpecYamlEncoding(t *testing.T) {
 					CPUs:   2,
 					Disk:   10,
 					Memory: "2G",
+				},
+			},
+			NodeController: kvm.NodeController{
+				nodecontroller.Docker{
+					Image: "quay.io/giantswarm/kvm-operator-node-controller",
 				},
 			},
 			Workers: []kvm.Node{
