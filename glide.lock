@@ -1,5 +1,5 @@
 hash: e4713821f0bf46fa425f80249a00a1db0fa6a90edacef7b0718078edf35188c8
-updated: 2017-11-03T14:25:06.563043235+01:00
+updated: 2017-11-03T15:33:17.279670981+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -109,7 +109,7 @@ imports:
   - informer
   - tpr
 - name: github.com/giantswarm/versionbundle
-  version: 9ef4a23c97c4dbabf4a152b8953a0a20d148ee26
+  version: efdbdae719c56ab4880f8fe56643d60a76fc19e5
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -242,6 +242,10 @@ imports:
   - idna
   - lex/httplex
   - publicsuffix
+- name: golang.org/x/sync
+  version: fd80eb99c8f653c847d294a001bdf2a3a6f768f5
+  subpackages:
+  - errgroup
 - name: golang.org/x/sys
   version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:
