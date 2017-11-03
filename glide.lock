@@ -1,5 +1,5 @@
 hash: e4713821f0bf46fa425f80249a00a1db0fa6a90edacef7b0718078edf35188c8
-updated: 2017-11-02T17:54:41.960403569+01:00
+updated: 2017-11-03T14:25:06.563043235+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -48,7 +48,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: afd33a7344789be3299ea05a034c09b4fa8518e3
+  version: 7336d366e94dc33ae827d3fac93fa8945ead9789
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
@@ -109,7 +109,7 @@ imports:
   - informer
   - tpr
 - name: github.com/giantswarm/versionbundle
-  version: 4d1e771cce94902dc952eed5deef58ebbcbb973f
+  version: 9ef4a23c97c4dbabf4a152b8953a0a20d148ee26
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -130,6 +130,8 @@ imports:
   version: 6aced65f8501fe1217321abf0749d354824ba2ff
 - name: github.com/go-openapi/swag
   version: 1d0bd113de87027671077d3c71eb3ac5d7dbba72
+- name: github.com/go-resty/resty
+  version: 9ac9c42358f7c3c69ac9f8610e8790d7c338e85d
 - name: github.com/go-stack/stack
   version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - name: github.com/gogo/protobuf
@@ -239,6 +241,7 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
+  - publicsuffix
 - name: golang.org/x/sys
   version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:
