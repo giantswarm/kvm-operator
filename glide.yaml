@@ -5,7 +5,7 @@ import:
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
-  version: 6ed6f05e679d8c9d07e6176e138f89bdea3e24bc
+  version: master
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/kvmtpr

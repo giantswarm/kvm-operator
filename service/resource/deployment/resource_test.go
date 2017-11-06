@@ -14,7 +14,7 @@ import (
 	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/operatorkit/framework/updateallowedcontext"
+	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -420,7 +420,7 @@ func Test_Resource_Deployment_GetCreateState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetCreateState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
+		result, err := newResource.newCreateChange(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
@@ -713,7 +713,7 @@ func Test_Resource_Deployment_GetDeleteState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetDeleteState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
+		result, err := newResource.newDeleteChange(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
@@ -735,12 +735,10 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 		Obj                         interface{}
 		CurrentState                interface{}
 		DesiredState                interface{}
-		ExpectedDeploymentsToCreate []*v1beta1.Deployment
-		ExpectedDeploymentsToDelete []*v1beta1.Deployment
 		ExpectedDeploymentsToUpdate []*v1beta1.Deployment
 	}{
-		// Test 1, in case current state and desired state are empty the create,
-		// delete and update state should be empty.
+		// Test 1, in case current state and desired state are empty the update
+		// state should be empty.
 		{
 			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
@@ -754,13 +752,11 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 			},
 			CurrentState:                []*v1beta1.Deployment{},
 			DesiredState:                []*v1beta1.Deployment{},
-			ExpectedDeploymentsToCreate: nil,
-			ExpectedDeploymentsToDelete: nil,
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 2, in case current state and desired state are equal the create,
-		// delete and update state should be empty.
+		// Test 2, in case current state and desired state are equal the update
+		// state should be empty.
 		{
 			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
@@ -832,226 +828,10 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToCreate: nil,
-			ExpectedDeploymentsToDelete: nil,
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 3, in case current state misses one item of desired state the delete
-		// state should not contain the missing item of the desired state.
-		{
-			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-					},
-				},
-			},
-			CurrentState: []*v1beta1.Deployment{},
-			DesiredState: []*v1beta1.Deployment{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "deployment-1",
-					},
-					Spec: extensionsv1.DeploymentSpec{
-						Template: apiv1.PodTemplateSpec{
-							Spec: apiv1.PodSpec{
-								Containers: []apiv1.Container{
-									{
-										Name: "deployment-1-container-1",
-									},
-								},
-								Volumes: []apiv1.Volume{
-									{
-										Name: "cloud-config",
-										VolumeSource: apiv1.VolumeSource{
-											ConfigMap: &apiv1.ConfigMapVolumeSource{
-												LocalObjectReference: apiv1.LocalObjectReference{
-													Name: "deployment-1-config-map-1",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			ExpectedDeploymentsToCreate: []*v1beta1.Deployment{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "deployment-1",
-					},
-					Spec: extensionsv1.DeploymentSpec{
-						Template: apiv1.PodTemplateSpec{
-							Spec: apiv1.PodSpec{
-								Containers: []apiv1.Container{
-									{
-										Name: "deployment-1-container-1",
-									},
-								},
-								Volumes: []apiv1.Volume{
-									{
-										Name: "cloud-config",
-										VolumeSource: apiv1.VolumeSource{
-											ConfigMap: &apiv1.ConfigMapVolumeSource{
-												LocalObjectReference: apiv1.LocalObjectReference{
-													Name: "deployment-1-config-map-1",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			ExpectedDeploymentsToDelete: nil,
-			ExpectedDeploymentsToUpdate: nil,
-		},
-
-		// Test 4, in case current state contains two items and desired state is
-		// missing one of them the delete state should contain the the missing item
-		// from the current state.
-		{
-			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-					},
-				},
-			},
-			CurrentState: []*v1beta1.Deployment{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "deployment-1",
-					},
-					Spec: extensionsv1.DeploymentSpec{
-						Template: apiv1.PodTemplateSpec{
-							Spec: apiv1.PodSpec{
-								Containers: []apiv1.Container{
-									{
-										Name: "deployment-1-container-1",
-									},
-								},
-								Volumes: []apiv1.Volume{
-									{
-										Name: "cloud-config",
-										VolumeSource: apiv1.VolumeSource{
-											ConfigMap: &apiv1.ConfigMapVolumeSource{
-												LocalObjectReference: apiv1.LocalObjectReference{
-													Name: "deployment-1-config-map-1",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "deployment-2",
-					},
-					Spec: extensionsv1.DeploymentSpec{
-						Template: apiv1.PodTemplateSpec{
-							Spec: apiv1.PodSpec{
-								Containers: []apiv1.Container{
-									{
-										Name: "deployment-2-container-2",
-									},
-								},
-								Volumes: []apiv1.Volume{
-									{
-										Name: "cloud-config",
-										VolumeSource: apiv1.VolumeSource{
-											ConfigMap: &apiv1.ConfigMapVolumeSource{
-												LocalObjectReference: apiv1.LocalObjectReference{
-													Name: "deployment-2-config-map-2",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			DesiredState: []*v1beta1.Deployment{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "deployment-1",
-					},
-					Spec: extensionsv1.DeploymentSpec{
-						Template: apiv1.PodTemplateSpec{
-							Spec: apiv1.PodSpec{
-								Containers: []apiv1.Container{
-									{
-										Name: "deployment-1-container-1",
-									},
-								},
-								Volumes: []apiv1.Volume{
-									{
-										Name: "cloud-config",
-										VolumeSource: apiv1.VolumeSource{
-											ConfigMap: &apiv1.ConfigMapVolumeSource{
-												LocalObjectReference: apiv1.LocalObjectReference{
-													Name: "deployment-1-config-map-1",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			ExpectedDeploymentsToCreate: nil,
-			ExpectedDeploymentsToDelete: []*v1beta1.Deployment{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "deployment-2",
-					},
-					Spec: extensionsv1.DeploymentSpec{
-						Template: apiv1.PodTemplateSpec{
-							Spec: apiv1.PodSpec{
-								Containers: []apiv1.Container{
-									{
-										Name: "deployment-2-container-2",
-									},
-								},
-								Volumes: []apiv1.Volume{
-									{
-										Name: "cloud-config",
-										VolumeSource: apiv1.VolumeSource{
-											ConfigMap: &apiv1.ConfigMapVolumeSource{
-												LocalObjectReference: apiv1.LocalObjectReference{
-													Name: "deployment-2-config-map-2",
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			ExpectedDeploymentsToUpdate: nil,
-		},
-
-		// Test 5, in case current state contains two items and desired state
+		// Test 3, in case current state contains two items and desired state
 		// contains the same state but one object is modified internally the update
 		// state should be empty in case updates are not allowed.
 		{
@@ -1181,12 +961,10 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToCreate: nil,
-			ExpectedDeploymentsToDelete: nil,
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 6, in case current state contains two items and desired state
+		// Test 4, in case current state contains two items and desired state
 		// contains the same state but one object is modified internally the update
 		// state should contain the the modified item from the current state.
 		{
@@ -1331,8 +1109,6 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToCreate: nil,
-			ExpectedDeploymentsToDelete: nil,
 			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
@@ -1365,7 +1141,7 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 			},
 		},
 
-		// Test 7, same as 6 but ensuring the right deployments are computed as
+		// Test 5, same as 4 but ensuring the right deployments are computed as
 		// update state when correspondig config names have changed.
 		{
 			Ctx: func() context.Context {
@@ -1509,8 +1285,6 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToCreate: nil,
-			ExpectedDeploymentsToDelete: nil,
 			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
@@ -1557,30 +1331,10 @@ func Test_Resource_Deployment_GetUpdateState(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		createState, deleteState, updateState, err := newResource.GetUpdateState(tc.Ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
+		updateState, err := newResource.newUpdateChange(tc.Ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("expected %#v got %#v", nil, err)
 		}
-
-		t.Run("deploymentsToCreate", func(t *testing.T) {
-			deploymentsToCreate, ok := createState.([]*v1beta1.Deployment)
-			if !ok {
-				t.Fatalf("expected %T got %T", []*v1beta1.Deployment{}, createState)
-			}
-			if !reflect.DeepEqual(deploymentsToCreate, tc.ExpectedDeploymentsToCreate) {
-				t.Fatalf("expected %#v got %#v", tc.ExpectedDeploymentsToCreate, deploymentsToCreate)
-			}
-		})
-
-		t.Run("deploymentsToDelete", func(t *testing.T) {
-			deploymentsToDelete, ok := deleteState.([]*v1beta1.Deployment)
-			if !ok {
-				t.Fatalf("expected %T got %T", []*v1beta1.Deployment{}, deleteState)
-			}
-			if !reflect.DeepEqual(deploymentsToDelete, tc.ExpectedDeploymentsToDelete) {
-				t.Fatalf("expected %#v got %#v", tc.ExpectedDeploymentsToDelete, deploymentsToDelete)
-			}
-		})
 
 		t.Run("deploymentsToUpdate", func(t *testing.T) {
 			deploymentsToUpdate, ok := updateState.([]*v1beta1.Deployment)

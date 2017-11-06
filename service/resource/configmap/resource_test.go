@@ -360,7 +360,7 @@ func Test_Resource_CloudConfig_GetCreateState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetCreateState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
+		result, err := newResource.newCreateChange(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
@@ -655,7 +655,7 @@ func Test_Resource_CloudConfig_GetDeleteState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.GetDeleteState(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
+		result, err := newResource.newDeleteChange(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
@@ -677,13 +677,11 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 		Obj                                  interface{}
 		CurrentState                         interface{}
 		DesiredState                         interface{}
-		ExpectedConfigMapsToCreate           []*apiv1.ConfigMap
-		ExpectedConfigMapsToDelete           []*apiv1.ConfigMap
 		ExpectedConfigMapsToUpdate           []*apiv1.ConfigMap
 		ExpectedMessageContextConfigMapNames []string
 	}{
-		// Test 1, in case current state and desired state are empty the create,
-		// delete and update state should be empty.
+		// Test 1, in case current state and desired state are empty the update
+		// state should be empty.
 		{
 			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
@@ -697,14 +695,12 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 			},
 			CurrentState:                         []*apiv1.ConfigMap{},
 			DesiredState:                         []*apiv1.ConfigMap{},
-			ExpectedConfigMapsToCreate:           nil,
-			ExpectedConfigMapsToDelete:           nil,
 			ExpectedConfigMapsToUpdate:           nil,
 			ExpectedMessageContextConfigMapNames: nil,
 		},
 
-		// Test 2, in case current state and desired state are equal the create,
-		// delete and update state should be empty.
+		// Test 2, in case current state and desired state are equal the update
+		// state should be empty.
 		{
 			Ctx: context.TODO(),
 			Obj: &kvmtpr.CustomObject{
@@ -736,109 +732,11 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToCreate:           nil,
-			ExpectedConfigMapsToDelete:           nil,
 			ExpectedConfigMapsToUpdate:           nil,
 			ExpectedMessageContextConfigMapNames: nil,
 		},
 
-		// Test 3, in case current state misses one item of desired state the delete
-		// state should not contain the missing item of the desired state.
-		{
-			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-					},
-				},
-			},
-			CurrentState: []*apiv1.ConfigMap{},
-			DesiredState: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-			},
-			ExpectedConfigMapsToCreate: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-			},
-			ExpectedConfigMapsToDelete:           nil,
-			ExpectedConfigMapsToUpdate:           nil,
-			ExpectedMessageContextConfigMapNames: nil,
-		},
-
-		// Test 4, in case current state contains two items and desired state is
-		// missing one of them the delete state should contain the the missing item
-		// from the current state.
-		{
-			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-					},
-				},
-			},
-			CurrentState: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-2",
-					},
-					Data: map[string]string{
-						"key2": "val2",
-					},
-				},
-			},
-			DesiredState: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-			},
-			ExpectedConfigMapsToCreate: nil,
-			ExpectedConfigMapsToDelete: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-2",
-					},
-					Data: map[string]string{
-						"key2": "val2",
-					},
-				},
-			},
-			ExpectedConfigMapsToUpdate:           nil,
-			ExpectedMessageContextConfigMapNames: nil,
-		},
-
-		// Test 5, in case current state contains two items and desired state is
+		// Test 3, in case current state contains two items and desired state is
 		// contains the same state but one object is modified internally the update
 		// state should contain the the modified item from the current state.
 		{
@@ -888,8 +786,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToCreate: nil,
-			ExpectedConfigMapsToDelete: nil,
 			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
@@ -903,7 +799,7 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 			ExpectedMessageContextConfigMapNames: nil,
 		},
 
-		// Test 6, same as 5 but ensuring the right config map names are written to
+		// Test 4, same as 3 but ensuring the right config map names are written to
 		// the message context.
 		{
 			Ctx: messagecontext.NewContext(context.Background(), messagecontext.NewMessage()),
@@ -952,8 +848,6 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToCreate: nil,
-			ExpectedConfigMapsToDelete: nil,
 			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
@@ -985,25 +879,9 @@ func Test_Resource_CloudConfig_GetUpdateState(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		createState, deleteState, updateState, err := newResource.GetUpdateState(tc.Ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
+		updateState, err := newResource.newUpdateChange(tc.Ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
-		}
-
-		configMapsToCreate, ok := createState.([]*apiv1.ConfigMap)
-		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, createState)
-		}
-		if !reflect.DeepEqual(configMapsToCreate, tc.ExpectedConfigMapsToCreate) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToCreate, configMapsToCreate)
-		}
-
-		configMapsToDelete, ok := deleteState.([]*apiv1.ConfigMap)
-		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, deleteState)
-		}
-		if !reflect.DeepEqual(configMapsToDelete, tc.ExpectedConfigMapsToDelete) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToDelete, configMapsToDelete)
 		}
 
 		configMapsToUpdate, ok := updateState.([]*apiv1.ConfigMap)
