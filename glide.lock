@@ -1,5 +1,5 @@
-hash: e4713821f0bf46fa425f80249a00a1db0fa6a90edacef7b0718078edf35188c8
-updated: 2017-11-03T15:33:17.279670981+01:00
+hash: c0b01acf2194ed9a45ea98b1c815daef0597b560a4ad5a8c5b687e1208c6a051
+updated: 2017-11-06T11:45:55.802629329+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -48,7 +48,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 7336d366e94dc33ae827d3fac93fa8945ead9789
+  version: 511e690a7372f44602e14661a2f13a7abcaab9ea
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
@@ -97,15 +97,15 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 6ed6f05e679d8c9d07e6176e138f89bdea3e24bc
+  version: 7fed726ca23a9ae0f6e26c0b430ce7c2ed249b26
   subpackages:
-  - client/k8s
+  - client/k8sclient
   - framework
-  - framework/canceledcontext
-  - framework/logresource
-  - framework/metricsresource
-  - framework/retryresource
-  - framework/updateallowedcontext
+  - framework/context/canceledcontext
+  - framework/context/updateallowedcontext
+  - framework/resource/logresource
+  - framework/resource/metricsresource
+  - framework/resource/retryresource
   - informer
   - tpr
 - name: github.com/giantswarm/versionbundle
@@ -200,13 +200,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 1bab55dd05dbff384524a6a1c99006d9eb5f139b
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a6e9df898b1336106c743392c48ee0b71f5c4efa
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
