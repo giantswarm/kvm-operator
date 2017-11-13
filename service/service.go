@@ -271,7 +271,7 @@ func New(config Config) (*Service, error) {
 	var frameworkBackOff *backoff.ExponentialBackOff
 	{
 		frameworkBackOff = backoff.NewExponentialBackOff()
-		frameworkBackOff.MaxElapsedTime = 5 * time.Minute
+		frameworkBackOff.MaxElapsedTime = 0 // retry forever
 	}
 
 	var operatorFramework *framework.Framework
