@@ -110,13 +110,6 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 	for _, currentDeployment := range currentDeployments {
 		if !containsDeployment(desiredDeployments, currentDeployment) {
 			deploymentsToDelete = append(deploymentsToDelete, currentDeployment)
-			fmt.Printf("selecting start\n")
-			fmt.Printf("%#v\n", currentDeployment)
-			fmt.Printf("selecting end\n")
-		} else {
-			fmt.Printf("ignoring start\n")
-			fmt.Printf("%#v\n", currentDeployment)
-			fmt.Printf("ignoring end\n")
 		}
 	}
 

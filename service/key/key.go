@@ -42,22 +42,6 @@ func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
 }
 
-func DeploymentNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, masterNode := range customObject.Spec.Cluster.Masters {
-		names = append(names, DeploymentName(MasterID, masterNode.ID))
-	}
-
-	names = append(names, NodeControllerID)
-
-	for _, workerNode := range customObject.Spec.Cluster.Workers {
-		names = append(names, DeploymentName(WorkerID, workerNode.ID))
-	}
-
-	return names
-}
-
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
