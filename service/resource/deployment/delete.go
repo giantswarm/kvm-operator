@@ -28,7 +28,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToDelete {
-			err := r.k8sClient.Extensions().Deployments(namespace).Delete(deployment.Name, &apismetav1.DeleteOptions{})
+			err := r.k8sClient.Extensions().Deployments(namespace).Delete(deployment.Name, newDeleteOptions())
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -123,4 +123,14 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
 
 	return deploymentsToDelete, nil
+}
+
+func newDeleteOptions() *apismetav1.DeleteOptions {
+	propagation := apismetav1.DeletePropagationForeground
+
+	options := &apismetav1.DeleteOptions{
+		PropagationPolicy: &propagation,
+	}
+
+	return options
 }
