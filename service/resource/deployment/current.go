@@ -28,7 +28,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else {
 			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found a list of deployments in the Kubernetes API")
 
-			for _, d := range deploymentList.Items {
+			for _, item := range deploymentList.Items {
+				d := item
+				fmt.Printf("item start\n")
+				fmt.Printf("%#v\n", d)
+				fmt.Printf("item end\n")
 				currentDeployments = append(currentDeployments, &d)
 			}
 		}

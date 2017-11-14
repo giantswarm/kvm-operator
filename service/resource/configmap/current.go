@@ -32,7 +32,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else {
 			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found a list of config maps in the Kubernetes API")
 
-			for _, c := range configMapList.Items {
+			for _, item := range configMapList.Items {
+				c := item
+				fmt.Printf("item start\n")
+				fmt.Printf("%#v\n", c)
+				fmt.Printf("item end\n")
 				currentConfigMaps = append(currentConfigMaps, &c)
 			}
 		}
