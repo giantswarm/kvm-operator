@@ -38,6 +38,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
+	fmt.Printf("current state start\n")
+	fmt.Printf("%#v\n", deployments)
+	fmt.Printf("current state end\n")
+
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments in the Kubernetes API", len(deployments)))
 
 	return deployments, nil

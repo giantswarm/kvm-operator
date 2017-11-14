@@ -18,6 +18,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
+	fmt.Printf("custom object state start\n")
+	fmt.Printf("%#v\n", customObject)
+	fmt.Printf("custom object state end\n")
+
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "looking for config maps in the Kubernetes API")
 
 	var configMaps []*apiv1.ConfigMap
@@ -37,6 +41,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			configMaps = append(configMaps, manifest)
 		}
 	}
+
+	fmt.Printf("current state start\n")
+	fmt.Printf("%#v\n", configMaps)
+	fmt.Printf("current state end\n")
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps in the Kubernetes API", len(configMaps)))
 

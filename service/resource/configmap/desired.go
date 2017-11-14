@@ -26,6 +26,10 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
+	fmt.Printf("desired state start\n")
+	fmt.Printf("%#v\n", configMaps)
+	fmt.Printf("desired state end\n")
+
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("computed the %d new config maps", len(configMaps)))
 
 	return configMaps, nil

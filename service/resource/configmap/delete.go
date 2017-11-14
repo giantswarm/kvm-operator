@@ -107,6 +107,13 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 	for _, currentConfigMap := range currentConfigMaps {
 		if !containsConfigMap(desiredConfigMaps, currentConfigMap) {
 			configMapsToDelete = append(configMapsToDelete, currentConfigMap)
+			fmt.Printf("selecting start\n")
+			fmt.Printf("%#v\n", currentConfigMap)
+			fmt.Printf("selecting end\n")
+		} else {
+			fmt.Printf("ignoring start\n")
+			fmt.Printf("%#v\n", currentConfigMap)
+			fmt.Printf("ignoring end\n")
 		}
 	}
 

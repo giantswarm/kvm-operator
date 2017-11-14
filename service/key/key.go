@@ -65,6 +65,8 @@ func DeploymentNames(customObject kvmtpr.CustomObject) []string {
 		names = append(names, DeploymentName(MasterID, masterNode.ID))
 	}
 
+	names = append(names, NodeControllerID)
+
 	for _, workerNode := range customObject.Spec.Cluster.Workers {
 		names = append(names, DeploymentName(WorkerID, workerNode.ID))
 	}
