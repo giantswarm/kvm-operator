@@ -65,5 +65,9 @@ func newNodeControllerDeployment(customObject kvmtpr.CustomObject) (*extensionsv
 		},
 	}
 
+	fmt.Printf("desired state start\n")
+	fmt.Printf("%#v\n", deployment)
+	fmt.Printf("desired state end\n")
+
 	return deployment, nil
 }

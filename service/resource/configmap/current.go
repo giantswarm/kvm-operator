@@ -27,24 +27,30 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var configMaps []*apiv1.ConfigMap
 
 	namespace := key.ClusterNamespace(customObject)
+	// TODO we have to fetch all config maps within the namespace.
 	configMapNames := key.ConfigMapNames(customObject)
+
+	fmt.Printf("%#v\n", configMapNames)
 
 	for _, name := range configMapNames {
 		manifest, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Get(name, apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "did not find a config map in the Kubernetes API")
+			fmt.Printf("current state start\n")
+			fmt.Printf("%#v\n", name)
+			fmt.Printf("current state end\n")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
 			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found a config map in the Kubernetes API")
+			fmt.Printf("current state start\n")
+			fmt.Printf("%#v\n", manifest)
+			fmt.Printf("current state end\n")
+
 			configMaps = append(configMaps, manifest)
 		}
 	}
-
-	fmt.Printf("current state start\n")
-	fmt.Printf("%#v\n", configMaps)
-	fmt.Printf("current state end\n")
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps in the Kubernetes API", len(configMaps)))
 
