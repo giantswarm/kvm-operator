@@ -261,15 +261,6 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var frameworkBackOffFactory func() backoff.BackOff
-	{
-		frameworkBackOffFactory = func() backoff.BackOff {
-			b := backoff.NewExponentialBackOff()
-			b.MaxElapsedTime = 5 * time.Minute
-			return b
-		}
-	}
-
 	var newTPR *tpr.TPR
 	{
 		c := tpr.DefaultConfig()
@@ -322,7 +313,7 @@ func New(config Config) (*Service, error) {
 	{
 		c := framework.DefaultConfig()
 
-		c.BackOffFactory = frameworkBackOffFactory
+		c.BackOffFactory = framework.DefaultBackOffFactory()
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
