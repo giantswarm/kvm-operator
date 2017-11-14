@@ -1,5 +1,5 @@
-hash: c0b01acf2194ed9a45ea98b1c815daef0597b560a4ad5a8c5b687e1208c6a051
-updated: 2017-11-13T09:22:31.361142435+01:00
+hash: 0328b6701eb3b576ff6682920771d79d20bf142aff5d2811c68e7c5532d174e0
+updated: 2017-11-14T12:46:17.680536935+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -33,7 +33,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/certificatetpr
-  version: 7ca1d560db684dd4e2effc49ae0ceeaae2963f5e
+  version: 72f3cbaf3beacc88d9ef59efeacaf028f2af59d0
   subpackages:
   - certificatetprtest
 - name: github.com/giantswarm/clustertpr
@@ -54,7 +54,7 @@ imports:
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
-  version: accb353f46cbeecb5c7799e0411b3feb6bb40f47
+  version: 74a5b0d3bf62eb92711c99c1e335b2143a90a67e
   subpackages:
   - spec
   - spec/kvm
@@ -97,7 +97,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 93c9638ca2fd14a9482acb7d8c26f599d6d808a5
+  version: 4cbe437f639212e9e72c08ea277cf4fe130e182e
   subpackages:
   - client/k8sclient
   - framework
@@ -109,7 +109,7 @@ imports:
   - informer
   - tpr
 - name: github.com/giantswarm/versionbundle
-  version: 9fa378d39ae958ea6a1e9dd15a0137ca72c18d2e
+  version: 81ac8381f028dfb2602413c890509c0967db92f3
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -266,7 +266,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
 - name: k8s.io/apimachinery
   version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
