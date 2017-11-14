@@ -317,7 +317,7 @@ func New(config Config) (*Service, error) {
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
-		c.ResourceRouter = framework.NewDefaultResourceRouter(resources)
+		c.ResourceRouter = framework.DefaultResourceRouter(resources)
 		c.TPR = newTPR
 
 		operatorFramework, err = framework.New(c)
