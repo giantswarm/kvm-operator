@@ -56,6 +56,8 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 	return patch, nil
 }
 
+// newDeleteChangeForDeletePatch is used on delete events to get rid of all
+// deployments.
 func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
 	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
@@ -85,6 +87,8 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 	return deploymentsToDelete, nil
 }
 
+// newDeleteChangeForUpdatePatch is used on update events to scale down
+// deployments.
 func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
 	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
