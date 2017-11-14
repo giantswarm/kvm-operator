@@ -220,10 +220,6 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 			},
 		}
 
-		fmt.Printf("desired state start\n")
-		fmt.Printf("%#v\n", deployment)
-		fmt.Printf("desired state end\n")
-
 		deployments = append(deployments, deployment)
 	}
 
