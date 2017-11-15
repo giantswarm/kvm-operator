@@ -65,6 +65,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 					"customer": key.ClusterCustomer(customObject),
 					"app":      key.MasterID,
 					"node":     masterNode.ID,
+					VersionBundleVersionLabel: key.VersionBundleVersion(customObject),
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{

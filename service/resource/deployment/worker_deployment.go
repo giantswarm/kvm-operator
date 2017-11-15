@@ -32,6 +32,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),
 					"node":     workerNode.ID,
+					VersionBundleVersionLabel: key.VersionBundleVersion(customObject),
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{
