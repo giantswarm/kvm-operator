@@ -1,5 +1,5 @@
 hash: c0b01acf2194ed9a45ea98b1c815daef0597b560a4ad5a8c5b687e1208c6a051
-updated: 2017-11-14T15:11:53.263238399+01:00
+updated: 2017-11-15T16:43:55.021126Z
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -62,7 +62,7 @@ imports:
   - spec/kvm/k8skvm
   - spec/kvm/nodecontroller
 - name: github.com/giantswarm/microendpoint
-  version: d656a166a5c2a5caa1eea316f884939b7746cea7
+  version: 26dce6e1681c27e7a150bccedb82a45109a0a6be
   subpackages:
   - endpoint/healthz
   - endpoint/version
