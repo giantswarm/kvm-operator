@@ -295,7 +295,7 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		result, err := newResource.newDeleteChange(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
+		result, err := newResource.newDeleteChangeForDeletePatch(context.TODO(), tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}

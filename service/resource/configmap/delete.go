@@ -46,7 +46,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 }
 
 func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*framework.Patch, error) {
-	delete, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
+	delete, err := r.newDeleteChangeForDeletePatch(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -57,7 +57,7 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 	return patch, nil
 }
 
-func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
+func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
 	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -77,6 +77,35 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 	for _, currentConfigMap := range currentConfigMaps {
 		if containsConfigMap(desiredConfigMaps, currentConfigMap) {
+			configMapsToDelete = append(configMapsToDelete, currentConfigMap)
+		}
+	}
+
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToDelete)))
+
+	return configMapsToDelete, nil
+}
+
+func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
+	customObject, err := key.ToCustomObject(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	currentConfigMaps, err := toConfigMaps(currentState)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	desiredConfigMaps, err := toConfigMaps(desiredState)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be deleted")
+
+	var configMapsToDelete []*apiv1.ConfigMap
+
+	for _, currentConfigMap := range currentConfigMaps {
+		if !containsConfigMap(desiredConfigMaps, currentConfigMap) {
 			configMapsToDelete = append(configMapsToDelete, currentConfigMap)
 		}
 	}

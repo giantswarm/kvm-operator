@@ -38,38 +38,8 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
-func ConfigMapNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, node := range customObject.Spec.Cluster.Masters {
-		name := ConfigMapName(customObject, node, MasterID)
-		names = append(names, name)
-	}
-
-	for _, node := range customObject.Spec.Cluster.Workers {
-		name := ConfigMapName(customObject, node, WorkerID)
-		names = append(names, name)
-	}
-
-	return names
-}
-
 func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
-}
-
-func DeploymentNames(customObject kvmtpr.CustomObject) []string {
-	var names []string
-
-	for _, masterNode := range customObject.Spec.Cluster.Masters {
-		names = append(names, DeploymentName(MasterID, masterNode.ID))
-	}
-
-	for _, workerNode := range customObject.Spec.Cluster.Workers {
-		names = append(names, DeploymentName(WorkerID, workerNode.ID))
-	}
-
-	return names
 }
 
 func EtcdPVCName(clusterID string, vmNumber string) string {
