@@ -113,6 +113,10 @@ func ToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
 	return customObject, nil
 }
 
+func VersionBundleVersion(customObject kvmtpr.CustomObject) string {
+	return customObject.Spec.VersionBundle.Version
+}
+
 func VMNumber(ID int) string {
 	return fmt.Sprintf("%d", ID)
 }
