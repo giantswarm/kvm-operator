@@ -34,7 +34,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 				major, minor, patch, err := getVersionBundleVersionInfos(d.Labels)
 				if err != nil {
-					r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot to update current version bundle version metric for guest cluster: %#v", err))
+					r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric for guest cluster: %#v", err))
 				} else {
 					updateVersionBundleVersionMetric(major, minor, patch)
 				}
