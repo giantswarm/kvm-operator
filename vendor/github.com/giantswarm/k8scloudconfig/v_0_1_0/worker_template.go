@@ -331,7 +331,7 @@ coreos:
   - name: k8s-proxy-watcher.service
     enable: true
     command: start
-    [Unit]
+      [Unit]
       Description=k8s-proxy-watcher
       Wants=k8s-kubelet.service
       After=k8s-kubelet.service
