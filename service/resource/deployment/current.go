@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/prometheus/client_golang/prometheus"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -35,10 +36,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 				currentDeployments = append(currentDeployments, &d)
 			}
 
-			err := updateVersionBundleVersionGauge(versionBundleVersionGauge, currentDeployments)
-			if err != nil {
-				r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: %s", err.Error()))
-			}
+			r.updateVersionBundleVersionGauge(customObject, versionBundleVersionGauge, currentDeployments)
 		}
 	}
 
@@ -47,13 +45,14 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	return currentDeployments, nil
 }
 
-func updateVersionBundleVersionGauge(gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) error {
+func (r *Resource) updateVersionBundleVersionGauge(customObject kvmtpr.CustomObject, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
 	versionCounts := map[string]float64{}
 
 	for _, d := range deployments {
 		version, ok := d.Labels[VersionBundleVersionLabel]
 		if !ok {
-			return microerror.Maskf(executionFailedError, "label '%s' must not be empty", VersionBundleVersionLabel)
+			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: label '%s' must not be empty", VersionBundleVersionLabel))
+			continue
 		} else {
 			count, ok := versionCounts[version]
 			if !ok {
@@ -67,7 +66,8 @@ func updateVersionBundleVersionGauge(gauge *prometheus.GaugeVec, deployments []*
 	for version, count := range versionCounts {
 		split := strings.Split(version, ".")
 		if len(split) != 3 {
-			return microerror.Maskf(executionFailedError, "invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version)
+			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
+			continue
 		}
 
 		major := split[0]
@@ -76,6 +76,4 @@ func updateVersionBundleVersionGauge(gauge *prometheus.GaugeVec, deployments []*
 
 		gauge.WithLabelValues(major, minor, patch).Set(count)
 	}
-
-	return nil
 }
