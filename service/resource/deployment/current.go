@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/giantswarm/microerror"
+	"github.com/prometheus/client_golang/prometheus"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
@@ -31,15 +32,12 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 			for _, item := range deploymentList.Items {
 				d := item
-
-				major, minor, patch, err := getVersionBundleVersionInfos(d.Labels)
-				if err != nil {
-					r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric for guest cluster: %#v", err))
-				} else {
-					updateVersionBundleVersionMetric(major, minor, patch)
-				}
-
 				currentDeployments = append(currentDeployments, &d)
+			}
+
+			err := updateVersionBundleVersionGauge(versionBundleVersionGauge, currentDeployments)
+			if err != nil {
+				return nil, microerror.Mask(err)
 			}
 		}
 	}
@@ -49,20 +47,35 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	return currentDeployments, nil
 }
 
-func getVersionBundleVersionInfos(labels map[string]string) (string, string, string, error) {
-	version, ok := labels[VersionBundleVersionLabel]
-	if !ok {
-		return "", "", "", microerror.Maskf(executionFailedError, "label '%s' must not be empty", VersionBundleVersionLabel)
+func updateVersionBundleVersionGauge(gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) error {
+	versionCounts := map[string]float64{}
+
+	for _, d := range deployments {
+		version, ok := d.Labels[VersionBundleVersionLabel]
+		if !ok {
+			return microerror.Maskf(executionFailedError, "label '%s' must not be empty", VersionBundleVersionLabel)
+		} else {
+			count, ok := versionCounts[version]
+			if !ok {
+				versionCounts[version] = 1
+			} else {
+				versionCounts[version] = count + 1
+			}
+		}
 	}
 
-	split := strings.Split(version, ".")
-	if len(split) != 3 {
-		return "", "", "", microerror.Maskf(executionFailedError, "invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version)
+	for version, count := range versionCounts {
+		split := strings.Split(version, ".")
+		if len(split) != 3 {
+			return microerror.Maskf(executionFailedError, "invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version)
+		}
+
+		major := split[0]
+		minor := split[1]
+		patch := split[2]
+
+		gauge.WithLabelValues(major, minor, patch).Set(count)
 	}
 
-	major := split[0]
-	minor := split[1]
-	patch := split[2]
-
-	return major, minor, patch, nil
+	return nil
 }
