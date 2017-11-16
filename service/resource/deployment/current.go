@@ -37,7 +37,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 			err := updateVersionBundleVersionGauge(versionBundleVersionGauge, currentDeployments)
 			if err != nil {
-				return nil, microerror.Mask(err)
+				r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: %s", err.Error()))
 			}
 		}
 	}
