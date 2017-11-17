@@ -35,12 +35,14 @@ func newNodeControllerDeployment(customObject kvmtpr.CustomObject) (*extensionsv
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apismetav1.ObjectMeta{
 					GenerateName: key.NodeControllerID,
+					Annotations: map[string]string{
+						VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+					},
 					Labels: map[string]string{
 						"app":      key.NodeControllerID,
 						"cluster":  key.ClusterID(customObject),
 						"customer": key.ClusterCustomer(customObject),
 					},
-					Annotations: map[string]string{},
 				},
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{

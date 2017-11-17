@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	PrometheusNamespace       = "kvm_operator"
-	PrometheusSubsystem       = "deployment_resource"
-	VersionBundleVersionLabel = "giantswarm.io/version-bundle-version"
+	PrometheusNamespace            = "kvm_operator"
+	PrometheusSubsystem            = "deployment_resource"
+	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
 var versionBundleVersionGauge = prometheus.NewGaugeVec(

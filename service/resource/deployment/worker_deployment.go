@@ -27,12 +27,14 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
+				Annotations: map[string]string{
+					VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+				},
 				Labels: map[string]string{
 					"app":      key.WorkerID,
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),
 					"node":     workerNode.ID,
-					VersionBundleVersionLabel: key.VersionBundleVersion(customObject),
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{
