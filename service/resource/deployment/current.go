@@ -49,9 +49,9 @@ func (r *Resource) updateVersionBundleVersionGauge(customObject kvmtpr.CustomObj
 	versionCounts := map[string]float64{}
 
 	for _, d := range deployments {
-		version, ok := d.Labels[VersionBundleVersionLabel]
+		version, ok := d.Annotations[VersionBundleVersionAnnotation]
 		if !ok {
-			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: label '%s' must not be empty", VersionBundleVersionLabel))
+			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
 			continue
 		} else {
 			count, ok := versionCounts[version]
