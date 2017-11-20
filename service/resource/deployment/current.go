@@ -3,8 +3,11 @@ package deployment
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
+	"github.com/prometheus/client_golang/prometheus"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
@@ -32,10 +35,45 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 				d := item
 				currentDeployments = append(currentDeployments, &d)
 			}
+
+			r.updateVersionBundleVersionGauge(customObject, versionBundleVersionGauge, currentDeployments)
 		}
 	}
 
 	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found a list of %d deployments in the Kubernetes API", len(currentDeployments)))
 
 	return currentDeployments, nil
+}
+
+func (r *Resource) updateVersionBundleVersionGauge(customObject kvmtpr.CustomObject, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
+	versionCounts := map[string]float64{}
+
+	for _, d := range deployments {
+		version, ok := d.Annotations[VersionBundleVersionAnnotation]
+		if !ok {
+			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
+			continue
+		} else {
+			count, ok := versionCounts[version]
+			if !ok {
+				versionCounts[version] = 1
+			} else {
+				versionCounts[version] = count + 1
+			}
+		}
+	}
+
+	for version, count := range versionCounts {
+		split := strings.Split(version, ".")
+		if len(split) != 3 {
+			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
+			continue
+		}
+
+		major := split[0]
+		minor := split[1]
+		patch := split[2]
+
+		gauge.WithLabelValues(major, minor, patch).Set(count)
+	}
 }
