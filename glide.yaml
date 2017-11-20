@@ -11,7 +11,7 @@ import:
 # Pinned to a branch with disabled RBAC.
 # Make sure to rebase k8scloudconfig "kvm-operator-disable-rbac" with "master"
 - package: github.com/giantswarm/k8scloudconfig
-  version: kvm-operator-disable-rbac
+  version: backwards-compatibility-for-kube-proxy
 - package: github.com/giantswarm/k8shealthz
   version: master
 - package: github.com/giantswarm/microendpoint
