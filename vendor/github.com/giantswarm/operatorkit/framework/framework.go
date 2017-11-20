@@ -387,11 +387,11 @@ func (f *Framework) ProcessEvents(ctx context.Context, deleteChan chan watch.Eve
 		for {
 			select {
 			case e := <-deleteChan:
-				t := prometheus.NewTimer(frameworkHistogram.WithLabelValues("delete"))
+				t := prometheus.NewTimer(frameworkEventSummary.WithLabelValues("delete"))
 				f.DeleteFunc(e.Object)
 				t.ObserveDuration()
 			case e := <-updateChan:
-				t := prometheus.NewTimer(frameworkHistogram.WithLabelValues("update"))
+				t := prometheus.NewTimer(frameworkEventSummary.WithLabelValues("update"))
 				f.UpdateFunc(nil, e.Object)
 				t.ObserveDuration()
 			case err := <-errChan:
@@ -516,6 +516,8 @@ func (f *Framework) bootWithError() error {
 		} else {
 			f.logger.Log("debug", "created third party resource")
 		}
+
+		f.tpr.CollectMetrics(context.TODO())
 	}
 
 	f.logger.Log("debug", "starting list/watch")

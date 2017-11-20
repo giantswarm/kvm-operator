@@ -1,5 +1,5 @@
-hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
-updated: 2017-11-17T12:04:50.143861818+01:00
+hash: e2105941902f498a1a7ae8425120c2e736b31aa9a2b7ac4ad00e9ccc4938b6b1
+updated: 2017-11-20T11:13:39.532356982+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -69,7 +69,7 @@ imports:
   - service/healthz
   - service/version
 - name: github.com/giantswarm/microerror
-  version: 5ade94eb4ee35ef72eb9382228470caeddb29989
+  version: ec5f66bb657662031c0d651504fee6908cdf28d9
 - name: github.com/giantswarm/microkit
   version: e6c3aafd2c6b8298599dc465dc1294fbd025d2f1
   subpackages:
@@ -97,7 +97,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: f4f5ada0b7447e1b71f6c622bbf873f6c74c1e1d
+  version: 6deeb2cedd469399c8a5cc2e7c4a935641b1b754
   subpackages:
   - client/k8sclient
   - framework
@@ -200,13 +200,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: e3fb1a1acd7605367a2b378bc2e2f893c05174b7
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a6e9df898b1336106c743392c48ee0b71f5c4efa
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -220,7 +220,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: d6948b782c9f4799ea3cd225f6de4131c29c243a
+  version: 19e54c4a2b8a78c9d54b2bed61b1a6c5e1bfcf6f
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
