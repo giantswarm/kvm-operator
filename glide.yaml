@@ -3,7 +3,7 @@ import:
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
-  version: master
+  version: summary
 - package: github.com/giantswarm/certificatetpr
   version: master
 - package: github.com/giantswarm/kvmtpr
