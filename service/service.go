@@ -134,7 +134,7 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		s.CustomObjectFramework.Boot()
-		s.PodFramework.Boot()
+		go s.CustomObjectFramework.Boot()
+		go s.PodFramework.Boot()
 	})
 }
