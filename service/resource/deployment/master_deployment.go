@@ -22,12 +22,12 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		capabilities := customObject.Spec.KVM.Masters[i]
 
-		cpuQuanity, err := key.CPUQuantity(capabilities)
+		cpuQuantity, err := key.CPUQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating CPU quantity")
 		}
 
-		memoryQuanity, err := key.MemoryQuanity(capabilities)
+		memoryQuantity, err := key.MemoryQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating memory quantity")
 		}
@@ -210,8 +210,8 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								},
 								Resources: apiv1.ResourceRequirements{
 									Requests: apiv1.ResourceList{
-										apiv1.ResourceCPU:    cpuQuanity,
-										apiv1.ResourceMemory: memoryQuanity,
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{

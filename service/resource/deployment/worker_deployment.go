@@ -22,12 +22,12 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
 
-		cpuQuanity, err := key.CPUQuantity(capabilities)
+		cpuQuantity, err := key.CPUQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating CPU quantity")
 		}
 
-		memoryQuanity, err := key.MemoryQuanity(capabilities)
+		memoryQuantity, err := key.MemoryQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating memory quantity")
 		}
@@ -178,8 +178,8 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								},
 								Resources: apiv1.ResourceRequirements{
 									Requests: map[apiv1.ResourceName]resource.Quantity{
-										apiv1.ResourceCPU:    cpuQuanity,
-										apiv1.ResourceMemory: memoryQuanity,
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{

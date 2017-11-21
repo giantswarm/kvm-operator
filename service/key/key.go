@@ -68,7 +68,7 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
 
-func MemoryQuanity(n kvmtprkvm.Node) (resource.Quantity, error) {
+func MemoryQuantity(n kvmtprkvm.Node) (resource.Quantity, error) {
 	q, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
 		return resource.Quantity{}, microerror.Mask(err)
