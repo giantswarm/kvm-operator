@@ -40,7 +40,7 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
-func CPUQuanity(n kvmtprkvm.Node) (resource.Quantity, error) {
+func CPUQuantity(n kvmtprkvm.Node) (resource.Quantity, error) {
 	cpu := strconv.Itoa(n.CPUs)
 	q, err := resource.ParseQuantity(cpu)
 	if err != nil {
