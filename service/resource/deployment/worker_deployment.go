@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/microerror"
+	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -19,6 +21,16 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
+
+		cpuQuantity, err := key.CPUQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating CPU quantity")
+		}
+
+		memoryQuantity, err := key.MemoryQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating memory quantity")
+		}
 
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
@@ -162,6 +174,12 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:  "CLOUD_CONFIG_PATH",
 										Value: "/cloudconfig/user_data",
+									},
+								},
+								Resources: apiv1.ResourceRequirements{
+									Requests: map[apiv1.ResourceName]resource.Quantity{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{

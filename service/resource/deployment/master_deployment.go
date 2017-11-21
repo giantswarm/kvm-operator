@@ -22,6 +22,16 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		capabilities := customObject.Spec.KVM.Masters[i]
 
+		cpuQuantity, err := key.CPUQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating CPU quantity")
+		}
+
+		memoryQuantity, err := key.MemoryQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating memory quantity")
+		}
+
 		storageType := key.StorageType(customObject)
 
 		// During migration, some TPOs do not have storage type set.
@@ -196,6 +206,12 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:  "CLOUD_CONFIG_PATH",
 										Value: "/cloudconfig/user_data",
+									},
+								},
+								Resources: apiv1.ResourceRequirements{
+									Requests: apiv1.ResourceList{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{
