@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/cenk/backoff"
@@ -355,7 +356,7 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
 			options := apismetav1.ListOptions{
-				LabelSelector: key.PodWatcherLabel,
+				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
 			}
 
 			watcher, err := k8sClient.CoreV1().Pods("").Watch(options)
