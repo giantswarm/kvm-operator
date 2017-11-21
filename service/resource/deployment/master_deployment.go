@@ -6,7 +6,6 @@ import (
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 
-	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -210,7 +209,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 								},
 								Resources: apiv1.ResourceRequirements{
-									Requests: map[apiv1.ResourceName]resource.Quantity{
+									Requests: apiv1.ResourceList{
 										apiv1.ResourceCPU:    cpuQuanity,
 										apiv1.ResourceMemory: memoryQuanity,
 									},

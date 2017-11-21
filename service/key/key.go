@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/giantswarm/clustertpr/spec"
@@ -40,8 +41,12 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 }
 
 func CPUQuanity(n kvmtprkvm.Node) (resource.Quantity, error) {
-	q := resource.NewQuantity(int64(n.CPUs), resource.DecimalSI)
-	return *q, nil // Return error to match MemoryQuantity.
+	cpu := strconv.Itoa(n.CPUs)
+	q, err := resource.ParseQuantity(cpu)
+	if err != nil {
+		return resource.Quantity{}, microerror.Mask(err)
+	}
+	return q, nil
 }
 
 func DeploymentName(prefix string, nodeID string) string {
