@@ -359,22 +359,10 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
 			}
 
-			fmt.Printf("\n")
-			fmt.Printf("options start\n")
-			fmt.Printf("%#v\n", options)
-			fmt.Printf("options end\n")
-			fmt.Printf("\n")
-
 			watcher, err := k8sClient.CoreV1().Pods("").Watch(options)
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
-
-			fmt.Printf("\n")
-			fmt.Printf("watcher start\n")
-			fmt.Printf("%#v\n", watcher)
-			fmt.Printf("watcher end\n")
-			fmt.Printf("\n")
 
 			return watcher, nil
 		}
