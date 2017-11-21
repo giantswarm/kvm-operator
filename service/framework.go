@@ -49,16 +49,16 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var k8sClient kubernetes.Interface
 	{
-		k8sConfig := k8sclient.DefaultConfig()
+		c := k8sclient.DefaultConfig()
 
-		k8sConfig.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
-		k8sConfig.Logger = config.Logger
-		k8sConfig.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
-		k8sConfig.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
-		k8sConfig.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
-		k8sConfig.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
+		c.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
+		c.Logger = config.Logger
+		c.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
+		c.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
+		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
+		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
 
-		k8sClient, err = k8sclient.New(k8sConfig)
+		k8sClient, err = k8sclient.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -79,11 +79,11 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var ccService *cloudconfig.CloudConfig
 	{
-		ccServiceConfig := cloudconfig.DefaultConfig()
+		c := cloudconfig.DefaultConfig()
 
-		ccServiceConfig.Logger = config.Logger
+		c.Logger = config.Logger
 
-		ccService, err = cloudconfig.New(ccServiceConfig)
+		ccService, err = cloudconfig.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -91,14 +91,14 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var configMapResource framework.Resource
 	{
-		configMapConfig := configmapresource.DefaultConfig()
+		c := configmapresource.DefaultConfig()
 
-		configMapConfig.CertWatcher = certWatcher
-		configMapConfig.CloudConfig = ccService
-		configMapConfig.K8sClient = k8sClient
-		configMapConfig.Logger = config.Logger
+		c.CertWatcher = certWatcher
+		c.CloudConfig = ccService
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
 
-		configMapResource, err = configmapresource.New(configMapConfig)
+		configMapResource, err = configmapresource.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -106,12 +106,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var deploymentResource framework.Resource
 	{
-		deploymentConfig := deploymentresource.DefaultConfig()
+		c := deploymentresource.DefaultConfig()
 
-		deploymentConfig.K8sClient = k8sClient
-		deploymentConfig.Logger = config.Logger
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
 
-		deploymentResource, err = deploymentresource.New(deploymentConfig)
+		deploymentResource, err = deploymentresource.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -119,12 +119,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var ingressResource framework.Resource
 	{
-		ingressConfig := ingressresource.DefaultConfig()
+		c := ingressresource.DefaultConfig()
 
-		ingressConfig.K8sClient = k8sClient
-		ingressConfig.Logger = config.Logger
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
 
-		ingressResource, err = ingressresource.New(ingressConfig)
+		ingressResource, err = ingressresource.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -132,12 +132,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var namespaceResource framework.Resource
 	{
-		namespaceConfig := namespaceresource.DefaultConfig()
+		c := namespaceresource.DefaultConfig()
 
-		namespaceConfig.K8sClient = k8sClient
-		namespaceConfig.Logger = config.Logger
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
 
-		namespaceResource, err = namespaceresource.New(namespaceConfig)
+		namespaceResource, err = namespaceresource.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -145,12 +145,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var pvcResource framework.Resource
 	{
-		pvcConfig := pvcresource.DefaultConfig()
+		c := pvcresource.DefaultConfig()
 
-		pvcConfig.K8sClient = k8sClient
-		pvcConfig.Logger = config.Logger
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
 
-		pvcResource, err = pvcresource.New(pvcConfig)
+		pvcResource, err = pvcresource.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -158,12 +158,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var serviceResource framework.Resource
 	{
-		serviceConfig := serviceresource.DefaultConfig()
+		c := serviceresource.DefaultConfig()
 
-		serviceConfig.K8sClient = k8sClient
-		serviceConfig.Logger = config.Logger
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
 
-		serviceResource, err = serviceresource.New(serviceConfig)
+		serviceResource, err = serviceresource.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -238,14 +238,14 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var newInformer *informer.Informer
 	{
-		informerConfig := informer.DefaultConfig()
+		c := informer.DefaultConfig()
 
-		informerConfig.WatcherFactory = newWatcherFactory
+		c.WatcherFactory = newWatcherFactory
 
-		informerConfig.RateWait = 10 * time.Second
-		informerConfig.ResyncPeriod = 5 * time.Minute
+		c.RateWait = 10 * time.Second
+		c.ResyncPeriod = 5 * time.Minute
 
-		newInformer, err = informer.New(informerConfig)
+		newInformer, err = informer.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -289,16 +289,16 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	var k8sClient kubernetes.Interface
 	{
-		k8sConfig := k8sclient.DefaultConfig()
+		c := k8sclient.DefaultConfig()
 
-		k8sConfig.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
-		k8sConfig.Logger = config.Logger
-		k8sConfig.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
-		k8sConfig.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
-		k8sConfig.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
-		k8sConfig.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
+		c.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
+		c.Logger = config.Logger
+		c.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
+		c.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
+		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
+		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
 
-		k8sClient, err = k8sclient.New(k8sConfig)
+		k8sClient, err = k8sclient.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -359,10 +359,22 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
 			}
 
+			fmt.Printf("\n")
+			fmt.Printf("options start\n")
+			fmt.Printf("%#v\n", options)
+			fmt.Printf("options end\n")
+			fmt.Printf("\n")
+
 			watcher, err := k8sClient.CoreV1().Pods("").Watch(options)
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
+
+			fmt.Printf("\n")
+			fmt.Printf("watcher start\n")
+			fmt.Printf("%#v\n", watcher)
+			fmt.Printf("watcher end\n")
+			fmt.Printf("\n")
 
 			return watcher, nil
 		}
@@ -370,14 +382,14 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	var newInformer *informer.Informer
 	{
-		informerConfig := informer.DefaultConfig()
+		c := informer.DefaultConfig()
 
-		informerConfig.WatcherFactory = newWatcherFactory
+		c.WatcherFactory = newWatcherFactory
 
-		informerConfig.RateWait = 10 * time.Second
-		informerConfig.ResyncPeriod = 5 * time.Minute
+		c.RateWait = 10 * time.Second
+		c.ResyncPeriod = 5 * time.Minute
 
-		newInformer, err = informer.New(informerConfig)
+		newInformer, err = informer.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
