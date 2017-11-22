@@ -2,6 +2,7 @@ package pod
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/giantswarm/microerror"
@@ -68,7 +69,11 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentPod, err := key.ToPod(obj)
+	currentPod, err := key.ToPod(currentState)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	reconciledPod, err := key.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -84,7 +89,21 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	// if the draining completed on the next reconciliation loop.
 
 	// TODO remove sleep. We just simlulate waiting for draining here.
+	fmt.Printf("\n")
+	fmt.Printf("start current pod\n")
+	fmt.Printf("%#v\n", currentPod.ObjectMeta)
+	fmt.Printf("end current pod\n")
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("start reconciled pod\n")
+	fmt.Printf("%#v\n", reconciledPod.ObjectMeta)
+	fmt.Printf("end reconciled pod\n")
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("start sleep 15\n")
 	time.Sleep(15 * time.Second)
+	fmt.Printf("end sleep 15\n")
+	fmt.Printf("\n")
 
 	// Here we remove the 'draining-nodes' finalizer from the reconciled pod, if
 	// any. This frees the garbage collection lock in the Kubernetes API and makes
