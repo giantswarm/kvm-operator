@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 	kvmtprkvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/microerror"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 const (
@@ -42,6 +44,15 @@ func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
+func CPUQuantity(n kvmtprkvm.Node) (resource.Quantity, error) {
+	cpu := strconv.Itoa(n.CPUs)
+	q, err := resource.ParseQuantity(cpu)
+	if err != nil {
+		return resource.Quantity{}, microerror.Mask(err)
+	}
+	return q, nil
+}
+
 func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
 }
@@ -59,6 +70,14 @@ func HasNodeController(customObject kvmtpr.CustomObject) bool {
 
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
+}
+
+func MemoryQuantity(n kvmtprkvm.Node) (resource.Quantity, error) {
+	q, err := resource.ParseQuantity(n.Memory)
+	if err != nil {
+		return resource.Quantity{}, microerror.Mask(err)
+	}
+	return q, nil
 }
 
 func NetworkBridgeName(customObject kvmtpr.CustomObject) string {

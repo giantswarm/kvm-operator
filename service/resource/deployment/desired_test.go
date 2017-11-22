@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"context"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -12,16 +13,20 @@ import (
 	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
 	"github.com/giantswarm/micrologger/microloggertest"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes/fake"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
 
 func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	testCases := []struct {
-		Obj                   interface{}
-		ExpectedMasterCount   int
-		ExpectedNodeCtrlCount int
-		ExpectedWorkerCount   int
+		Obj                      interface{}
+		ExpectedMasterCount      int
+		ExpectedNodeCtrlCount    int
+		ExpectedWorkerCount      int
+		ExpectedMastersResources []apiv1.ResourceRequirements
+		ExpectedWorkersResources []apiv1.ResourceRequirements
 	}{
 		// Test 1 ensures there is one deployment for master and worker each when there
 		// is one master and one worker node in the custom object.
@@ -44,10 +49,10 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							StorageType: "hostPath",
 						},
 						Masters: []kvmtprspeckvm.Node{
-							{},
+							{CPUs: 1, Memory: "1Gi"},
 						},
 						Workers: []kvmtprspeckvm.Node{
-							{},
+							{CPUs: 4, Memory: "8.2G"},
 						},
 					},
 				},
@@ -55,6 +60,22 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			ExpectedMasterCount:   1,
 			ExpectedNodeCtrlCount: 0,
 			ExpectedWorkerCount:   1,
+			ExpectedMastersResources: []apiv1.ResourceRequirements{
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+					},
+				},
+			},
+			ExpectedWorkersResources: []apiv1.ResourceRequirements{
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+					},
+				},
+			},
 		},
 
 		// Test 2 ensures there is one deployment for master and worker each when there
@@ -80,7 +101,7 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							StorageType: "hostPath",
 						},
 						Masters: []kvmtprspeckvm.Node{
-							{},
+							{CPUs: 1, Memory: "1Gi"},
 						},
 						NodeController: kvmtprspeckvm.NodeController{
 							Docker: nodecontroller.Docker{
@@ -88,9 +109,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							},
 						},
 						Workers: []kvmtprspeckvm.Node{
-							{},
-							{},
-							{},
+							{CPUs: 4, Memory: "8.2G"},
+							{CPUs: 4, Memory: "8.2G"},
+							{CPUs: 4, Memory: "8.2G"},
 						},
 					},
 				},
@@ -98,6 +119,34 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			ExpectedMasterCount:   1,
 			ExpectedNodeCtrlCount: 1,
 			ExpectedWorkerCount:   3,
+			ExpectedMastersResources: []apiv1.ResourceRequirements{
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+					},
+				},
+			},
+			ExpectedWorkersResources: []apiv1.ResourceRequirements{
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+					},
+				},
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+					},
+				},
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+					},
+				},
+			},
 		},
 
 		// Test 3 ensures there is one deployment for master and worker each when there
@@ -125,9 +174,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							StorageType: "hostPath",
 						},
 						Masters: []kvmtprspeckvm.Node{
-							{},
-							{},
-							{},
+							{CPUs: 1, Memory: "1Gi"},
+							{CPUs: 1, Memory: "1Gi"},
+							{CPUs: 1, Memory: "1Gi"},
 						},
 						NodeController: kvmtprspeckvm.NodeController{
 							Docker: nodecontroller.Docker{
@@ -135,9 +184,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							},
 						},
 						Workers: []kvmtprspeckvm.Node{
-							{},
-							{},
-							{},
+							{CPUs: 4, Memory: "8.2G"},
+							{CPUs: 4, Memory: "8.2G"},
+							{CPUs: 4, Memory: "8.2G"},
 						},
 					},
 				},
@@ -145,6 +194,46 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			ExpectedMasterCount:   3,
 			ExpectedNodeCtrlCount: 1,
 			ExpectedWorkerCount:   3,
+			ExpectedMastersResources: []apiv1.ResourceRequirements{
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+					},
+				},
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+					},
+				},
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+					},
+				},
+			},
+			ExpectedWorkersResources: []apiv1.ResourceRequirements{
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+					},
+				},
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+					},
+				},
+				{
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+					},
+				},
+			},
 		},
 	}
 
@@ -182,14 +271,30 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		if len(deployments) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount {
 			t.Fatalf("case %d expected %d nodes got %d", i+1, tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount, len(deployments))
 		}
+
+		if !reflect.DeepEqual(testGetK8sMasterKVMResources(deployments), tc.ExpectedMastersResources) {
+			t.Fatalf("case %d expected %#v got %#v", i+1, testGetK8sMasterKVMResources(deployments), tc.ExpectedMastersResources)
+		}
+
+		if !reflect.DeepEqual(testGetK8sWorkerKVMResources(deployments), tc.ExpectedWorkersResources) {
+			t.Fatalf("case %d expected %#v got %#v", i+1, testGetK8sWorkerKVMResources(deployments), tc.ExpectedWorkersResources)
+		}
 	}
 }
 
 func testGetMasterCount(deployments []*v1beta1.Deployment) int {
+	return testGetCountPrefix(deployments, "master-")
+}
+
+func testGetWorkerCount(deployments []*v1beta1.Deployment) int {
+	return testGetCountPrefix(deployments, "worker-")
+}
+
+func testGetCountPrefix(deployments []*v1beta1.Deployment, prefix string) int {
 	var count int
 
 	for _, d := range deployments {
-		if strings.HasPrefix(d.Name, "master-") {
+		if strings.HasPrefix(d.Name, prefix) {
 			count++
 		}
 	}
@@ -197,14 +302,27 @@ func testGetMasterCount(deployments []*v1beta1.Deployment) int {
 	return count
 }
 
-func testGetWorkerCount(deployments []*v1beta1.Deployment) int {
-	var count int
+func testGetK8sMasterKVMResources(deployments []*v1beta1.Deployment) []apiv1.ResourceRequirements {
+	return testGetK8sKVMResourcesPrefix(deployments, "master-")
+}
+
+func testGetK8sWorkerKVMResources(deployments []*v1beta1.Deployment) []apiv1.ResourceRequirements {
+	return testGetK8sKVMResourcesPrefix(deployments, "worker-")
+}
+
+func testGetK8sKVMResourcesPrefix(deployments []*v1beta1.Deployment, prefix string) []apiv1.ResourceRequirements {
+	var rs []apiv1.ResourceRequirements
 
 	for _, d := range deployments {
-		if strings.HasPrefix(d.Name, "worker-") {
-			count++
+		if !strings.HasPrefix(d.Name, prefix) {
+			continue
+		}
+		for _, c := range d.Spec.Template.Spec.Containers {
+			if c.Name == "k8s-kvm" {
+				rs = append(rs, c.Resources)
+			}
 		}
 	}
 
-	return count
+	return rs
 }
