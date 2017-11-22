@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger/loggercontext"
 	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/giantswarm/operatorkit/framework/resource/logresource"
@@ -252,7 +253,22 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 	}
 
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		ctx = messagecontext.NewContext(ctx, messagecontext.NewMessage())
+		{
+			message := messagecontext.NewMessage()
+			ctx = messagecontext.NewContext(ctx, message)
+		}
+
+		{
+			container := loggercontext.NewContainer()
+
+			customObject, err := key.ToCustomObject(obj)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+			container.KeyVals["cluster"] = key.ClusterID(customObject)
+
+			ctx = loggercontext.NewContext(ctx, container)
+		}
 
 		return ctx, nil
 	}
@@ -384,6 +400,18 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	}
 
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
+		{
+			container := loggercontext.NewContainer()
+
+			pod, err := key.ToPod(obj)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+			container.KeyVals["cluster"] = key.ClusterIDFromPod(pod)
+
+			ctx = loggercontext.NewContext(ctx, container)
+		}
+
 		return ctx, nil
 	}
 

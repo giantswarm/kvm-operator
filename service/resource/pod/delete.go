@@ -17,7 +17,7 @@ const (
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	podToDelete, err := toPod(obj)
+	podToDelete, err := key.ToPod(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -68,7 +68,7 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentPod, err := toPod(obj)
+	currentPod, err := key.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

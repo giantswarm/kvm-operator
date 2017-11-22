@@ -19,14 +19,14 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new config maps")
+	r.logger.LogWithCtx(ctx, "debug", "computing the new config maps")
 
 	configMaps, err := r.newConfigMaps(customObject)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("computed the %d new config maps", len(configMaps)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("computed the %d new config maps", len(configMaps)))
 
 	return configMaps, nil
 }

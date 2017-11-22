@@ -150,6 +150,19 @@ func ToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
 	return customObject, nil
 }
 
+func ToPod(v interface{}) (*apiv1.Pod, error) {
+	if v == nil {
+		return nil, nil
+	}
+
+	pod, ok := v.(*apiv1.Pod)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &apiv1.Pod{}, v)
+	}
+
+	return pod, nil
+}
+
 func VersionBundleVersion(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.VersionBundle.Version
 }
