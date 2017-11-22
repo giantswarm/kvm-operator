@@ -15,9 +15,8 @@ type key string
 // key directly.
 var loggerKey key = "logger"
 
-// Container is a communication structure used to transport information from one
-// resource to another. Container move between resource during reconciliation
-// within the dispatched context.
+// Container is a communication structure used to transport information in order
+// for a micro logger to use it when issuing logs.
 type Container struct {
 	// KeyVals is a mapping of key-value pairs a micro logger adds to the log
 	// message issuance.
