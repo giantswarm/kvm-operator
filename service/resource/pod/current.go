@@ -5,10 +5,12 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
+
+	"github.com/giantswarm/kvm-operator/service/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	currentPod, err := toPod(obj)
+	currentPod, err := key.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

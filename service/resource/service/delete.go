@@ -23,7 +23,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(servicesToDelete) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the services in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "deleting the services in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, service := range servicesToDelete {
@@ -35,9 +35,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted the services in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "deleted the services in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the services do not need to be deleted from the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the services do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -56,10 +56,6 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentServices, err := toServices(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -69,7 +65,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which services have to be deleted")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which services have to be deleted")
 
 	var servicesToDelete []*apiv1.Service
 
@@ -79,7 +75,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d services that have to be deleted", len(servicesToDelete)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d services that have to be deleted", len(servicesToDelete)))
 
 	return servicesToDelete, nil
 }

@@ -22,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(servicesToCreate) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating the services in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "creating the services in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, service := range servicesToCreate {
@@ -34,19 +34,15 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the services in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "created the services in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the services do not need to be created in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the services do not need to be created in the Kubernetes API")
 	}
 
 	return nil
 }
 
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentServices, err := toServices(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -56,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which services have to be created")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which services have to be created")
 
 	var servicesToCreate []*apiv1.Service
 
@@ -66,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d services that have to be created", len(servicesToCreate)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d services that have to be created", len(servicesToCreate)))
 
 	return servicesToCreate, nil
 }
