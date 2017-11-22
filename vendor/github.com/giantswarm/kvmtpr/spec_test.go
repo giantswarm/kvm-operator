@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"net"
 	"testing"
-	"time"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -17,14 +16,14 @@ import (
 	clustertprkuberneteskubectl "github.com/giantswarm/clustertpr/spec/kubernetes/kubectl"
 	clustertprkubernetesnetworksetup "github.com/giantswarm/clustertpr/spec/kubernetes/networksetup"
 	clustertprkubernetesssh "github.com/giantswarm/clustertpr/spec/kubernetes/ssh"
+	"github.com/kylelemons/godebug/pretty"
+	"github.com/stretchr/testify/require"
+
 	spec "github.com/giantswarm/kvmtpr/spec"
 	kvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/kvmtpr/spec/kvm/endpointupdater"
 	"github.com/giantswarm/kvmtpr/spec/kvm/k8skvm"
 	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
-	"github.com/giantswarm/versionbundle"
-	"github.com/kylelemons/godebug/pretty"
-	"github.com/stretchr/testify/require"
 )
 
 func TestSpecYamlEncoding(t *testing.T) {
@@ -163,35 +162,8 @@ func TestSpecYamlEncoding(t *testing.T) {
 				},
 			},
 		},
-		VersionBundle: versionbundle.Bundle{
-			Changelogs: []versionbundle.Changelog{
-				{
-					Component:   "calico",
-					Description: "Calico version updated.",
-					Kind:        "changed",
-				},
-			},
-			Components: []versionbundle.Component{
-				{
-					Name:    "calico",
-					Version: "1.1.0",
-				},
-				{
-					Name:    "kube-dns",
-					Version: "1.0.0",
-				},
-			},
-			Dependencies: []versionbundle.Dependency{
-				{
-					Name:    "kubernetes",
-					Version: "<= 1.7.x",
-				},
-			},
-			Deprecated: false,
-			Name:       "kubernetes-operator",
-			Time:       time.Unix(10, 5).In(time.UTC),
-			Version:    "0.1.0",
-			WIP:        false,
+		VersionBundle: spec.VersionBundle{
+			Version: "0.1.0",
 		},
 	}
 
