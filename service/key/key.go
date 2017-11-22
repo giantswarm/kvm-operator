@@ -20,6 +20,10 @@ const (
 	WorkerID         = "worker"
 )
 
+const (
+	PodWatcherLabel = "giantswarm.io/pod-watcher"
+)
+
 func ClusterAPIEndpoint(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
 }
