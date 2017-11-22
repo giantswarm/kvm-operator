@@ -5,7 +5,6 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
 	"k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -53,17 +52,4 @@ func (r *Resource) Name() string {
 
 func (r *Resource) Underlying() framework.Resource {
 	return r
-}
-
-func toPod(v interface{}) (*apiv1.Pod, error) {
-	if v == nil {
-		return nil, nil
-	}
-
-	pod, ok := v.(*apiv1.Pod)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &apiv1.Pod{}, v)
-	}
-
-	return pod, nil
 }

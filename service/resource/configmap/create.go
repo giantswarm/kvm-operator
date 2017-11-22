@@ -23,7 +23,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 	// Create the config maps in the Kubernetes API.
 	if len(configMapsToCreate) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating the config maps in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "creating the config maps in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToCreate {
@@ -35,19 +35,15 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the config maps in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "created the config maps in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do not need to be created in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the config maps do not need to be created in the Kubernetes API")
 	}
 
 	return nil
 }
 
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentConfigMaps, err := toConfigMaps(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -57,7 +53,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be created")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which config maps have to be created")
 
 	var configMapsToCreate []*apiv1.ConfigMap
 
@@ -67,7 +63,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be created", len(configMapsToCreate)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d config maps that have to be created", len(configMapsToCreate)))
 
 	return configMapsToCreate, nil
 }

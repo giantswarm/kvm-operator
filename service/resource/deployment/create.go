@@ -22,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(deploymentsToCreate) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating the deployments in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "creating the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToCreate {
@@ -34,19 +34,15 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the deployments in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "created the deployments in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do not need to be created in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the deployments do not need to be created in the Kubernetes API")
 	}
 
 	return nil
 }
 
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentDeployments, err := toDeployments(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -56,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which deployments have to be created")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which deployments have to be created")
 
 	var deploymentsToCreate []*v1beta1.Deployment
 
@@ -66,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be created", len(deploymentsToCreate)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be created", len(deploymentsToCreate)))
 
 	return deploymentsToCreate, nil
 }

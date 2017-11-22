@@ -24,7 +24,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if len(deploymentsToUpdate) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "updating the deployments in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "updating the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToUpdate {
@@ -34,9 +34,9 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "updated the deployments in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "updated the deployments in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do not need to be updated in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the deployments do not need to be updated in the Kubernetes API")
 	}
 
 	return nil
@@ -65,10 +65,6 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentDeployments, err := toDeployments(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -80,7 +76,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	var deploymentsToUpdate []*v1beta1.Deployment
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which deployments have to be updated")
+		r.logger.LogWithCtx(ctx, "debug", "finding out which deployments have to be updated")
 
 		// Check if config maps of deployments changed. In case they did, add the
 		// deployments to the list of deployments intended to be updated.
@@ -117,9 +113,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			deploymentsToUpdate = append(deploymentsToUpdate, desiredDeployment)
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be updated", len(deploymentsToUpdate)))
+		r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be updated", len(deploymentsToUpdate)))
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "not computing update state because deployments are not allowed to be updated")
+		r.logger.LogWithCtx(ctx, "debug", "not computing update state because deployments are not allowed to be updated")
 	}
 
 	return deploymentsToUpdate, nil
