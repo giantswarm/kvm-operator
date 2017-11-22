@@ -22,11 +22,11 @@ const (
 )
 
 const (
-	DrainingNodesFinalizer = "giantswarm.io/draining-nodes"
+	DrainingNodesFinalizer = "kvm-operator.giantswarm.io/draining-nodes"
 )
 
 const (
-	PodWatcherLabel = "giantswarm.io/pod-watcher"
+	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
 )
 
 func ClusterAPIEndpoint(customObject kvmtpr.CustomObject) string {
