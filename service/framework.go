@@ -265,7 +265,9 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
+
 			container.KeyVals["cluster"] = key.ClusterID(customObject)
+			container.KeyVals["framework"] = "customobject"
 
 			ctx = loggercontext.NewContext(ctx, container)
 		}
@@ -407,7 +409,9 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
+
 			container.KeyVals["cluster"] = key.ClusterIDFromPod(pod)
+			container.KeyVals["framework"] = "pod"
 
 			ctx = loggercontext.NewContext(ctx, container)
 		}
