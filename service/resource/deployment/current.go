@@ -20,7 +20,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "looking for a list of deployments in the Kubernetes API")
+	r.logger.LogWithCtx(ctx, "debug", "looking for a list of deployments in the Kubernetes API")
 
 	var currentDeployments []*v1beta1.Deployment
 	{
@@ -29,29 +29,29 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.Log("cluster", key.ClusterID(customObject), "debug", "found a list of deployments in the Kubernetes API")
+			r.logger.LogWithCtx(ctx, "debug", "found a list of deployments in the Kubernetes API")
 
 			for _, item := range deploymentList.Items {
 				d := item
 				currentDeployments = append(currentDeployments, &d)
 			}
 
-			r.updateVersionBundleVersionGauge(customObject, versionBundleVersionGauge, currentDeployments)
+			r.updateVersionBundleVersionGauge(ctx, customObject, versionBundleVersionGauge, currentDeployments)
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found a list of %d deployments in the Kubernetes API", len(currentDeployments)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found a list of %d deployments in the Kubernetes API", len(currentDeployments)))
 
 	return currentDeployments, nil
 }
 
-func (r *Resource) updateVersionBundleVersionGauge(customObject kvmtpr.CustomObject, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
+func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customObject kvmtpr.CustomObject, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
 	versionCounts := map[string]float64{}
 
 	for _, d := range deployments {
 		version, ok := d.Annotations[VersionBundleVersionAnnotation]
 		if !ok {
-			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
+			r.logger.LogWithCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
 			continue
 		} else {
 			count, ok := versionCounts[version]
@@ -66,7 +66,7 @@ func (r *Resource) updateVersionBundleVersionGauge(customObject kvmtpr.CustomObj
 	for version, count := range versionCounts {
 		split := strings.Split(version, ".")
 		if len(split) != 3 {
-			r.logger.Log("cluster", key.ClusterID(customObject), "warning", fmt.Sprintf("cannot update current version bundle version metric: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
+			r.logger.LogWithCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
 			continue
 		}
 

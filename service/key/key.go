@@ -12,6 +12,7 @@ import (
 	kvmtprkvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/microerror"
 	"k8s.io/apimachinery/pkg/api/resource"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 )
 
 const (
@@ -34,6 +35,15 @@ func ClusterCustomer(customObject kvmtpr.CustomObject) string {
 
 func ClusterID(customObject kvmtpr.CustomObject) string {
 	return customObject.Spec.Cluster.Cluster.ID
+}
+
+func ClusterIDFromPod(pod *apiv1.Pod) string {
+	l, ok := pod.Labels["cluster"]
+	if ok {
+		return l
+	}
+
+	return "n/a"
 }
 
 func ClusterNamespace(customObject kvmtpr.CustomObject) string {
@@ -134,6 +144,19 @@ func ToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
 	customObject := *customObjectPointer
 
 	return customObject, nil
+}
+
+func ToPod(v interface{}) (*apiv1.Pod, error) {
+	if v == nil {
+		return nil, nil
+	}
+
+	pod, ok := v.(*apiv1.Pod)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &apiv1.Pod{}, v)
+	}
+
+	return pod, nil
 }
 
 func VersionBundleVersion(customObject kvmtpr.CustomObject) string {

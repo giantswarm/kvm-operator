@@ -22,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(ingressesToCreate) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "creating the ingresses in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "creating the ingresses in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToCreate {
@@ -34,19 +34,15 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "created the ingresses in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "created the ingresses in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the ingresses do not need to be created in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the ingresses do not need to be created in the Kubernetes API")
 	}
 
 	return nil
 }
 
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentIngresses, err := toIngresses(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -56,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which ingresses have to be created")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which ingresses have to be created")
 
 	var ingressesToCreate []*v1beta1.Ingress
 
@@ -66,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d ingresses that have to be created", len(ingressesToCreate)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d ingresses that have to be created", len(ingressesToCreate)))
 
 	return ingressesToCreate, nil
 }

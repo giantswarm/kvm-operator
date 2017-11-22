@@ -24,7 +24,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(deploymentsToDelete) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the deployments in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "deleting the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToDelete {
@@ -36,9 +36,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted the deployments in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "deleted the deployments in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the deployments do not need to be deleted from the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the deployments do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -59,10 +59,6 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 // newDeleteChangeForDeletePatch is used on delete events to get rid of all
 // deployments.
 func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentDeployments, err := toDeployments(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -72,7 +68,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which deployments have to be deleted")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which deployments have to be deleted")
 
 	var deploymentsToDelete []*v1beta1.Deployment
 
@@ -82,7 +78,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
 
 	return deploymentsToDelete, nil
 }
@@ -90,10 +86,6 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 // newDeleteChangeForUpdatePatch is used on update events to scale down
 // deployments.
 func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentDeployments, err := toDeployments(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -103,7 +95,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which deployments have to be deleted")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which deployments have to be deleted")
 
 	var deploymentsToDelete []*v1beta1.Deployment
 
@@ -113,7 +105,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
 
 	return deploymentsToDelete, nil
 }

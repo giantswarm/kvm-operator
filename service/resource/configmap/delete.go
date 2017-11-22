@@ -24,7 +24,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(configMapsToDelete) != 0 {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleting the config maps in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "deleting the config maps in the Kubernetes API")
 
 		// Create the config maps in the Kubernetes API.
 		namespace := key.ClusterNamespace(customObject)
@@ -37,9 +37,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "deleted the config maps in the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "deleted the config maps in the Kubernetes API")
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "the config maps do not need to be deleted from the Kubernetes API")
+		r.logger.LogWithCtx(ctx, "debug", "the config maps do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -58,10 +58,6 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentConfigMaps, err := toConfigMaps(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -71,7 +67,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be deleted")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which config maps have to be deleted")
 
 	var configMapsToDelete []*apiv1.ConfigMap
 
@@ -81,16 +77,12 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToDelete)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToDelete)))
 
 	return configMapsToDelete, nil
 }
 
 func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	currentConfigMaps, err := toConfigMaps(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -100,7 +92,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", "finding out which config maps have to be deleted")
+	r.logger.LogWithCtx(ctx, "debug", "finding out which config maps have to be deleted")
 
 	var configMapsToDelete []*apiv1.ConfigMap
 
@@ -110,7 +102,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToDelete)))
+	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d config maps that have to be deleted", len(configMapsToDelete)))
 
 	return configMapsToDelete, nil
 }

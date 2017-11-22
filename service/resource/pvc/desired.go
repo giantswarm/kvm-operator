@@ -19,16 +19,16 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	var PVCs []*apiv1.PersistentVolumeClaim
 
 	if key.StorageType(customObject) == "persistentVolume" {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "computing the new PVCs")
+		r.logger.LogWithCtx(ctx, "debug", "computing the new PVCs")
 
 		PVCs, err = newEtcdPVCs(customObject)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", fmt.Sprintf("computed the %d new PVCs", len(PVCs)))
+		r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("computed the %d new PVCs", len(PVCs)))
 	} else {
-		r.logger.Log("cluster", key.ClusterID(customObject), "debug", "not computing the new PVCs because storage type is not 'persistentVolume'")
+		r.logger.LogWithCtx(ctx, "debug", "not computing the new PVCs because storage type is not 'persistentVolume'")
 	}
 
 	return PVCs, nil
