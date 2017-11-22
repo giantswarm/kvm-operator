@@ -23,25 +23,33 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if podToDelete != nil {
-		r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "updating the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
+		{
+			r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "updating the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
 
-		_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
-		if err != nil {
-			return microerror.Mask(err)
+			_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "updated the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
 		}
 
-		gracePeriodSeconds := int64(PodDeletionGracePeriod.Seconds())
-		options := &apismetav1.DeleteOptions{
-			GracePeriodSeconds: &gracePeriodSeconds,
-		}
-		err = r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Delete(podToDelete.Name, options)
-		if err != nil {
-			return microerror.Mask(err)
-		}
+		{
+			r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "deleting the pod in the Kubernetes API")
 
-		r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "updated the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
+			gracePeriodSeconds := int64(PodDeletionGracePeriod.Seconds())
+			options := &apismetav1.DeleteOptions{
+				GracePeriodSeconds: &gracePeriodSeconds,
+			}
+			err = r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Delete(podToDelete.Name, options)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "deleted the pod in the Kubernetes API")
+		}
 	} else {
-		r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "the pod does not need to be updated in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
+		r.logger.Log("cluster", key.ClusterIDFromPod(podToDelete), "debug", "the pod does not need to be updated nor to be deleted in the Kubernetes API")
 	}
 
 	return nil
