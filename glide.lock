@@ -1,5 +1,5 @@
-hash: 844542a3bc0f0f7eac397028ef5f68ae5a60d419d2d770746f39bea3305c8f32
-updated: 2017-11-23T09:26:47.699859088+01:00
+hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
+updated: 2017-11-23T10:08:17.402733804+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -90,16 +90,16 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/micrologger
-  version: c2ffba36495025eff48982e6543397dbc4da0ac6
+  version: bab5376fda89f10a5ebc5bd9feedab634400ab75
   subpackages:
-  - loggercontext
+  - loggermeta
   - microloggertest
 - name: github.com/giantswarm/microstorage
   version: 99418478ec8f5c68f9b5fc5e6be7e0474948f80d
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 026aae96f716e5c5f902c64c05e23c9b0c750608
+  version: 6081a53f18556c853e82d5d8037cf623e250e7b2
   subpackages:
   - client/k8sclient
   - framework
