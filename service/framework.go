@@ -9,10 +9,9 @@ import (
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger/loggercontext"
+	"github.com/giantswarm/micrologger/loggermeta"
 	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/resource/logresource"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
@@ -182,15 +181,6 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 			serviceResource,
 		}
 
-		logWrapConfig := logresource.DefaultWrapConfig()
-
-		logWrapConfig.Logger = config.Logger
-
-		resources, err = logresource.Wrap(resources, logWrapConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
 		retryWrapConfig := retryresource.DefaultWrapConfig()
 
 		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
@@ -259,17 +249,17 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		}
 
 		{
-			container := loggercontext.NewContainer()
+			meta := loggermeta.New()
 
 			customObject, err := key.ToCustomObject(obj)
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
 
-			container.KeyVals["cluster"] = key.ClusterID(customObject)
-			container.KeyVals["framework"] = "customobject"
+			meta.KeyVals["cluster"] = key.ClusterID(customObject)
+			meta.KeyVals["framework"] = "customobject"
 
-			ctx = loggercontext.NewContext(ctx, container)
+			ctx = loggermeta.NewContext(ctx, meta)
 		}
 
 		return ctx, nil
@@ -341,15 +331,6 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 			podResource,
 		}
 
-		logWrapConfig := logresource.DefaultWrapConfig()
-
-		logWrapConfig.Logger = config.Logger
-
-		resources, err = logresource.Wrap(resources, logWrapConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
 		retryWrapConfig := retryresource.DefaultWrapConfig()
 
 		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
@@ -403,17 +384,17 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
 		{
-			container := loggercontext.NewContainer()
+			meta := loggermeta.New()
 
 			pod, err := key.ToPod(obj)
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
 
-			container.KeyVals["cluster"] = key.ClusterIDFromPod(pod)
-			container.KeyVals["framework"] = "pod"
+			meta.KeyVals["cluster"] = key.ClusterIDFromPod(pod)
+			meta.KeyVals["framework"] = "pod"
 
-			ctx = loggercontext.NewContext(ctx, container)
+			ctx = loggermeta.NewContext(ctx, meta)
 		}
 
 		return ctx, nil

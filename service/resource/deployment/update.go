@@ -24,7 +24,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if len(deploymentsToUpdate) != 0 {
-		r.logger.LogWithCtx(ctx, "debug", "updating the deployments in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "updating the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToUpdate {
@@ -34,9 +34,9 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			}
 		}
 
-		r.logger.LogWithCtx(ctx, "debug", "updated the deployments in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "updated the deployments in the Kubernetes API")
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "the deployments do not need to be updated in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "the deployments do not need to be updated in the Kubernetes API")
 	}
 
 	return nil
@@ -76,7 +76,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	var deploymentsToUpdate []*v1beta1.Deployment
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
-		r.logger.LogWithCtx(ctx, "debug", "finding out which deployments have to be updated")
+		r.logger.LogCtx(ctx, "debug", "finding out which deployments have to be updated")
 
 		// Check if config maps of deployments changed. In case they did, add the
 		// deployments to the list of deployments intended to be updated.
@@ -113,9 +113,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			deploymentsToUpdate = append(deploymentsToUpdate, desiredDeployment)
 		}
 
-		r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be updated", len(deploymentsToUpdate)))
+		r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be updated", len(deploymentsToUpdate)))
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "not computing update state because deployments are not allowed to be updated")
+		r.logger.LogCtx(ctx, "debug", "not computing update state because deployments are not allowed to be updated")
 	}
 
 	return deploymentsToUpdate, nil

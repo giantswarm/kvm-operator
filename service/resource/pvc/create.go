@@ -22,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(pvcsToCreate) != 0 {
-		r.logger.LogWithCtx(ctx, "debug", "creating the PVCs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "creating the PVCs in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, PVC := range pvcsToCreate {
@@ -34,9 +34,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogWithCtx(ctx, "debug", "created the PVCs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "created the PVCs in the Kubernetes API")
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "the PVCs do not need to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "the PVCs do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -52,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "finding out which PVCs have to be created")
+	r.logger.LogCtx(ctx, "debug", "finding out which PVCs have to be created")
 
 	var pvcsToCreate []*apiv1.PersistentVolumeClaim
 
@@ -62,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d PVCs that have to be created", len(pvcsToCreate)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d PVCs that have to be created", len(pvcsToCreate)))
 
 	return pvcsToCreate, nil
 }
