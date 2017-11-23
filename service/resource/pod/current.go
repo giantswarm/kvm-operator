@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/operatorkit/framework/context/canceledcontext"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -24,7 +25,16 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		// informer's watch event is outdated and the pod got already deleted in the
 		// Kubernetes API. This is a normal transition behaviour, so we just ignore
 		// it and assume we are done.
+
 		r.logger.LogCtx(ctx, "debug", "cannot find the current version of the reconciled pod in the Kubernetes API")
+
+		canceledcontext.SetCanceled(ctx)
+		if canceledcontext.IsCanceled(ctx) {
+			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+
+			return nil, nil
+		}
+
 		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
