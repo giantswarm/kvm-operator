@@ -69,12 +69,7 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	reconciledPod, err := key.ToPod(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	currentPod, err := r.k8sClient.CoreV1().Pods(reconciledPod.Namespace).Get(reconciledPod.Name, apismetav1.GetOptions{})
+	currentPod, err := key.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -90,11 +85,6 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	// if the draining completed on the next reconciliation loop.
 
 	// TODO remove sleep. We just simlulate waiting for draining here.
-	fmt.Printf("\n")
-	fmt.Printf("start reconciled pod\n")
-	fmt.Printf("%#v\n", reconciledPod.ObjectMeta)
-	fmt.Printf("end reconciled pod\n")
-	fmt.Printf("\n")
 	fmt.Printf("\n")
 	fmt.Printf("start current pod\n")
 	fmt.Printf("%#v\n", currentPod.ObjectMeta)
@@ -114,7 +104,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		var newFinalizers []string
 		var changed bool
 
-		for _, f := range reconciledPod.GetFinalizers() {
+		for _, f := range currentPod.GetFinalizers() {
 			if f == key.DrainingNodesFinalizer {
 				changed = true
 				continue
@@ -124,8 +114,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		}
 
 		if changed {
-			podToDelete = reconciledPod
-			podToDelete.SetResourceVersion("0")
+			podToDelete = currentPod
 			podToDelete.SetFinalizers(newFinalizers)
 		}
 	}
