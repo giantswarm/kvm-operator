@@ -7,6 +7,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/framework"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
@@ -28,7 +29,14 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			r.logger.LogCtx(ctx, "debug", "updating the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
 
 			_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
-			if err != nil {
+			if apierrors.IsConflict(err) {
+				// The reconciled pod may be updated by other processes or even humans
+				// meanwhile. In case the resource version we currently know does not
+				// match the latest existing one, we give up here and wait for the
+				// delete event to be replayed. Then we try again later until we
+				// succeed.
+				return nil
+			} else if err != nil {
 				return microerror.Mask(err)
 			}
 
