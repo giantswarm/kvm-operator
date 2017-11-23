@@ -12,7 +12,6 @@ import (
 	"github.com/giantswarm/micrologger/loggercontext"
 	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/resource/logresource"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
@@ -182,15 +181,6 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 			serviceResource,
 		}
 
-		logWrapConfig := logresource.DefaultWrapConfig()
-
-		logWrapConfig.Logger = config.Logger
-
-		resources, err = logresource.Wrap(resources, logWrapConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
 		retryWrapConfig := retryresource.DefaultWrapConfig()
 
 		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
@@ -339,15 +329,6 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	{
 		resources = []framework.Resource{
 			podResource,
-		}
-
-		logWrapConfig := logresource.DefaultWrapConfig()
-
-		logWrapConfig.Logger = config.Logger
-
-		resources, err = logresource.Wrap(resources, logWrapConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
 		}
 
 		retryWrapConfig := retryresource.DefaultWrapConfig()
