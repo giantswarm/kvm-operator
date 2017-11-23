@@ -74,6 +74,11 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
+	currentPod, err := r.k8sClient.CoreV1().Pods(reconciledPod.Namespace).Get(reconciledPod.Name, apismetav1.GetOptions{})
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	// TODO go ahead without doing anything in case the pod is already terminated.
 
 	// TODO drain guest cluster node and only remove the finalizer as soon as the
@@ -85,9 +90,15 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	// if the draining completed on the next reconciliation loop.
 
 	// TODO remove sleep. We just simlulate waiting for draining here.
+	fmt.Printf("\n")
 	fmt.Printf("start reconciled pod\n")
 	fmt.Printf("%#v\n", reconciledPod.ObjectMeta)
 	fmt.Printf("end reconciled pod\n")
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("start current pod\n")
+	fmt.Printf("%#v\n", currentPod.ObjectMeta)
+	fmt.Printf("end current pod\n")
 	fmt.Printf("\n")
 	fmt.Printf("\n")
 	fmt.Printf("start sleep 15\n")
@@ -114,6 +125,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 		if changed {
 			podToDelete = reconciledPod
+			podToDelete.SetResourceVersion("0")
 			podToDelete.SetFinalizers(newFinalizers)
 		}
 	}
