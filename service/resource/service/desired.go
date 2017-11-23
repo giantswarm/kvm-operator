@@ -16,14 +16,14 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "computing the new services")
+	r.logger.LogCtx(ctx, "debug", "computing the new services")
 
 	var services []*apiv1.Service
 
 	services = append(services, newMasterService(customObject))
 	services = append(services, newWorkerService(customObject))
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("computed the %d new services", len(services)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("computed the %d new services", len(services)))
 
 	return services, nil
 }
