@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"path"
 	"time"
 
 	"github.com/cenk/backoff"
@@ -256,8 +257,8 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 				return nil, microerror.Mask(err)
 			}
 
-			meta.KeyVals["cluster"] = key.ClusterID(customObject)
-			meta.KeyVals["framework"] = "customobject"
+			meta.KeyVals["object"] = path.Join(customObject.Namespace, customObject.Name)
+			meta.KeyVals["groupVersionKind"] = customObject.GroupVersionKind().String()
 
 			ctx = loggermeta.NewContext(ctx, meta)
 		}
@@ -391,8 +392,8 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 				return nil, microerror.Mask(err)
 			}
 
-			meta.KeyVals["cluster"] = key.ClusterIDFromPod(pod)
-			meta.KeyVals["framework"] = "pod"
+			meta.KeyVals["object"] = path.Join(pod.Namespace, pod.Name)
+			meta.KeyVals["groupVersionKind"] = pod.GroupVersionKind().String()
 
 			ctx = loggermeta.NewContext(ctx, meta)
 		}
