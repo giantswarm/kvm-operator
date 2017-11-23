@@ -2,7 +2,6 @@ package pod
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/giantswarm/microerror"
@@ -83,8 +82,6 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	// TODO go ahead without doing anything in case the pod is already terminated.
-
 	// TODO drain guest cluster node and only remove the finalizer as soon as the
 	// guest cluster node associated with the reconciled host cluster pod is
 	// drained.
@@ -92,18 +89,6 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	// TODO go ahead and do not block once the draining is initialized. Using
 	// finalizers on the pods the delete event will be replayed and we can check
 	// if the draining completed on the next reconciliation loop.
-
-	// TODO remove sleep. We just simlulate waiting for draining here.
-	fmt.Printf("\n")
-	fmt.Printf("start current pod\n")
-	fmt.Printf("%#v\n", currentPod.ObjectMeta)
-	fmt.Printf("end current pod\n")
-	fmt.Printf("\n")
-	fmt.Printf("\n")
-	fmt.Printf("start sleep 15\n")
-	time.Sleep(15 * time.Second)
-	fmt.Printf("end sleep 15\n")
-	fmt.Printf("\n")
 
 	// Here we remove the 'draining-nodes' finalizer from the reconciled pod, if
 	// any. This frees the garbage collection lock in the Kubernetes API and makes
