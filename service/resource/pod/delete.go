@@ -35,6 +35,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 				// match the latest existing one, we give up here and wait for the
 				// delete event to be replayed. Then we try again later until we
 				// succeed.
+				r.logger.LogCtx(ctx, "debug", "cannot update the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer because of outdated resource version")
 				return nil
 			} else if err != nil {
 				return microerror.Mask(err)
