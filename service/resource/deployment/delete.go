@@ -24,7 +24,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(deploymentsToDelete) != 0 {
-		r.logger.LogWithCtx(ctx, "debug", "deleting the deployments in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "deleting the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToDelete {
@@ -36,9 +36,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogWithCtx(ctx, "debug", "deleted the deployments in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "deleted the deployments in the Kubernetes API")
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "the deployments do not need to be deleted from the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "the deployments do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -68,7 +68,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "finding out which deployments have to be deleted")
+	r.logger.LogCtx(ctx, "debug", "finding out which deployments have to be deleted")
 
 	var deploymentsToDelete []*v1beta1.Deployment
 
@@ -78,7 +78,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
 
 	return deploymentsToDelete, nil
 }
@@ -95,7 +95,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "finding out which deployments have to be deleted")
+	r.logger.LogCtx(ctx, "debug", "finding out which deployments have to be deleted")
 
 	var deploymentsToDelete []*v1beta1.Deployment
 
@@ -105,7 +105,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
 
 	return deploymentsToDelete, nil
 }

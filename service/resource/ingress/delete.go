@@ -24,7 +24,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(ingressesToDelete) != 0 {
-		r.logger.LogWithCtx(ctx, "debug", "deleting the ingresses in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "deleting the ingresses in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToDelete {
@@ -36,9 +36,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogWithCtx(ctx, "debug", "deleted the ingresses in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "deleted the ingresses in the Kubernetes API")
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "the ingresses do not need to be deleted from the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "the ingresses do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -66,7 +66,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "finding out which ingresses have to be deleted")
+	r.logger.LogCtx(ctx, "debug", "finding out which ingresses have to be deleted")
 
 	var ingressesToDelete []*v1beta1.Ingress
 
@@ -76,7 +76,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d ingresses that have to be deleted", len(ingressesToDelete)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d ingresses that have to be deleted", len(ingressesToDelete)))
 
 	return ingressesToDelete, nil
 }

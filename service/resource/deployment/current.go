@@ -20,7 +20,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "looking for a list of deployments in the Kubernetes API")
+	r.logger.LogCtx(ctx, "debug", "looking for a list of deployments in the Kubernetes API")
 
 	var currentDeployments []*v1beta1.Deployment
 	{
@@ -29,7 +29,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogWithCtx(ctx, "debug", "found a list of deployments in the Kubernetes API")
+			r.logger.LogCtx(ctx, "debug", "found a list of deployments in the Kubernetes API")
 
 			for _, item := range deploymentList.Items {
 				d := item
@@ -40,7 +40,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found a list of %d deployments in the Kubernetes API", len(currentDeployments)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found a list of %d deployments in the Kubernetes API", len(currentDeployments)))
 
 	return currentDeployments, nil
 }
@@ -51,7 +51,7 @@ func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customOb
 	for _, d := range deployments {
 		version, ok := d.Annotations[VersionBundleVersionAnnotation]
 		if !ok {
-			r.logger.LogWithCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
+			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
 			continue
 		} else {
 			count, ok := versionCounts[version]
@@ -66,7 +66,7 @@ func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customOb
 	for version, count := range versionCounts {
 		split := strings.Split(version, ".")
 		if len(split) != 3 {
-			r.logger.LogWithCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
+			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
 			continue
 		}
 

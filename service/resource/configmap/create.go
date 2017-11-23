@@ -23,7 +23,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 	// Create the config maps in the Kubernetes API.
 	if len(configMapsToCreate) != 0 {
-		r.logger.LogWithCtx(ctx, "debug", "creating the config maps in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "creating the config maps in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToCreate {
@@ -35,9 +35,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogWithCtx(ctx, "debug", "created the config maps in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "created the config maps in the Kubernetes API")
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "the config maps do not need to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "the config maps do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -53,7 +53,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "finding out which config maps have to be created")
+	r.logger.LogCtx(ctx, "debug", "finding out which config maps have to be created")
 
 	var configMapsToCreate []*apiv1.ConfigMap
 
@@ -63,7 +63,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d config maps that have to be created", len(configMapsToCreate)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d config maps that have to be created", len(configMapsToCreate)))
 
 	return configMapsToCreate, nil
 }

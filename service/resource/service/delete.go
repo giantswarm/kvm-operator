@@ -23,7 +23,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(servicesToDelete) != 0 {
-		r.logger.LogWithCtx(ctx, "debug", "deleting the services in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "deleting the services in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, service := range servicesToDelete {
@@ -35,9 +35,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogWithCtx(ctx, "debug", "deleted the services in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "deleted the services in the Kubernetes API")
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "the services do not need to be deleted from the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "the services do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -65,7 +65,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "finding out which services have to be deleted")
+	r.logger.LogCtx(ctx, "debug", "finding out which services have to be deleted")
 
 	var servicesToDelete []*apiv1.Service
 
@@ -75,7 +75,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("found %d services that have to be deleted", len(servicesToDelete)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d services that have to be deleted", len(servicesToDelete)))
 
 	return servicesToDelete, nil
 }
