@@ -16,7 +16,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "computing the new deployments")
+	r.logger.LogCtx(ctx, "debug", "computing the new deployments")
 
 	var deployments []*v1beta1.Deployment
 
@@ -42,7 +42,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", fmt.Sprintf("computed the %d new deployments", len(deployments)))
+	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("computed the %d new deployments", len(deployments)))
 
 	return deployments, nil
 }
