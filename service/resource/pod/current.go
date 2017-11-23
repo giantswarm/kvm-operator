@@ -15,14 +15,14 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "looking for the current version of the reconciled pod in the Kubernetes API")
+	r.logger.LogCtx(ctx, "debug", "looking for the current version of the reconciled pod in the Kubernetes API")
 
 	currentPod, err := r.k8sClient.CoreV1().Pods(reconciledPod.Namespace).Get(reconciledPod.Name, apismetav1.GetOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogWithCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
+	r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
 
 	return currentPod, nil
 }

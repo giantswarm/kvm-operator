@@ -25,18 +25,18 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 	if podToDelete != nil {
 		{
-			r.logger.LogWithCtx(ctx, "debug", "updating the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
+			r.logger.LogCtx(ctx, "debug", "updating the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
 
 			_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 
-			r.logger.LogWithCtx(ctx, "debug", "updated the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
+			r.logger.LogCtx(ctx, "debug", "updated the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
 		}
 
 		{
-			r.logger.LogWithCtx(ctx, "debug", "deleting the pod in the Kubernetes API")
+			r.logger.LogCtx(ctx, "debug", "deleting the pod in the Kubernetes API")
 
 			gracePeriodSeconds := int64(PodDeletionGracePeriod.Seconds())
 			options := &apismetav1.DeleteOptions{
@@ -47,10 +47,10 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 				return microerror.Mask(err)
 			}
 
-			r.logger.LogWithCtx(ctx, "debug", "deleted the pod in the Kubernetes API")
+			r.logger.LogCtx(ctx, "debug", "deleted the pod in the Kubernetes API")
 		}
 	} else {
-		r.logger.LogWithCtx(ctx, "debug", "the pod does not need to be updated nor to be deleted in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "the pod does not need to be updated nor to be deleted in the Kubernetes API")
 	}
 
 	return nil
