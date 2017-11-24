@@ -1,5 +1,5 @@
 hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
-updated: 2017-11-24T13:21:29.036557652+01:00
+updated: 2017-11-24T14:35:11.398526342+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -49,7 +49,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 511e690a7372f44602e14661a2f13a7abcaab9ea
+  version: 62aa3dc074ab045375dbad85001afe69c9f82487
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
