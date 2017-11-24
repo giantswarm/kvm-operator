@@ -3,14 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
-	"path"
 	"time"
 
 	"github.com/cenk/backoff"
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger/loggermeta"
 	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
@@ -244,24 +242,8 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 	}
 
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		{
-			message := messagecontext.NewMessage()
-			ctx = messagecontext.NewContext(ctx, message)
-		}
-
-		{
-			meta := loggermeta.New()
-
-			customObject, err := key.ToCustomObject(obj)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			meta.KeyVals["object"] = path.Join(customObject.Namespace, customObject.Name)
-			meta.KeyVals["groupVersionKind"] = customObject.GroupVersionKind().String()
-
-			ctx = loggermeta.NewContext(ctx, meta)
-		}
+		message := messagecontext.NewMessage()
+		ctx = messagecontext.NewContext(ctx, message)
 
 		return ctx, nil
 	}
@@ -384,20 +366,6 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	}
 
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		{
-			meta := loggermeta.New()
-
-			pod, err := key.ToPod(obj)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			meta.KeyVals["object"] = path.Join(pod.Namespace, pod.Name)
-			meta.KeyVals["groupVersionKind"] = pod.GroupVersionKind().String()
-
-			ctx = loggermeta.NewContext(ctx, meta)
-		}
-
 		return ctx, nil
 	}
 
