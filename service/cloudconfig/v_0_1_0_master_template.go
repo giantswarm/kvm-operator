@@ -143,9 +143,10 @@ func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		// Encryption key
 		{
 			AssetContent: e.keys.APIServerEncryptionKey,
-			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml.enc",
+			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
 			Owner:        FileOwner,
-			Permissions:  0644,
+			Permissions:  0600,
+		},
 		// etcd_data_dir drop-in
 		{
 			AssetContent: etcd_data_dir_dropin,
