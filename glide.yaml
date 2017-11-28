@@ -11,7 +11,7 @@ import:
 # Pinned to a branch with w/a for https://github.com/giantswarm/kvm-operator/pull/216.
 # Make sure to rebase k8scloudconfig "kvm-operator-disable-rbac" with "master"
 - package: github.com/giantswarm/k8scloudconfig
-  version: kvm-operator-disable-rbac
+  version: 459a19f48292e3481fa1aff8104105b3c4fd2698
 - package: github.com/giantswarm/k8shealthz
   version: master
 - package: github.com/giantswarm/microendpoint
