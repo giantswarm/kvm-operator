@@ -1,12 +1,15 @@
+<<<<<<< HEAD
 hash: 6c9fe9ff21142e2520e20d2f13da99a512ebe3c39efe684811a63d36551a378b
 updated: 2017-11-28T15:26:26.600822958+01:00
+=======
+hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
+updated: 2017-11-28T15:44:25.458170464+01:00
+>>>>>>> origin/master
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
-- name: github.com/cenk/backoff
-  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/cenkalti/backoff
   version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/coreos/go-semver
