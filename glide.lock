@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 hash: 6c9fe9ff21142e2520e20d2f13da99a512ebe3c39efe684811a63d36551a378b
-updated: 2017-11-28T15:26:26.600822958+01:00
-=======
-hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
-updated: 2017-11-28T15:44:25.458170464+01:00
->>>>>>> origin/master
+updated: 2017-11-28T17:02:57.899920085+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -102,11 +97,10 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 7bc36a32297dd4f45f94aba0b19a3c6028f831bb
+  version: a3a11e7cd38b119e98d4db12036cb210f363a130
   subpackages:
   - client/k8sclient
   - client/k8scrdclient
-  - crd
   - framework
   - framework/context/canceledcontext
   - framework/context/updateallowedcontext
@@ -116,6 +110,8 @@ imports:
   - tpr
 - name: github.com/giantswarm/randomkeytpr
   version: 9e1d78d125841c496889e8a54d49057212a2893e
+  subpackages:
+  - randomtprtest
 - name: github.com/giantswarm/versionbundle
   version: 3b7cd23ec96043f5193c1b6c966fade961f0da65
 - name: github.com/go-kit/kit
@@ -191,7 +187,7 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
@@ -208,13 +204,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 2e54d0b93cba2fd133edc32211dcc32c06ef72ca
+  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a6e9df898b1336106c743392c48ee0b71f5c4efa
+  version: 65c1f6f8f0fc1e2185eb9863a3bc751496404259
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
