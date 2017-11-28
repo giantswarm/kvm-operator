@@ -10,6 +10,7 @@ import (
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/micrologger/microloggertest"
+	"github.com/giantswarm/randomkeytpr/randomtprtest"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
@@ -94,6 +95,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.KeyWatcher = randomkeytprtest.NewService()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
 		if err != nil {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cenk/backoff"
+	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
@@ -15,6 +15,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/operatorkit/tpr"
+	"github.com/giantswarm/randomkeytpr"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -76,6 +77,17 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	var keyWatcher randomkeytpr.Searcher
+	{
+		keyConfig := randomkeytpr.DefaultServiceConfig()
+		keyConfig.K8sClient = k8sClient
+		keyConfig.Logger = config.Logger
+		keyWatcher, err = randomkeytpr.NewService(keyConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var ccService *cloudconfig.CloudConfig
 	{
 		c := cloudconfig.DefaultConfig()
@@ -95,6 +107,7 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
+		c.KeyWatcher = keyWatcher
 		c.Logger = config.Logger
 
 		configMapResource, err = configmapresource.New(c)
@@ -252,7 +265,6 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 	{
 		c := framework.DefaultConfig()
 
-		c.BackOffFactory = framework.DefaultBackOffFactory()
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
@@ -373,7 +385,6 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	{
 		c := framework.DefaultConfig()
 
-		c.BackOffFactory = framework.DefaultBackOffFactory()
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger

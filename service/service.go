@@ -8,9 +8,6 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/informer"
-	"github.com/giantswarm/operatorkit/tpr"
-	"github.com/giantswarm/randomkeytpr"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/kubernetes"
 
