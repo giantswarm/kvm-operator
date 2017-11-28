@@ -1,12 +1,12 @@
 package: github.com/giantswarm/kvm-operator
 import:
+- package: github.com/giantswarm/apiextensions
+  version: clientset
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
   version: master
 - package: github.com/giantswarm/certificatetpr
-  version: master
-- package: github.com/giantswarm/kvmtpr
   version: master
 # Pinned to a branch with w/a for https://github.com/giantswarm/kvm-operator/pull/216.
 # Make sure to rebase k8scloudconfig "kvm-operator-disable-rbac" with "master"

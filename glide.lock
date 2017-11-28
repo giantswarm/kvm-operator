@@ -1,12 +1,10 @@
-hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
-updated: 2017-11-27T12:24:49.441439+01:00
+hash: 0732a82b1c79f4a674e5b6f57f9be461c7879bae199646949ce79ac7752b5439
+updated: 2017-11-28T17:01:35.73391+01:00
 imports:
 - name: github.com/beorn7/perks
-  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
   - quantile
-- name: github.com/cenk/backoff
-  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/cenkalti/backoff
   version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/coreos/go-semver
@@ -32,6 +30,15 @@ imports:
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/giantswarm/apiextensions
+  version: a50685242279dfd7a9ea9c223ff09b6b82487eeb
+  subpackages:
+  - pkg/apis/cluster/v1alpha1
+  - pkg/apis/core/v1alpha1
+  - pkg/clientset/versioned
+  - pkg/clientset/versioned/scheme
+  - pkg/clientset/versioned/typed/cluster/v1alpha1
+  - pkg/clientset/versioned/typed/core/v1alpha1
 - name: github.com/giantswarm/certificatetpr
   version: 9a7c674d13714bc7a5258453570bc8163a47b2cc
   subpackages:
@@ -99,9 +106,11 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: a805b836b6c6f5d03c923b86d443a86484114f8b
+  version: a3a11e7cd38b119e98d4db12036cb210f363a130
   subpackages:
   - client/k8sclient
+  - client/k8scrdclient
+  - client/k8sextclient
   - framework
   - framework/context/canceledcontext
   - framework/context/updateallowedcontext
@@ -141,11 +150,16 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
+  - jsonpb
   - proto
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/timestamp
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/gorilla/context
@@ -184,7 +198,7 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
@@ -197,17 +211,17 @@ imports:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
+  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 2e54d0b93cba2fd133edc32211dcc32c06ef72ca
+  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a6e9df898b1336106c743392c48ee0b71f5c4efa
+  version: 65c1f6f8f0fc1e2185eb9863a3bc751496404259
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -268,6 +282,14 @@ imports:
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
   version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+- name: k8s.io/apiextensions-apiserver
+  version: fcd622fe88a4a6efcb5aea9e94ee87324ac1b036
+  subpackages:
+  - pkg/apis/apiextensions
+  - pkg/apis/apiextensions/v1beta1
+  - pkg/client/clientset/clientset
+  - pkg/client/clientset/clientset/scheme
+  - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
   version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
