@@ -1503,20 +1503,6 @@ write_files:
           done
       done
 
-      # apply Security bootstrap (RBAC and PSP)
-      SECURITY_FILES="rbac_bindings.yaml rbac_roles.yaml psp_policies.yaml psp_roles.yaml psp_binding.yaml"
-
-      for manifest in $SECURITY_FILES
-      do
-          while
-              /usr/bin/docker run --net=host --rm -v /srv:/srv $KUBECTL apply -f /srv/$manifest
-              [ "$?" -ne "0" ]
-          do
-              echo "failed to apply /src/$manifest, retrying in 5 sec"
-              sleep 5s
-          done
-      done
-
       # apply calico CNI
       CALICO_FILES="calico-configmap.yaml\
        calico-node-sa.yaml\
@@ -2071,7 +2057,7 @@ coreos:
       --allow_privileged=true \
       --insecure_bind_address=0.0.0.0 \
       --anonymous-auth=false \
-      --insecure_port=0 \
+      --insecure-port=0 \
       --kubelet_https=true \
       --kubelet-preferred-address-types=InternalIP \
       --secure_port={{.Cluster.Kubernetes.API.SecurePort}} \

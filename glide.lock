@@ -1,5 +1,5 @@
-hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
-updated: 2017-11-27T12:24:49.441439+01:00
+hash: 6c9fe9ff21142e2520e20d2f13da99a512ebe3c39efe684811a63d36551a378b
+updated: 2017-11-28T15:26:26.600822958+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -49,7 +49,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 62aa3dc074ab045375dbad85001afe69c9f82487
+  version: 2bb8e6c55338a2cec47782e547f2710f63cd130a
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
@@ -99,9 +99,11 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: a805b836b6c6f5d03c923b86d443a86484114f8b
+  version: 7bc36a32297dd4f45f94aba0b19a3c6028f831bb
   subpackages:
   - client/k8sclient
+  - client/k8scrdclient
+  - crd
   - framework
   - framework/context/canceledcontext
   - framework/context/updateallowedcontext
@@ -109,6 +111,8 @@ imports:
   - framework/resource/retryresource
   - informer
   - tpr
+- name: github.com/giantswarm/randomkeytpr
+  version: 9e1d78d125841c496889e8a54d49057212a2893e
 - name: github.com/giantswarm/versionbundle
   version: 3b7cd23ec96043f5193c1b6c966fade961f0da65
 - name: github.com/go-kit/kit
@@ -268,6 +272,14 @@ imports:
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
   version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+- name: k8s.io/apiextensions-apiserver
+  version: fcd622fe88a4a6efcb5aea9e94ee87324ac1b036
+  subpackages:
+  - pkg/apis/apiextensions
+  - pkg/apis/apiextensions/v1beta1
+  - pkg/client/clientset/clientset
+  - pkg/client/clientset/clientset/scheme
+  - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
   version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
