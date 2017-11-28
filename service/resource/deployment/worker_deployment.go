@@ -2,9 +2,10 @@ package deployment
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/microerror"
+	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -21,6 +22,16 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
 
+		cpuQuantity, err := key.CPUQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating CPU quantity")
+		}
+
+		memoryQuantity, err := key.MemoryQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating memory quantity")
+		}
+
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
@@ -28,6 +39,9 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
+				Annotations: map[string]string{
+					VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+				},
 				Labels: map[string]string{
 					"app":      key.WorkerID,
 					"cluster":  key.ClusterID(customObject),
@@ -79,9 +93,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 							{
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
-									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms", key.ClusterID(customObject), workerNode.ID),
-									},
+									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
 						},
@@ -91,36 +103,24 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Image:           customObject.Spec.KVM.EndpointUpdater.Docker.Image,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								Command: []string{
-									"/opt/k8s-endpoint-updater",
-									"update",
-									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
-									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
-									"--service.kubernetes.cluster.service=" + key.WorkerID,
-									"--service.kubernetes.inCluster=true",
+									"/bin/sh",
+									"-c",
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + key.NetworkBridgeName(customObject) +
+										" --service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject) +
+										" --service.kubernetes.cluster.service=" + key.WorkerID +
+										" --service.kubernetes.inCluster=true" +
+										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
 								},
 								Env: []apiv1.EnvVar{
 									{
-										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(customObject),
-									},
-									{
 										Name: "POD_NAME",
 										ValueFrom: &apiv1.EnvVarSource{
 											FieldRef: &apiv1.ObjectFieldSelector{
 												APIVersion: "v1",
 												FieldPath:  "metadata.name",
-											},
-										},
-									},
-									{
-										Name: "POD_NAMESPACE",
-										ValueFrom: &apiv1.EnvVarSource{
-											FieldRef: &apiv1.ObjectFieldSelector{
-												APIVersion: "v1",
-												FieldPath:  "metadata.namespace",
 											},
 										},
 									},
@@ -159,6 +159,10 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 										Value: key.NetworkBridgeName(customObject),
 									},
 									{
+										Name:  "NETWORK_TAP_NAME",
+										Value: key.NetworkTapName(customObject),
+									},
+									{
 										Name: "MEMORY",
 										// TODO provide memory like disk as float64 and format here.
 										Value: capabilities.Memory,
@@ -170,6 +174,12 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:  "CLOUD_CONFIG_PATH",
 										Value: "/cloudconfig/user_data",
+									},
+								},
+								Resources: apiv1.ResourceRequirements{
+									Requests: map[apiv1.ResourceName]resource.Quantity{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{

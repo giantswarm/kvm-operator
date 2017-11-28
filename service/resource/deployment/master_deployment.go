@@ -2,10 +2,10 @@ package deployment
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
+
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
@@ -21,6 +21,16 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		capabilities := customObject.Spec.KVM.Masters[i]
+
+		cpuQuantity, err := key.CPUQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating CPU quantity")
+		}
+
+		memoryQuantity, err := key.MemoryQuantity(capabilities)
+		if err != nil {
+			return nil, microerror.Maskf(err, "creating memory quantity")
+		}
 
 		storageType := key.StorageType(customObject)
 
@@ -60,6 +70,9 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.DeploymentName(key.MasterID, masterNode.ID),
+				Annotations: map[string]string{
+					VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+				},
 				Labels: map[string]string{
 					"cluster":  key.ClusterID(customObject),
 					"customer": key.ClusterCustomer(customObject),
@@ -112,9 +125,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 							{
 								Name: "rootfs",
 								VolumeSource: apiv1.VolumeSource{
-									HostPath: &apiv1.HostPathVolumeSource{
-										Path: filepath.Join("/home/core/vms", key.ClusterID(customObject), masterNode.ID),
-									},
+									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
 						},
@@ -124,15 +135,27 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Image:           customObject.Spec.KVM.EndpointUpdater.Docker.Image,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								Command: []string{
-									"/opt/k8s-endpoint-updater",
-									"update",
-									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
-									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
-									"--service.kubernetes.cluster.service=" + key.MasterID,
-									"--service.kubernetes.inCluster=true",
+									"/bin/sh",
+									"-c",
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + key.NetworkBridgeName(customObject) +
+										" --service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject) +
+										" --service.kubernetes.cluster.service=" + key.MasterID +
+										" --service.kubernetes.inCluster=true" +
+										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
+								},
+								Env: []apiv1.EnvVar{
+									{
+										Name: "POD_NAME",
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												APIVersion: "v1",
+												FieldPath:  "metadata.name",
+											},
+										},
+									},
 								},
 							},
 							{
@@ -168,6 +191,10 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 										Value: key.NetworkBridgeName(customObject),
 									},
 									{
+										Name:  "NETWORK_TAP_NAME",
+										Value: key.NetworkTapName(customObject),
+									},
+									{
 										Name: "MEMORY",
 										// TODO provide memory like disk as float64 and format here.
 										Value: capabilities.Memory,
@@ -179,6 +206,12 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:  "CLOUD_CONFIG_PATH",
 										Value: "/cloudconfig/user_data",
+									},
+								},
+								Resources: apiv1.ResourceRequirements{
+									Requests: apiv1.ResourceList{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{

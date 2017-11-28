@@ -1,12 +1,11 @@
 package tpr
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -14,6 +13,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/tools/cache"
+
+	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 )
 
 const (
@@ -202,7 +204,7 @@ func (t *TPR) CreateAndWait() error {
 // poll for TPR readiness. Returns alreadyExistsError when the resource already
 // exists.
 func (t *TPR) CreateAndWaitBackOff(initBackOff backoff.BackOff) error {
-	err := t.create()
+	err := t.create(initBackOff)
 	if err != nil {
 		return microerror.Maskf(err, "creating TPR %s", t.name)
 	}
@@ -252,7 +254,7 @@ func (t *TPR) NewInformer(resourceEventHandler cache.ResourceEventHandler, zeroO
 
 // create is extracted for testing because fake REST client does not work.
 // Therefore waitInit can not be tested.
-func (t *TPR) create() error {
+func (t *TPR) create(retry backoff.BackOff) error {
 	tpr := &v1beta1.ThirdPartyResource{
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: t.name,
@@ -263,13 +265,23 @@ func (t *TPR) create() error {
 		Description: t.description,
 	}
 
-	_, err := t.k8sClient.ExtensionsV1beta1().ThirdPartyResources().Create(tpr)
-	if err != nil && apierrors.IsAlreadyExists(err) {
-		return microerror.Mask(alreadyExistsError)
+	createTpr := func() error {
+		_, err := t.k8sClient.ExtensionsV1beta1().ThirdPartyResources().Create(tpr)
+		if err != nil && apierrors.IsAlreadyExists(err) {
+			return backoff.Permanent(microerror.Mask(alreadyExistsError))
+		}
+		if err != nil {
+			return microerror.Maskf(err, "creating TPR %s", t.name)
+		}
+
+		return nil
 	}
+
+	err := backoff.Retry(createTpr, retry)
 	if err != nil {
-		return microerror.Maskf(err, "creating TPR %s", t.name)
+		return microerror.Mask(err)
 	}
+
 	return nil
 }
 
@@ -286,4 +298,44 @@ func (t *TPR) waitInit(retry backoff.BackOff) error {
 		err = tprInitTimeoutError
 	}
 	return microerror.Maskf(err, "requesting TPR %s", t.name)
+}
+
+func (t *TPR) CollectMetrics(ctx context.Context) {
+	go func() {
+		t.logger.Log("info", "starting metrics collection")
+
+		ticker := time.NewTicker(t.resyncPeriod)
+
+		for {
+			select {
+			case <-ctx.Done():
+				t.logger.Log("info", "context done, stopping metrics collection")
+				return
+
+			case <-ticker.C:
+				t.logger.Log("info", "listing TPOs for metrics")
+
+				operation := func() error {
+					req := t.k8sClient.Core().RESTClient().Get().AbsPath(t.Endpoint(""))
+					b, err := req.DoRaw()
+					if err != nil {
+						return microerror.Mask(err)
+					}
+
+					list := TPOList{}
+					if err := json.Unmarshal(b, &list); err != nil {
+						return microerror.Mask(err)
+					}
+
+					tpoCount.WithLabelValues(t.Kind(), t.APIVersion(), t.Name(), t.Group()).Set(float64(len(list.Items)))
+
+					return nil
+				}
+
+				if err := backoff.Retry(operation, backoff.NewExponentialBackOff()); err != nil {
+					t.logger.Log("error", "could not get tpo metrics", "message", err.Error())
+				}
+			}
+		}
+	}()
 }

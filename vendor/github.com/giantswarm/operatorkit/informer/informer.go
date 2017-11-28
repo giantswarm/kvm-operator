@@ -22,7 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cenk/backoff"
 	"github.com/giantswarm/microerror"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/watch"
@@ -42,7 +41,6 @@ const (
 type Config struct {
 	// Dependencies.
 
-	BackOff        backoff.BackOff
 	WatcherFactory WatcherFactory
 
 	// Settings.
@@ -61,7 +59,6 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		BackOff:        nil,
 		WatcherFactory: nil,
 
 		// Settings.
@@ -74,7 +71,6 @@ func DefaultConfig() Config {
 // in a deterministic way.
 type Informer struct {
 	// Dependencies.
-	backOff        backoff.BackOff
 	watcherFactory WatcherFactory
 
 	// Internals.
@@ -89,9 +85,6 @@ type Informer struct {
 // New creates a new Informer.
 func New(config Config) (*Informer, error) {
 	// Dependencies.
-	if config.BackOff == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.BackOff must not be empty")
-	}
 	if config.WatcherFactory == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.WatcherFactory must not be empty")
 	}
@@ -103,7 +96,6 @@ func New(config Config) (*Informer, error) {
 
 	newInformer := &Informer{
 		// Settings.
-		backOff:        config.BackOff,
 		watcherFactory: config.WatcherFactory,
 
 		// Internals.
@@ -156,19 +148,23 @@ func (i *Informer) Watch(ctx context.Context) (chan watch.Event, chan watch.Even
 				case watch.Added:
 					err := i.cacheAndSendIfNotExists(event, updateChan)
 					if err != nil {
+						watchEventCounter.WithLabelValues("error").Inc()
 						errChan <- microerror.Mask(err)
 					}
 				case watch.Deleted:
 					err := i.uncacheAndSend(event, deleteChan)
 					if err != nil {
+						watchEventCounter.WithLabelValues("error").Inc()
 						errChan <- microerror.Mask(err)
 					}
 				case watch.Modified:
 					err := i.cacheAndSend(event, deleteChan, updateChan)
 					if err != nil {
+						watchEventCounter.WithLabelValues("error").Inc()
 						errChan <- microerror.Mask(err)
 					}
 				default:
+					watchEventCounter.WithLabelValues("error").Inc()
 					errChan <- microerror.Maskf(invalidEventError, "%#v", event)
 				}
 			}
@@ -182,6 +178,7 @@ func (i *Informer) Watch(ctx context.Context) (chan watch.Event, chan watch.Even
 		{
 			err := i.fillCache(ctx, eventChan)
 			if err != nil {
+				watchEventCounter.WithLabelValues("error").Inc()
 				errChan <- microerror.Mask(err)
 			}
 			close(i.initializer)
@@ -202,6 +199,7 @@ func (i *Informer) Watch(ctx context.Context) (chan watch.Event, chan watch.Even
 						default:
 							err := i.streamEvents(ctx, eventChan)
 							if err != nil {
+								watchEventCounter.WithLabelValues("error").Inc()
 								errChan <- microerror.Mask(err)
 							}
 						}
@@ -248,8 +246,10 @@ func (i *Informer) cacheAndSend(event watch.Event, deleteChan, updateChan chan w
 	}
 	t := m.GetDeletionTimestamp()
 	if t == nil {
+		watchEventCounter.WithLabelValues("update").Inc()
 		updateChan <- event
 	} else {
+		watchEventCounter.WithLabelValues("delete").Inc()
 		deleteChan <- event
 	}
 
@@ -277,6 +277,7 @@ func (i *Informer) cacheAndSendIfNotExists(event watch.Event, updateChan chan wa
 
 	_, ok := i.cache.Load(k)
 	if !ok && i.isCachedFilled() {
+		watchEventCounter.WithLabelValues("create").Inc()
 		updateChan <- event
 	}
 
@@ -310,8 +311,6 @@ func (i *Informer) fillCache(ctx context.Context, eventChan chan watch.Event) er
 			return nil
 		}
 	}
-
-	return nil
 }
 
 // isCachedFilled checks whether the informer cache is filled.
@@ -339,7 +338,11 @@ func (i *Informer) sendCachedEvents(ctx context.Context, deleteChan, updateChan 
 	// the first event object after the configured resync period.
 	var useRateWait bool
 
+	var count int
+
 	i.cache.Range(func(k, v interface{}) bool {
+		count++
+
 		e := v.(watch.Event)
 
 		if useRateWait && i.rateWait != 0 {
@@ -353,12 +356,15 @@ func (i *Informer) sendCachedEvents(ctx context.Context, deleteChan, updateChan 
 		default:
 			m, err := meta.Accessor(e.Object)
 			if err != nil {
+				watchEventCounter.WithLabelValues("error").Inc()
 				errChan <- microerror.Mask(err)
 			} else {
 				t := m.GetDeletionTimestamp()
 				if t == nil {
+					watchEventCounter.WithLabelValues("update").Inc()
 					updateChan <- e
 				} else {
+					watchEventCounter.WithLabelValues("delete").Inc()
 					deleteChan <- e
 				}
 			}
@@ -366,6 +372,8 @@ func (i *Informer) sendCachedEvents(ctx context.Context, deleteChan, updateChan 
 
 		return true
 	})
+
+	cacheSizeGauge.Set(float64(count))
 }
 
 // streamEvents creates a new watcher and sends event objects the watcher
@@ -389,17 +397,17 @@ func (i *Informer) streamEvents(ctx context.Context, eventChan chan watch.Event)
 			if ok {
 				eventChan <- event
 			} else {
+				watcherCloseCounter.Inc()
 				return nil
 			}
 		}
 	}
-
-	return nil
 }
 
 // uncacheAndSend sends the received event to the provided delete channel and
 // removes the event object from the internal informer cache.
 func (i *Informer) uncacheAndSend(event watch.Event, deleteChan chan watch.Event) error {
+	watchEventCounter.WithLabelValues("delete").Inc()
 	deleteChan <- event
 
 	k, err := cache.MetaNamespaceKeyFunc(event.Object)

@@ -1,14 +1,18 @@
-hash: f455fc36abb9624da2e2e4c1a584377514f8c922faee0330fa5046edf705fae4
-updated: 2017-10-13T08:43:59.571209741+02:00
+hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
+updated: 2017-11-27T12:24:49.441439+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/cenk/backoff
-  version: 61ba96c4d1002f22e06acb8e34a7650611125a63
+  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/cenkalti/backoff
-  version: 61ba96c4d1002f22e06acb8e34a7650611125a63
+  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
+- name: github.com/coreos/go-semver
+  version: 8ab6407b697782a06568d4b7f1db25550ec2e4c6
+  subpackages:
+  - semver
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
@@ -29,9 +33,10 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/certificatetpr
-  version: 02983fbbe2165d6acd9e6cb081ace6769311d67a
+  version: 9a7c674d13714bc7a5258453570bc8163a47b2cc
   subpackages:
   - certificatetprtest
+  - spec
 - name: github.com/giantswarm/clustertpr
   version: 6b89a787f157c5531d1c955c32b3c621f0d64c3a
   subpackages:
@@ -44,29 +49,30 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 7d46932eb7e895064a8c2d646123802669a24df9
+  version: 62aa3dc074ab045375dbad85001afe69c9f82487
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
-  version: 7639997ea1e6b770028a71712097ea68655695b8
+  version: a59418a32c5b5280b58e4dc95fcb14f0cdfb6bed
   subpackages:
   - spec
   - spec/kvm
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
+  - spec/kvm/nodecontroller
 - name: github.com/giantswarm/microendpoint
-  version: 1ea4d8cd5f0167625f134c855ae42fc747191890
+  version: 26dce6e1681c27e7a150bccedb82a45109a0a6be
   subpackages:
   - endpoint/healthz
   - endpoint/version
   - service/healthz
   - service/version
 - name: github.com/giantswarm/microerror
-  version: 5ade94eb4ee35ef72eb9382228470caeddb29989
+  version: ec5f66bb657662031c0d651504fee6908cdf28d9
 - name: github.com/giantswarm/microkit
-  version: 4871f763488a16c5b7ea3c411bbd82cd5139e29a
+  version: e6c3aafd2c6b8298599dc465dc1294fbd025d2f1
   subpackages:
   - command
   - command/daemon
@@ -84,27 +90,27 @@ imports:
   - transaction/context/id
   - transaction/context/tracked
 - name: github.com/giantswarm/micrologger
-  version: 8a69b2ab80ba2d0bd40d609206518fefacfc8fdf
+  version: bab5376fda89f10a5ebc5bd9feedab634400ab75
   subpackages:
+  - loggermeta
   - microloggertest
 - name: github.com/giantswarm/microstorage
   version: 99418478ec8f5c68f9b5fc5e6be7e0474948f80d
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 53da8cd36ce876d8d3dfe9c0bada1b11d9758926
+  version: a805b836b6c6f5d03c923b86d443a86484114f8b
   subpackages:
-  - client/k8s
+  - client/k8sclient
   - framework
-  - framework/canceledcontext
-  - framework/logresource
-  - framework/metricsresource
-  - framework/retryresource
-  - framework/updateallowedcontext
+  - framework/context/canceledcontext
+  - framework/context/updateallowedcontext
+  - framework/resource/metricsresource
+  - framework/resource/retryresource
   - informer
   - tpr
-- name: github.com/giantswarm/randomkeytpr
-  version: cde692def8cce039a7469a846a78cfac255f9845
+- name: github.com/giantswarm/versionbundle
+  version: 3b7cd23ec96043f5193c1b6c966fade961f0da65
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -125,6 +131,8 @@ imports:
   version: 6aced65f8501fe1217321abf0749d354824ba2ff
 - name: github.com/go-openapi/swag
   version: 1d0bd113de87027671077d3c71eb3ac5d7dbba72
+- name: github.com/go-resty/resty
+  version: 9ac9c42358f7c3c69ac9f8610e8790d7c338e85d
 - name: github.com/go-stack/stack
   version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - name: github.com/gogo/protobuf
@@ -149,7 +157,7 @@ imports:
   subpackages:
   - simplelru
 - name: github.com/hashicorp/hcl
-  version: 42e33e2d55a0ff1d6263f738896ea8c13571a8d0
+  version: 23c074d0eceb2b8a5bfdbb271ab780cde70f05a8
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -168,7 +176,7 @@ imports:
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 - name: github.com/magiconair/properties
-  version: 8d7837e64d3c1ee4e54a880c5a920ab4316fc90a
+  version: 49d762b9817ba1c2e9d0c69183c2b4a8b8f1d934
 - name: github.com/mailru/easyjson
   version: d5b7844b561a7bc640052f1b935f7b800330d7e0
   subpackages:
@@ -180,26 +188,26 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
-  version: d0303fe809921458f417bcf828397a65db30a7e4
+  version: 06020f85339e21b2478f756a78e295255ffa4d6a
 - name: github.com/pelletier/go-toml
-  version: 2009e44b6f182e34d8ce081ac2767622937ea3d4
+  version: 4e9e0ee19b60b13eb79915933f44d8ed5f268bdd
 - name: github.com/prometheus/client_golang
-  version: c5b7fccd204277076155f10851dad72b76a49317
+  version: 1cdba8fdde81f444626530cce66e138d2f68ae1c
   subpackages:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: 6f3806018612930941127f2a7c6c453ba2c527d2
+  version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 1bab55dd05dbff384524a6a1c99006d9eb5f139b
+  version: 2e54d0b93cba2fd133edc32211dcc32c06ef72ca
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
+  version: a6e9df898b1336106c743392c48ee0b71f5c4efa
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell
@@ -207,19 +215,19 @@ imports:
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/spf13/afero
-  version: e67d870304c4bca21331b02f414f970df13aa694
+  version: 8d919cbe7e2627e417f3e45c3c0e489a5b7e2536
   subpackages:
   - mem
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
+  version: 1be1d2841c773c01bee8289f55f7463b6e2c2539
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
-  version: a9789e855c7696159b7db0db7f440b449edf2b31
+  version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: github.com/spf13/viper
-  version: d9cca5ef33035202efb1586825bdbb15ff9ec3ba
+  version: 4dddf7c62e16bce5807744018f5b753bfe21bbd2
 - name: github.com/tylerb/graceful
   version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 - name: github.com/ugorji/go
@@ -234,6 +242,11 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
+  - publicsuffix
+- name: golang.org/x/sync
+  version: fd80eb99c8f653c847d294a001bdf2a3a6f768f5
+  subpackages:
+  - errgroup
 - name: golang.org/x/sys
   version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:
@@ -254,7 +267,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
 - name: k8s.io/apimachinery
   version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:

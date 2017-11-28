@@ -6,8 +6,77 @@ import (
 	"testing"
 
 	"github.com/cenk/backoff"
+	"github.com/giantswarm/micrologger/loggermeta"
 	"github.com/giantswarm/micrologger/microloggertest"
+	"github.com/giantswarm/operatorkit/informer/informertest"
+	"github.com/giantswarm/operatorkit/tpr/tprtest"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/client-go/pkg/api/v1"
 )
+
+func Test_Framework_InitCtxFunc(t *testing.T) {
+	testCases := []struct {
+		Object                   interface{}
+		InitCtxFunc              func(ctx context.Context, obj interface{}) (context.Context, error)
+		ExpectedLoggerMetaSet    bool
+		ExpectedLoggerMetaObject string
+	}{
+		{
+			Object: &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					SelfLink: "/api/v1/namespace/default/pods/test-pod",
+				},
+			},
+			ExpectedLoggerMetaSet:    true,
+			ExpectedLoggerMetaObject: "/api/v1/namespace/default/pods/test-pod",
+		},
+		{
+			Object:                nil,
+			ExpectedLoggerMetaSet: false,
+		},
+		{
+			Object:                "non-runtime-object",
+			ExpectedLoggerMetaSet: false,
+		},
+	}
+	for i, tc := range testCases {
+		r := &testInitCtxFuncResource{}
+
+		var f *Framework
+		{
+			c := DefaultConfig()
+
+			c.BackOffFactory = func() backoff.BackOff { return &backoff.StopBackOff{} }
+			c.Informer = informertest.New()
+			c.InitCtxFunc = tc.InitCtxFunc
+			c.Logger = microloggertest.New()
+			c.ResourceRouter = DefaultResourceRouter([]Resource{
+				r,
+			})
+			c.TPR = tprtest.New()
+
+			var err error
+			f, err = New(c)
+			if err != nil {
+				t.Fatal("expected", nil, "got", err)
+			}
+		}
+
+		ctx, err := f.initCtxFunc(context.Background(), tc.Object)
+		if err != nil {
+			t.Fatal("test", i+1, "expected", nil, "got", err)
+		}
+
+		meta, ok := loggermeta.FromContext(ctx)
+		if tc.ExpectedLoggerMetaSet != ok {
+			t.Fatal("test", i+1, "expected", tc.ExpectedLoggerMetaSet, "got", ok)
+		}
+
+		if ok && (tc.ExpectedLoggerMetaObject != meta.KeyVals["object"]) {
+			t.Fatal("test", i+1, "expected", tc.ExpectedLoggerMetaObject, "got", meta.KeyVals["object"])
+		}
+	}
+}
 
 func Test_Framework_InitCtxFunc_AddFunc(t *testing.T) {
 	testCases := []struct {
@@ -31,14 +100,10 @@ func Test_Framework_InitCtxFunc_AddFunc(t *testing.T) {
 			ExpectedOrder: []string{
 				"GetCurrentState",
 				"GetDesiredState",
-				"GetCreateState",
-				"ProcessCreateState",
-				"GetCurrentState",
-				"GetDesiredState",
-				"GetUpdateState",
-				"ProcessCreateState",
-				"ProcessDeleteState",
-				"ProcessUpdateState",
+				"NewUpdatePatch",
+				"Create",
+				"Delete",
+				"Update",
 			},
 		},
 	}
@@ -50,12 +115,14 @@ func Test_Framework_InitCtxFunc_AddFunc(t *testing.T) {
 		{
 			c := DefaultConfig()
 
-			c.BackOff = &backoff.StopBackOff{}
+			c.BackOffFactory = func() backoff.BackOff { return &backoff.StopBackOff{} }
+			c.Informer = informertest.New()
 			c.InitCtxFunc = tc.InitCtxFunc
 			c.Logger = microloggertest.New()
-			c.Resources = []Resource{
+			c.ResourceRouter = DefaultResourceRouter([]Resource{
 				r,
-			}
+			})
+			c.TPR = tprtest.New()
 
 			var err error
 			f, err = New(c)
@@ -94,8 +161,10 @@ func Test_Framework_InitCtxFunc_DeleteFunc(t *testing.T) {
 			ExpectedOrder: []string{
 				"GetCurrentState",
 				"GetDesiredState",
-				"GetDeleteState",
-				"ProcessDeleteState",
+				"NewDeletePatch",
+				"Create",
+				"Delete",
+				"Update",
 			},
 		},
 	}
@@ -107,12 +176,14 @@ func Test_Framework_InitCtxFunc_DeleteFunc(t *testing.T) {
 		{
 			c := DefaultConfig()
 
-			c.BackOff = &backoff.StopBackOff{}
+			c.BackOffFactory = func() backoff.BackOff { return &backoff.StopBackOff{} }
+			c.Informer = informertest.New()
 			c.InitCtxFunc = tc.InitCtxFunc
 			c.Logger = microloggertest.New()
-			c.Resources = []Resource{
+			c.ResourceRouter = DefaultResourceRouter([]Resource{
 				r,
-			}
+			})
+			c.TPR = tprtest.New()
 
 			var err error
 			f, err = New(c)
@@ -151,14 +222,10 @@ func Test_Framework_InitCtxFunc_UpdateFunc(t *testing.T) {
 			ExpectedOrder: []string{
 				"GetCurrentState",
 				"GetDesiredState",
-				"GetCreateState",
-				"ProcessCreateState",
-				"GetCurrentState",
-				"GetDesiredState",
-				"GetUpdateState",
-				"ProcessCreateState",
-				"ProcessDeleteState",
-				"ProcessUpdateState",
+				"NewUpdatePatch",
+				"Create",
+				"Delete",
+				"Update",
 			},
 		},
 	}
@@ -170,12 +237,14 @@ func Test_Framework_InitCtxFunc_UpdateFunc(t *testing.T) {
 		{
 			c := DefaultConfig()
 
-			c.BackOff = &backoff.StopBackOff{}
+			c.BackOffFactory = func() backoff.BackOff { return &backoff.StopBackOff{} }
+			c.Informer = informertest.New()
 			c.InitCtxFunc = tc.InitCtxFunc
 			c.Logger = microloggertest.New()
-			c.Resources = []Resource{
+			c.ResourceRouter = DefaultResourceRouter([]Resource{
 				r,
-			}
+			})
+			c.TPR = tprtest.New()
 
 			var err error
 			f, err = New(c)
@@ -216,64 +285,62 @@ func (r *testInitCtxFuncResource) GetDesiredState(ctx context.Context, obj inter
 	return nil, nil
 }
 
-func (r *testInitCtxFuncResource) GetCreateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
+func (r *testInitCtxFuncResource) NewUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*Patch, error) {
 	_, ok := testInitCtxFuncFromContext(ctx)
 	if ok {
-		m := "GetCreateState"
+		m := "NewUpdatePatch"
 		r.Order = append(r.Order, m)
 	}
 
-	return nil, nil
+	p := NewPatch()
+	p.SetCreateChange("test create state")
+	p.SetUpdateChange("test update state")
+	p.SetDeleteChange("test delete state")
+	return p, nil
 }
 
-func (r *testInitCtxFuncResource) GetDeleteState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
+func (r *testInitCtxFuncResource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*Patch, error) {
 	_, ok := testInitCtxFuncFromContext(ctx)
 	if ok {
-		m := "GetDeleteState"
+		m := "NewDeletePatch"
 		r.Order = append(r.Order, m)
 	}
 
-	return nil, nil
-}
-
-func (r *testInitCtxFuncResource) GetUpdateState(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, interface{}, interface{}, error) {
-	_, ok := testInitCtxFuncFromContext(ctx)
-	if ok {
-		m := "GetUpdateState"
-		r.Order = append(r.Order, m)
-	}
-
-	return nil, nil, nil, nil
+	p := NewPatch()
+	p.SetCreateChange("test create state")
+	p.SetUpdateChange("test update state")
+	p.SetDeleteChange("test delete state")
+	return p, nil
 }
 
 func (r *testInitCtxFuncResource) Name() string {
 	return "testInitCtxFuncResource"
 }
 
-func (r *testInitCtxFuncResource) ProcessCreateState(ctx context.Context, obj, createState interface{}) error {
+func (r *testInitCtxFuncResource) ApplyCreateChange(ctx context.Context, obj, createState interface{}) error {
 	_, ok := testInitCtxFuncFromContext(ctx)
 	if ok {
-		m := "ProcessCreateState"
+		m := "Create"
 		r.Order = append(r.Order, m)
 	}
 
 	return nil
 }
 
-func (r *testInitCtxFuncResource) ProcessDeleteState(ctx context.Context, obj, deleteState interface{}) error {
+func (r *testInitCtxFuncResource) ApplyDeleteChange(ctx context.Context, obj, deleteState interface{}) error {
 	_, ok := testInitCtxFuncFromContext(ctx)
 	if ok {
-		m := "ProcessDeleteState"
+		m := "Delete"
 		r.Order = append(r.Order, m)
 	}
 
 	return nil
 }
 
-func (r *testInitCtxFuncResource) ProcessUpdateState(ctx context.Context, obj, updateState interface{}) error {
+func (r *testInitCtxFuncResource) ApplyUpdateChange(ctx context.Context, obj, updateState interface{}) error {
 	_, ok := testInitCtxFuncFromContext(ctx)
 	if ok {
-		m := "ProcessUpdateState"
+		m := "Update"
 		r.Order = append(r.Order, m)
 	}
 

@@ -568,6 +568,10 @@ func UnquoteUsage(flag *Flag) (name string, usage string) {
 		name = "strings"
 	case "intSlice":
 		name = "ints"
+	case "uintSlice":
+		name = "uints"
+	case "boolSlice":
+		name = "bools"
 	}
 
 	return
@@ -873,8 +877,10 @@ func VarP(value Value, name, shorthand, usage string) {
 // returns the error.
 func (f *FlagSet) failf(format string, a ...interface{}) error {
 	err := fmt.Errorf(format, a...)
-	fmt.Fprintln(f.out(), err)
-	f.usage()
+	if f.errorHandling != ContinueOnError {
+		fmt.Fprintln(f.out(), err)
+		f.usage()
+	}
 	return err
 }
 
@@ -1056,6 +1062,7 @@ func (f *FlagSet) Parse(arguments []string) error {
 		case ContinueOnError:
 			return err
 		case ExitOnError:
+			fmt.Println(err)
 			os.Exit(2)
 		case PanicOnError:
 			panic(err)

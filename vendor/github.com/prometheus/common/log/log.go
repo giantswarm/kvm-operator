@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 // setSyslogFormatter is nil if the target architecture does not support syslog.
@@ -56,11 +55,11 @@ func (s *loggerSettings) apply(ctx *kingpin.ParseContext) error {
 // To use the default Kingpin application, call AddFlags(kingpin.CommandLine)
 func AddFlags(a *kingpin.Application) {
 	s := loggerSettings{}
-	kingpin.Flag("log.level", "Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal]").
+	a.Flag("log.level", "Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal]").
 		Default(origLogger.Level.String()).
 		StringVar(&s.level)
 	defaultFormat := url.URL{Scheme: "logger", Opaque: "stderr"}
-	kingpin.Flag("log.format", `Set the log target and format. Example: "logger:syslog?appname=bob&local=7" or "logger:stdout?json=true"`).
+	a.Flag("log.format", `Set the log target and format. Example: "logger:syslog?appname=bob&local=7" or "logger:stdout?json=true"`).
 		Default(defaultFormat.String()).
 		StringVar(&s.format)
 	a.Action(s.apply)

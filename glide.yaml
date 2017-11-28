@@ -1,7 +1,5 @@
 package: github.com/giantswarm/kvm-operator
 import:
-- package: github.com/prometheus/client_golang
-  version: ~0.8.0
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
@@ -10,7 +8,6 @@ import:
   version: master
 - package: github.com/giantswarm/kvmtpr
   version: master
-# Pinned to a version before RBAC magic came in.
 - package: github.com/giantswarm/k8scloudconfig
   version: master
 - package: github.com/giantswarm/k8shealthz
@@ -22,4 +19,6 @@ import:
 - package: github.com/giantswarm/micrologger
   version: master
 - package: github.com/giantswarm/randomkeytpr
+  version: master
+- package: github.com/giantswarm/versionbundle
   version: master

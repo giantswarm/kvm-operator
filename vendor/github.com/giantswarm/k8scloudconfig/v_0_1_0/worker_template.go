@@ -25,6 +25,7 @@ write_files:
     - name: local
       cluster:
         certificate-authority: /etc/kubernetes/ssl/worker-ca.pem
+        server: https://{{.Cluster.Kubernetes.API.Domain}}
     contexts:
     - context:
         cluster: local
@@ -46,6 +47,7 @@ write_files:
     - name: local
       cluster:
         certificate-authority: /etc/kubernetes/ssl/worker-ca.pem
+        server: https://{{.Cluster.Kubernetes.API.Domain}}
     contexts:
     - context:
         cluster: local
@@ -157,7 +159,7 @@ coreos:
 
       [Service]
       Type=oneshot
-      ExecStartPre=/bin/bash -c "gpasswd -d core rkt; gpasswd -d core docker; gpasswd -d core wheel"
+      ExecStartPre=-/bin/bash -c "gpasswd -d core rkt; gpasswd -d core docker; gpasswd -d core wheel"
       ExecStartPre=/bin/bash -c "until [ -f '/etc/sysctl.d/hardening.conf' ]; do echo Waiting for sysctl file; sleep 1s;done;"
       ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/hardening.conf
 
@@ -222,40 +224,6 @@ coreos:
       ExecStart=/usr/bin/docker run --rm --net=host -v /etc:/etc --name $NAME $IMAGE
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
       ExecStopPost=-/usr/bin/docker rm -f $NAME
-  - name: k8s-proxy.service
-    enable: true
-    command: start
-    content: |
-      [Unit]
-      Description=k8s-proxy
-      StartLimitIntervalSec=0
-
-      [Service]
-      Restart=always
-      RestartSec=0
-      TimeoutStopSec=10
-      EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{.Cluster.Kubernetes.Hyperkube.Docker.Image}}"
-      Environment="NAME=%p.service"
-      Environment="NETWORK_CONFIG_CONTAINER="
-      ExecStartPre=/usr/bin/docker pull $IMAGE
-      ExecStartPre=-/usr/bin/docker stop -t 10 $NAME
-      ExecStartPre=-/usr/bin/docker rm -f $NAME      
-      ExecStart=/bin/sh -c "/usr/bin/docker run --rm --net=host --privileged=true \
-      --name $NAME \
-      -v /usr/share/ca-certificates:/etc/ssl/certs \
-      -v /etc/kubernetes/ssl/:/etc/kubernetes/ssl/ \
-      -v /etc/kubernetes/config/:/etc/kubernetes/config/ \
-      $IMAGE \
-      /hyperkube proxy \
-      --master=https://{{.Cluster.Kubernetes.API.Domain}} \
-      --proxy-mode=iptables \
-      --logtostderr=true \
-      --kubeconfig=/etc/kubernetes/config/proxy-kubeconfig.yml \
-      --conntrack-max-per-core 131072 \
-      --v=2"
-      ExecStop=-/usr/bin/docker stop -t 10 $NAME
-      ExecStopPost=-/usr/bin/docker rm -f $NAME
   - name: k8s-kubelet.service
     enable: true
     command: start
@@ -269,7 +237,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{.Cluster.Kubernetes.Hyperkube.Docker.Image}}"
+      Environment="IMAGE=quay.io/giantswarm/hyperkube:v1.8.1_coreos.0"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/docker pull $IMAGE
@@ -291,6 +259,13 @@ coreos:
       -v /etc/kubernetes/config/:/etc/kubernetes/config/ \
       -v /etc/cni/net.d/:/etc/cni/net.d/ \
       -v /opt/cni/bin/:/opt/cni/bin/ \
+      -v /usr/sbin/iscsiadm:/usr/sbin/iscsiadm \
+      -v /etc/iscsi/:/etc/iscsi/ \
+      -v /dev/disk/by-path/:/dev/disk/by-path/ \
+      -v /dev/mapper/:/dev/mapper/ \
+      -v /usr/sbin/mkfs.xfs:/usr/sbin/mkfs.xfs \
+      -v /usr/lib64/libxfs.so.0:/usr/lib/libxfs.so.0 \
+      -v /usr/lib64/libxcmd.so.0:/usr/lib/libxcmd.so.0 \
       -e ETCD_CA_CERT_FILE=/etc/kubernetes/ssl/etcd/client-ca.pem \
       -e ETCD_CERT_FILE=/etc/kubernetes/ssl/etcd/client-crt.pem \
       -e ETCD_KEY_FILE=/etc/kubernetes/ssl/etcd/client-key.pem \
@@ -300,7 +275,6 @@ coreos:
       --address=${DEFAULT_IPV4} \
       --port={{.Cluster.Kubernetes.Kubelet.Port}} \
       --node-ip=${DEFAULT_IPV4} \
-      --api-servers=https://{{.Cluster.Kubernetes.API.Domain}} \
       --containerized \
       --enable-server \
       --logtostderr=true \
@@ -316,38 +290,11 @@ coreos:
       --allow-privileged=true \
       --kubeconfig=/etc/kubernetes/config/kubelet-kubeconfig.yml \
       --node-labels="kubernetes.io/hostname=${HOSTNAME},ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
+      --kube-reserved="cpu=150m,memory=250Mi" \
+      --system-reserved="cpu=150m,memory=250Mi" \
       --v=2"
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
       ExecStopPost=-/usr/bin/docker rm -f $NAME
-  - name: node-exporter.service
-    enable: true
-    command: start
-    content: |
-      [Unit]
-      Description=Prometheus Node Exporter Service
-      Requires=docker.service
-      After=docker.service
-
-      [Service]
-      Restart=always
-      RestartSec=0
-      TimeoutStopSec=10
-      Environment="IMAGE=prom/node-exporter:0.12.0"
-      Environment="NAME=%p.service"
-      ExecStartPre=/usr/bin/docker pull $IMAGE
-      ExecStartPre=-/usr/bin/docker stop -t 10 $NAME
-      ExecStartPre=-/usr/bin/docker rm -f $NAME
-      ExecStart=/usr/bin/docker run --rm \
-        -p 91:91 \
-        --net=host \
-        --name $NAME \
-        $IMAGE \
-        --web.listen-address=:91
-      ExecStop=-/usr/bin/docker stop -t 10 $NAME
-      ExecStopPost=-/usr/bin/docker rm -f $NAME
-
-      [Install]
-      WantedBy=multi-user.target
 
   update:
     reboot-strategy: off
