@@ -1795,9 +1795,9 @@ coreos:
       Type=oneshot
       RemainAfterExit=yes
       TimeoutStartSec=0
-      ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/data/etcd
-      ExecStartPre=/bin/bash -c "until [ -f '/etc/kubernetes/data/etcd' ]; do echo Waiting for etcd data directory; sleep 1s;done;"
-      ExecStart=/bin/bash -c "/usr/bin/chown etcd:etcd /etc/kubernetes/data/etcd; /usr/bin/chmod -R 700 /etc/kubernetes/data/etcd"
+      ExecStart=/usr/bin/mkdir -p /etc/kubernetes/data/etcd
+      ExecStart=/usr/bin/chown etcd:etcd /etc/kubernetes/data/etcd
+      ExecStart=/usr/bin/chmod -R 700 /etc/kubernetes/data/etcd
   - name: docker.service
     enable: true
     command: start
@@ -2057,7 +2057,7 @@ coreos:
       --allow_privileged=true \
       --insecure_bind_address=0.0.0.0 \
       --anonymous-auth=false \
-      --insecure-port=0 \
+      --insecure_port=0 \
       --kubelet_https=true \
       --kubelet-preferred-address-types=InternalIP \
       --secure_port={{.Cluster.Kubernetes.API.SecurePort}} \
@@ -2084,8 +2084,7 @@ coreos:
       --audit-log-path=/var/log/apiserver/audit.log \
       --audit-log-maxage=30 \
       --audit-log-maxbackup=10 \
-      --audit-log-maxsize=100 \
-      --experimental-encryption-provider-config=/etc/kubernetes/encryption/k8s-encryption-config.yaml
+      --audit-log-maxsize=100
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
       ExecStopPost=-/usr/bin/docker rm -f $NAME
   - name: k8s-controller-manager.service
