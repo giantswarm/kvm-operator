@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cenkalti/backoff"
+	"github.com/cenk/backoff"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/micrologger/loggermeta"
@@ -25,7 +25,8 @@ import (
 type Config struct {
 	// Dependencies.
 
-	Informer informer.Interface
+	BackOffFactory func() backoff.BackOff
+	Informer       informer.Interface
 	// InitCtxFunc is to prepare the given context for a single reconciliation
 	// loop. Operators can implement common context packages to enable
 	// communication between resources. These context packages can be set up
@@ -47,9 +48,6 @@ type Config struct {
 	//
 	// NOTE this is deprecated since the CRD concept is the successor of the TPR.
 	TPR tpr.Interface
-
-	// Settings.
-	BackOffFactory func() backoff.BackOff
 }
 
 // DefaultConfig provides a default configuration to create a new operator
@@ -57,33 +55,23 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
+		BackOffFactory: nil,
 		Informer:       nil,
+		InitCtxFunc:    nil,
 		Logger:         nil,
 		ResourceRouter: nil,
 		TPR:            nil,
-
-		// Settings.
-		BackOffFactory: func() backoff.BackOff {
-			b := backoff.NewExponentialBackOff()
-			b.MaxElapsedTime = 0
-			return backoff.WithMaxTries(b, 7)
-		},
-		InitCtxFunc: func(ctx context.Context, obj interface{}) (context.Context, error) {
-			return ctx, nil
-		},
 	}
 }
 
 type Framework struct {
 	// Dependencies.
+	backOffFactory func() backoff.BackOff
 	informer       informer.Interface
+	initCtxFunc    func(ctx context.Context, obj interface{}) (context.Context, error)
 	logger         micrologger.Logger
 	resourceRouter func(ctx context.Context, obj interface{}) ([]Resource, error)
 	tpr            tpr.Interface
-
-	// Settings.
-	backOffFactory func() backoff.BackOff
-	initCtxFunc    func(ctx context.Context, obj interface{}) (context.Context, error)
 
 	// Internals.
 	bootOnce sync.Once
@@ -93,6 +81,9 @@ type Framework struct {
 // New creates a new configured operator framework.
 func New(config Config) (*Framework, error) {
 	// Dependencies.
+	if config.BackOffFactory == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.BackOffFactory must not be empty")
+	}
 	if config.Informer == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Informer must not be empty")
 	}
@@ -103,20 +94,15 @@ func New(config Config) (*Framework, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.ResourceRouter must not be empty")
 	}
 
-	// Settings.
-	if config.BackOffFactory == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.BackOffFactory must not be empty")
-	}
-	if config.InitCtxFunc == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.InitCtxFunc must not be empty")
-	}
-
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
 		ctx = canceledcontext.NewContext(ctx, make(chan struct{}))
 
-		ctx, err := config.InitCtxFunc(ctx, obj)
-		if err != nil {
-			return nil, microerror.Maskf(err, "initializing context")
+		if config.InitCtxFunc != nil {
+			var err error
+			ctx, err = config.InitCtxFunc(ctx, obj)
+			if err != nil {
+				return nil, microerror.Maskf(err, "initializing context")
+			}
 		}
 
 		accessor, err := meta.Accessor(obj)
@@ -137,14 +123,12 @@ func New(config Config) (*Framework, error) {
 
 	f := &Framework{
 		// Dependencies.
+		backOffFactory: config.BackOffFactory,
 		informer:       config.Informer,
+		initCtxFunc:    initCtxFunc,
 		logger:         config.Logger,
 		resourceRouter: config.ResourceRouter,
 		tpr:            config.TPR,
-
-		// Settings.
-		backOffFactory: config.BackOffFactory,
-		initCtxFunc:    initCtxFunc,
 
 		// Internals.
 		bootOnce: sync.Once{},

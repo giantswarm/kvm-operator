@@ -1,10 +1,12 @@
-hash: 2158d0d07dd53b8b8c312f12c706899d69c52b8e2ac0e75284757ac55c4947e3
-updated: 2017-11-28T10:04:33.597640284+01:00
+hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
+updated: 2017-11-27T12:24:49.441439+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
+- name: github.com/cenk/backoff
+  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/cenkalti/backoff
   version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/coreos/go-semver
@@ -47,7 +49,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 459a19f48292e3481fa1aff8104105b3c4fd2698
+  version: 62aa3dc074ab045375dbad85001afe69c9f82487
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
@@ -97,7 +99,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: a3ee60105c169617725d14208a9ce9454a29c5b2
+  version: a805b836b6c6f5d03c923b86d443a86484114f8b
   subpackages:
   - client/k8sclient
   - framework

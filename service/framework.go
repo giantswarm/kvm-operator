@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cenkalti/backoff"
+	"github.com/cenk/backoff"
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
@@ -252,6 +252,7 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 	{
 		c := framework.DefaultConfig()
 
+		c.BackOffFactory = framework.DefaultBackOffFactory()
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
@@ -372,6 +373,7 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	{
 		c := framework.DefaultConfig()
 
+		c.BackOffFactory = framework.DefaultBackOffFactory()
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
