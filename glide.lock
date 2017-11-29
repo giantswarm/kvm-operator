@@ -1,5 +1,5 @@
 hash: 6c9fe9ff21142e2520e20d2f13da99a512ebe3c39efe684811a63d36551a378b
-updated: 2017-11-28T17:02:57.899920085+01:00
+updated: 2017-11-29T16:46:08.723316182+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -47,18 +47,19 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 2bb8e6c55338a2cec47782e547f2710f63cd130a
+  version: 6321a5bb6e91675ac820f57f0508fd25f9d6f6bf
   subpackages:
   - v_0_1_0
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
-  version: a59418a32c5b5280b58e4dc95fcb14f0cdfb6bed
+  version: 691d308b74d0a2181f8122816b353854448e15ab
   subpackages:
   - spec
   - spec/kvm
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
+  - spec/kvm/network
   - spec/kvm/nodecontroller
 - name: github.com/giantswarm/microendpoint
   version: 26dce6e1681c27e7a150bccedb82a45109a0a6be
