@@ -7,7 +7,6 @@ import (
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/randomkeytpr"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
@@ -45,22 +44,8 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 		return nil, microerror.Mask(err)
 	}
 
-	encryptionKey, ok := keys[randomkeytpr.EncryptionKey]
-	if !ok {
-		return nil, microerror.Maskf(notFoundError, "could not get encryption keys from secrets")
-	}
-
-	encryptionConfig, err := r.EncryptionConfig(string(encryptionKey))
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	compactKeys := randomkeytpr.CompactRandomKeyAssets{
-		APIServerEncryptionKey: encryptionConfig,
-	}
-
 	for _, node := range customObject.Spec.Cluster.Masters {
-		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node, compactKeys)
+		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node, keys)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -53,7 +53,7 @@ func New(config Config) (*CloudConfig, error) {
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node, keys randomkeytpr.CompactRandomKeyAssets) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node, keys map[randomkeytpr.Key][]byte) (string, error) {
 	var err error
 
 	// TODO remove defaulting as soon as custom objects are configured.

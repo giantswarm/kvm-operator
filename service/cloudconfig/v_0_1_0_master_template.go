@@ -9,15 +9,20 @@ import (
 	"github.com/giantswarm/randomkeytpr"
 )
 
-func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node, keys randomkeytpr.CompactRandomKeyAssets) (string, error) {
+func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node, keys map[randomkeytpr.Key][]byte) (string, error) {
 	var err error
+
+	encryptionKey, ok := keys[randomkeytpr.EncryptionKey]
+	if !ok {
+		return "", microerror.Maskf(notFoundError, "could not get encryption keys from secrets")
+	}
 
 	var params k8scloudconfig.Params
 	{
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &v_0_1_0MasterExtension{
 			certs: certs,
-			keys:  keys,
+			keys:  encryptionKey,
 		}
 		params.Node = node
 	}
@@ -40,10 +45,19 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 
 type v_0_1_0MasterExtension struct {
 	certs certificatetpr.AssetsBundle
-	keys  randomkeytpr.CompactRandomKeyAssets
+	keys  []byte
 }
 
 func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+	encryptionConfig, err := EncryptionConfig(string(e.keys))
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	compactKeys := randomkeytpr.CompactRandomKeyAssets{
+		APIServerEncryptionKey: encryptionConfig,
+	}
+
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{
@@ -142,7 +156,7 @@ func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		},
 		// Encryption key
 		{
-			AssetContent: e.keys.APIServerEncryptionKey,
+			AssetContent: compactKeys.APIServerEncryptionKey,
 			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
 			Owner:        FileOwner,
 			Permissions:  0600,
