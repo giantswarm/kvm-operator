@@ -2,6 +2,7 @@ package cloudconfig
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 
 	"github.com/giantswarm/microerror"
@@ -27,6 +28,7 @@ resources:
 )
 
 func EncryptionConfig(encryptionKey string) (string, error) {
+	fmt.Println("jgsqware-1", encryptionKey)
 	tmpl, err := template.New("encryptionConfig").Parse(encryptionConfigTemplate)
 	if err != nil {
 		return "", microerror.Mask(err)
