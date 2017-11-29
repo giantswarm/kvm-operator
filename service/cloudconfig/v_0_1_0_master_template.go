@@ -12,7 +12,7 @@ import (
 func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node, keys map[randomkeytpr.Key][]byte) (string, error) {
 	var err error
 
-	encryptionKey, ok := keys[randomkeytpr.EncryptionKey]
+	_, ok := keys[randomkeytpr.EncryptionKey]
 	if !ok {
 		return "", microerror.Maskf(notFoundError, "could not get encryption keys from secrets")
 	}
@@ -21,8 +21,8 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 	{
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &v_0_1_0MasterExtension{
-			certs:         certs,
-			encryptionKey: encryptionKey,
+			certs: certs,
+			keys:  keys,
 		}
 		params.Node = node
 	}
@@ -44,12 +44,12 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 }
 
 type v_0_1_0MasterExtension struct {
-	certs         certificatetpr.AssetsBundle
-	encryptionKey []byte
+	certs certificatetpr.AssetsBundle
+	keys  map[randomkeytpr.Key][]byte
 }
 
 func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	encryptionConfig, err := EncryptionConfig(string(e.encryptionKey))
+	encryptionConfig, err := EncryptionConfig(string(e.keys[randomkeytpr.EncryptionKey]))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
