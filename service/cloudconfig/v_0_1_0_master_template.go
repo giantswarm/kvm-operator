@@ -21,8 +21,8 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 	{
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &v_0_1_0MasterExtension{
-			certs: certs,
-			keys:  encryptionKey,
+			certs:         certs,
+			encryptionKey: encryptionKey,
 		}
 		params.Node = node
 	}
@@ -44,18 +44,14 @@ func v_0_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 }
 
 type v_0_1_0MasterExtension struct {
-	certs certificatetpr.AssetsBundle
-	keys  []byte
+	certs         certificatetpr.AssetsBundle
+	encryptionKey []byte
 }
 
 func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	encryptionConfig, err := EncryptionConfig(string(e.keys))
+	encryptionConfig, err := EncryptionConfig(string(e.encryptionKey))
 	if err != nil {
 		return nil, microerror.Mask(err)
-	}
-
-	compactKeys := randomkeytpr.CompactRandomKeyAssets{
-		APIServerEncryptionKey: encryptionConfig,
 	}
 
 	filesMeta := []k8scloudconfig.FileMetadata{
@@ -156,7 +152,7 @@ func (e *v_0_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		},
 		// Encryption key
 		{
-			AssetContent: compactKeys.APIServerEncryptionKey,
+			AssetContent: encryptionConfig,
 			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
 			Owner:        FileOwner,
 			Permissions:  0600,
