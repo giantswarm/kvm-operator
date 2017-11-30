@@ -1,5 +1,5 @@
 hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
-updated: 2017-11-28T15:44:25.458170464+01:00
+updated: 2017-11-30T10:25:18.59368159+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -53,12 +53,13 @@ imports:
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
-  version: a59418a32c5b5280b58e4dc95fcb14f0cdfb6bed
+  version: 691d308b74d0a2181f8122816b353854448e15ab
   subpackages:
   - spec
   - spec/kvm
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
+  - spec/kvm/network
   - spec/kvm/nodecontroller
 - name: github.com/giantswarm/microendpoint
   version: 26dce6e1681c27e7a150bccedb82a45109a0a6be
@@ -97,11 +98,10 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 7bc36a32297dd4f45f94aba0b19a3c6028f831bb
+  version: 2804229e2bf865f72763ec1cf6f1d9dabb096665
   subpackages:
   - client/k8sclient
   - client/k8scrdclient
-  - crd
   - framework
   - framework/context/canceledcontext
   - framework/context/updateallowedcontext
@@ -184,7 +184,7 @@ imports:
   - jlexer
   - jwriter
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
@@ -201,13 +201,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 2e54d0b93cba2fd133edc32211dcc32c06ef72ca
+  version: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a6e9df898b1336106c743392c48ee0b71f5c4efa
+  version: 65c1f6f8f0fc1e2185eb9863a3bc751496404259
   subpackages:
   - xfs
 - name: github.com/PuerkitoBio/purell

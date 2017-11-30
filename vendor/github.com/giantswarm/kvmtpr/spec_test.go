@@ -23,6 +23,7 @@ import (
 	kvm "github.com/giantswarm/kvmtpr/spec/kvm"
 	"github.com/giantswarm/kvmtpr/spec/kvm/endpointupdater"
 	"github.com/giantswarm/kvmtpr/spec/kvm/k8skvm"
+	"github.com/giantswarm/kvmtpr/spec/kvm/network"
 	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
 )
 
@@ -142,6 +143,11 @@ func TestSpecYamlEncoding(t *testing.T) {
 					CPUs:   2,
 					Disk:   10,
 					Memory: "2G",
+				},
+			},
+			Network: kvm.Network{
+				network.Flannel{
+					VNI: 10,
 				},
 			},
 			NodeController: kvm.NodeController{
