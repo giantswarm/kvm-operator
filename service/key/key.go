@@ -29,12 +29,12 @@ const (
 	InitialDelaySeconds = 60
 	TimeoutSeconds      = 3
 	PeriodSeconds       = 10
-	FailureThreshold    = 3
+	FailureThreshold    = 2
 	SuccessThreshold    = 1
 
 	FlannelEnvPathPrefix = "/run/flannel"
 
-	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:729cb9a92087cde9706225b1a1cb8d01c5f6eb4a"
+	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:8ef3faf2660cfbabc14d41c0203eaa68f5b8a881"
 )
 
 const (
