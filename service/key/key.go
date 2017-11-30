@@ -19,6 +19,22 @@ const (
 	MasterID         = "master"
 	NodeControllerID = "node-controller"
 	WorkerID         = "worker"
+	// base port for liveness probes
+	portBase = 21000
+	// health endpoint
+	HealthEndpoint = "/healthz"
+	// liveness probe host
+	ProbeHost = "127.0.0.1"
+	// liveness config
+	InitialDelaySeconds = 60
+	TimeoutSeconds      = 3
+	PeriodSeconds       = 10
+	FailureThreshold    = 3
+	SuccessThreshold    = 2
+
+	FlannelEnvPathPrefix = "/run/flannel"
+
+	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:729cb9a92087cde9706225b1a1cb8d01c5f6eb4a"
 )
 
 const (
@@ -76,6 +92,18 @@ func HasNodeController(customObject kvmtpr.CustomObject) bool {
 		return true
 	}
 	return false
+}
+
+func NetworkEnvFilePath(customObject kvmtpr.CustomObject) string {
+	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
+}
+
+func HealthListenAddress(customObject kvmtpr.CustomObject) string {
+	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
+}
+
+func LivenessPort(customObject kvmtpr.CustomObject) int32 {
+	return int32(portBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
 
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
