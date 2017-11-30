@@ -28,13 +28,13 @@ const (
 	// InitialDelaySeconds is InitialDelaySeconds param in liveness probe config
 	InitialDelaySeconds = 60
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config
-	TimeoutSeconds      = 3
+	TimeoutSeconds = 3
 	// PeriodSeconds is PeriodSeconds param in liveness probe config
-	PeriodSeconds       = 20
+	PeriodSeconds = 20
 	// FailureThreshold is FailureThreshold param in liveness probe config
-	FailureThreshold    = 4
+	FailureThreshold = 4
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
-	SuccessThreshold    = 1
+	SuccessThreshold = 1
 
 	FlannelEnvPathPrefix = "/run/flannel"
 
