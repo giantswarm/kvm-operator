@@ -28,13 +28,13 @@ const (
 	// liveness config
 	InitialDelaySeconds = 60
 	TimeoutSeconds      = 3
-	PeriodSeconds       = 10
-	FailureThreshold    = 2
+	PeriodSeconds       = 20
+	FailureThreshold    = 4
 	SuccessThreshold    = 1
 
 	FlannelEnvPathPrefix = "/run/flannel"
 
-	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:8ef3faf2660cfbabc14d41c0203eaa68f5b8a881"
+	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 )
 
 const (
