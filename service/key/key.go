@@ -20,7 +20,7 @@ const (
 	NodeControllerID = "node-controller"
 	WorkerID         = "worker"
 	// base port for liveness probes
-	portBase = 21000
+	portBase = 23000
 	// health endpoint
 	HealthEndpoint = "/healthz"
 	// liveness probe host
