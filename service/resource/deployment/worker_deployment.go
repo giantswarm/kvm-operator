@@ -11,6 +11,7 @@ import (
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
 	"github.com/giantswarm/kvm-operator/service/key"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Deployment, error) {
@@ -96,6 +97,14 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
+							{
+								Name: "flannel",
+								VolumeSource: apiv1.VolumeSource{
+									HostPath: &apiv1.HostPathVolumeSource{
+										Path: key.FlannelEnvPathPrefix,
+									},
+								},
+							},
 						},
 						Containers: []apiv1.Container{
 							{
@@ -176,6 +185,20 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 										Value: "/cloudconfig/user_data",
 									},
 								},
+								LivenessProbe: &apiv1.Probe{
+									InitialDelaySeconds: key.InitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: key.LivenessPort(customObject)},
+											Host: key.ProbeHost,
+										},
+									},
+								},
 								Resources: apiv1.ResourceRequirements{
 									Requests: map[apiv1.ResourceName]resource.Quantity{
 										apiv1.ResourceCPU:    cpuQuantity,
@@ -194,6 +217,30 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									{
 										Name:      "rootfs",
 										MountPath: "/usr/code/rootfs/",
+									},
+								},
+							},
+							{
+								Name:            "k8s-kvm-health",
+								Image:           key.K8SKVMHealthDocker,
+								ImagePullPolicy: apiv1.PullAlways,
+								Env: []apiv1.EnvVar{
+									{
+										Name:  "LISTEN_ADDRESS",
+										Value: key.HealthListenAddress(customObject),
+									},
+									{
+										Name:  "NETWORK_ENV_FILE_PATH",
+										Value: key.NetworkEnvFilePath(customObject),
+									},
+								},
+								SecurityContext: &apiv1.SecurityContext{
+									Privileged: &privileged,
+								},
+								VolumeMounts: []apiv1.VolumeMount{
+									{
+										Name:      "flannel",
+										MountPath: key.FlannelEnvPathPrefix,
 									},
 								},
 							},
