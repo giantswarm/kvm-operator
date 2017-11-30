@@ -30,7 +30,7 @@ const (
 	TimeoutSeconds      = 3
 	PeriodSeconds       = 10
 	FailureThreshold    = 3
-	SuccessThreshold    = 2
+	SuccessThreshold    = 1
 
 	FlannelEnvPathPrefix = "/run/flannel"
 

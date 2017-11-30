@@ -129,6 +129,14 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
+							{
+								Name: "flannel",
+								VolumeSource: apiv1.VolumeSource{
+									HostPath: &apiv1.HostPathVolumeSource{
+										Path: key.FlannelEnvPathPrefix,
+									},
+								},
+							},
 						},
 						Containers: []apiv1.Container{
 							{
@@ -268,7 +276,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeMounts: []apiv1.VolumeMount{
 									{
 										Name:      "flannel",
-										MountPath: "/run/flannel",
+										MountPath: key.FlannelEnvPathPrefix,
 									},
 								},
 							},
