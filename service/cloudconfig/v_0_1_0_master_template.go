@@ -226,17 +226,17 @@ ExecStart=/bin/sh -c "\
 WantedBy=multi-user.target
 `,
 
-/*
-ExecStartPre=/bin/sh -c "while ! /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get no 2>/dev/null 1>/dev/null; do sleep 1 && echo 'Waiting for healthy k8s'; done"
-ExecStartPre=/bin/sh -c "/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-node"
-ExecStartPre=/bin/sh -c "sleep 1m"
-ExecStart=/bin/sh -c "/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy"
+			/*
+			   ExecStartPre=/bin/sh -c "while ! /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get no 2>/dev/null 1>/dev/null; do sleep 1 && echo 'Waiting for healthy k8s'; done"
+			   ExecStartPre=/bin/sh -c "/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-node"
+			   ExecStartPre=/bin/sh -c "sleep 1m"
+			   ExecStart=/bin/sh -c "/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy"
 
-*/
+			*/
 
-			Name:   "calico-kube-kill.service",
+			Name:    "calico-kube-kill.service",
 			Command: "start",
-			Enable: true,
+			Enable:  true,
 		},
 	}
 
