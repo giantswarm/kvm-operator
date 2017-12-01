@@ -21,15 +21,15 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
-	configmapresource "github.com/giantswarm/kvm-operator/service/resource/configmap"
-	deploymentresource "github.com/giantswarm/kvm-operator/service/resource/deployment"
-	ingressresource "github.com/giantswarm/kvm-operator/service/resource/ingress"
-	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
-	podresource "github.com/giantswarm/kvm-operator/service/resource/pod"
-	pvcresource "github.com/giantswarm/kvm-operator/service/resource/pvc"
-	serviceresource "github.com/giantswarm/kvm-operator/service/resource/service"
+	"github.com/giantswarm/kvm-operator/service/resource/configmapv1"
+	"github.com/giantswarm/kvm-operator/service/resource/deploymentv1"
+	"github.com/giantswarm/kvm-operator/service/resource/ingressv1"
+	"github.com/giantswarm/kvm-operator/service/resource/namespacev1"
+	"github.com/giantswarm/kvm-operator/service/resource/podv1"
+	"github.com/giantswarm/kvm-operator/service/resource/pvcv1"
+	"github.com/giantswarm/kvm-operator/service/resource/servicev1"
 )
 
 const (
@@ -90,14 +90,14 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var configMapResource framework.Resource
 	{
-		c := configmapresource.DefaultConfig()
+		c := configmapv1.DefaultConfig()
 
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		configMapResource, err = configmapresource.New(c)
+		configMapResource, err = configmapv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -105,12 +105,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var deploymentResource framework.Resource
 	{
-		c := deploymentresource.DefaultConfig()
+		c := deploymentv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		deploymentResource, err = deploymentresource.New(c)
+		deploymentResource, err = deploymentv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -118,12 +118,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var ingressResource framework.Resource
 	{
-		c := ingressresource.DefaultConfig()
+		c := ingressv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		ingressResource, err = ingressresource.New(c)
+		ingressResource, err = ingressv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -131,12 +131,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var namespaceResource framework.Resource
 	{
-		c := namespaceresource.DefaultConfig()
+		c := namespacev1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		namespaceResource, err = namespaceresource.New(c)
+		namespaceResource, err = namespacev1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -144,12 +144,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var pvcResource framework.Resource
 	{
-		c := pvcresource.DefaultConfig()
+		c := pvcv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		pvcResource, err = pvcresource.New(c)
+		pvcResource, err = pvcv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -157,12 +157,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var serviceResource framework.Resource
 	{
-		c := serviceresource.DefaultConfig()
+		c := servicev1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		serviceResource, err = serviceresource.New(c)
+		serviceResource, err = servicev1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -296,12 +296,12 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	var podResource framework.Resource
 	{
-		c := podresource.DefaultConfig()
+		c := podv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		podResource, err = podresource.New(c)
+		podResource, err = podv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -337,7 +337,7 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
 			options := apismetav1.ListOptions{
-				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
+				LabelSelector: fmt.Sprintf("%s=%s", keyv1.PodWatcherLabel, config.Name),
 			}
 
 			watcher, err := k8sClient.CoreV1().Pods("").Watch(options)
