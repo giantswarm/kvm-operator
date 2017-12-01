@@ -223,8 +223,8 @@ ExecStart=/bin/sh -c "/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host
 [Install]
 WantedBy=multi-user.target
 `,
-			Name:    "calico-kube-kill.service",
-			Enable:  true,
+			Name:   "calico-kube-kill.service",
+			Enable: true,
 		},
 	}
 
