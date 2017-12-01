@@ -1,4 +1,4 @@
-package keyv1
+package keyv2
 
 import (
 	"fmt"
@@ -7,9 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
-	kvmtprkvm "github.com/giantswarm/kvmtpr/spec/kvm"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -45,15 +43,15 @@ const (
 	PodWatcherLabel = "giantswarm.io/pod-watcher"
 )
 
-func ClusterAPIEndpoint(customObject kvmtpr.CustomObject) string {
+func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
 }
 
-func ClusterCustomer(customObject kvmtpr.CustomObject) string {
+func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Customer.ID
 }
 
-func ClusterID(customObject kvmtpr.CustomObject) string {
+func ClusterID(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Cluster.ID
 }
 
@@ -66,15 +64,15 @@ func ClusterIDFromPod(pod *apiv1.Pod) string {
 	return "n/a"
 }
 
-func ClusterNamespace(customObject kvmtpr.CustomObject) string {
+func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
 
-func ConfigMapName(customObject kvmtpr.CustomObject, node spec.Node, prefix string) string {
+func ConfigMapName(customObject v1alpha1.KVMConfig, node v1alpha1.KVMConfigSpecClusterNode, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
-func CPUQuantity(n kvmtprkvm.Node) (resource.Quantity, error) {
+func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	cpu := strconv.Itoa(n.CPUs)
 	q, err := resource.ParseQuantity(cpu)
 	if err != nil {
@@ -91,22 +89,22 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
-func HasNodeController(customObject kvmtpr.CustomObject) bool {
-	if customObject.Spec.KVM.NodeController != (kvmtprkvm.NodeController{}) {
+func HasNodeController(customObject v1alpha1.KVMConfig) bool {
+	if customObject.Spec.KVM.NodeController != (v1alpha1.KVMConfigSpecKVMNodeController{}) {
 		return true
 	}
 	return false
 }
 
-func NetworkEnvFilePath(customObject kvmtpr.CustomObject) string {
+func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
 }
 
-func HealthListenAddress(customObject kvmtpr.CustomObject) string {
+func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
 }
 
-func LivenessPort(customObject kvmtpr.CustomObject) int32 {
+func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
 	return int32(portBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
 
@@ -114,7 +112,7 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
 
-func MemoryQuantity(n kvmtprkvm.Node) (resource.Quantity, error) {
+func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	q, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
 		return resource.Quantity{}, microerror.Mask(err)
@@ -122,11 +120,11 @@ func MemoryQuantity(n kvmtprkvm.Node) (resource.Quantity, error) {
 	return q, nil
 }
 
-func NetworkBridgeName(customObject kvmtpr.CustomObject) string {
+func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("br-%s", ClusterID(customObject))
 }
 
-func NetworkTapName(customObject kvmtpr.CustomObject) string {
+func NetworkTapName(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("tap-%s", ClusterID(customObject))
 }
 
@@ -154,7 +152,7 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
-func PVCNames(customObject kvmtpr.CustomObject) []string {
+func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	var names []string
 
 	for i := range customObject.Spec.Cluster.Masters {
@@ -164,14 +162,14 @@ func PVCNames(customObject kvmtpr.CustomObject) []string {
 	return names
 }
 
-func StorageType(customObject kvmtpr.CustomObject) string {
+func StorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }
 
-func ToCustomObject(v interface{}) (kvmtpr.CustomObject, error) {
-	customObjectPointer, ok := v.(*kvmtpr.CustomObject)
+func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
+	customObjectPointer, ok := v.(*v1alpha1.KVMConfig)
 	if !ok {
-		return kvmtpr.CustomObject{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &kvmtpr.CustomObject{}, v)
+		return v1alpha1.KVMConfig{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.KVMConfig{}, v)
 	}
 	customObject := *customObjectPointer
 
@@ -191,7 +189,7 @@ func ToPod(v interface{}) (*apiv1.Pod, error) {
 	return pod, nil
 }
 
-func VersionBundleVersion(customObject kvmtpr.CustomObject) string {
+func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.VersionBundle.Version
 }
 

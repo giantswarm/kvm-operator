@@ -1,4 +1,4 @@
-package deploymentv1
+package deploymentv2
 
 import (
 	"reflect"
@@ -12,7 +12,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "deployment"
+	Name = "deploymentv2"
 )
 
 // Config represents the configuration used to create a new deployment resource.

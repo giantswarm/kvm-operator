@@ -1,21 +1,21 @@
-package deploymentv1
+package deploymentv2
 
 import (
 	"context"
 	"fmt"
 	"strings"
 
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/prometheus/client_golang/prometheus"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := keyv1.ToCustomObject(obj)
+	customObject, err := keyv2.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -24,7 +24,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentDeployments []*v1beta1.Deployment
 	{
-		namespace := keyv1.ClusterNamespace(customObject)
+		namespace := keyv2.ClusterNamespace(customObject)
 		deploymentList, err := r.k8sClient.Extensions().Deployments(namespace).List(apismetav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)
@@ -45,7 +45,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	return currentDeployments, nil
 }
 
-func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customObject kvmtpr.CustomObject, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
+func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customObject v1alpha1.KVMConfig, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
 	versionCounts := map[string]float64{}
 
 	for _, d := range deployments {

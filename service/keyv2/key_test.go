@@ -1,32 +1,26 @@
-package keyv1
+package keyv2
 
 import (
 	"net"
 	"testing"
 
-	"github.com/giantswarm/clustertpr"
-	"github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
-	kvmtprspec "github.com/giantswarm/kvmtpr/spec"
-	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
-	"github.com/giantswarm/kvmtpr/spec/kvm/k8skvm"
-	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 )
 
 func Test_ClusterID(t *testing.T) {
 	expectedID := "test-cluster"
 
-	cluster := clustertpr.Spec{
-		Cluster: spec.Cluster{
+	cluster := v1alpha1.KVMConfigSpec{
+		Cluster: v1alpha1.KVMConfigSpecCluster{
 			ID: expectedID,
 		},
-		Customer: spec.Customer{
+		Customer: v1alpha1.KVMConfigSpecCustomer{
 			ID: "test-customer",
 		},
 	}
 
-	customObject := kvmtpr.CustomObject{
-		Spec: kvmtpr.Spec{
+	customObject := v1alpha1.KVMConfig{
+		Spec: v1alpha1.KVMConfigSpec{
 			Cluster: cluster,
 		},
 	}
@@ -39,17 +33,17 @@ func Test_ClusterID(t *testing.T) {
 func Test_ClusterCustomer(t *testing.T) {
 	expectedID := "test-customer"
 
-	cluster := clustertpr.Spec{
-		Cluster: spec.Cluster{
+	cluster := v1alpha1.KVMConfigSpec{
+		Cluster: v1alpha1.KVMConfigSpecCluster{
 			ID: "test-cluster",
 		},
-		Customer: spec.Customer{
+		Customer: v1alpha1.KVMConfigSpecCustomer{
 			ID: expectedID,
 		},
 	}
 
-	customObject := kvmtpr.CustomObject{
-		Spec: kvmtpr.Spec{
+	customObject := v1alpha1.KVMConfig{
+		Spec: v1alpha1.KVMConfigSpec{
 			Cluster: cluster,
 		},
 	}
@@ -61,20 +55,20 @@ func Test_ClusterCustomer(t *testing.T) {
 
 func Test_HasNodeController(t *testing.T) {
 	testCases := []struct {
-		Obj            kvmtpr.CustomObject
+		Obj            v1alpha1.KVMConfig
 		ExpectedResult bool
 	}{
 		{
-			Obj: kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
-							Docker: k8skvm.Docker{
+			Obj: v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
+							Docker: v1alpha1.KVMConfigSpecKVMK8sKVMDocker{
 								Image: "123",
 							},
 						},
-						NodeController: kvmtprspeckvm.NodeController{
-							Docker: nodecontroller.Docker{
+						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
+							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
 								Image: "123",
 							},
 						},
@@ -84,11 +78,11 @@ func Test_HasNodeController(t *testing.T) {
 			ExpectedResult: true,
 		},
 		{
-			Obj: kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
-							Docker: k8skvm.Docker{
+			Obj: v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
+							Docker: v1alpha1.KVMConfigSpecKVMK8sKVMDocker{
 								Image: "123",
 							},
 						},

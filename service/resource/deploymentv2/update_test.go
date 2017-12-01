@@ -1,13 +1,11 @@
-package deploymentv1
+package deploymentv2
 
 import (
 	"context"
 	"reflect"
 	"testing"
 
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,12 +29,10 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -49,12 +45,10 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -126,12 +120,10 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		// state should be empty in case updates are not allowed.
 		{
 			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -274,12 +266,10 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 
 				return ctx
 			}(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -450,12 +440,10 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 
 				return ctx
 			}(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
 					},
 				},
 			},

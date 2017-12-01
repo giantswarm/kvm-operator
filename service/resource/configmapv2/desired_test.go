@@ -1,14 +1,12 @@
-package configmapv1
+package configmapv2
 
 import (
 	"context"
 	"strings"
 	"testing"
 
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/certificatetpr/certificatetprtest"
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -23,16 +21,14 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		ExpectedWorkerCount int
 	}{
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.KVMConfigSpecClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.KVMConfigSpecClusterNode{
 							{},
 						},
 					},
@@ -42,16 +38,14 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 			ExpectedWorkerCount: 1,
 		},
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.KVMConfigSpecClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.KVMConfigSpecClusterNode{
 							{},
 							{},
 							{},
@@ -63,18 +57,16 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 			ExpectedWorkerCount: 3,
 		},
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.KVMConfigSpecCluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.KVMConfigSpecClusterNode{
 							{},
 							{},
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.KVMConfigSpecClusterNode{
 							{},
 							{},
 							{},

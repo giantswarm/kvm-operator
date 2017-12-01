@@ -1,4 +1,4 @@
-package configmapv1
+package configmapv2
 
 import (
 	"reflect"
@@ -16,7 +16,7 @@ import (
 const (
 	KeyUserData = "user_data"
 	// Name is the identifier of the resource.
-	Name = "configmap"
+	Name = "configmapv2"
 )
 
 // Config represents the configuration used to create a new config map resource.
