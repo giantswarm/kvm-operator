@@ -214,7 +214,6 @@ Wants=k8s-kubelet.service
 After=k8s-kubelet.service
 
 [Service]
-Type=oneshot
 Environment="KUBECONFIG=/etc/kubernetes/config/addons-kubeconfig.yml"
 Environment="KUBECTL=quay.io/giantswarm/docker-kubectl:1dc536ec6dc4597ba46769b3d5d6ce53a7e62038"
 ExecStartPre=/bin/sh -c "while ! /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get no 2>/dev/null 1>/dev/null; do sleep 1 && echo 'Waiting for healthy k8s'; done"
