@@ -1,4 +1,4 @@
-package namespace
+package namespacev1
 
 import (
 	"context"
