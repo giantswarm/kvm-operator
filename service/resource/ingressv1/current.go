@@ -1,4 +1,4 @@
-package ingress
+package ingressv1
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -22,7 +22,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var ingresses []*v1beta1.Ingress
 
-	namespace := key.ClusterNamespace(customObject)
+	namespace := keyv1.ClusterNamespace(customObject)
 	ingressNames := []string{
 		APIID,
 		EtcdID,
