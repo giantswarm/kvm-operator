@@ -210,14 +210,14 @@ WantedBy=multi-user.target
 		{
 			AssetContent: `[Unit]
 Description=Temporary fix for issues with calico-node and kube-proxy after master restart
-Wants=k8s-kubelet.service
+Require=k8s-kubelet.service
 After=k8s-kubelet.service
 
 [Service]
 Environment="KUBECONFIG=/etc/kubernetes/config/addons-kubeconfig.yml"
 Environment="KUBECTL=quay.io/giantswarm/docker-kubectl:1dc536ec6dc4597ba46769b3d5d6ce53a7e62038"
-ExecStart=/bin/sh -c "\
-	while ! /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get no 2>/dev/null 1>/dev/null; do sleep 1 && echo 'Waiting for healthy k8s'; done ; \
+ExecStart=/bin/sh -c "while ! /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get no 2>/dev/null 1>/dev/null; do sleep 1 && echo 'Waiting for healthy k8s'; done ;"
+ExecStartPost=/bin/sh -c "\
 	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-node; \
 	sleep 1m; \
 	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy"
