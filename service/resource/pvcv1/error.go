@@ -1,4 +1,4 @@
-package pvc
+package pvcv1
 
 import "github.com/giantswarm/microerror"
 

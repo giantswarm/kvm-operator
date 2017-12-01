@@ -1,12 +1,13 @@
-package pvc
+package pvcv1
 
 import (
-	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 const (
@@ -29,11 +30,11 @@ func newEtcdPVCs(customObject kvmtpr.CustomObject) ([]*apiv1.PersistentVolumeCla
 				APIVersion: "v1",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
+				Name: keyv1.EtcdPVCName(keyv1.ClusterID(customObject), keyv1.VMNumber(i)),
 				Labels: map[string]string{
-					"app":      key.MasterID,
-					"cluster":  key.ClusterID(customObject),
-					"customer": key.ClusterCustomer(customObject),
+					"app":      keyv1.MasterID,
+					"cluster":  keyv1.ClusterID(customObject),
+					"customer": keyv1.ClusterCustomer(customObject),
 					"node":     masterNode.ID,
 				},
 				Annotations: map[string]string{

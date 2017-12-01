@@ -1,4 +1,4 @@
-package pvc
+package pvcv1
 
 import (
 	"context"
@@ -7,18 +7,18 @@ import (
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	var PVCs []*apiv1.PersistentVolumeClaim
 
-	if key.StorageType(customObject) == "persistentVolume" {
+	if keyv1.StorageType(customObject) == "persistentVolume" {
 		r.logger.LogCtx(ctx, "debug", "computing the new PVCs")
 
 		PVCs, err = newEtcdPVCs(customObject)
