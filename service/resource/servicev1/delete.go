@@ -1,19 +1,20 @@
-package service
+package servicev1
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/kvm-operator/service/key"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/framework"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -25,7 +26,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(servicesToDelete) != 0 {
 		r.logger.LogCtx(ctx, "debug", "deleting the services in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(customObject)
+		namespace := keyv1.ClusterNamespace(customObject)
 		for _, service := range servicesToDelete {
 			err := r.k8sClient.CoreV1().Services(namespace).Delete(service.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
