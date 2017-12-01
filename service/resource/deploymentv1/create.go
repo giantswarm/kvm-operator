@@ -1,4 +1,4 @@
-package deployment
+package deploymentv1
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(deploymentsToCreate) != 0 {
 		r.logger.LogCtx(ctx, "debug", "creating the deployments in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(customObject)
+		namespace := keyv1.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToCreate {
 			_, err := r.k8sClient.Extensions().Deployments(namespace).Create(deployment)
 			if apierrors.IsAlreadyExists(err) {

@@ -1,4 +1,4 @@
-package deployment
+package deploymentv1
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 
 	"github.com/giantswarm/clustertpr"
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvm-operator/service/messagecontext"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
@@ -16,6 +15,8 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
+
+	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 func Test_Resource_Deployment_newUpdateChange(t *testing.T) {

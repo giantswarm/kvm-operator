@@ -1,4 +1,4 @@
-package deployment
+package deploymentv1
 
 import "github.com/giantswarm/microerror"
 
