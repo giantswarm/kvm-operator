@@ -1,4 +1,4 @@
-package pvc
+package pvcv1
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(pvcsToCreate) != 0 {
 		r.logger.LogCtx(ctx, "debug", "creating the PVCs in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(customObject)
+		namespace := keyv1.ClusterNamespace(customObject)
 		for _, PVC := range pvcsToCreate {
 			_, err := r.k8sClient.Core().PersistentVolumeClaims(namespace).Create(PVC)
 			if apierrors.IsAlreadyExists(err) {

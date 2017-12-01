@@ -1,4 +1,4 @@
-package deployment
+package deploymentv1
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -23,12 +23,12 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
 
-		cpuQuantity, err := key.CPUQuantity(capabilities)
+		cpuQuantity, err := keyv1.CPUQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating CPU quantity")
 		}
 
-		memoryQuantity, err := key.MemoryQuantity(capabilities)
+		memoryQuantity, err := keyv1.MemoryQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating memory quantity")
 		}
@@ -39,14 +39,14 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
+				Name: keyv1.DeploymentName(keyv1.WorkerID, workerNode.ID),
 				Annotations: map[string]string{
-					VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+					VersionBundleVersionAnnotation: keyv1.VersionBundleVersion(customObject),
 				},
 				Labels: map[string]string{
-					"app":      key.WorkerID,
-					"cluster":  key.ClusterID(customObject),
-					"customer": key.ClusterCustomer(customObject),
+					"app":      keyv1.WorkerID,
+					"cluster":  keyv1.ClusterID(customObject),
+					"customer": keyv1.ClusterCustomer(customObject),
 					"node":     workerNode.ID,
 				},
 			},
@@ -57,11 +57,11 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						Name: key.WorkerID,
+						Name: keyv1.WorkerID,
 						Labels: map[string]string{
-							"cluster":  key.ClusterID(customObject),
-							"customer": key.ClusterCustomer(customObject),
-							"app":      key.WorkerID,
+							"cluster":  keyv1.ClusterID(customObject),
+							"customer": keyv1.ClusterCustomer(customObject),
+							"app":      keyv1.WorkerID,
 							"node":     workerNode.ID,
 						},
 						Annotations: map[string]string{},
@@ -70,7 +70,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 						Affinity:    newWorkerPodAfinity(customObject),
 						HostNetwork: true,
 						NodeSelector: map[string]string{
-							"role": key.WorkerID,
+							"role": keyv1.WorkerID,
 						},
 						Volumes: []apiv1.Volume{
 							{
@@ -78,7 +78,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: key.ConfigMapName(customObject, workerNode, key.WorkerID),
+											Name: keyv1.ConfigMapName(customObject, workerNode, keyv1.WorkerID),
 										},
 									},
 								},
@@ -101,7 +101,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Name: "flannel",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: key.FlannelEnvPathPrefix,
+										Path: keyv1.FlannelEnvPathPrefix,
 									},
 								},
 							},
@@ -114,9 +114,9 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Command: []string{
 									"/bin/sh",
 									"-c",
-									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + key.NetworkBridgeName(customObject) +
-										" --service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject) +
-										" --service.kubernetes.cluster.service=" + key.WorkerID +
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + keyv1.NetworkBridgeName(customObject) +
+										" --service.kubernetes.cluster.namespace=" + keyv1.ClusterNamespace(customObject) +
+										" --service.kubernetes.cluster.service=" + keyv1.WorkerID +
 										" --service.kubernetes.inCluster=true" +
 										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
@@ -143,7 +143,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									Privileged: &privileged,
 								},
 								Args: []string{
-									key.WorkerID,
+									keyv1.WorkerID,
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -165,11 +165,11 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(customObject),
+										Value: keyv1.NetworkBridgeName(customObject),
 									},
 									{
 										Name:  "NETWORK_TAP_NAME",
-										Value: key.NetworkTapName(customObject),
+										Value: keyv1.NetworkTapName(customObject),
 									},
 									{
 										Name: "MEMORY",
@@ -178,7 +178,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 									{
 										Name:  "ROLE",
-										Value: key.WorkerID,
+										Value: keyv1.WorkerID,
 									},
 									{
 										Name:  "CLOUD_CONFIG_PATH",
@@ -186,16 +186,16 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.InitialDelaySeconds,
-									TimeoutSeconds:      key.TimeoutSeconds,
-									PeriodSeconds:       key.PeriodSeconds,
-									FailureThreshold:    key.FailureThreshold,
-									SuccessThreshold:    key.SuccessThreshold,
+									InitialDelaySeconds: keyv1.InitialDelaySeconds,
+									TimeoutSeconds:      keyv1.TimeoutSeconds,
+									PeriodSeconds:       keyv1.PeriodSeconds,
+									FailureThreshold:    keyv1.FailureThreshold,
+									SuccessThreshold:    keyv1.SuccessThreshold,
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.LivenessPort(customObject)},
-											Host: key.ProbeHost,
+											Path: keyv1.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: keyv1.LivenessPort(customObject)},
+											Host: keyv1.ProbeHost,
 										},
 									},
 								},
@@ -222,16 +222,16 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 							},
 							{
 								Name:            "k8s-kvm-health",
-								Image:           key.K8SKVMHealthDocker,
+								Image:           keyv1.K8SKVMHealthDocker,
 								ImagePullPolicy: apiv1.PullAlways,
 								Env: []apiv1.EnvVar{
 									{
 										Name:  "LISTEN_ADDRESS",
-										Value: key.HealthListenAddress(customObject),
+										Value: keyv1.HealthListenAddress(customObject),
 									},
 									{
 										Name:  "NETWORK_ENV_FILE_PATH",
-										Value: key.NetworkEnvFilePath(customObject),
+										Value: keyv1.NetworkEnvFilePath(customObject),
 									},
 								},
 								SecurityContext: &apiv1.SecurityContext{
@@ -240,7 +240,7 @@ func newWorkerDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeMounts: []apiv1.VolumeMount{
 									{
 										Name:      "flannel",
-										MountPath: key.FlannelEnvPathPrefix,
+										MountPath: keyv1.FlannelEnvPathPrefix,
 									},
 								},
 							},

@@ -1,11 +1,11 @@
-package service
+package servicev1
 
 import (
 	"github.com/giantswarm/kvmtpr"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func newMasterService(customObject kvmtpr.CustomObject) *apiv1.Service {
@@ -15,14 +15,14 @@ func newMasterService(customObject kvmtpr.CustomObject) *apiv1.Service {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: key.MasterID,
+			Name: keyv1.MasterID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(customObject),
-				"customer": key.ClusterCustomer(customObject),
-				"app":      key.MasterID,
+				"cluster":  keyv1.ClusterID(customObject),
+				"customer": keyv1.ClusterCustomer(customObject),
+				"app":      keyv1.MasterID,
 			},
 			Annotations: map[string]string{
-				"giantswarm.io/prometheus-cluster": key.ClusterID(customObject),
+				"giantswarm.io/prometheus-cluster": keyv1.ClusterID(customObject),
 			},
 		},
 		Spec: apiv1.ServiceSpec{

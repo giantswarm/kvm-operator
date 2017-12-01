@@ -1,4 +1,4 @@
-package pod
+package podv1
 
 import (
 	"github.com/giantswarm/microerror"

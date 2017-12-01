@@ -1,4 +1,4 @@
-package configmap
+package configmapv1
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -26,7 +26,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 		r.logger.LogCtx(ctx, "debug", "updating the config maps in the Kubernetes API")
 
 		// Create the config maps in the Kubernetes API.
-		namespace := key.ClusterNamespace(customObject)
+		namespace := keyv1.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToUpdate {
 			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Update(configMap)
 			if err != nil {

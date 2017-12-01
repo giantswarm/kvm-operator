@@ -1,4 +1,4 @@
-package pvc
+package pvcv1
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -22,8 +22,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var PVCs []*apiv1.PersistentVolumeClaim
 
-	namespace := key.ClusterNamespace(customObject)
-	pvcNames := key.PVCNames(customObject)
+	namespace := keyv1.ClusterNamespace(customObject)
+	pvcNames := keyv1.PVCNames(customObject)
 
 	for _, name := range pvcNames {
 		manifest, err := r.k8sClient.Core().PersistentVolumeClaims(namespace).Get(name, apismetav1.GetOptions{})

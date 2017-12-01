@@ -1,4 +1,4 @@
-package service
+package servicev1
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -22,10 +22,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var services []*apiv1.Service
 
-	namespace := key.ClusterNamespace(customObject)
+	namespace := keyv1.ClusterNamespace(customObject)
 	serviceNames := []string{
-		key.MasterID,
-		key.WorkerID,
+		keyv1.MasterID,
+		keyv1.WorkerID,
 	}
 
 	for _, name := range serviceNames {

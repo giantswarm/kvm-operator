@@ -1,4 +1,4 @@
-package deployment
+package deploymentv1
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func newNodeControllerDeployment(customObject kvmtpr.CustomObject) (*extensionsv1.Deployment, error) {
@@ -20,11 +20,11 @@ func newNodeControllerDeployment(customObject kvmtpr.CustomObject) (*extensionsv
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: key.NodeControllerID,
+			Name: keyv1.NodeControllerID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(customObject),
-				"customer": key.ClusterCustomer(customObject),
-				"app":      key.NodeControllerID,
+				"cluster":  keyv1.ClusterID(customObject),
+				"customer": keyv1.ClusterCustomer(customObject),
+				"app":      keyv1.NodeControllerID,
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -34,30 +34,30 @@ func newNodeControllerDeployment(customObject kvmtpr.CustomObject) (*extensionsv
 			Replicas: &replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apismetav1.ObjectMeta{
-					GenerateName: key.NodeControllerID,
+					GenerateName: keyv1.NodeControllerID,
 					Annotations: map[string]string{
-						VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+						VersionBundleVersionAnnotation: keyv1.VersionBundleVersion(customObject),
 					},
 					Labels: map[string]string{
-						"app":      key.NodeControllerID,
-						"cluster":  key.ClusterID(customObject),
-						"customer": key.ClusterCustomer(customObject),
+						"app":      keyv1.NodeControllerID,
+						"cluster":  keyv1.ClusterID(customObject),
+						"customer": keyv1.ClusterCustomer(customObject),
 					},
 				},
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name:            key.NodeControllerID,
+							Name:            keyv1.NodeControllerID,
 							Image:           customObject.Spec.KVM.NodeController.Docker.Image,
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Args: []string{
-								fmt.Sprintf("-cluster-api=%s", key.ClusterAPIEndpoint(customObject)),
-								fmt.Sprintf("-cluster-id=%s", key.ClusterID(customObject)),
+								fmt.Sprintf("-cluster-api=%s", keyv1.ClusterAPIEndpoint(customObject)),
+								fmt.Sprintf("-cluster-id=%s", keyv1.ClusterID(customObject)),
 							},
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "PROVIDER_HOST_CLUSTER_NAMESPACE",
-									Value: key.ClusterID(customObject),
+									Value: keyv1.ClusterID(customObject),
 								},
 							},
 						},
