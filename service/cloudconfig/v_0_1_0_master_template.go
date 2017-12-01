@@ -225,7 +225,6 @@ WantedBy=multi-user.target
 `,
 			Name:    "calico-kube-kill.service",
 			Enable:  true,
-			Command: "start",
 		},
 	}
 
