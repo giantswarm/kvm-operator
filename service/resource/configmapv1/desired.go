@@ -1,4 +1,4 @@
-package configmap
+package configmapv1
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customObject, err := keyv1.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -45,7 +45,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, key.MasterID)
+		configMap, err := r.newConfigMap(customObject, template, node, keyv1.MasterID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -59,7 +59,7 @@ func (r *Resource) newConfigMaps(customObject kvmtpr.CustomObject) ([]*apiv1.Con
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, key.WorkerID)
+		configMap, err := r.newConfigMap(customObject, template, node, keyv1.WorkerID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -80,10 +80,10 @@ func (r *Resource) newConfigMap(customObject kvmtpr.CustomObject, template strin
 	{
 		newConfigMap = &apiv1.ConfigMap{
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.ConfigMapName(customObject, node, prefix),
+				Name: keyv1.ConfigMapName(customObject, node, prefix),
 				Labels: map[string]string{
-					"cluster":  key.ClusterID(customObject),
-					"customer": key.ClusterCustomer(customObject),
+					"cluster":  keyv1.ClusterID(customObject),
+					"customer": keyv1.ClusterCustomer(customObject),
 				},
 			},
 			Data: map[string]string{
