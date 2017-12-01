@@ -88,8 +88,9 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	{
 		c := k8sclient.DefaultConfig()
 
-		c.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
 		c.Logger = config.Logger
+
+		c.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
 		c.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
 		c.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
 		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
@@ -249,7 +250,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 		clientSet, err = versioned.NewForConfig(c)
 		if err != nil {
-			panic(fmt.Sprintf("%#v\n", err))
+			return nil, microerror.Mask(err)
 		}
 	}
 
