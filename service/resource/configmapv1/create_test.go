@@ -13,7 +13,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfig/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv1/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {

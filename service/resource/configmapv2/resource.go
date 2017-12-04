@@ -10,7 +10,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv1"
 )
 
 const (
@@ -23,7 +23,7 @@ const (
 type Config struct {
 	// Dependencies.
 	CertWatcher certificatetpr.Searcher
-	CloudConfig *cloudconfig.CloudConfig
+	CloudConfig *cloudconfigv1.CloudConfig
 	K8sClient   kubernetes.Interface
 	Logger      micrologger.Logger
 }
@@ -44,7 +44,7 @@ func DefaultConfig() Config {
 type Resource struct {
 	// Dependencies.
 	certWatcher certificatetpr.Searcher
-	cloudConfig *cloudconfig.CloudConfig
+	cloudConfig *cloudconfigv1.CloudConfig
 	k8sClient   kubernetes.Interface
 	logger      micrologger.Logger
 }

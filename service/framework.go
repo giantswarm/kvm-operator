@@ -20,7 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv1"
 	"github.com/giantswarm/kvm-operator/service/keyv1"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv1"
@@ -76,13 +76,13 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var ccService *cloudconfig.CloudConfig
+	var ccService *cloudconfigv1.CloudConfig
 	{
-		c := cloudconfig.DefaultConfig()
+		c := cloudconfigv1.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		ccService, err = cloudconfig.New(c)
+		ccService, err = cloudconfigv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
