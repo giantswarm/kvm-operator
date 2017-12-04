@@ -23,7 +23,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -38,7 +38,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -65,7 +65,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -88,7 +88,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -118,7 +118,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -140,7 +140,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -167,7 +167,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},

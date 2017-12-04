@@ -28,12 +28,12 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.KVMConfigSpecClusterNode{
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []v1alpha1.KVMConfigSpecClusterNode{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 						},
 					},
@@ -76,12 +76,12 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.KVMConfigSpecClusterNode{
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []v1alpha1.KVMConfigSpecClusterNode{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
@@ -145,14 +145,14 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.KVMConfigSpecClusterNode{
+						Masters: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
-						Workers: []v1alpha1.KVMConfigSpecClusterNode{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
