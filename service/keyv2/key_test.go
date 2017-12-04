@@ -10,18 +10,14 @@ import (
 func Test_ClusterID(t *testing.T) {
 	expectedID := "test-cluster"
 
-	cluster := v1alpha1.KVMConfigSpec{
-		Cluster: v1alpha1.KVMConfigSpecCluster{
-			ID: expectedID,
-		},
-		Customer: v1alpha1.KVMConfigSpecCustomer{
-			ID: "test-customer",
-		},
-	}
-
 	customObject := v1alpha1.KVMConfig{
 		Spec: v1alpha1.KVMConfigSpec{
-			Cluster: cluster,
+			Cluster: v1alpha1.Cluster{
+				ID: expectedID,
+				Customer: v1alpha1.ClusterCustomer{
+					ID: "test-customer",
+				},
+			},
 		},
 	}
 
@@ -33,18 +29,14 @@ func Test_ClusterID(t *testing.T) {
 func Test_ClusterCustomer(t *testing.T) {
 	expectedID := "test-customer"
 
-	cluster := v1alpha1.KVMConfigSpec{
-		Cluster: v1alpha1.KVMConfigSpecCluster{
-			ID: "test-cluster",
-		},
-		Customer: v1alpha1.KVMConfigSpecCustomer{
-			ID: expectedID,
-		},
-	}
-
 	customObject := v1alpha1.KVMConfig{
 		Spec: v1alpha1.KVMConfigSpec{
-			Cluster: cluster,
+			Cluster: v1alpha1.Cluster{
+				ID: expectedID,
+				Customer: v1alpha1.ClusterCustomer{
+					ID: "test-customer",
+				},
+			},
 		},
 	}
 

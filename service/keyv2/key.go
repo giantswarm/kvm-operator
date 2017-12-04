@@ -52,7 +52,7 @@ func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
 }
 
 func ClusterID(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.Cluster.Cluster.ID
+	return customObject.Spec.Cluster.ID
 }
 
 func ClusterIDFromPod(pod *apiv1.Pod) string {
@@ -68,7 +68,7 @@ func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
 
-func ConfigMapName(customObject v1alpha1.KVMConfig, node v1alpha1.KVMConfigSpecClusterNode, prefix string) string {
+func ConfigMapName(customObject v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
