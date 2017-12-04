@@ -1,5 +1,5 @@
-hash: 09f9b2d58299b8f4c5207c78e825bee56170889585fec5fa1c666b610df67f62
-updated: 2017-11-30T10:25:18.59368159+01:00
+hash: fddb8390522c2f83410f37a423f8cf1e87f97451f75870f415761da915254025
+updated: 2017-12-04T11:11:13.141923+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -30,6 +30,10 @@ imports:
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/giantswarm/apiextensions
+  version: ff77d3fd222f34b512255ee7c2c67c55569bcae6
+  subpackages:
+  - pkg/apis/cluster/v1alpha1
 - name: github.com/giantswarm/certificatetpr
   version: 9a7c674d13714bc7a5258453570bc8163a47b2cc
   subpackages:
@@ -47,9 +51,12 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 62aa3dc074ab045375dbad85001afe69c9f82487
+  version: ea70bc4ea6fc4c3214c0a71e3c6a95ba3be5fd32
   subpackages:
   - v_0_1_0
+  - v_1_0_0
+  - v_1_1_0
+  - v_2_0_0
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
@@ -71,7 +78,7 @@ imports:
 - name: github.com/giantswarm/microerror
   version: ec5f66bb657662031c0d651504fee6908cdf28d9
 - name: github.com/giantswarm/microkit
-  version: e6c3aafd2c6b8298599dc465dc1294fbd025d2f1
+  version: cd17f87c1287d47572c3428a5b34f6fc23ff2a8d
   subpackages:
   - command
   - command/daemon
@@ -192,7 +199,7 @@ imports:
 - name: github.com/pelletier/go-toml
   version: 4e9e0ee19b60b13eb79915933f44d8ed5f268bdd
 - name: github.com/prometheus/client_golang
-  version: 1cdba8fdde81f444626530cce66e138d2f68ae1c
+  version: 661e31bf844dfca9aeba15f27ea8aa0d485ad212
   subpackages:
   - prometheus
   - prometheus/promhttp
@@ -221,7 +228,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 1be1d2841c773c01bee8289f55f7463b6e2c2539
+  version: 45a52e208c932faae0b0755052d0bca997ad27d0
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
@@ -267,7 +274,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/apiextensions-apiserver
   version: fcd622fe88a4a6efcb5aea9e94ee87324ac1b036
   subpackages:
