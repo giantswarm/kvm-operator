@@ -1,4 +1,4 @@
-package cloudconfig
+package cloudconfigv1
 
 const (
 	etcd_data_dir_dropin = `[Unit]
