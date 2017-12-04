@@ -3,7 +3,7 @@ package cloudconfigv1
 import (
 	"github.com/giantswarm/certificatetpr"
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_0_1_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_0_0"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 )
