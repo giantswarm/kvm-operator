@@ -1,10 +1,9 @@
-package cloudconfigv1
+package cloudconfigv2
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/certificatetpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	cloudconfig "github.com/giantswarm/k8scloudconfig"
-	"github.com/giantswarm/kvmtpr"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 )
@@ -52,60 +51,60 @@ func New(config Config) (*CloudConfig, error) {
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
 	var err error
 
-	// TODO remove defaulting as soon as custom objects are configured.
-	if customObject.Spec.Cluster.Version == "" {
-		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
-	}
-	// TODO remove defaulting as soon as custom objects are migrated.
-	if customObject.Spec.Cluster.Version == string(cloudconfig.V_0_1_0) {
-		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
+	var params k8scloudconfig.Params
+	{
+		params.Cluster = customObject.Spec.Cluster
+		params.Extension = &masterExtension{
+			certs: certs,
+		}
+		params.Node = node
 	}
 
-	var template string
-
-	switch customObject.Spec.Cluster.Version {
-	case string(cloudconfig.V_1_0_0):
-		template, err = v_1_0_0MasterTemplate(customObject, certs, node)
+	var newCloudConfig *k8scloudconfig.CloudConfig
+	{
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.MasterTemplate, params)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
 
-	default:
-		return "", microerror.Maskf(notFoundError, "k8scloudconfig version '%s'", customObject.Spec.Cluster.Version)
+		err = newCloudConfig.ExecuteTemplate()
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
 	}
 
-	return template, nil
+	return newCloudConfig.Base64(), nil
 }
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node) (string, error) {
+func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
 	var err error
 
-	// TODO remove defaulting as soon as custom objects are configured.
-	if customObject.Spec.Cluster.Version == "" {
-		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
-	}
-	// TODO remove defaulting as soon as custom objects are migrated.
-	if customObject.Spec.Cluster.Version == string(cloudconfig.V_0_1_0) {
-		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
+	var params k8scloudconfig.Params
+	{
+		params.Cluster = customObject.Spec.Cluster
+		params.Extension = &workerExtension{
+			certs: certs,
+		}
+		params.Node = node
 	}
 
-	var template string
-
-	switch customObject.Spec.Cluster.Version {
-	case string(cloudconfig.V_1_0_0):
-		template, err = v_1_0_0WorkerTemplate(customObject, certs, node)
+	var newCloudConfig *k8scloudconfig.CloudConfig
+	{
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.WorkerTemplate, params)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
 
-	default:
-		return "", microerror.Maskf(notFoundError, "k8scloudconfig version '%s'", customObject.Spec.Cluster.Version)
+		err = newCloudConfig.ExecuteTemplate()
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
 	}
 
-	return template, nil
+	return newCloudConfig.Base64(), nil
 }
