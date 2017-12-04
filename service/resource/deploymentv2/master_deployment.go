@@ -1,19 +1,19 @@
-package deploymentv1
+package deploymentv2
 
 import (
 	"fmt"
 
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
-	"k8s.io/apimachinery/pkg/util/intstr"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Deployment, error) {
+func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
 	var deployments []*extensionsv1.Deployment
 
 	privileged := true
@@ -22,17 +22,17 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		capabilities := customObject.Spec.KVM.Masters[i]
 
-		cpuQuantity, err := keyv1.CPUQuantity(capabilities)
+		cpuQuantity, err := keyv2.CPUQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating CPU quantity")
 		}
 
-		memoryQuantity, err := keyv1.MemoryQuantity(capabilities)
+		memoryQuantity, err := keyv2.MemoryQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating memory quantity")
 		}
 
-		storageType := keyv1.StorageType(customObject)
+		storageType := keyv2.StorageType(customObject)
 
 		// During migration, some TPOs do not have storage type set.
 		// This specifies a default, until all TPOs have the correct storage type set.
@@ -47,7 +47,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					HostPath: &apiv1.HostPathVolumeSource{
-						Path: keyv1.MasterHostPathVolumeDir(keyv1.ClusterID(customObject), keyv1.VMNumber(i)),
+						Path: keyv2.MasterHostPathVolumeDir(keyv2.ClusterID(customObject), keyv2.VMNumber(i)),
 					},
 				},
 			}
@@ -56,12 +56,12 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				Name: "etcd-data",
 				VolumeSource: apiv1.VolumeSource{
 					PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
-						ClaimName: keyv1.EtcdPVCName(keyv1.ClusterID(customObject), keyv1.VMNumber(i)),
+						ClaimName: keyv2.EtcdPVCName(keyv2.ClusterID(customObject), keyv2.VMNumber(i)),
 					},
 				},
 			}
 		} else {
-			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", keyv1.StorageType(customObject))
+			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", keyv2.StorageType(customObject))
 		}
 		deployment := &extensionsv1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
@@ -69,14 +69,14 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: keyv1.DeploymentName(keyv1.MasterID, masterNode.ID),
+				Name: keyv2.DeploymentName(keyv2.MasterID, masterNode.ID),
 				Annotations: map[string]string{
-					VersionBundleVersionAnnotation: keyv1.VersionBundleVersion(customObject),
+					VersionBundleVersionAnnotation: keyv2.VersionBundleVersion(customObject),
 				},
 				Labels: map[string]string{
-					"cluster":  keyv1.ClusterID(customObject),
-					"customer": keyv1.ClusterCustomer(customObject),
-					"app":      keyv1.MasterID,
+					"cluster":  keyv2.ClusterID(customObject),
+					"customer": keyv2.ClusterCustomer(customObject),
+					"app":      keyv2.MasterID,
 					"node":     masterNode.ID,
 				},
 			},
@@ -87,11 +87,11 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						GenerateName: keyv1.MasterID,
+						GenerateName: keyv2.MasterID,
 						Labels: map[string]string{
-							"app":      keyv1.MasterID,
-							"cluster":  keyv1.ClusterID(customObject),
-							"customer": keyv1.ClusterCustomer(customObject),
+							"app":      keyv2.MasterID,
+							"cluster":  keyv2.ClusterID(customObject),
+							"customer": keyv2.ClusterCustomer(customObject),
 							"node":     masterNode.ID,
 						},
 						Annotations: map[string]string{},
@@ -100,7 +100,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 						Affinity:    newMasterPodAfinity(customObject),
 						HostNetwork: true,
 						NodeSelector: map[string]string{
-							"role": keyv1.MasterID,
+							"role": keyv2.MasterID,
 						},
 						Volumes: []apiv1.Volume{
 							{
@@ -108,7 +108,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: keyv1.ConfigMapName(customObject, masterNode, keyv1.MasterID),
+											Name: keyv2.ConfigMapName(customObject, masterNode, keyv2.MasterID),
 										},
 									},
 								},
@@ -132,7 +132,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Name: "flannel",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: keyv1.FlannelEnvPathPrefix,
+										Path: keyv2.FlannelEnvPathPrefix,
 									},
 								},
 							},
@@ -145,9 +145,9 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								Command: []string{
 									"/bin/sh",
 									"-c",
-									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + keyv1.NetworkBridgeName(customObject) +
-										" --service.kubernetes.cluster.namespace=" + keyv1.ClusterNamespace(customObject) +
-										" --service.kubernetes.cluster.service=" + keyv1.MasterID +
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + keyv2.NetworkBridgeName(customObject) +
+										" --service.kubernetes.cluster.namespace=" + keyv2.ClusterNamespace(customObject) +
+										" --service.kubernetes.cluster.service=" + keyv2.MasterID +
 										" --service.kubernetes.inCluster=true" +
 										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
@@ -174,7 +174,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									Privileged: &privileged,
 								},
 								Args: []string{
-									keyv1.MasterID,
+									keyv2.MasterID,
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -196,11 +196,11 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: keyv1.NetworkBridgeName(customObject),
+										Value: keyv2.NetworkBridgeName(customObject),
 									},
 									{
 										Name:  "NETWORK_TAP_NAME",
-										Value: keyv1.NetworkTapName(customObject),
+										Value: keyv2.NetworkTapName(customObject),
 									},
 									{
 										Name: "MEMORY",
@@ -209,7 +209,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 									{
 										Name:  "ROLE",
-										Value: keyv1.MasterID,
+										Value: keyv2.MasterID,
 									},
 									{
 										Name:  "CLOUD_CONFIG_PATH",
@@ -217,16 +217,16 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: keyv1.InitialDelaySeconds,
-									TimeoutSeconds:      keyv1.TimeoutSeconds,
-									PeriodSeconds:       keyv1.PeriodSeconds,
-									FailureThreshold:    keyv1.FailureThreshold,
-									SuccessThreshold:    keyv1.SuccessThreshold,
+									InitialDelaySeconds: keyv2.InitialDelaySeconds,
+									TimeoutSeconds:      keyv2.TimeoutSeconds,
+									PeriodSeconds:       keyv2.PeriodSeconds,
+									FailureThreshold:    keyv2.FailureThreshold,
+									SuccessThreshold:    keyv2.SuccessThreshold,
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
-											Path: keyv1.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: keyv1.LivenessPort(customObject)},
-											Host: keyv1.ProbeHost,
+											Path: keyv2.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: keyv2.LivenessPort(customObject)},
+											Host: keyv2.ProbeHost,
 										},
 									},
 								},
@@ -257,16 +257,16 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 							},
 							{
 								Name:            "k8s-kvm-health",
-								Image:           keyv1.K8SKVMHealthDocker,
+								Image:           keyv2.K8SKVMHealthDocker,
 								ImagePullPolicy: apiv1.PullAlways,
 								Env: []apiv1.EnvVar{
 									{
 										Name:  "LISTEN_ADDRESS",
-										Value: keyv1.HealthListenAddress(customObject),
+										Value: keyv2.HealthListenAddress(customObject),
 									},
 									{
 										Name:  "NETWORK_ENV_FILE_PATH",
-										Value: keyv1.NetworkEnvFilePath(customObject),
+										Value: keyv2.NetworkEnvFilePath(customObject),
 									},
 								},
 								SecurityContext: &apiv1.SecurityContext{
@@ -275,7 +275,7 @@ func newMasterDeployments(customObject kvmtpr.CustomObject) ([]*extensionsv1.Dep
 								VolumeMounts: []apiv1.VolumeMount{
 									{
 										Name:      "flannel",
-										MountPath: keyv1.FlannelEnvPathPrefix,
+										MountPath: keyv2.FlannelEnvPathPrefix,
 									},
 								},
 							},

@@ -1,20 +1,18 @@
-package configmapv1
+package configmapv2
 
 import (
 	"context"
 	"reflect"
 	"testing"
 
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/certificatetpr/certificatetprtest"
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv1/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv2/cloudconfigtest"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
@@ -31,12 +29,10 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -50,12 +46,10 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -88,12 +82,10 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// state should contain the the modified item from the current state.
 		{
 			Ctx: context.TODO(),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -150,12 +142,10 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// the message context.
 		{
 			Ctx: messagecontext.NewContext(context.Background(), messagecontext.NewMessage()),
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},

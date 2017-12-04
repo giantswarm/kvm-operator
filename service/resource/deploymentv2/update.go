@@ -1,4 +1,4 @@
-package deploymentv1
+package deploymentv2
 
 import (
 	"context"
@@ -9,12 +9,12 @@ import (
 	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
-	customObject, err := keyv1.ToCustomObject(obj)
+	customObject, err := keyv2.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -26,7 +26,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	if len(deploymentsToUpdate) != 0 {
 		r.logger.LogCtx(ctx, "debug", "updating the deployments in the Kubernetes API")
 
-		namespace := keyv1.ClusterNamespace(customObject)
+		namespace := keyv2.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToUpdate {
 			_, err := r.k8sClient.Extensions().Deployments(namespace).Update(deployment)
 			if err != nil {

@@ -1,4 +1,4 @@
-package deploymentv1
+package deploymentv2
 
 import (
 	"context"
@@ -6,12 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
-	kvmtprspec "github.com/giantswarm/kvmtpr/spec"
-	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
-	"github.com/giantswarm/kvmtpr/spec/kvm/nodecontroller"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes/fake"
@@ -31,27 +26,25 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		// Test 1 ensures there is one deployment for master and worker each when there
 		// is one master and one worker node in the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "hostPath",
 						},
-						Masters: []kvmtprspeckvm.Node{
+						Masters: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 1, Memory: "1Gi"},
 						},
-						Workers: []kvmtprspeckvm.Node{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 4, Memory: "8.2G"},
 						},
 					},
@@ -81,34 +74,32 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		// Test 2 ensures there is one deployment for master and worker each when there
 		// is one master and three worker nodes in the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "hostPath",
 						},
-						Masters: []kvmtprspeckvm.Node{
+						Masters: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 1, Memory: "1Gi"},
 						},
-						NodeController: kvmtprspeckvm.NodeController{
-							Docker: nodecontroller.Docker{
+						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
+							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
 								Image: "123",
 							},
 						},
-						Workers: []kvmtprspeckvm.Node{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 4, Memory: "8.2G"},
 							{CPUs: 4, Memory: "8.2G"},
 							{CPUs: 4, Memory: "8.2G"},
@@ -152,38 +143,36 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		// Test 3 ensures there is one deployment for master and worker each when there
 		// are three master and three worker nodes in the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "hostPath",
 						},
-						Masters: []kvmtprspeckvm.Node{
+						Masters: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 1, Memory: "1Gi"},
 							{CPUs: 1, Memory: "1Gi"},
 							{CPUs: 1, Memory: "1Gi"},
 						},
-						NodeController: kvmtprspeckvm.NodeController{
-							Docker: nodecontroller.Docker{
+						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
+							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
 								Image: "123",
 							},
 						},
-						Workers: []kvmtprspeckvm.Node{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 4, Memory: "8.2G"},
 							{CPUs: 4, Memory: "8.2G"},
 							{CPUs: 4, Memory: "8.2G"},

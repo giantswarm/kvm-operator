@@ -1,4 +1,4 @@
-package deploymentv1
+package deploymentv2
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := keyv1.ToCustomObject(obj)
+	customObject, err := keyv2.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -26,7 +26,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(deploymentsToDelete) != 0 {
 		r.logger.LogCtx(ctx, "debug", "deleting the deployments in the Kubernetes API")
 
-		namespace := keyv1.ClusterNamespace(customObject)
+		namespace := keyv2.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToDelete {
 			err := r.k8sClient.Extensions().Deployments(namespace).Delete(deployment.Name, newDeleteOptions())
 			if apierrors.IsNotFound(err) {

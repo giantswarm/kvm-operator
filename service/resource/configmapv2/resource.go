@@ -1,4 +1,4 @@
-package configmapv1
+package configmapv2
 
 import (
 	"reflect"
@@ -10,20 +10,20 @@ import (
 	"k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv1"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 )
 
 const (
 	KeyUserData = "user_data"
 	// Name is the identifier of the resource.
-	Name = "configmap"
+	Name = "configmapv2"
 )
 
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
 	CertWatcher certificatetpr.Searcher
-	CloudConfig *cloudconfigv1.CloudConfig
+	CloudConfig *cloudconfigv2.CloudConfig
 	K8sClient   kubernetes.Interface
 	Logger      micrologger.Logger
 }
@@ -44,7 +44,7 @@ func DefaultConfig() Config {
 type Resource struct {
 	// Dependencies.
 	certWatcher certificatetpr.Searcher
-	cloudConfig *cloudconfigv1.CloudConfig
+	cloudConfig *cloudconfigv2.CloudConfig
 	k8sClient   kubernetes.Interface
 	logger      micrologger.Logger
 }
