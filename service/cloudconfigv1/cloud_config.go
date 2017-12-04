@@ -68,7 +68,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject kvmtpr.CustomObject, certs 
 
 	switch customObject.Spec.Cluster.Version {
 	case string(cloudconfig.V_1_0_0):
-		template, err = v_0_1_0MasterTemplate(customObject, certs, node)
+		template, err = v_1_0_0MasterTemplate(customObject, certs, node)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
@@ -98,7 +98,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject kvmtpr.CustomObject, certs 
 
 	switch customObject.Spec.Cluster.Version {
 	case string(cloudconfig.V_1_0_0):
-		template, err = v_0_1_0WorkerTemplate(customObject, certs, node)
+		template, err = v_1_0_0WorkerTemplate(customObject, certs, node)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
