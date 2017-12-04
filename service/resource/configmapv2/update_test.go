@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv1/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv2/cloudconfigtest"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
@@ -31,7 +31,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			Ctx: context.TODO(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -48,7 +48,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			Ctx: context.TODO(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -84,7 +84,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			Ctx: context.TODO(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},
@@ -144,7 +144,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			Ctx: messagecontext.NewContext(context.Background(), messagecontext.NewMessage()),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
 				},

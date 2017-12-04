@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv1/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv2/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
@@ -23,12 +23,12 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.KVMConfigSpecClusterNode{
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []v1alpha1.KVMConfigSpecClusterNode{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 						},
 					},
@@ -40,12 +40,12 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.KVMConfigSpecClusterNode{
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []v1alpha1.KVMConfigSpecClusterNode{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
@@ -59,14 +59,14 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.KVMConfigSpecCluster{
+					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.KVMConfigSpecClusterNode{
+						Masters: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
-						Workers: []v1alpha1.KVMConfigSpecClusterNode{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
