@@ -3,18 +3,18 @@ package cloudconfigv2
 import (
 	"github.com/giantswarm/certificatetpr"
 	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_0_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 )
 
-func v_1_0_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node) (string, error) {
+func v_1_1_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetpr.AssetsBundle, node clustertprspec.Node) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
 	{
 		params.Cluster = customObject.Spec.Cluster
-		params.Extension = &v_1_0_0MasterExtension{
+		params.Extension = &v_1_1_0MasterExtension{
 			certs: certs,
 		}
 		params.Node = node
@@ -36,11 +36,11 @@ func v_1_0_0MasterTemplate(customObject kvmtpr.CustomObject, certs certificatetp
 	return newCloudConfig.Base64(), nil
 }
 
-type v_1_0_0MasterExtension struct {
+type v_1_1_0MasterExtension struct {
 	certs certificatetpr.AssetsBundle
 }
 
-func (e *v_1_0_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+func (e *v_1_1_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{
@@ -165,7 +165,7 @@ func (e *v_1_0_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	return newFiles, nil
 }
 
-func (e *v_1_0_0MasterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
+func (e *v_1_1_0MasterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 	unitsMeta := []k8scloudconfig.UnitMetadata{
 		// Mount etcd volume when directory first accessed
 		// This automount is workaround for
@@ -249,6 +249,6 @@ WantedBy=multi-user.target`,
 	return newUnits, nil
 }
 
-func (e *v_1_0_0MasterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
+func (e *v_1_1_0MasterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
 	return nil
 }
