@@ -8,10 +8,8 @@ import:
   version: master
 - package: github.com/giantswarm/kvmtpr
   version: master
-# Pinned to a branch with w/a for https://github.com/giantswarm/kvm-operator/pull/216.
-# Make sure to rebase k8scloudconfig "kvm-operator-disable-rbac" with "master"
 - package: github.com/giantswarm/k8scloudconfig
-  version: kvm-operator-disable-rbac
+  version: master
 - package: github.com/giantswarm/k8shealthz
   version: master
 - package: github.com/giantswarm/microendpoint

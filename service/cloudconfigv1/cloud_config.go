@@ -57,14 +57,18 @@ func (c *CloudConfig) NewMasterTemplate(customObject kvmtpr.CustomObject, certs 
 
 	// TODO remove defaulting as soon as custom objects are configured.
 	if customObject.Spec.Cluster.Version == "" {
-		customObject.Spec.Cluster.Version = string(cloudconfig.V_0_1_0)
+		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
+	}
+	// TODO remove defaulting as soon as custom objects are migrated.
+	if customObject.Spec.Cluster.Version == string(cloudconfig.V_0_1_0) {
+		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
 	}
 
 	var template string
 
 	switch customObject.Spec.Cluster.Version {
-	case string(cloudconfig.V_0_1_0):
-		template, err = v_0_1_0MasterTemplate(customObject, certs, node)
+	case string(cloudconfig.V_1_0_0):
+		template, err = v_1_0_0MasterTemplate(customObject, certs, node)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
@@ -83,14 +87,18 @@ func (c *CloudConfig) NewWorkerTemplate(customObject kvmtpr.CustomObject, certs 
 
 	// TODO remove defaulting as soon as custom objects are configured.
 	if customObject.Spec.Cluster.Version == "" {
-		customObject.Spec.Cluster.Version = string(cloudconfig.V_0_1_0)
+		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
+	}
+	// TODO remove defaulting as soon as custom objects are migrated.
+	if customObject.Spec.Cluster.Version == string(cloudconfig.V_0_1_0) {
+		customObject.Spec.Cluster.Version = string(cloudconfig.V_1_0_0)
 	}
 
 	var template string
 
 	switch customObject.Spec.Cluster.Version {
-	case string(cloudconfig.V_0_1_0):
-		template, err = v_0_1_0WorkerTemplate(customObject, certs, node)
+	case string(cloudconfig.V_1_0_0):
+		template, err = v_1_0_0WorkerTemplate(customObject, certs, node)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
