@@ -3,6 +3,7 @@ package cloudconfigv2
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/certificatetpr"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 )
@@ -51,21 +52,59 @@ func New(config Config) (*CloudConfig, error) {
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
 func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
-	template, err := newMasterTemplate(customObject, certs, node)
-	if err != nil {
-		return "", microerror.Mask(err)
+	var err error
+
+	var params k8scloudconfig.Params
+	{
+		params.Cluster = customObject.Spec.Cluster
+		params.Extension = &masterExtension{
+			certs: certs,
+		}
+		params.Node = node
 	}
 
-	return template, nil
+	var newCloudConfig *k8scloudconfig.CloudConfig
+	{
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.MasterTemplate, params)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+
+		err = newCloudConfig.ExecuteTemplate()
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+	}
+
+	return newCloudConfig.Base64(), nil
 }
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
 func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
-	template, err := newWorkerTemplate(customObject, certs, node)
-	if err != nil {
-		return "", microerror.Mask(err)
+	var err error
+
+	var params k8scloudconfig.Params
+	{
+		params.Cluster = customObject.Spec.Cluster
+		params.Extension = &workerExtension{
+			certs: certs,
+		}
+		params.Node = node
 	}
 
-	return template, nil
+	var newCloudConfig *k8scloudconfig.CloudConfig
+	{
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.WorkerTemplate, params)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+
+		err = newCloudConfig.ExecuteTemplate()
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+	}
+
+	return newCloudConfig.Base64(), nil
 }
