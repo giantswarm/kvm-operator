@@ -207,6 +207,27 @@ WantedBy=multi-user.target
 			Enable:  true,
 			Command: "start",
 		},
+		{
+			AssetContent: `[Unit]
+Description=Temporary fix for issues with calico-node and kube-proxy after master restart
+Require=k8s-kubelet.service
+After=k8s-kubelet.service
+
+[Service]
+Environment="KUBECONFIG=/etc/kubernetes/config/addons-kubeconfig.yml"
+Environment="KUBECTL=quay.io/giantswarm/docker-kubectl:1dc536ec6dc4597ba46769b3d5d6ce53a7e62038"
+ExecStart=/bin/sh -c "\
+	while [ \"$(/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get cs | grep Healthy | wc -l)\" -ne \"3\" ]; do sleep 1 && echo 'Waiting for healthy k8s'; done;sleep 30s; \
+	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-node; \
+	sleep 1m; \
+	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy"
+
+[Install]
+WantedBy=multi-user.target`,
+			Name:    "calico-kube-kill.service",
+			Command: "start",
+			Enable:  true,
+		},
 	}
 
 	var newUnits []k8scloudconfig.UnitAsset
