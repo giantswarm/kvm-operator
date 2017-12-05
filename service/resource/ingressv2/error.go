@@ -1,4 +1,4 @@
-package ingressv1
+package ingressv2
 
 import "github.com/giantswarm/microerror"
 
