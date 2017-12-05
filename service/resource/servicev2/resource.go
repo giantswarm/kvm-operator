@@ -1,4 +1,4 @@
-package servicev1
+package servicev2
 
 import (
 	"github.com/giantswarm/microerror"
@@ -10,7 +10,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "service"
+	Name = "servicev2"
 )
 
 // Config represents the configuration used to create a new service resource.
