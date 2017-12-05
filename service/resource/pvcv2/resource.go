@@ -1,4 +1,4 @@
-package pvcv1
+package pvcv2
 
 import (
 	"github.com/giantswarm/microerror"
@@ -10,7 +10,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "pvc"
+	Name = "pvcv2"
 	// StorageClass is the storage class annotation persistent volume claims are
 	// configured with.
 	StorageClass = "g8s-storage"
