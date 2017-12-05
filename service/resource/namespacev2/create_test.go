@@ -1,12 +1,10 @@
-package namespacev1
+package namespacev2
 
 import (
 	"context"
 	"testing"
 
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -21,12 +19,10 @@ func Test_Resource_Namespace_newCreateChange(t *testing.T) {
 		ExpectedNamespace *apiv1.Namespace
 	}{
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "foobar",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "foobar",
 					},
 				},
 			},
@@ -60,12 +56,10 @@ func Test_Resource_Namespace_newCreateChange(t *testing.T) {
 		},
 
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "foobar",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "foobar",
 					},
 				},
 			},
