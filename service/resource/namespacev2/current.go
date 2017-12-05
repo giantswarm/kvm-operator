@@ -1,4 +1,4 @@
-package namespacev1
+package namespacev2
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := keyv1.ToCustomObject(obj)
+	customObject, err := keyv2.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -23,7 +23,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// Lookup the current state of the namespace.
 	var namespace *apiv1.Namespace
 	{
-		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(keyv1.ClusterNamespace(customObject), apismetav1.GetOptions{})
+		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(keyv2.ClusterNamespace(customObject), apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.LogCtx(ctx, "debug", "did not find the namespace in the Kubernetes API")
 			// fall through
