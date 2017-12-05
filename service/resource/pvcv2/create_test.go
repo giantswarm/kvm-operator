@@ -1,12 +1,10 @@
-package pvcv1
+package pvcv2
 
 import (
 	"context"
 	"testing"
 
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -23,12 +21,10 @@ func Test_Resource_PVC_newCreateChange(t *testing.T) {
 		// Test 1, in case current state and desired state are empty the create
 		// state should be empty.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -40,12 +36,10 @@ func Test_Resource_PVC_newCreateChange(t *testing.T) {
 		// Test 2, in case current state equals desired state the create state
 		// should be empty.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -69,12 +63,10 @@ func Test_Resource_PVC_newCreateChange(t *testing.T) {
 		// Test 3, in case current state misses one item of desired state the create
 		// state should contain the missing item of the desired state.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -94,12 +86,10 @@ func Test_Resource_PVC_newCreateChange(t *testing.T) {
 		// Test 4, in case current state misses items of desired state the create
 		// state should contain the missing items of the desired state.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -126,12 +116,10 @@ func Test_Resource_PVC_newCreateChange(t *testing.T) {
 		// state the create state should not contain the missing item of the desired
 		// state.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -150,12 +138,10 @@ func Test_Resource_PVC_newCreateChange(t *testing.T) {
 		// the create state should not contain the missing items of the desired
 		// state.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},
@@ -179,12 +165,10 @@ func Test_Resource_PVC_newCreateChange(t *testing.T) {
 		// create state should contain the items being in desired state which are
 		// not in create state.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
 				},
 			},

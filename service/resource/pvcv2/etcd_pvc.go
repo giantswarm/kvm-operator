@@ -1,13 +1,13 @@
-package pvcv1
+package pvcv2
 
 import (
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 	EtcdPVSize = "15Gi"
 )
 
-func newEtcdPVCs(customObject kvmtpr.CustomObject) ([]*apiv1.PersistentVolumeClaim, error) {
+func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*apiv1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []*apiv1.PersistentVolumeClaim
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
@@ -30,11 +30,11 @@ func newEtcdPVCs(customObject kvmtpr.CustomObject) ([]*apiv1.PersistentVolumeCla
 				APIVersion: "v1",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: keyv1.EtcdPVCName(keyv1.ClusterID(customObject), keyv1.VMNumber(i)),
+				Name: keyv2.EtcdPVCName(keyv2.ClusterID(customObject), keyv2.VMNumber(i)),
 				Labels: map[string]string{
-					"app":      keyv1.MasterID,
-					"cluster":  keyv1.ClusterID(customObject),
-					"customer": keyv1.ClusterCustomer(customObject),
+					"app":      keyv2.MasterID,
+					"cluster":  keyv2.ClusterID(customObject),
+					"customer": keyv2.ClusterCustomer(customObject),
 					"node":     masterNode.ID,
 				},
 				Annotations: map[string]string{
