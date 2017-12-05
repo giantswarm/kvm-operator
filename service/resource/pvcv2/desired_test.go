@@ -1,15 +1,11 @@
-package pvcv1
+package pvcv2
 
 import (
 	"context"
 	"strings"
 	"testing"
 
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
-	kvmtprspec "github.com/giantswarm/kvmtpr/spec"
-	kvmtprspeckvm "github.com/giantswarm/kvmtpr/spec/kvm"
+	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -24,21 +20,19 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and one worker node and storage type is 'persistentVolume' in the custom
 		// object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "persistentVolume",
 						},
 					},
@@ -51,23 +45,21 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and three worker nodes and storage type is 'persistentVolume' in the
 		// custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "persistentVolume",
 						},
 					},
@@ -80,25 +72,23 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// master and three worker nodes and storage type is 'persistentVolume' in
 		// the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "persistentVolume",
 						},
 					},
@@ -111,21 +101,19 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and one worker node and storage type is 'hostPath' in the custom
 		// object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "hostPath",
 						},
 					},
@@ -138,23 +126,21 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and three worker nodes and storage type is 'hostPath' in the
 		// custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "hostPath",
 						},
 					},
@@ -167,25 +153,23 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// master and three worker nodes and storage type is 'hostPath' in
 		// the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
 					},
-					KVM: kvmtprspec.KVM{
-						K8sKVM: kvmtprspeckvm.K8sKVM{
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
 							StorageType: "hostPath",
 						},
 					},
