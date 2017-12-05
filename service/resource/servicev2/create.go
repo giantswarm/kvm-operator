@@ -1,4 +1,4 @@
-package servicev1
+package servicev2
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := keyv1.ToCustomObject(obj)
+	customObject, err := keyv2.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(servicesToCreate) != 0 {
 		r.logger.LogCtx(ctx, "debug", "creating the services in the Kubernetes API")
 
-		namespace := keyv1.ClusterNamespace(customObject)
+		namespace := keyv2.ClusterNamespace(customObject)
 		for _, service := range servicesToCreate {
 			_, err := r.k8sClient.CoreV1().Services(namespace).Create(service)
 			if apierrors.IsAlreadyExists(err) {
