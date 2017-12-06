@@ -26,12 +26,16 @@ type FakeCoreV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeCoreV1alpha1) Certs(namespace string) v1alpha1.CertInterface {
-	return &FakeCerts{c, namespace}
+func (c *FakeCoreV1alpha1) CertConfigs(namespace string) v1alpha1.CertConfigInterface {
+	return &FakeCertConfigs{c, namespace}
 }
 
-func (c *FakeCoreV1alpha1) Ingresses(namespace string) v1alpha1.IngressInterface {
-	return &FakeIngresses{c, namespace}
+func (c *FakeCoreV1alpha1) FlannelConfigs(namespace string) v1alpha1.FlannelConfigInterface {
+	return &FakeFlannelConfigs{c, namespace}
+}
+
+func (c *FakeCoreV1alpha1) IngressConfigs(namespace string) v1alpha1.IngressConfigInterface {
+	return &FakeIngressConfigs{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

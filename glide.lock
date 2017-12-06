@@ -1,12 +1,12 @@
-hash: 0732a82b1c79f4a674e5b6f57f9be461c7879bae199646949ce79ac7752b5439
-updated: 2017-11-28T17:01:35.73391+01:00
+hash: 93b8c6c5382ef1c9b718bebc271d566cc2ef7022a0e38b6cc887518ec58772a7
+updated: 2017-12-06T06:45:50.153833+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
   - quantile
 - name: github.com/cenkalti/backoff
-  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
+  version: 32cd0c5b3aef12c76ed64aaf678f6c79736be7dc
 - name: github.com/coreos/go-semver
   version: 8ab6407b697782a06568d4b7f1db25550ec2e4c6
   subpackages:
@@ -31,7 +31,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/apiextensions
-  version: a50685242279dfd7a9ea9c223ff09b6b82487eeb
+  version: ff77d3fd222f34b512255ee7c2c67c55569bcae6
   subpackages:
   - pkg/apis/cluster/v1alpha1
   - pkg/apis/core/v1alpha1
@@ -40,7 +40,7 @@ imports:
   - pkg/clientset/versioned/typed/cluster/v1alpha1
   - pkg/clientset/versioned/typed/core/v1alpha1
 - name: github.com/giantswarm/certificatetpr
-  version: 9a7c674d13714bc7a5258453570bc8163a47b2cc
+  version: 04eb2f7e6433cb9d706eb5fbd2de4f0f986e57f5
   subpackages:
   - certificatetprtest
   - spec
@@ -56,18 +56,22 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: 62aa3dc074ab045375dbad85001afe69c9f82487
+  version: ea70bc4ea6fc4c3214c0a71e3c6a95ba3be5fd32
   subpackages:
   - v_0_1_0
+  - v_1_0_0
+  - v_1_1_0
+  - v_2_0_0
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
-  version: a59418a32c5b5280b58e4dc95fcb14f0cdfb6bed
+  version: 691d308b74d0a2181f8122816b353854448e15ab
   subpackages:
   - spec
   - spec/kvm
   - spec/kvm/endpointupdater
   - spec/kvm/k8skvm
+  - spec/kvm/network
   - spec/kvm/nodecontroller
 - name: github.com/giantswarm/microendpoint
   version: 26dce6e1681c27e7a150bccedb82a45109a0a6be
@@ -79,7 +83,7 @@ imports:
 - name: github.com/giantswarm/microerror
   version: ec5f66bb657662031c0d651504fee6908cdf28d9
 - name: github.com/giantswarm/microkit
-  version: e6c3aafd2c6b8298599dc465dc1294fbd025d2f1
+  version: cd17f87c1287d47572c3428a5b34f6fc23ff2a8d
   subpackages:
   - command
   - command/daemon
@@ -106,7 +110,7 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: a3a11e7cd38b119e98d4db12036cb210f363a130
+  version: 2804229e2bf865f72763ec1cf6f1d9dabb096665
   subpackages:
   - client/k8sclient
   - client/k8scrdclient
@@ -150,7 +154,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
@@ -206,7 +210,7 @@ imports:
 - name: github.com/pelletier/go-toml
   version: 4e9e0ee19b60b13eb79915933f44d8ed5f268bdd
 - name: github.com/prometheus/client_golang
-  version: 1cdba8fdde81f444626530cce66e138d2f68ae1c
+  version: 661e31bf844dfca9aeba15f27ea8aa0d485ad212
   subpackages:
   - prometheus
   - prometheus/promhttp
@@ -235,7 +239,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 1be1d2841c773c01bee8289f55f7463b6e2c2539
+  version: de2d9c4eca8f3c1de17d48b096b6504e0296f003
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
@@ -252,11 +256,16 @@ imports:
   version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
   subpackages:
   - context
+  - html
+  - html/atom
   - http2
   - http2/hpack
   - idna
+  - internal/timeseries
   - lex/httplex
   - publicsuffix
+  - trace
+  - websocket
 - name: golang.org/x/sync
   version: fd80eb99c8f653c847d294a001bdf2a3a6f768f5
   subpackages:

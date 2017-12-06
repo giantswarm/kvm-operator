@@ -25,8 +25,9 @@ import (
 
 type CoreV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	CertsGetter
-	IngressesGetter
+	CertConfigsGetter
+	FlannelConfigsGetter
+	IngressConfigsGetter
 }
 
 // CoreV1alpha1Client is used to interact with features provided by the core.giantswarm.io group.
@@ -34,12 +35,16 @@ type CoreV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *CoreV1alpha1Client) Certs(namespace string) CertInterface {
-	return newCerts(c, namespace)
+func (c *CoreV1alpha1Client) CertConfigs(namespace string) CertConfigInterface {
+	return newCertConfigs(c, namespace)
 }
 
-func (c *CoreV1alpha1Client) Ingresses(namespace string) IngressInterface {
-	return newIngresses(c, namespace)
+func (c *CoreV1alpha1Client) FlannelConfigs(namespace string) FlannelConfigInterface {
+	return newFlannelConfigs(c, namespace)
+}
+
+func (c *CoreV1alpha1Client) IngressConfigs(namespace string) IngressConfigInterface {
+	return newIngressConfigs(c, namespace)
 }
 
 // NewForConfig creates a new CoreV1alpha1Client for the given config.
@@ -73,7 +78,7 @@ func New(c rest.Interface) *CoreV1alpha1Client {
 func setConfigDefaults(config *rest.Config) error {
 	gv := v1alpha1.SchemeGroupVersion
 	config.GroupVersion = &gv
-	config.APIPath = "/api"
+	config.APIPath = "/apis"
 	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
 
 	if config.UserAgent == "" {

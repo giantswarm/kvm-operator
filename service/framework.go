@@ -27,16 +27,17 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/key"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv1"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
+	"github.com/giantswarm/kvm-operator/service/keyv1"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
-	configmapresource "github.com/giantswarm/kvm-operator/service/resource/configmap"
-	deploymentresource "github.com/giantswarm/kvm-operator/service/resource/deployment"
-	ingressresource "github.com/giantswarm/kvm-operator/service/resource/ingress"
-	namespaceresource "github.com/giantswarm/kvm-operator/service/resource/namespace"
-	podresource "github.com/giantswarm/kvm-operator/service/resource/pod"
-	pvcresource "github.com/giantswarm/kvm-operator/service/resource/pvc"
-	serviceresource "github.com/giantswarm/kvm-operator/service/resource/service"
+	"github.com/giantswarm/kvm-operator/service/resource/configmapv1"
+	"github.com/giantswarm/kvm-operator/service/resource/deploymentv1"
+	"github.com/giantswarm/kvm-operator/service/resource/ingressv1"
+	"github.com/giantswarm/kvm-operator/service/resource/namespacev1"
+	"github.com/giantswarm/kvm-operator/service/resource/podv1"
+	"github.com/giantswarm/kvm-operator/service/resource/pvcv1"
+	"github.com/giantswarm/kvm-operator/service/resource/servicev1"
 )
 
 const (
@@ -115,13 +116,13 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var ccService *cloudconfig.CloudConfig
+	var ccService *cloudconfigv2.CloudConfig
 	{
-		c := cloudconfig.DefaultConfig()
+		c := cloudconfigv2.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		ccService, err = cloudconfig.New(c)
+		ccService, err = cloudconfigv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -129,14 +130,14 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var configMapResource framework.Resource
 	{
-		c := configmapresource.DefaultConfig()
+		c := configmapresourcev2.DefaultConfig()
 
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		configMapResource, err = configmapresource.New(c)
+		configMapResource, err = configmapresourcev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -144,12 +145,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var deploymentResource framework.Resource
 	{
-		c := deploymentresource.DefaultConfig()
+		c := deploymentresourcev2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		deploymentResource, err = deploymentresource.New(c)
+		deploymentResource, err = deploymentresourcev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -157,12 +158,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var ingressResource framework.Resource
 	{
-		c := ingressresource.DefaultConfig()
+		c := ingressresourcev2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		ingressResource, err = ingressresource.New(c)
+		ingressResource, err = ingressresourcev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -170,12 +171,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var namespaceResource framework.Resource
 	{
-		c := namespaceresource.DefaultConfig()
+		c := namespaceresourcev2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		namespaceResource, err = namespaceresource.New(c)
+		namespaceResource, err = namespaceresourcev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -183,12 +184,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var pvcResource framework.Resource
 	{
-		c := pvcresource.DefaultConfig()
+		c := pvcresourcev2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		pvcResource, err = pvcresource.New(c)
+		pvcResource, err = pvcresourcev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -196,12 +197,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var serviceResource framework.Resource
 	{
-		c := serviceresource.DefaultConfig()
+		c := serviceresourcev2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		serviceResource, err = serviceresource.New(c)
+		serviceResource, err = serviceresourcev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -210,13 +211,13 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	var resources []framework.Resource
 	{
 		resources = []framework.Resource{
-			namespaceResource,
+			namespaceResourcev2,
 
-			configMapResource,
-			deploymentResource,
-			ingressResource,
-			pvcResource,
-			serviceResource,
+			configMapResourcev2,
+			deploymentResourcev2,
+			ingressResourcev2,
+			pvcResourcev2,
+			serviceResourcev2,
 		}
 
 		retryWrapConfig := retryresource.DefaultWrapConfig()
@@ -257,7 +258,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	var newWatcherFactory informer.WatcherFactory
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
-			watcher, err := clientSet.ClusterV1alpha1().KVMs("").Watch(apismetav1.ListOptions{})
+			watcher, err := clientSet.ClusterV1alpha1().KVMConfigs("").Watch(apismetav1.ListOptions{})
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
@@ -271,9 +272,6 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c := informer.DefaultConfig()
 
 		c.WatcherFactory = newWatcherFactory
-
-		c.RateWait = 10 * time.Second
-		c.ResyncPeriod = 5 * time.Minute
 
 		newInformer, err = informer.New(c)
 		if err != nil {
@@ -349,13 +347,13 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var ccService *cloudconfig.CloudConfig
+	var ccService *cloudconfigv1.CloudConfig
 	{
-		c := cloudconfig.DefaultConfig()
+		c := cloudconfigv1.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		ccService, err = cloudconfig.New(c)
+		ccService, err = cloudconfigv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -363,14 +361,14 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var configMapResource framework.Resource
 	{
-		c := configmapresource.DefaultConfig()
+		c := configmapv1.DefaultConfig()
 
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		configMapResource, err = configmapresource.New(c)
+		configMapResource, err = configmapv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -378,12 +376,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var deploymentResource framework.Resource
 	{
-		c := deploymentresource.DefaultConfig()
+		c := deploymentv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		deploymentResource, err = deploymentresource.New(c)
+		deploymentResource, err = deploymentv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -391,12 +389,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var ingressResource framework.Resource
 	{
-		c := ingressresource.DefaultConfig()
+		c := ingressv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		ingressResource, err = ingressresource.New(c)
+		ingressResource, err = ingressv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -404,12 +402,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var namespaceResource framework.Resource
 	{
-		c := namespaceresource.DefaultConfig()
+		c := namespacev1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		namespaceResource, err = namespaceresource.New(c)
+		namespaceResource, err = namespacev1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -417,12 +415,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var pvcResource framework.Resource
 	{
-		c := pvcresource.DefaultConfig()
+		c := pvcv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		pvcResource, err = pvcresource.New(c)
+		pvcResource, err = pvcv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -430,12 +428,12 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var serviceResource framework.Resource
 	{
-		c := serviceresource.DefaultConfig()
+		c := servicev1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		serviceResource, err = serviceresource.New(c)
+		serviceResource, err = servicev1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -570,12 +568,12 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	var podResource framework.Resource
 	{
-		c := podresource.DefaultConfig()
+		c := podv1.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		podResource, err = podresource.New(c)
+		podResource, err = podv1.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -611,7 +609,7 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
 			options := apismetav1.ListOptions{
-				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
+				LabelSelector: fmt.Sprintf("%s=%s", keyv1.PodWatcherLabel, config.Name),
 			}
 
 			watcher, err := k8sClient.CoreV1().Pods("").Watch(options)

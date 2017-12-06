@@ -75,6 +75,9 @@ kvm:
   - cpus: 2
     disk: 10
     memory: 2G
+  network:
+    flannel:
+      vni: 10
   nodeController:
     docker:
       image: "quay.io/giantswarm/kvm-operator-node-controller"

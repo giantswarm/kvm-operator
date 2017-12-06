@@ -25,9 +25,9 @@ import (
 
 type ClusterV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	AWSsGetter
-	AzuresGetter
-	KVMsGetter
+	AWSConfigsGetter
+	AzureConfigsGetter
+	KVMConfigsGetter
 }
 
 // ClusterV1alpha1Client is used to interact with features provided by the cluster.giantswarm.io group.
@@ -35,16 +35,16 @@ type ClusterV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *ClusterV1alpha1Client) AWSs(namespace string) AWSInterface {
-	return newAWSs(c, namespace)
+func (c *ClusterV1alpha1Client) AWSConfigs(namespace string) AWSConfigInterface {
+	return newAWSConfigs(c, namespace)
 }
 
-func (c *ClusterV1alpha1Client) Azures(namespace string) AzureInterface {
-	return newAzures(c, namespace)
+func (c *ClusterV1alpha1Client) AzureConfigs(namespace string) AzureConfigInterface {
+	return newAzureConfigs(c, namespace)
 }
 
-func (c *ClusterV1alpha1Client) KVMs(namespace string) KVMInterface {
-	return newKVMs(c, namespace)
+func (c *ClusterV1alpha1Client) KVMConfigs(namespace string) KVMConfigInterface {
+	return newKVMConfigs(c, namespace)
 }
 
 // NewForConfig creates a new ClusterV1alpha1Client for the given config.

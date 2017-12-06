@@ -5,39 +5,39 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// NewIngressCRD returns a new custom resource definition for Ingress. This
-// might look something like the following.
+// NewIngressConfigCRD returns a new custom resource definition for
+// IngressConfig. This might look something like the following.
 //
 //     apiVersion: apiextensions.k8s.io/v1beta1
 //     kind: CustomResourceDefinition
 //     metadata:
-//       name: ingresss.core.giantswarm.io
+//       name: ingressconfigs.core.giantswarm.io
 //     spec:
 //       group: core.giantswarm.io
 //       scope: Namespaced
 //       version: v1alpha1
 //       names:
-//         kind: Ingress
-//         plural: ingresss
-//         singular: ingress
+//         kind: IngressConfig
+//         plural: ingressconfigs
+//         singular: ingressconfig
 //
-func NewIngressCRD() *apiextensionsv1beta1.CustomResourceDefinition {
+func NewIngressConfigCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 	return &apiextensionsv1beta1.CustomResourceDefinition{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: apiextensionsv1beta1.SchemeGroupVersion.String(),
 			Kind:       "CustomResourceDefinition",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "ingresss.core.giantswarm.io",
+			Name: "ingressconfigs.core.giantswarm.io",
 		},
 		Spec: apiextensionsv1beta1.CustomResourceDefinitionSpec{
 			Group:   "core.giantswarm.io",
 			Scope:   "Namespaced",
 			Version: "v1alpha1",
 			Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
-				Kind:     "Ingress",
-				Plural:   "ingresss",
-				Singular: "ingress",
+				Kind:     "IngressConfig",
+				Plural:   "ingressconfigs",
+				Singular: "ingressconfig",
 			},
 		},
 	}
@@ -47,35 +47,35 @@ func NewIngressCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 // +genclient:noStatus
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type Ingress struct {
+type IngressConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	Spec              IngressSpec `json:"spec"`
+	Spec              IngressConfigSpec `json:"spec"`
 }
 
-type IngressSpec struct {
-	GuestCluster  IngressSpecGuestCluster   `json:"guestcluster" yaml:"guestcluster"`
-	HostCluster   IngressSpecHostCluster    `json:"hostcluster" yaml:"hostcluster"`
-	ProtocolPorts []IngressSpecProtocolPort `json:"protocolPorts" yaml:"protocolPorts"`
+type IngressConfigSpec struct {
+	GuestCluster  IngressConfigSpecGuestCluster   `json:"guestcluster" yaml:"guestcluster"`
+	HostCluster   IngressConfigSpecHostCluster    `json:"hostcluster" yaml:"hostcluster"`
+	ProtocolPorts []IngressConfigSpecProtocolPort `json:"protocolPorts" yaml:"protocolPorts"`
 }
 
-type IngressSpecGuestCluster struct {
+type IngressConfigSpecGuestCluster struct {
 	ID        string `json:"id" yaml:"id"`
 	Namespace string `json:"namespace" yaml:"namespace"`
 	Service   string `json:"service" yaml:"service"`
 }
 
-type IngressSpecHostCluster struct {
-	IngressController IngressSpecHostClusterIngressController `json:"ingressController" yaml:"ingressController"`
+type IngressConfigSpecHostCluster struct {
+	IngressController IngressConfigSpecHostClusterIngressController `json:"ingressController" yaml:"ingressController"`
 }
 
-type IngressSpecHostClusterIngressController struct {
+type IngressConfigSpecHostClusterIngressController struct {
 	ConfigMap string `json:"configMap" yaml:"configMap"`
 	Namespace string `json:"namespace" yaml:"namespace"`
 	Service   string `json:"service" yaml:"service"`
 }
 
-type IngressSpecProtocolPort struct {
+type IngressConfigSpecProtocolPort struct {
 	IngressPort int    `json:"ingressPort" yaml:"ingressPort"`
 	LBPort      int    `json:"lbPort" yaml:"lbPort"`
 	Protocol    string `json:"protocol" yaml:"protocol"`
@@ -83,8 +83,8 @@ type IngressSpecProtocolPort struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type IngressList struct {
+type IngressConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Ingress `json:"items"`
+	Items           []IngressConfig `json:"items"`
 }

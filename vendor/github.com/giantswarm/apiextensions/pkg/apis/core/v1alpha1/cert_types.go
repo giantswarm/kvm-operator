@@ -5,39 +5,39 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// NewCertCRD returns a new custom resource definition for Cert. This might look
-// something like the following.
+// NewCertConfigCRD returns a new custom resource definition for CertConfig.
+// This might look something like the following.
 //
 //     apiVersion: apiextensions.k8s.io/v1beta1
 //     kind: CustomResourceDefinition
 //     metadata:
-//       name: certs.core.giantswarm.io
+//       name: certconfigs.core.giantswarm.io
 //     spec:
 //       group: core.giantswarm.io
 //       scope: Namespaced
 //       version: v1alpha1
 //       names:
-//         kind: Cert
-//         plural: certs
-//         singular: cert
+//         kind: CertConfig
+//         plural: certconfigs
+//         singular: certconfig
 //
-func NewCertCRD() *apiextensionsv1beta1.CustomResourceDefinition {
+func NewCertConfigCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 	return &apiextensionsv1beta1.CustomResourceDefinition{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: apiextensionsv1beta1.SchemeGroupVersion.String(),
 			Kind:       "CustomResourceDefinition",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "certs.core.giantswarm.io",
+			Name: "certconfigs.core.giantswarm.io",
 		},
 		Spec: apiextensionsv1beta1.CustomResourceDefinitionSpec{
 			Group:   "core.giantswarm.io",
 			Scope:   "Namespaced",
 			Version: "v1alpha1",
 			Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
-				Kind:     "Cert",
-				Plural:   "certs",
-				Singular: "cert",
+				Kind:     "CertConfig",
+				Plural:   "certconfigs",
+				Singular: "certconfig",
 			},
 		},
 	}
@@ -47,18 +47,18 @@ func NewCertCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 // +genclient:noStatus
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type Cert struct {
+type CertConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
-	Spec              CertSpec `json:"spec"`
+	Spec              CertConfigSpec `json:"spec"`
 }
 
-type CertSpec struct {
-	Cert          CertSpecCert          `json:"cert" yaml:"cert"`
-	VersionBundle CertSpecVersionBundle `json:"versionBundle" yaml:"versionBundle"`
+type CertConfigSpec struct {
+	Cert          CertConfigSpecCert          `json:"cert" yaml:"cert"`
+	VersionBundle CertConfigSpecVersionBundle `json:"versionBundle" yaml:"versionBundle"`
 }
 
-type CertSpecCert struct {
+type CertConfigSpecCert struct {
 	AllowBareDomains bool     `json:"allowBareDomains" yaml:"allowBareDomains"`
 	AltNames         []string `json:"altNames" yaml:"altNames"`
 	ClusterComponent string   `json:"clusterComponent" yaml:"clusterComponent"`
@@ -69,14 +69,14 @@ type CertSpecCert struct {
 	TTL              string   `json:"ttl" yaml:"ttl"`
 }
 
-type CertSpecVersionBundle struct {
+type CertConfigSpecVersionBundle struct {
 	Version string `json:"version" yaml:"version"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type CertList struct {
+type CertConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []Cert `json:"items"`
+	Items           []CertConfig `json:"items"`
 }
