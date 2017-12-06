@@ -5,7 +5,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// NewKVMConfigCRD returns a new custom resource definition for KvmConfig. This
+// NewKVMConfigCRD returns a new custom resource definition for KVMConfig. This
 // might look something like the following.
 //
 //     apiVersion: apiextensions.k8s.io/v1beta1
@@ -17,11 +17,11 @@ import (
 //       scope: Namespaced
 //       version: v1alpha1
 //       names:
-//         kind: KvmConfig
+//         kind: KVMConfig
 //         plural: kvmconfigs
 //         singular: kvmconfig
 //
-func NewKvmConfigCRD() *apiextensionsv1beta1.CustomResourceDefinition {
+func NewKVMConfigCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 	return &apiextensionsv1beta1.CustomResourceDefinition{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: apiextensionsv1beta1.SchemeGroupVersion.String(),
@@ -35,7 +35,7 @@ func NewKvmConfigCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 			Scope:   "Namespaced",
 			Version: "v1alpha1",
 			Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
-				Kind:     "KvmConfig",
+				Kind:     "KVMConfig",
 				Plural:   "kvmconfigs",
 				Singular: "kvmconfig",
 			},
@@ -47,7 +47,7 @@ func NewKvmConfigCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 // +genclient:noStatus
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type KvmConfig struct {
+type KVMConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 	Spec              KVMConfigSpec `json:"spec"`
@@ -113,8 +113,8 @@ type KVMConfigSpecVersionBundle struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type KvmConfigList struct {
+type KVMConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []KvmConfig `json:"items"`
+	Items           []KVMConfig `json:"items"`
 }

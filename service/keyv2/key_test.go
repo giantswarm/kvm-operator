@@ -10,7 +10,7 @@ import (
 func Test_ClusterID(t *testing.T) {
 	expectedID := "test-cluster"
 
-	customObject := v1alpha1.KvmConfig{
+	customObject := v1alpha1.KVMConfig{
 		Spec: v1alpha1.KVMConfigSpec{
 			Cluster: v1alpha1.Cluster{
 				ID: expectedID,
@@ -29,7 +29,7 @@ func Test_ClusterID(t *testing.T) {
 func Test_ClusterCustomer(t *testing.T) {
 	expectedID := "test-customer"
 
-	customObject := v1alpha1.KvmConfig{
+	customObject := v1alpha1.KVMConfig{
 		Spec: v1alpha1.KVMConfigSpec{
 			Cluster: v1alpha1.Cluster{
 				ID: expectedID,
@@ -47,11 +47,11 @@ func Test_ClusterCustomer(t *testing.T) {
 
 func Test_HasNodeController(t *testing.T) {
 	testCases := []struct {
-		Obj            v1alpha1.KvmConfig
+		Obj            v1alpha1.KVMConfig
 		ExpectedResult bool
 	}{
 		{
-			Obj: v1alpha1.KvmConfig{
+			Obj: v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					KVM: v1alpha1.KVMConfigSpecKVM{
 						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
@@ -70,7 +70,7 @@ func Test_HasNodeController(t *testing.T) {
 			ExpectedResult: true,
 		},
 		{
-			Obj: v1alpha1.KvmConfig{
+			Obj: v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					KVM: v1alpha1.KVMConfigSpecKVM{
 						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{

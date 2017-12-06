@@ -21,7 +21,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// Test 1, in case current state and desired state are empty the delete
 		// state should be empty.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -36,7 +36,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// Test 2, in case current state has one item and equals desired state the
 		// delete state should equal the current state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -65,7 +65,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// Test 3, in case current state misses one item of desired state the delete
 		// state should not contain the missing item of the desired state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -86,7 +86,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// Test 4, in case current state misses items of desired state the delete
 		// state should not contain the missing items of the desired state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -112,7 +112,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// Test 5, in case current state contains one item and desired state is
 		// empty the delete state should be empty.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -133,7 +133,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// Test 6, in case current state contains items and desired state is empty
 		// the delete state should be empty.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -160,7 +160,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// desired state contains more items not being in current state the create
 		// state should contain all items being in current state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -211,7 +211,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 		// current state contains more items not being in desired state the create
 		// state should contain all items being in desired state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
