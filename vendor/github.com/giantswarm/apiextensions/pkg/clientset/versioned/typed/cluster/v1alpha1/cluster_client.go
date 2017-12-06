@@ -43,7 +43,7 @@ func (c *ClusterV1alpha1Client) AzureConfigs(namespace string) AzureConfigInterf
 	return newAzureConfigs(c, namespace)
 }
 
-func (c *ClusterV1alpha1Client) KVMConfigs(namespace string) KVMConfigInterface {
+func (c *ClusterV1alpha1Client) KvmConfigs(namespace string) KVMConfigInterface {
 	return newKVMConfigs(c, namespace)
 }
 

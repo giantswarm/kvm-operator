@@ -45,7 +45,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	return currentDeployments, nil
 }
 
-func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customObject v1alpha1.KVMConfig, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
+func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customObject v1alpha1.KvmConfig, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
 	versionCounts := map[string]float64{}
 
 	for _, d := range deployments {

@@ -1,5 +1,5 @@
 hash: 93b8c6c5382ef1c9b718bebc271d566cc2ef7022a0e38b6cc887518ec58772a7
-updated: 2017-12-06T07:11:11.858084+01:00
+updated: 2017-12-06T10:06:49.247816+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
@@ -256,16 +256,11 @@ imports:
   version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
   subpackages:
   - context
-  - html
-  - html/atom
   - http2
   - http2/hpack
   - idna
-  - internal/timeseries
   - lex/httplex
   - publicsuffix
-  - trace
-  - websocket
 - name: golang.org/x/sync
   version: fd80eb99c8f653c847d294a001bdf2a3a6f768f5
   subpackages:

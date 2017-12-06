@@ -30,7 +30,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return configMaps, nil
 }
 
-func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.ConfigMap, error) {
+func (r *Resource) newConfigMaps(customObject v1alpha1.KvmConfig) ([]*apiv1.ConfigMap, error) {
 	var configMaps []*apiv1.ConfigMap
 
 	certs, err := r.certWatcher.SearchCerts(keyv2.ClusterID(customObject))
@@ -74,7 +74,7 @@ func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.Conf
 // as structure being injected into the template execution to interpolate
 // variables. prefix can be either "master" or "worker" and is used to prefix
 // the configmap name.
-func (r *Resource) newConfigMap(customObject v1alpha1.KVMConfig, template string, node v1alpha1.ClusterNode, prefix string) (*apiv1.ConfigMap, error) {
+func (r *Resource) newConfigMap(customObject v1alpha1.KvmConfig, template string, node v1alpha1.ClusterNode, prefix string) (*apiv1.ConfigMap, error) {
 	var newConfigMap *apiv1.ConfigMap
 	{
 		newConfigMap = &apiv1.ConfigMap{
