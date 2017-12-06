@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"

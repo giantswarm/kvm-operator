@@ -4,7 +4,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 )
 
 func Test_ClusterID(t *testing.T) {

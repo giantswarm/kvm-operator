@@ -3,7 +3,7 @@ package deploymentv2
 import (
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
