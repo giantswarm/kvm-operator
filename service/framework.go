@@ -279,7 +279,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	var newWatcherFactory informer.WatcherFactory
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
-			watcher, err := clientSet.ClusterV1alpha1().KVMConfigs("").Watch(apismetav1.ListOptions{})
+			watcher, err := clientSet.ProviderV1alpha1().KVMConfigs("").Watch(apismetav1.ListOptions{})
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
