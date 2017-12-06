@@ -43,15 +43,15 @@ const (
 	PodWatcherLabel = "giantswarm.io/pod-watcher"
 )
 
-func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
+func ClusterAPIEndpoint(customObject v1alpha1.KvmConfig) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
 }
 
-func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
+func ClusterCustomer(customObject v1alpha1.KvmConfig) string {
 	return customObject.Spec.Cluster.Customer.ID
 }
 
-func ClusterID(customObject v1alpha1.KVMConfig) string {
+func ClusterID(customObject v1alpha1.KvmConfig) string {
 	return customObject.Spec.Cluster.ID
 }
 
@@ -64,11 +64,11 @@ func ClusterIDFromPod(pod *apiv1.Pod) string {
 	return "n/a"
 }
 
-func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
+func ClusterNamespace(customObject v1alpha1.KvmConfig) string {
 	return ClusterID(customObject)
 }
 
-func ConfigMapName(customObject v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
+func ConfigMapName(customObject v1alpha1.KvmConfig, node v1alpha1.ClusterNode, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
 
@@ -89,22 +89,22 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
-func HasNodeController(customObject v1alpha1.KVMConfig) bool {
+func HasNodeController(customObject v1alpha1.KvmConfig) bool {
 	if customObject.Spec.KVM.NodeController != (v1alpha1.KVMConfigSpecKVMNodeController{}) {
 		return true
 	}
 	return false
 }
 
-func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
+func NetworkEnvFilePath(customObject v1alpha1.KvmConfig) string {
 	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
 }
 
-func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
+func HealthListenAddress(customObject v1alpha1.KvmConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
 }
 
-func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
+func LivenessPort(customObject v1alpha1.KvmConfig) int32 {
 	return int32(portBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
 
@@ -120,11 +120,11 @@ func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) 
 	return q, nil
 }
 
-func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
+func NetworkBridgeName(customObject v1alpha1.KvmConfig) string {
 	return fmt.Sprintf("br-%s", ClusterID(customObject))
 }
 
-func NetworkTapName(customObject v1alpha1.KVMConfig) string {
+func NetworkTapName(customObject v1alpha1.KvmConfig) string {
 	return fmt.Sprintf("tap-%s", ClusterID(customObject))
 }
 
@@ -152,7 +152,7 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
-func PVCNames(customObject v1alpha1.KVMConfig) []string {
+func PVCNames(customObject v1alpha1.KvmConfig) []string {
 	var names []string
 
 	for i := range customObject.Spec.Cluster.Masters {
@@ -162,14 +162,14 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	return names
 }
 
-func StorageType(customObject v1alpha1.KVMConfig) string {
+func StorageType(customObject v1alpha1.KvmConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }
 
-func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
-	customObjectPointer, ok := v.(*v1alpha1.KVMConfig)
+func ToCustomObject(v interface{}) (v1alpha1.KvmConfig, error) {
+	customObjectPointer, ok := v.(*v1alpha1.KvmConfig)
 	if !ok {
-		return v1alpha1.KVMConfig{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.KVMConfig{}, v)
+		return v1alpha1.KvmConfig{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.KvmConfig{}, v)
 	}
 	customObject := *customObjectPointer
 
@@ -189,7 +189,7 @@ func ToPod(v interface{}) (*apiv1.Pod, error) {
 	return pod, nil
 }
 
-func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
+func VersionBundleVersion(customObject v1alpha1.KvmConfig) string {
 	return customObject.Spec.VersionBundle.Version
 }
 

@@ -34,7 +34,7 @@ func (c *FakeClusterV1alpha1) AzureConfigs(namespace string) v1alpha1.AzureConfi
 	return &FakeAzureConfigs{c, namespace}
 }
 
-func (c *FakeClusterV1alpha1) KVMConfigs(namespace string) v1alpha1.KVMConfigInterface {
+func (c *FakeClusterV1alpha1) KvmConfigs(namespace string) v1alpha1.KVMConfigInterface {
 	return &FakeKVMConfigs{c, namespace}
 }
 

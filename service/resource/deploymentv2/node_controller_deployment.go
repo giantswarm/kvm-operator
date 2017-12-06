@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1.Deployment, error) {
+func newNodeControllerDeployment(customObject v1alpha1.KvmConfig) (*extensionsv1.Deployment, error) {
 	replicas := int32(1)
 
 	deployment := &extensionsv1.Deployment{

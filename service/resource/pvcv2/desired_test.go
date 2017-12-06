@@ -20,7 +20,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and one worker node and storage type is 'persistentVolume' in the custom
 		// object.
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -45,7 +45,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and three worker nodes and storage type is 'persistentVolume' in the
 		// custom object.
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -72,7 +72,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// master and three worker nodes and storage type is 'persistentVolume' in
 		// the custom object.
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -101,7 +101,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and one worker node and storage type is 'hostPath' in the custom
 		// object.
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -126,7 +126,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// and three worker nodes and storage type is 'hostPath' in the
 		// custom object.
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -153,7 +153,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		// master and three worker nodes and storage type is 'hostPath' in
 		// the custom object.
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",

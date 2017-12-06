@@ -29,7 +29,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -45,7 +45,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -120,7 +120,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		// state should be empty in case updates are not allowed.
 		{
 			Ctx: context.TODO(),
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -266,7 +266,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 
 				return ctx
 			}(),
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -440,7 +440,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 
 				return ctx
 			}(),
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",

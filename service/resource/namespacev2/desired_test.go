@@ -16,7 +16,7 @@ func Test_Resource_Namespace_GetDesiredState(t *testing.T) {
 		ExpectedName string
 	}{
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -26,7 +26,7 @@ func Test_Resource_Namespace_GetDesiredState(t *testing.T) {
 			ExpectedName: "al9qy",
 		},
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "foobar",

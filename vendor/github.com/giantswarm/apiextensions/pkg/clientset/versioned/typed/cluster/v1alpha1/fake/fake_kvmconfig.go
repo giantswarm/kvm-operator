@@ -34,23 +34,23 @@ type FakeKVMConfigs struct {
 
 var kvmconfigsResource = schema.GroupVersionResource{Group: "cluster.giantswarm.io", Version: "v1alpha1", Resource: "kvmconfigs"}
 
-var kvmconfigsKind = schema.GroupVersionKind{Group: "cluster.giantswarm.io", Version: "v1alpha1", Kind: "KVMConfig"}
+var kvmconfigsKind = schema.GroupVersionKind{Group: "cluster.giantswarm.io", Version: "v1alpha1", Kind: "KvmConfig"}
 
 // Get takes name of the kVMConfig, and returns the corresponding kVMConfig object, and an error if there is any.
-func (c *FakeKVMConfigs) Get(name string, options v1.GetOptions) (result *v1alpha1.KVMConfig, err error) {
+func (c *FakeKVMConfigs) Get(name string, options v1.GetOptions) (result *v1alpha1.KvmConfig, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(kvmconfigsResource, c.ns, name), &v1alpha1.KVMConfig{})
+		Invokes(testing.NewGetAction(kvmconfigsResource, c.ns, name), &v1alpha1.KvmConfig{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.KVMConfig), err
+	return obj.(*v1alpha1.KvmConfig), err
 }
 
-// List takes label and field selectors, and returns the list of KVMConfigs that match those selectors.
-func (c *FakeKVMConfigs) List(opts v1.ListOptions) (result *v1alpha1.KVMConfigList, err error) {
+// List takes label and field selectors, and returns the list of KvmConfigs that match those selectors.
+func (c *FakeKVMConfigs) List(opts v1.ListOptions) (result *v1alpha1.KvmConfigList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(kvmconfigsResource, kvmconfigsKind, c.ns, opts), &v1alpha1.KVMConfigList{})
+		Invokes(testing.NewListAction(kvmconfigsResource, kvmconfigsKind, c.ns, opts), &v1alpha1.KvmConfigList{})
 
 	if obj == nil {
 		return nil, err
@@ -60,8 +60,8 @@ func (c *FakeKVMConfigs) List(opts v1.ListOptions) (result *v1alpha1.KVMConfigLi
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha1.KVMConfigList{}
-	for _, item := range obj.(*v1alpha1.KVMConfigList).Items {
+	list := &v1alpha1.KvmConfigList{}
+	for _, item := range obj.(*v1alpha1.KvmConfigList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -77,31 +77,31 @@ func (c *FakeKVMConfigs) Watch(opts v1.ListOptions) (watch.Interface, error) {
 }
 
 // Create takes the representation of a kVMConfig and creates it.  Returns the server's representation of the kVMConfig, and an error, if there is any.
-func (c *FakeKVMConfigs) Create(kVMConfig *v1alpha1.KVMConfig) (result *v1alpha1.KVMConfig, err error) {
+func (c *FakeKVMConfigs) Create(kVMConfig *v1alpha1.KvmConfig) (result *v1alpha1.KvmConfig, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(kvmconfigsResource, c.ns, kVMConfig), &v1alpha1.KVMConfig{})
+		Invokes(testing.NewCreateAction(kvmconfigsResource, c.ns, kVMConfig), &v1alpha1.KvmConfig{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.KVMConfig), err
+	return obj.(*v1alpha1.KvmConfig), err
 }
 
 // Update takes the representation of a kVMConfig and updates it. Returns the server's representation of the kVMConfig, and an error, if there is any.
-func (c *FakeKVMConfigs) Update(kVMConfig *v1alpha1.KVMConfig) (result *v1alpha1.KVMConfig, err error) {
+func (c *FakeKVMConfigs) Update(kVMConfig *v1alpha1.KvmConfig) (result *v1alpha1.KvmConfig, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(kvmconfigsResource, c.ns, kVMConfig), &v1alpha1.KVMConfig{})
+		Invokes(testing.NewUpdateAction(kvmconfigsResource, c.ns, kVMConfig), &v1alpha1.KvmConfig{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.KVMConfig), err
+	return obj.(*v1alpha1.KvmConfig), err
 }
 
 // Delete takes name of the kVMConfig and deletes it. Returns an error if one occurs.
 func (c *FakeKVMConfigs) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(kvmconfigsResource, c.ns, name), &v1alpha1.KVMConfig{})
+		Invokes(testing.NewDeleteAction(kvmconfigsResource, c.ns, name), &v1alpha1.KvmConfig{})
 
 	return err
 }
@@ -110,17 +110,17 @@ func (c *FakeKVMConfigs) Delete(name string, options *v1.DeleteOptions) error {
 func (c *FakeKVMConfigs) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(kvmconfigsResource, c.ns, listOptions)
 
-	_, err := c.Fake.Invokes(action, &v1alpha1.KVMConfigList{})
+	_, err := c.Fake.Invokes(action, &v1alpha1.KvmConfigList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched kVMConfig.
-func (c *FakeKVMConfigs) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.KVMConfig, err error) {
+func (c *FakeKVMConfigs) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.KvmConfig, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(kvmconfigsResource, c.ns, name, data, subresources...), &v1alpha1.KVMConfig{})
+		Invokes(testing.NewPatchSubresourceAction(kvmconfigsResource, c.ns, name, data, subresources...), &v1alpha1.KvmConfig{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.KVMConfig), err
+	return obj.(*v1alpha1.KvmConfig), err
 }

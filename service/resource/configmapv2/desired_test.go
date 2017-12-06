@@ -21,7 +21,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		ExpectedWorkerCount int
 	}{
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -38,7 +38,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 			ExpectedWorkerCount: 1,
 		},
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -57,7 +57,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 			ExpectedWorkerCount: 3,
 		},
 		{
-			Obj: &v1alpha1.KVMConfig{
+			Obj: &v1alpha1.KvmConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
