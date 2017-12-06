@@ -51,7 +51,7 @@ func New(config Config) (*CloudConfig, error) {
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KvmConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
@@ -81,7 +81,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
+func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KvmConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params

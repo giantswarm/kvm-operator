@@ -19,8 +19,8 @@ var knownTypes = []runtime.Object{
 	&AWSConfigList{},
 	&AzureConfig{},
 	&AzureConfigList{},
-	&KVMConfig{},
-	&KVMConfigList{},
+	&KvmConfig{},
+	&KvmConfigList{},
 }
 
 // SchemeGroupVersion is group version used to register these objects

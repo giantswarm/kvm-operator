@@ -28,19 +28,19 @@ import (
 // KVMConfigsGetter has a method to return a KVMConfigInterface.
 // A group's client should implement this interface.
 type KVMConfigsGetter interface {
-	KVMConfigs(namespace string) KVMConfigInterface
+	KvmConfigs(namespace string) KVMConfigInterface
 }
 
-// KVMConfigInterface has methods to work with KVMConfig resources.
+// KVMConfigInterface has methods to work with KvmConfig resources.
 type KVMConfigInterface interface {
-	Create(*v1alpha1.KVMConfig) (*v1alpha1.KVMConfig, error)
-	Update(*v1alpha1.KVMConfig) (*v1alpha1.KVMConfig, error)
+	Create(*v1alpha1.KvmConfig) (*v1alpha1.KvmConfig, error)
+	Update(*v1alpha1.KvmConfig) (*v1alpha1.KvmConfig, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1alpha1.KVMConfig, error)
-	List(opts v1.ListOptions) (*v1alpha1.KVMConfigList, error)
+	Get(name string, options v1.GetOptions) (*v1alpha1.KvmConfig, error)
+	List(opts v1.ListOptions) (*v1alpha1.KvmConfigList, error)
 	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.KVMConfig, err error)
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.KvmConfig, err error)
 	KVMConfigExpansion
 }
 
@@ -50,7 +50,7 @@ type kVMConfigs struct {
 	ns     string
 }
 
-// newKVMConfigs returns a KVMConfigs
+// newKVMConfigs returns a KvmConfigs
 func newKVMConfigs(c *ClusterV1alpha1Client, namespace string) *kVMConfigs {
 	return &kVMConfigs{
 		client: c.RESTClient(),
@@ -59,8 +59,8 @@ func newKVMConfigs(c *ClusterV1alpha1Client, namespace string) *kVMConfigs {
 }
 
 // Get takes name of the kVMConfig, and returns the corresponding kVMConfig object, and an error if there is any.
-func (c *kVMConfigs) Get(name string, options v1.GetOptions) (result *v1alpha1.KVMConfig, err error) {
-	result = &v1alpha1.KVMConfig{}
+func (c *kVMConfigs) Get(name string, options v1.GetOptions) (result *v1alpha1.KvmConfig, err error) {
+	result = &v1alpha1.KvmConfig{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("kvmconfigs").
@@ -71,9 +71,9 @@ func (c *kVMConfigs) Get(name string, options v1.GetOptions) (result *v1alpha1.K
 	return
 }
 
-// List takes label and field selectors, and returns the list of KVMConfigs that match those selectors.
-func (c *kVMConfigs) List(opts v1.ListOptions) (result *v1alpha1.KVMConfigList, err error) {
-	result = &v1alpha1.KVMConfigList{}
+// List takes label and field selectors, and returns the list of KvmConfigs that match those selectors.
+func (c *kVMConfigs) List(opts v1.ListOptions) (result *v1alpha1.KvmConfigList, err error) {
+	result = &v1alpha1.KvmConfigList{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("kvmconfigs").
@@ -94,8 +94,8 @@ func (c *kVMConfigs) Watch(opts v1.ListOptions) (watch.Interface, error) {
 }
 
 // Create takes the representation of a kVMConfig and creates it.  Returns the server's representation of the kVMConfig, and an error, if there is any.
-func (c *kVMConfigs) Create(kVMConfig *v1alpha1.KVMConfig) (result *v1alpha1.KVMConfig, err error) {
-	result = &v1alpha1.KVMConfig{}
+func (c *kVMConfigs) Create(kVMConfig *v1alpha1.KvmConfig) (result *v1alpha1.KvmConfig, err error) {
+	result = &v1alpha1.KvmConfig{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("kvmconfigs").
@@ -106,8 +106,8 @@ func (c *kVMConfigs) Create(kVMConfig *v1alpha1.KVMConfig) (result *v1alpha1.KVM
 }
 
 // Update takes the representation of a kVMConfig and updates it. Returns the server's representation of the kVMConfig, and an error, if there is any.
-func (c *kVMConfigs) Update(kVMConfig *v1alpha1.KVMConfig) (result *v1alpha1.KVMConfig, err error) {
-	result = &v1alpha1.KVMConfig{}
+func (c *kVMConfigs) Update(kVMConfig *v1alpha1.KvmConfig) (result *v1alpha1.KvmConfig, err error) {
+	result = &v1alpha1.KvmConfig{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("kvmconfigs").
@@ -141,8 +141,8 @@ func (c *kVMConfigs) DeleteCollection(options *v1.DeleteOptions, listOptions v1.
 }
 
 // Patch applies the patch and returns the patched kVMConfig.
-func (c *kVMConfigs) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.KVMConfig, err error) {
-	result = &v1alpha1.KVMConfig{}
+func (c *kVMConfigs) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.KvmConfig, err error) {
+	result = &v1alpha1.KvmConfig{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("kvmconfigs").
