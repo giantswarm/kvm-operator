@@ -248,12 +248,27 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var clientSet *versioned.Clientset
 	{
-		c := &rest.Config{}
+		var c *rest.Config
 
-		c.Host = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
-		c.TLSClientConfig.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
-		c.TLSClientConfig.CertFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
-		c.TLSClientConfig.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
+		if config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster) {
+			config.Logger.Log("debug", "creating in-cluster config")
+
+			c, err = rest.InClusterConfig()
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+		} else {
+			config.Logger.Log("debug", "creating out-cluster config")
+
+			c = &rest.Config{
+				Host: config.Viper.GetString(config.Flag.Service.Kubernetes.Address),
+				TLSClientConfig: rest.TLSClientConfig{
+					CAFile:   config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile),
+					CertFile: config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile),
+					KeyFile:  config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile),
+				},
+			}
+		}
 
 		clientSet, err = versioned.NewForConfig(c)
 		if err != nil {
