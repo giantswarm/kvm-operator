@@ -32,12 +32,18 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv1"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv1"
+	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv1"
+	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv1"
+	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev1"
+	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
 	"github.com/giantswarm/kvm-operator/service/resource/podv1"
 	"github.com/giantswarm/kvm-operator/service/resource/pvcv1"
+	"github.com/giantswarm/kvm-operator/service/resource/pvcv2"
 	"github.com/giantswarm/kvm-operator/service/resource/servicev1"
+	"github.com/giantswarm/kvm-operator/service/resource/servicev2"
 )
 
 const (
@@ -130,14 +136,14 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var configMapResource framework.Resource
 	{
-		c := configmapresourcev2.DefaultConfig()
+		c := configmapv2.DefaultConfig()
 
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		configMapResource, err = configmapresourcev2.New(c)
+		configMapResource, err = configmapv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -145,12 +151,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var deploymentResource framework.Resource
 	{
-		c := deploymentresourcev2.DefaultConfig()
+		c := deploymentv2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		deploymentResource, err = deploymentresourcev2.New(c)
+		deploymentResource, err = deploymentv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -158,12 +164,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var ingressResource framework.Resource
 	{
-		c := ingressresourcev2.DefaultConfig()
+		c := ingressv2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		ingressResource, err = ingressresourcev2.New(c)
+		ingressResource, err = ingressv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -171,12 +177,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var namespaceResource framework.Resource
 	{
-		c := namespaceresourcev2.DefaultConfig()
+		c := namespacev2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		namespaceResource, err = namespaceresourcev2.New(c)
+		namespaceResource, err = namespacev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -184,12 +190,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var pvcResource framework.Resource
 	{
-		c := pvcresourcev2.DefaultConfig()
+		c := pvcv2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		pvcResource, err = pvcresourcev2.New(c)
+		pvcResource, err = pvcv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -197,12 +203,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var serviceResource framework.Resource
 	{
-		c := serviceresourcev2.DefaultConfig()
+		c := servicev2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		serviceResource, err = serviceresourcev2.New(c)
+		serviceResource, err = servicev2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -211,13 +217,13 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	var resources []framework.Resource
 	{
 		resources = []framework.Resource{
-			namespaceResourcev2,
+			namespaceResource,
 
-			configMapResourcev2,
-			deploymentResourcev2,
-			ingressResourcev2,
-			pvcResourcev2,
-			serviceResourcev2,
+			configMapResource,
+			deploymentResource,
+			ingressResource,
+			pvcResource,
+			serviceResource,
 		}
 
 		retryWrapConfig := retryresource.DefaultWrapConfig()
@@ -290,7 +296,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	{
 		c := framework.DefaultConfig()
 
-		c.CRD = v1alpha1.NewKVMCRD()
+		c.CRD = v1alpha1.NewKVMConfigCRD()
 		c.CRDClient = crdClient
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
