@@ -31,7 +31,7 @@ func NewKVMConfigCRD() *apiextensionsv1beta1.CustomResourceDefinition {
 			Name: "kvmconfigs.cluster1.giantswarm.io",
 		},
 		Spec: apiextensionsv1beta1.CustomResourceDefinitionSpec{
-			Group:   "cluster.giantswarm.io",
+			Group:   "cluster1.giantswarm.io",
 			Scope:   "Namespaced",
 			Version: "v1alpha1",
 			Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
