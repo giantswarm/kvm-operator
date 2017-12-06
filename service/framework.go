@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"

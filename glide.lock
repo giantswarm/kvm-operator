@@ -1,5 +1,5 @@
 hash: 93b8c6c5382ef1c9b718bebc271d566cc2ef7022a0e38b6cc887518ec58772a7
-updated: 2017-12-06T10:06:49.247816+01:00
+updated: 2017-12-06T17:17:06.075219+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
@@ -31,14 +31,14 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/apiextensions
-  version: ff77d3fd222f34b512255ee7c2c67c55569bcae6
+  version: 11fc47c2373c9ca55b706261e59b0c897d9e3999
   subpackages:
-  - pkg/apis/cluster/v1alpha1
   - pkg/apis/core/v1alpha1
+  - pkg/apis/provider/v1alpha1
   - pkg/clientset/versioned
   - pkg/clientset/versioned/scheme
-  - pkg/clientset/versioned/typed/cluster/v1alpha1
   - pkg/clientset/versioned/typed/core/v1alpha1
+  - pkg/clientset/versioned/typed/provider/v1alpha1
 - name: github.com/giantswarm/certificatetpr
   version: 04eb2f7e6433cb9d706eb5fbd2de4f0f986e57f5
   subpackages:
@@ -56,7 +56,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/k8scloudconfig
-  version: ea70bc4ea6fc4c3214c0a71e3c6a95ba3be5fd32
+  version: 4b0542adc876f2e34129d95bc06e5557415c320e
   subpackages:
   - v_0_1_0
   - v_1_0_0
@@ -154,7 +154,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
@@ -285,7 +285,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/apiextensions-apiserver
   version: fcd622fe88a4a6efcb5aea9e94ee87324ac1b036
   subpackages:
