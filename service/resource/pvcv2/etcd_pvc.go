@@ -15,7 +15,7 @@ const (
 	EtcdPVSize = "15Gi"
 )
 
-func newEtcdPVCs(customObject v1alpha1.KvmConfig) ([]*apiv1.PersistentVolumeClaim, error) {
+func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*apiv1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []*apiv1.PersistentVolumeClaim
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {

@@ -14,7 +14,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newWorkerDeployments(customObject v1alpha1.KvmConfig) ([]*extensionsv1.Deployment, error) {
+func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
 	var deployments []*extensionsv1.Deployment
 
 	privileged := true

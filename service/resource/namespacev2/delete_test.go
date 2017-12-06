@@ -19,7 +19,7 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 		ExpectedNamespace *apiv1.Namespace
 	}{
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "foobar",
@@ -68,7 +68,7 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 		},
 
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "foobar",

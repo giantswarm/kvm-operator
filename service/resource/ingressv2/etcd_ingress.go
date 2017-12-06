@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newEtcdIngress(customObject v1alpha1.KvmConfig) *extensionsv1.Ingress {
+func newEtcdIngress(customObject v1alpha1.KVMConfig) *extensionsv1.Ingress {
 	ingress := &extensionsv1.Ingress{
 		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "Ingress",

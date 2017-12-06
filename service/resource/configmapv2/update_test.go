@@ -29,7 +29,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -46,7 +46,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -82,7 +82,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// state should contain the the modified item from the current state.
 		{
 			Ctx: context.TODO(),
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -142,7 +142,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		// the message context.
 		{
 			Ctx: messagecontext.NewContext(context.Background(), messagecontext.NewMessage()),
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",

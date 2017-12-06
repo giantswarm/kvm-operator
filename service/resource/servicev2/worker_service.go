@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newWorkerService(customObject v1alpha1.KvmConfig) *apiv1.Service {
+func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 	service := &apiv1.Service{
 		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "service",

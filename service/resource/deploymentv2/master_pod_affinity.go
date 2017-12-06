@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newMasterPodAfinity(customObject v1alpha1.KvmConfig) *apiv1.Affinity {
+func newMasterPodAfinity(customObject v1alpha1.KVMConfig) *apiv1.Affinity {
 	podAffinity := &apiv1.Affinity{
 		PodAntiAffinity: &apiv1.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []apiv1.PodAffinityTerm{

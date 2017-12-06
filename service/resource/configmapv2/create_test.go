@@ -24,7 +24,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// Test 1, in case current state and desired state are empty the create
 		// state should be empty.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -39,7 +39,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// Test 2, in case current state equals desired state the create state
 		// should be empty.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -66,7 +66,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// Test 3, in case current state misses one item of desired state the create
 		// state should contain the missing item of the desired state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -89,7 +89,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// Test 4, in case current state misses items of desired state the create
 		// state should contain the missing items of the desired state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -119,7 +119,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// state the create state should not contain the missing item of the desired
 		// state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -141,7 +141,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// the create state should not contain the missing items of the desired
 		// state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -168,7 +168,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// create state should contain the items being in desired state which are
 		// not in create state.
 		{
-			Obj: &v1alpha1.KvmConfig{
+			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
