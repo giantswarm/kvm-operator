@@ -1,5 +1,5 @@
-hash: 93b8c6c5382ef1c9b718bebc271d566cc2ef7022a0e38b6cc887518ec58772a7
-updated: 2017-12-06T17:06:16.99373+01:00
+hash: 994796b85d066d3dee9cc8e7d4f96ed9e66b108c578842423c36ec5bd48e3c28
+updated: 2017-12-07T11:57:49.829799644+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -31,7 +31,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/apiextensions
-  version: 11fc47c2373c9ca55b706261e59b0c897d9e3999
+  version: 7ec3d5ca6238c9d2473d71494a2b36d295513a4e
   subpackages:
   - pkg/apis/provider/v1alpha1
 - name: github.com/giantswarm/certificatetpr
@@ -172,6 +172,7 @@ imports:
   subpackages:
   - hcl/ast
   - hcl/parser
+  - hcl/printer
   - hcl/scanner
   - hcl/strconv
   - hcl/token
@@ -208,7 +209,7 @@ imports:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -232,13 +233,13 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: de2d9c4eca8f3c1de17d48b096b6504e0296f003
+  version: ccaecb155a2177302cb56cae929251a256d0f646
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
   version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: github.com/spf13/viper
-  version: 4dddf7c62e16bce5807744018f5b753bfe21bbd2
+  version: 1a0c4a370c3e8286b835467d2dfcdaf636c3538b
 - name: github.com/tylerb/graceful
   version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 - name: github.com/ugorji/go
@@ -278,7 +279,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
 - name: k8s.io/apiextensions-apiserver
   version: fcd622fe88a4a6efcb5aea9e94ee87324ac1b036
   subpackages:
