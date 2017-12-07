@@ -37,7 +37,7 @@ func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.Conf
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	keys, err := r.keyWatcher.SearchKeys(customObject.Spec.Cluster.Cluster.ID)
+	keys, err := r.keyWatcher.SearchKeys(customObject.Spec.Cluster.ID)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

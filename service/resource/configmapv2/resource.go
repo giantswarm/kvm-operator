@@ -26,7 +26,7 @@ type Config struct {
 	CertWatcher certificatetpr.Searcher
 	CloudConfig *cloudconfigv2.CloudConfig
 	K8sClient   kubernetes.Interface
-	keyWatcher  randomkeytpr.Searcher
+	KeyWatcher  randomkeytpr.Searcher
 	Logger      micrologger.Logger
 }
 
@@ -49,7 +49,7 @@ type Resource struct {
 	certWatcher certificatetpr.Searcher
 	cloudConfig *cloudconfigv2.CloudConfig
 	k8sClient   kubernetes.Interface
-	KeyWatcher  randomkeytpr.Searcher
+	keyWatcher  randomkeytpr.Searcher
 	logger      micrologger.Logger
 }
 
