@@ -11,9 +11,8 @@ import (
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
-	"github.com/giantswarm/operatorkit/client/k8sextclient"
+	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
@@ -59,9 +58,9 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 	var err error
 
-	var k8sExtClient apiextensionsclient.Interface
+	var restConfig *rest.Config
 	{
-		c := k8sextclient.DefaultConfig()
+		c := k8srestconfig.DefaultConfig()
 
 		c.Logger = config.Logger
 
@@ -71,10 +70,25 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
 		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
 
-		k8sExtClient, err = k8sextclient.New(c)
+		restConfig, err = k8srestconfig.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
+	}
+
+	clientSet, err := versioned.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	k8sClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	k8sExtClient, err := apiextensionsclient.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
 	var crdClient *k8scrdclient.CRDClient
@@ -85,24 +99,6 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.Logger = config.Logger
 
 		crdClient, err = k8scrdclient.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var k8sClient kubernetes.Interface
-	{
-		c := k8sclient.DefaultConfig()
-
-		c.Logger = config.Logger
-
-		c.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
-		c.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
-		c.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
-		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
-		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
-
-		k8sClient, err = k8sclient.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -245,36 +241,6 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var clientSet *versioned.Clientset
-	{
-		var c *rest.Config
-
-		if config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster) {
-			config.Logger.Log("debug", "creating in-cluster config")
-
-			c, err = rest.InClusterConfig()
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-		} else {
-			config.Logger.Log("debug", "creating out-cluster config")
-
-			c = &rest.Config{
-				Host: config.Viper.GetString(config.Flag.Service.Kubernetes.Address),
-				TLSClientConfig: rest.TLSClientConfig{
-					CAFile:   config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile),
-					CertFile: config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile),
-					KeyFile:  config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile),
-				},
-			}
-		}
-
-		clientSet, err = versioned.NewForConfig(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var newWatcherFactory informer.WatcherFactory
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
@@ -336,9 +302,9 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 
 	var err error
 
-	var k8sClient kubernetes.Interface
+	var restConfig *rest.Config
 	{
-		c := k8sclient.DefaultConfig()
+		c := k8srestconfig.DefaultConfig()
 
 		c.Logger = config.Logger
 
@@ -348,10 +314,15 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
 		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
 
-		k8sClient, err = k8sclient.New(c)
+		restConfig, err = k8srestconfig.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
+	}
+
+	k8sClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
 	var certWatcher certificatetpr.Searcher
@@ -568,9 +539,9 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	var err error
 
-	var k8sClient kubernetes.Interface
+	var restConfig *rest.Config
 	{
-		c := k8sclient.DefaultConfig()
+		c := k8srestconfig.DefaultConfig()
 
 		c.Logger = config.Logger
 
@@ -580,10 +551,15 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
 		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
 
-		k8sClient, err = k8sclient.New(c)
+		restConfig, err = k8srestconfig.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
+	}
+
+	k8sClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
 	var podResource framework.Resource
