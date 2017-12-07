@@ -11,7 +11,6 @@ import (
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/client/k8sextclient"
@@ -83,7 +82,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c := k8scrdclient.DefaultConfig()
 
 		c.K8sExtClient = k8sExtClient
-		c.Logger = microloggertest.New()
+		c.Logger = config.Logger
 
 		crdClient, err = k8scrdclient.New(c)
 		if err != nil {
