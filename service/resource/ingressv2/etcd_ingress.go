@@ -1,15 +1,15 @@
-package ingressv1
+package ingressv2
 
 import (
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newEtcdIngress(customObject kvmtpr.CustomObject) *extensionsv1.Ingress {
+func newEtcdIngress(customObject v1alpha1.KVMConfig) *extensionsv1.Ingress {
 	ingress := &extensionsv1.Ingress{
 		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "Ingress",
@@ -18,9 +18,9 @@ func newEtcdIngress(customObject kvmtpr.CustomObject) *extensionsv1.Ingress {
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: EtcdID,
 			Labels: map[string]string{
-				"cluster":  keyv1.ClusterID(customObject),
-				"customer": keyv1.ClusterCustomer(customObject),
-				"app":      keyv1.MasterID,
+				"cluster":  keyv2.ClusterID(customObject),
+				"customer": keyv2.ClusterCustomer(customObject),
+				"app":      keyv2.MasterID,
 			},
 			Annotations: map[string]string{
 				"ingress.kubernetes.io/ssl-passthrough": "true",
@@ -43,7 +43,7 @@ func newEtcdIngress(customObject kvmtpr.CustomObject) *extensionsv1.Ingress {
 								{
 									Path: "/",
 									Backend: extensionsv1.IngressBackend{
-										ServiceName: keyv1.MasterID,
+										ServiceName: keyv2.MasterID,
 										ServicePort: intstr.FromInt(2379),
 									},
 								},

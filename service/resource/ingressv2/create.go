@@ -1,4 +1,4 @@
-package ingressv1
+package ingressv2
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := keyv1.ToCustomObject(obj)
+	customObject, err := keyv2.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(ingressesToCreate) != 0 {
 		r.logger.LogCtx(ctx, "debug", "creating the ingresses in the Kubernetes API")
 
-		namespace := keyv1.ClusterNamespace(customObject)
+		namespace := keyv2.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToCreate {
 			_, err := r.k8sClient.Extensions().Ingresses(namespace).Create(ingress)
 			if apierrors.IsAlreadyExists(err) {

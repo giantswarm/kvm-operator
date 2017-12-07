@@ -1,12 +1,10 @@
-package servicev1
+package servicev2
 
 import (
 	"context"
 	"testing"
 
-	"github.com/giantswarm/clustertpr"
-	clustertprspec "github.com/giantswarm/clustertpr/spec"
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
@@ -21,16 +19,14 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 		// Test 1 ensures there is one service for master and worker each when there
 		// is one master and one worker node in the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 						},
 					},
@@ -43,16 +39,14 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 		// Test 2 ensures there is one service for master and worker each when there
 		// is one master and three worker nodes in the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
@@ -67,18 +61,16 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 		// Test 3 ensures there is one service for master and worker each when there
 		// are three master and three worker nodes in the custom object.
 		{
-			Obj: &kvmtpr.CustomObject{
-				Spec: kvmtpr.Spec{
-					Cluster: clustertpr.Spec{
-						Cluster: clustertprspec.Cluster{
-							ID: "al9qy",
-						},
-						Masters: []clustertprspec.Node{
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},
 						},
-						Workers: []clustertprspec.Node{
+						Workers: []v1alpha1.ClusterNode{
 							{},
 							{},
 							{},

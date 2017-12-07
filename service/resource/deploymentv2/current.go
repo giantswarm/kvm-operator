@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/cluster/v1alpha1"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/prometheus/client_golang/prometheus"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

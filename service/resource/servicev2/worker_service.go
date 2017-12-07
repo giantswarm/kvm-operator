@@ -1,26 +1,26 @@
-package servicev1
+package servicev2
 
 import (
-	"github.com/giantswarm/kvmtpr"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
-func newWorkerService(customObject kvmtpr.CustomObject) *apiv1.Service {
+func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 	service := &apiv1.Service{
 		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: keyv1.WorkerID,
+			Name: keyv2.WorkerID,
 			Labels: map[string]string{
-				"cluster":  keyv1.ClusterID(customObject),
-				"customer": keyv1.ClusterCustomer(customObject),
-				"app":      keyv1.WorkerID,
+				"cluster":  keyv2.ClusterID(customObject),
+				"customer": keyv2.ClusterCustomer(customObject),
+				"app":      keyv2.WorkerID,
 			},
 		},
 		Spec: apiv1.ServiceSpec{
