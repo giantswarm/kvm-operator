@@ -122,6 +122,16 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 			return nil, microerror.Mask(err)
 		}
 	}
+	var keyWatcher randomkeytpr.Searcher
+	{
+		keyConfig := randomkeytpr.DefaultServiceConfig()
+		keyConfig.K8sClient = k8sClient
+		keyConfig.Logger = config.Logger
+		keyWatcher, err = randomkeytpr.NewService(keyConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
 
 	var ccService *cloudconfigv2.CloudConfig
 	{
@@ -142,6 +152,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
+		c.KeyWatcher = keyWatcher
 		c.Logger = config.Logger
 
 		configMapResource, err = configmapv2.New(c)
@@ -369,17 +380,6 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var keyWatcher randomkeytpr.Searcher
-	{
-		keyConfig := randomkeytpr.DefaultServiceConfig()
-		keyConfig.K8sClient = k8sClient
-		keyConfig.Logger = config.Logger
-		keyWatcher, err = randomkeytpr.NewService(keyConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var ccService *cloudconfigv1.CloudConfig
 	{
 		c := cloudconfigv1.DefaultConfig()
@@ -399,7 +399,6 @@ func newCustomObjectFramework(config Config) (*framework.Framework, error) {
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
-		c.KeyWatcher = keyWatcher
 		c.Logger = config.Logger
 
 		configMapResource, err = configmapv1.New(c)
