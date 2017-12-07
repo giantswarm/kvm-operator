@@ -2,6 +2,7 @@ package deploymentv2
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -14,11 +15,16 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
+const (
+	PodDeletionGracePeriod = 5 * time.Minute
+)
+
 func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
 	var deployments []*extensionsv1.Deployment
 
 	privileged := true
 	replicas := int32(1)
+	podDeletionGracePeriod := int64(PodDeletionGracePeriod.Seconds())
 
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
@@ -57,14 +63,18 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						Name: keyv2.WorkerID,
-						Labels: map[string]string{
-							"cluster":  keyv2.ClusterID(customObject),
-							"customer": keyv2.ClusterCustomer(customObject),
-							"app":      keyv2.WorkerID,
-							"node":     workerNode.ID,
-						},
+						Name:        keyv2.WorkerID,
 						Annotations: map[string]string{},
+						Finalizers: []string{
+							keyv2.DrainingNodesFinalizer,
+						},
+						Labels: map[string]string{
+							"app":                 keyv2.WorkerID,
+							"cluster":             keyv2.ClusterID(customObject),
+							"customer":            keyv2.ClusterCustomer(customObject),
+							keyv2.PodWatcherLabel: "kvm-operator",
+							"node":                workerNode.ID,
+						},
 					},
 					Spec: apiv1.PodSpec{
 						Affinity:    newWorkerPodAfinity(customObject),
@@ -72,6 +82,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 						NodeSelector: map[string]string{
 							"role": keyv2.WorkerID,
 						},
+						TerminationGracePeriodSeconds: &podDeletionGracePeriod,
 						Volumes: []apiv1.Volume{
 							{
 								Name: "cloud-config",
