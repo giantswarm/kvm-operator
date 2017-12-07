@@ -11,7 +11,6 @@ import (
 	"github.com/giantswarm/certificatetpr"
 	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/client/k8sclient"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/giantswarm/operatorkit/framework"
@@ -540,9 +539,9 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	var err error
 
-	var k8sClient kubernetes.Interface
+	var restConfig *rest.Config
 	{
-		c := k8sclient.DefaultConfig()
+		c := k8srestconfig.DefaultConfig()
 
 		c.Logger = config.Logger
 
@@ -552,10 +551,15 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
 		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
 
-		k8sClient, err = k8sclient.New(c)
+		restConfig, err = k8srestconfig.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
+	}
+
+	k8sClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
 	var podResource framework.Resource
