@@ -1,4 +1,4 @@
-package podv1
+package podv2
 
 import (
 	"github.com/giantswarm/microerror"
@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Name = "pod"
+	Name = "podv2"
 )
 
 type Config struct {
