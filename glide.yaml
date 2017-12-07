@@ -1,5 +1,7 @@
 package: github.com/giantswarm/kvm-operator
 import:
+- package: github.com/giantswarm/apiextensions
+  version: clientset
 - package: github.com/giantswarm/microkit
   version: master
 - package: github.com/giantswarm/operatorkit
