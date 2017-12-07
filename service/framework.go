@@ -39,7 +39,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev1"
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
-	"github.com/giantswarm/kvm-operator/service/resource/podv1"
+	"github.com/giantswarm/kvm-operator/service/resource/podv2"
 	"github.com/giantswarm/kvm-operator/service/resource/pvcv1"
 	"github.com/giantswarm/kvm-operator/service/resource/pvcv2"
 	"github.com/giantswarm/kvm-operator/service/resource/servicev1"
@@ -589,12 +589,12 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 
 	var podResource framework.Resource
 	{
-		c := podv1.DefaultConfig()
+		c := podv2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		podResource, err = podv1.New(c)
+		podResource, err = podv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
