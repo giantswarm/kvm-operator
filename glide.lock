@@ -1,8 +1,8 @@
-hash: 994796b85d066d3dee9cc8e7d4f96ed9e66b108c578842423c36ec5bd48e3c28
-updated: 2017-12-07T11:57:49.829799644+01:00
+hash: 93b8c6c5382ef1c9b718bebc271d566cc2ef7022a0e38b6cc887518ec58772a7
+updated: 2017-12-06T17:17:06.075219+01:00
 imports:
 - name: github.com/beorn7/perks
-  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
   - quantile
 - name: github.com/cenkalti/backoff
@@ -33,7 +33,12 @@ imports:
 - name: github.com/giantswarm/apiextensions
   version: 7ec3d5ca6238c9d2473d71494a2b36d295513a4e
   subpackages:
+  - pkg/apis/core/v1alpha1
   - pkg/apis/provider/v1alpha1
+  - pkg/clientset/versioned
+  - pkg/clientset/versioned/scheme
+  - pkg/clientset/versioned/typed/core/v1alpha1
+  - pkg/clientset/versioned/typed/provider/v1alpha1
 - name: github.com/giantswarm/certificatetpr
   version: 04eb2f7e6433cb9d706eb5fbd2de4f0f986e57f5
   subpackages:
@@ -109,6 +114,7 @@ imports:
   subpackages:
   - client/k8sclient
   - client/k8scrdclient
+  - client/k8sextclient
   - framework
   - framework/context/canceledcontext
   - framework/context/updateallowedcontext
@@ -156,7 +162,12 @@ imports:
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
+  - jsonpb
   - proto
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/timestamp
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/gorilla/context
