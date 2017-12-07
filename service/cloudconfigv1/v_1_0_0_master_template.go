@@ -144,6 +144,13 @@ func (e *v_1_0_0MasterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
+		// set_ownership_etcd_data_dir drop-in
+		{
+			AssetContent: set_ownership_etcd_data_dir_dropin,
+			Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
+			Owner:        FileOwner,
+			Permissions:  FilePermission,
+		},
 	}
 
 	var newFiles []k8scloudconfig.FileAsset
