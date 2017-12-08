@@ -711,6 +711,8 @@ func migrateTPRsToCRDs(logger micrologger.Logger, clientSet *versioned.Clientset
 		{
 			cro = &v1alpha1.KVMConfig{}
 
+			cro.TypeMeta.APIVersion = "provider.giantswarm.io"
+			cro.TypeMeta.Kind = "KVMConfig"
 			cro.ObjectMeta.Name = tpo.Name
 			cro.ObjectMeta.Finalizers = []string{
 				KVMConfigCleanupFinalizer,
