@@ -77,33 +77,8 @@ func NewVersionBundles() []versionbundle.Bundle {
 		{
 			Changelogs: []versionbundle.Changelog{
 				{
-					Component:   "calico",
-					Description: "Calico version updated.",
-					Kind:        "changed",
-				},
-				{
-					Component:   "docker",
-					Description: "Docker version updated.",
-					Kind:        "changed",
-				},
-				{
-					Component:   "etcd",
-					Description: "Etcd version updated.",
-					Kind:        "changed",
-				},
-				{
-					Component:   "kubedns",
-					Description: "KubeDNS version updated.",
-					Kind:        "changed",
-				},
-				{
 					Component:   "kubernetes",
-					Description: "Kubernetes version updated.",
-					Kind:        "changed",
-				},
-				{
-					Component:   "nginx-ingress-controller",
-					Description: "Nginx-ingress-controller version updated.",
+					Description: "Kubernetes version updated. Fixes a memory leak in the Kubernetes API.",
 					Kind:        "changed",
 				},
 			},
@@ -136,8 +111,8 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Dependencies: []versionbundle.Dependency{},
 			Deprecated:   false,
 			Name:         "kvm-operator",
-			Time:         time.Date(2017, time.October, 26, 16, 38, 0, 0, time.UTC),
-			Version:      "0.2.0",
+			Time:         time.Date(2017, time.December, 8, 9, 25, 0, 0, time.UTC),
+			Version:      "1.0.0",
 			WIP:          false,
 		},
 	}
