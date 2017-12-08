@@ -23,6 +23,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/operatorkit/tpr"
+	"github.com/giantswarm/randomkeytpr"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -125,6 +126,16 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 			return nil, microerror.Mask(err)
 		}
 	}
+	var keyWatcher randomkeytpr.Searcher
+	{
+		keyConfig := randomkeytpr.DefaultServiceConfig()
+		keyConfig.K8sClient = k8sClient
+		keyConfig.Logger = config.Logger
+		keyWatcher, err = randomkeytpr.NewService(keyConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
 
 	var ccService *cloudconfigv2.CloudConfig
 	{
@@ -145,6 +156,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.CertWatcher = certWatcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
+		c.KeyWatcher = keyWatcher
 		c.Logger = config.Logger
 
 		configMapResource, err = configmapv2.New(c)

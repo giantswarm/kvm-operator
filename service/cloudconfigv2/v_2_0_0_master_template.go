@@ -1,16 +1,60 @@
 package cloudconfigv2
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certificatetpr"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_2_0_0"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/randomkeytpr"
 )
 
-type masterExtension struct {
+type v2_0_0masterExtension struct {
 	certs certificatetpr.AssetsBundle
+	keys  map[randomkeytpr.Key][]byte
 }
 
-func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+// NewMasterTemplate generates a new worker cloud config template and returns it
+// as a base64 encoded string.
+func v2_0_0MasterTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode, keys map[randomkeytpr.Key][]byte) (string, error) {
+	var err error
+
+	_, ok := keys[randomkeytpr.EncryptionKey]
+	if !ok {
+		return "", microerror.Maskf(notFoundError, "could not get encryption keys from secrets")
+	}
+
+	var params k8scloudconfig.Params
+	{
+		params.Cluster = customObject.Spec.Cluster
+		params.Extension = &v2_0_0masterExtension{
+			certs: certs,
+			keys:  keys,
+		}
+		params.Node = node
+	}
+
+	var newCloudConfig *k8scloudconfig.CloudConfig
+	{
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.MasterTemplate, params)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+
+		err = newCloudConfig.ExecuteTemplate()
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+	}
+
+	return newCloudConfig.Base64(), nil
+}
+
+func (e *v2_0_0masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+	encryptionConfig, err := EncryptionConfig(string(e.keys[randomkeytpr.EncryptionKey]))
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{
@@ -21,7 +65,6 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		},
 		{
 			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.Crt}]),
-			Path:         "/etc/kubernetes/ssl/apiserver-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
@@ -107,6 +150,13 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
+		// Encryption key
+		{
+			AssetContent: encryptionConfig,
+			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
+			Owner:        FileOwner,
+			Permissions:  0600,
+		},
 		// etcd_data_dir drop-in
 		{
 			AssetContent: etcd_data_dir_dropin,
@@ -135,7 +185,7 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	return newFiles, nil
 }
 
-func (e *masterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
+func (e *v2_0_0masterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 	unitsMeta := []k8scloudconfig.UnitMetadata{
 		// Mount etcd volume when directory first accessed
 		// This automount is workaround for
@@ -190,9 +240,7 @@ ExecStart=/bin/sh -c "\
 	while [ \"$(/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get cs | grep Healthy | wc -l)\" -ne \"3\" ]; do sleep 1 && echo 'Waiting for healthy k8s'; done;sleep 30s; \
 	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-node; \
 	sleep 1m; \
-	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy; \
-	sleep 1m; \
-	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-kube-controllers"
+	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy"
 
 [Install]
 WantedBy=multi-user.target`,
@@ -221,6 +269,6 @@ WantedBy=multi-user.target`,
 	return newUnits, nil
 }
 
-func (e *masterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
+func (e *v2_0_0masterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
 	return nil
 }

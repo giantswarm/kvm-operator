@@ -20,5 +20,7 @@ import:
   version: master
 - package: github.com/giantswarm/micrologger
   version: master
+- package: github.com/giantswarm/randomkeytpr
+  version: master
 - package: github.com/giantswarm/versionbundle
   version: master

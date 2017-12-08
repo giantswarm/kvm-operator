@@ -7,7 +7,9 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certificatetpr/certificatetprtest"
+	cloudconfig "github.com/giantswarm/k8scloudconfig"
 	"github.com/giantswarm/micrologger/microloggertest"
+	"github.com/giantswarm/randomkeytpr/randomtprtest"
 	"k8s.io/client-go/kubernetes/fake"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
@@ -31,6 +33,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 						Workers: []v1alpha1.ClusterNode{
 							{},
 						},
+						Version: string(cloudconfig.V_1_1_0),
 					},
 				},
 			},
@@ -50,6 +53,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 							{},
 							{},
 						},
+						Version: string(cloudconfig.V_1_1_0),
 					},
 				},
 			},
@@ -71,6 +75,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 							{},
 							{},
 						},
+						Version: string(cloudconfig.V_2_0_0),
 					},
 				},
 			},
@@ -86,6 +91,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		resourceConfig.CertWatcher = certificatetprtest.NewService()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.KeyWatcher = randomkeytprtest.NewService()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
 		if err != nil {

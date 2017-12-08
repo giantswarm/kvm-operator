@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/randomkeytpr"
 	"k8s.io/client-go/kubernetes"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 
@@ -25,6 +26,7 @@ type Config struct {
 	CertWatcher certificatetpr.Searcher
 	CloudConfig *cloudconfigv2.CloudConfig
 	K8sClient   kubernetes.Interface
+	KeyWatcher  randomkeytpr.Searcher
 	Logger      micrologger.Logger
 }
 
@@ -36,6 +38,7 @@ func DefaultConfig() Config {
 		CertWatcher: nil,
 		CloudConfig: nil,
 		K8sClient:   nil,
+		KeyWatcher:  nil,
 		Logger:      nil,
 	}
 }
@@ -46,6 +49,7 @@ type Resource struct {
 	certWatcher certificatetpr.Searcher
 	cloudConfig *cloudconfigv2.CloudConfig
 	k8sClient   kubernetes.Interface
+	keyWatcher  randomkeytpr.Searcher
 	logger      micrologger.Logger
 }
 
@@ -61,6 +65,9 @@ func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
+	if config.KeyWatcher == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.KeyWatcher must not be empty")
+	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
@@ -70,6 +77,7 @@ func New(config Config) (*Resource, error) {
 		certWatcher: config.CertWatcher,
 		cloudConfig: config.CloudConfig,
 		k8sClient:   config.K8sClient,
+		keyWatcher:  config.KeyWatcher,
 		logger: config.Logger.With(
 			"resource", Name,
 		),

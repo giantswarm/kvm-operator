@@ -3,9 +3,11 @@ package cloudconfigv2
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certificatetpr"
+	cloudconfig "github.com/giantswarm/k8scloudconfig"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/randomkeytpr"
 )
 
 const (
@@ -51,32 +53,26 @@ func New(config Config) (*CloudConfig, error) {
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode, keys map[randomkeytpr.Key][]byte) (string, error) {
 	var err error
-
-	var params k8scloudconfig.Params
-	{
-		params.Cluster = customObject.Spec.Cluster
-		params.Extension = &masterExtension{
-			certs: certs,
+	var template string
+	switch customObject.Spec.Cluster.Version {
+	case string(cloudconfig.V_1_1_0):
+		template, err = v1_1_0MasterTemplate(customObject, certs, node)
+		if err != nil {
+			return "", microerror.Mask(err)
 		}
-		params.Node = node
-	}
-
-	var newCloudConfig *k8scloudconfig.CloudConfig
-	{
-		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.MasterTemplate, params)
+	case string(cloudconfig.V_2_0_0):
+		template, err = v2_0_0MasterTemplate(customObject, certs, node, keys)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
 
-		err = newCloudConfig.ExecuteTemplate()
-		if err != nil {
-			return "", microerror.Mask(err)
-		}
+	default:
+		return "", microerror.Maskf(notFoundError, "k8scloudconfig version '%s'", customObject.Spec.Cluster.Version)
 	}
 
-	return newCloudConfig.Base64(), nil
+	return template, nil
 }
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it

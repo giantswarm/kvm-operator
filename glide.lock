@@ -122,6 +122,10 @@ imports:
   - framework/resource/retryresource
   - informer
   - tpr
+- name: github.com/giantswarm/randomkeytpr
+  version: 9e1d78d125841c496889e8a54d49057212a2893e
+  subpackages:
+  - randomtprtest
 - name: github.com/giantswarm/versionbundle
   version: e22eefeb8e97277bfebe225f77cf0528b69f36b8
 - name: github.com/go-kit/kit
@@ -215,7 +219,7 @@ imports:
   - prometheus
   - prometheus/promhttp
 - name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
+  version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -289,7 +293,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
 - name: k8s.io/apiextensions-apiserver
   version: fcd622fe88a4a6efcb5aea9e94ee87324ac1b036
   subpackages:
