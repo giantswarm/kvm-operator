@@ -53,6 +53,10 @@ const (
 	ResourceRetries uint64 = 3
 )
 
+const (
+	KVMConfigCleanupFinalizer = "kvm-operator.giantswarm.io/custom-object-cleanup"
+)
+
 func newCRDFramework(config Config) (*framework.Framework, error) {
 	if config.Flag == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Flag must not be empty")
@@ -687,6 +691,7 @@ func migrateTPRsToCRDs(logger micrologger.Logger, clientSet *versioned.Clientset
 	// Convert bytes into structure.
 	var v *kvmtpr.List
 	{
+		v = &kvmtpr.List{}
 		if err := json.Unmarshal(b, v); err != nil {
 			logger.Log("error", fmt.Sprintf("%#v", err))
 			return
@@ -706,6 +711,10 @@ func migrateTPRsToCRDs(logger micrologger.Logger, clientSet *versioned.Clientset
 		{
 			cro = &v1alpha1.KVMConfig{}
 
+			cro.ObjectMeta.Name = tpo.Name
+			cro.ObjectMeta.Finalizers = []string{
+				KVMConfigCleanupFinalizer,
+			}
 			cro.Spec.Cluster.Calico.CIDR = tpo.Spec.Cluster.Calico.CIDR
 			cro.Spec.Cluster.Calico.Domain = tpo.Spec.Cluster.Calico.Domain
 			cro.Spec.Cluster.Calico.MTU = tpo.Spec.Cluster.Calico.MTU
@@ -761,11 +770,17 @@ func migrateTPRsToCRDs(logger micrologger.Logger, clientSet *versioned.Clientset
 		// Create CRO in Kubernetes API.
 		{
 			// TODO enable.
-			//_, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Create(cro)
-			//if err != nil {
-			//	logger.Log("error", fmt.Sprintf("%#v", err))
-			//	return
-			//}
+			// _, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Get(cro.Name, apismetav1.GetOptions{})
+			// if apierrors.IsNotFound(err) {
+			// 	_, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Create(cro)
+			// 	if err != nil {
+			// 		logger.Log("error", fmt.Sprintf("%#v", err))
+			// 		return
+			// 	}
+			// } else if err != nil {
+			// 	logger.Log("error", fmt.Sprintf("%#v", err))
+			// 	return
+			// }
 		}
 	}
 
