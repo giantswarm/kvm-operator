@@ -758,7 +758,15 @@ func migrateTPRsToCRDs(logger micrologger.Logger, clientSet *versioned.Clientset
 			fmt.Printf("\n")
 		}
 
-		// TODO create CRO in Kubernetes API.
+		// Create CRO in Kubernetes API.
+		{
+			// TODO enable.
+			//_, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Create(cro)
+			//if err != nil {
+			//	logger.Log("error", fmt.Sprintf("%#v", err))
+			//	return
+			//}
+		}
 	}
 
 	logger.Log("debug", "end TPR migration")
