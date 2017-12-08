@@ -107,10 +107,10 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
-		// etcd_data_dir drop-in
+		// set_ownership_etcd_data_dir drop-in
 		{
-			AssetContent: etcd_data_dir_dropin,
-			Path:         "/etc/systemd/system/etc-kubernetes-data-etcd.mount.d/00-before-set-ownership.conf",
+			AssetContent: set_ownership_etcd_data_dir_dropin,
+			Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
