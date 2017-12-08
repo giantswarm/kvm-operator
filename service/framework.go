@@ -790,9 +790,9 @@ func migrateTPRsToCRDs(logger micrologger.Logger, clientSet *versioned.Clientset
 func toClusterMasters(masters []spec.Node) []v1alpha1.ClusterNode {
 	var newList []v1alpha1.ClusterNode
 
-	for _, master := range masters {
+	for _, m := range masters {
 		n := v1alpha1.ClusterNode{
-			ID: master.ID,
+			ID: m.ID,
 		}
 
 		newList = append(newList, n)
@@ -804,9 +804,9 @@ func toClusterMasters(masters []spec.Node) []v1alpha1.ClusterNode {
 func toClusterWorkers(workers []spec.Node) []v1alpha1.ClusterNode {
 	var newList []v1alpha1.ClusterNode
 
-	for _, worker := range workers {
+	for _, w := range workers {
 		n := v1alpha1.ClusterNode{
-			ID: worker.ID,
+			ID: w.ID,
 		}
 
 		newList = append(newList, n)
@@ -818,14 +818,14 @@ func toClusterWorkers(workers []spec.Node) []v1alpha1.ClusterNode {
 func toKVMMasters(masters []kvm.Node) []v1alpha1.KVMConfigSpecKVMNode {
 	var newList []v1alpha1.KVMConfigSpecKVMNode
 
-	for _, master := range masters {
-		w := v1alpha1.KVMConfigSpecKVMNode{
-			CPUs:   master.CPUs,
-			Disk:   master.Disk,
-			Memory: master.Memory,
+	for _, m := range masters {
+		n := v1alpha1.KVMConfigSpecKVMNode{
+			CPUs:   m.CPUs,
+			Disk:   m.Disk,
+			Memory: m.Memory,
 		}
 
-		newList = append(newList, w)
+		newList = append(newList, n)
 	}
 
 	return newList
@@ -834,14 +834,14 @@ func toKVMMasters(masters []kvm.Node) []v1alpha1.KVMConfigSpecKVMNode {
 func toKVMWorkers(workers []kvm.Node) []v1alpha1.KVMConfigSpecKVMNode {
 	var newList []v1alpha1.KVMConfigSpecKVMNode
 
-	for _, worker := range workers {
-		w := v1alpha1.KVMConfigSpecKVMNode{
-			CPUs:   worker.CPUs,
-			Disk:   worker.Disk,
-			Memory: worker.Memory,
+	for _, w := range workers {
+		n := v1alpha1.KVMConfigSpecKVMNode{
+			CPUs:   w.CPUs,
+			Disk:   w.Disk,
+			Memory: w.Memory,
 		}
 
-		newList = append(newList, w)
+		newList = append(newList, n)
 	}
 
 	return newList
