@@ -60,7 +60,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				},
 				{
 					Name:    "kubernetes",
-					Version: "1.8.1",
+					Version: "1.8.4",
 				},
 				{
 					Name:    "nginx-ingress-controller",
@@ -72,7 +72,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Name:         "kvm-operator",
 			Time:         time.Date(2017, time.October, 26, 16, 38, 0, 0, time.UTC),
 			Version:      "0.1.0",
-			WIP:          true,
+			WIP:          false,
 		},
 	}
 }
