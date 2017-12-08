@@ -1,5 +1,5 @@
-hash: 93b8c6c5382ef1c9b718bebc271d566cc2ef7022a0e38b6cc887518ec58772a7
-updated: 2017-12-06T17:17:06.075219+01:00
+hash: 9af00a8011391d58921b3c84788439dc7b16212ebba18d18b6e7509ed49f7f3b
+updated: 2017-12-08T09:21:42.687438+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
@@ -31,7 +31,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/apiextensions
-  version: 11fc47c2373c9ca55b706261e59b0c897d9e3999
+  version: 7ec3d5ca6238c9d2473d71494a2b36d295513a4e
   subpackages:
   - pkg/apis/core/v1alpha1
   - pkg/apis/provider/v1alpha1
@@ -110,11 +110,11 @@ imports:
   subpackages:
   - memory
 - name: github.com/giantswarm/operatorkit
-  version: 2804229e2bf865f72763ec1cf6f1d9dabb096665
+  version: 8b3446a2ecbe707fb6ba351b035cd60508af5aec
   subpackages:
   - client/k8sclient
   - client/k8scrdclient
-  - client/k8sextclient
+  - client/k8srestconfig
   - framework
   - framework/context/canceledcontext
   - framework/context/updateallowedcontext
@@ -123,7 +123,7 @@ imports:
   - informer
   - tpr
 - name: github.com/giantswarm/versionbundle
-  version: 3b7cd23ec96043f5193c1b6c966fade961f0da65
+  version: e22eefeb8e97277bfebe225f77cf0528b69f36b8
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -158,12 +158,7 @@ imports:
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
-  - jsonpb
   - proto
-  - ptypes
-  - ptypes/any
-  - ptypes/duration
-  - ptypes/timestamp
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/gorilla/context
@@ -179,12 +174,17 @@ imports:
   subpackages:
   - hcl/ast
   - hcl/parser
+  - hcl/printer
   - hcl/scanner
   - hcl/strconv
   - hcl/token
   - json/parser
   - json/scanner
   - json/token
+- name: github.com/howeyc/gopass
+  version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
+- name: github.com/imdario/mergo
+  version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/juju/errgo
@@ -239,19 +239,23 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: de2d9c4eca8f3c1de17d48b096b6504e0296f003
+  version: ccaecb155a2177302cb56cae929251a256d0f646
 - name: github.com/spf13/jwalterweatherman
   version: 12bd96e66386c1960ab0f74ced1362f66f552f7b
 - name: github.com/spf13/pflag
   version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: github.com/spf13/viper
-  version: 4dddf7c62e16bce5807744018f5b753bfe21bbd2
+  version: 1a0c4a370c3e8286b835467d2dfcdaf636c3538b
 - name: github.com/tylerb/graceful
   version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 - name: github.com/ugorji/go
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
   - codec
+- name: golang.org/x/crypto
+  version: d172538b2cfce0c13cee31e647d0367aa8cd2486
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/net
   version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
   subpackages:
@@ -295,7 +299,7 @@ imports:
   - pkg/client/clientset/clientset/scheme
   - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
-  version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
+  version: 1fd2e63a9a370677308a42f24fd40c86438afddf
   subpackages:
   - pkg/api/equality
   - pkg/api/errors
@@ -430,11 +434,16 @@ imports:
   - rest
   - rest/watch
   - testing
+  - tools/auth
   - tools/cache
+  - tools/clientcmd
   - tools/clientcmd/api
+  - tools/clientcmd/api/latest
+  - tools/clientcmd/api/v1
   - tools/metrics
   - transport
   - util/cert
   - util/flowcontrol
+  - util/homedir
   - util/integer
 testImports: []
