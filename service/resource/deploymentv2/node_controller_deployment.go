@@ -5,6 +5,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
 	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
@@ -58,6 +59,19 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 								{
 									Name:  "PROVIDER_HOST_CLUSTER_NAMESPACE",
 									Value: keyv2.ClusterID(customObject),
+								},
+							},
+							LivenessProbe: &apiv1.Probe{
+								InitialDelaySeconds: 15,
+								TimeoutSeconds:      1,
+								PeriodSeconds:       10,
+								FailureThreshold:    3,
+								SuccessThreshold:    1,
+								Handler: apiv1.Handler{
+									HTTPGet: &apiv1.HTTPGetAction{
+										Path: keyv2.HealthEndpoint,
+										Port: intstr.IntOrString{IntVal: 8080},
+									},
 								},
 							},
 						},
