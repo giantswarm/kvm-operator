@@ -24,6 +24,7 @@ import (
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/operatorkit/tpr"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -771,18 +772,17 @@ func migrateTPRsToCRDs(logger micrologger.Logger, clientSet *versioned.Clientset
 
 		// Create CRO in Kubernetes API.
 		{
-			// TODO enable.
-			// _, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Get(cro.Name, apismetav1.GetOptions{})
-			// if apierrors.IsNotFound(err) {
-			// 	_, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Create(cro)
-			// 	if err != nil {
-			// 		logger.Log("error", fmt.Sprintf("%#v", err))
-			// 		return
-			// 	}
-			// } else if err != nil {
-			// 	logger.Log("error", fmt.Sprintf("%#v", err))
-			// 	return
-			// }
+			_, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Get(cro.Name, apismetav1.GetOptions{})
+			if apierrors.IsNotFound(err) {
+				_, err := clientSet.ProviderV1alpha1().KVMConfigs(tpo.Namespace).Create(cro)
+				if err != nil {
+					logger.Log("error", fmt.Sprintf("%#v", err))
+					return
+				}
+			} else if err != nil {
+				logger.Log("error", fmt.Sprintf("%#v", err))
+				return
+			}
 		}
 	}
 
