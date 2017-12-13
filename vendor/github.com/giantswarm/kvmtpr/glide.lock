@@ -1,5 +1,5 @@
-hash: 1c1b31995f13886bcd11d665c834dcce93633fd86d35bdfa31ffd5a223daa061
-updated: 2017-11-21T15:01:49.237043481+01:00
+hash: b0f730929f3a6ee10db297531a2dd9f607262d4663e28b995967e4bea52db34a
+updated: 2017-12-08T15:43:47.920219+01:00
 imports:
 - name: github.com/emicklei/go-restful
   version: ff4f55a206334ef123e4f79bbf348980da81ca46
@@ -17,7 +17,7 @@ imports:
   - spec/kubernetes/networksetup
   - spec/kubernetes/ssh
 - name: github.com/giantswarm/operatorkit
-  version: 0bd1c4365f66a52c233957c38367ca3a3c2a81e9
+  version: 8b3446a2ecbe707fb6ba351b035cd60508af5aec
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -70,7 +70,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: k8s.io/apimachinery
-  version: 1fd2e63a9a370677308a42f24fd40c86438afddf
+  version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
   - pkg/api/resource
   - pkg/apis/meta/v1
@@ -112,4 +112,4 @@ testImports:
   - assert
   - require
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5

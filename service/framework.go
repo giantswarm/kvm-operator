@@ -9,7 +9,6 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certificatetpr"
-	"github.com/giantswarm/kvmtpr"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
@@ -17,30 +16,21 @@ import (
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
-	"github.com/giantswarm/operatorkit/tpr"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv1"
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
-	"github.com/giantswarm/kvm-operator/service/resource/configmapv1"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
-	"github.com/giantswarm/kvm-operator/service/resource/deploymentv1"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
-	"github.com/giantswarm/kvm-operator/service/resource/ingressv1"
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
-	"github.com/giantswarm/kvm-operator/service/resource/namespacev1"
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
 	"github.com/giantswarm/kvm-operator/service/resource/podv2"
-	"github.com/giantswarm/kvm-operator/service/resource/pvcv1"
 	"github.com/giantswarm/kvm-operator/service/resource/pvcv2"
-	"github.com/giantswarm/kvm-operator/service/resource/servicev1"
 	"github.com/giantswarm/kvm-operator/service/resource/servicev2"
 )
 
@@ -282,6 +272,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
 		c.ResourceRouter = NewResourceRouter(resources)
+
 		crdFramework, err = framework.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
@@ -367,7 +358,7 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
 			options := apismetav1.ListOptions{
-				LabelSelector: fmt.Sprintf("%s=%s", keyv1.PodWatcherLabel, config.Name),
+				LabelSelector: fmt.Sprintf("%s=%s", keyv2.PodWatcherLabel, config.Name),
 			}
 
 			watcher, err := k8sClient.CoreV1().Pods("").Watch(options)

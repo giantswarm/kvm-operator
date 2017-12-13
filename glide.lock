@@ -1,5 +1,5 @@
 hash: 9af00a8011391d58921b3c84788439dc7b16212ebba18d18b6e7509ed49f7f3b
-updated: 2017-12-08T09:21:42.687438+01:00
+updated: 2017-12-08T17:14:53.83419+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
@@ -31,7 +31,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/apiextensions
-  version: 7ec3d5ca6238c9d2473d71494a2b36d295513a4e
+  version: 4d6738e12b97ccac6befe4d41525912cb59c8335
   subpackages:
   - pkg/apis/core/v1alpha1
   - pkg/apis/provider/v1alpha1
@@ -40,7 +40,7 @@ imports:
   - pkg/clientset/versioned/typed/core/v1alpha1
   - pkg/clientset/versioned/typed/provider/v1alpha1
 - name: github.com/giantswarm/certificatetpr
-  version: 04eb2f7e6433cb9d706eb5fbd2de4f0f986e57f5
+  version: 6d5c3a764f2c1729aa24960f7fa53c80b5219497
   subpackages:
   - certificatetprtest
   - spec
@@ -65,7 +65,7 @@ imports:
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
 - name: github.com/giantswarm/kvmtpr
-  version: 691d308b74d0a2181f8122816b353854448e15ab
+  version: 2eb4afb7658d7bd0f2a9a7241f60cecc08212f4e
   subpackages:
   - spec
   - spec/kvm
@@ -158,7 +158,12 @@ imports:
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
+  - jsonpb
   - proto
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/timestamp
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/gorilla/context
@@ -181,10 +186,6 @@ imports:
   - json/parser
   - json/scanner
   - json/token
-- name: github.com/howeyc/gopass
-  version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
-- name: github.com/imdario/mergo
-  version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/juju/errgo
@@ -252,10 +253,6 @@ imports:
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
   - codec
-- name: golang.org/x/crypto
-  version: d172538b2cfce0c13cee31e647d0367aa8cd2486
-  subpackages:
-  - ssh/terminal
 - name: golang.org/x/net
   version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
   subpackages:
@@ -299,7 +296,7 @@ imports:
   - pkg/client/clientset/clientset/scheme
   - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
-  version: 1fd2e63a9a370677308a42f24fd40c86438afddf
+  version: 8ab5f3d8a330c2e9baaf84e39042db8d49034ae2
   subpackages:
   - pkg/api/equality
   - pkg/api/errors
@@ -434,16 +431,11 @@ imports:
   - rest
   - rest/watch
   - testing
-  - tools/auth
   - tools/cache
-  - tools/clientcmd
   - tools/clientcmd/api
-  - tools/clientcmd/api/latest
-  - tools/clientcmd/api/v1
   - tools/metrics
   - transport
   - util/cert
   - util/flowcontrol
-  - util/homedir
   - util/integer
 testImports: []
