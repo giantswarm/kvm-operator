@@ -10,7 +10,7 @@ import (
 
 // NewResourceRouter determines which resources are enabled based upon the
 // version in the version bundle.
-func NewResourceRouter(resources map[string][]framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
+func NewResourceRouter(resources []framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 	return func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 		var enabledResources []framework.Resource
 
@@ -21,9 +21,9 @@ func NewResourceRouter(resources map[string][]framework.Resource) func(ctx conte
 
 		switch keyv2.VersionBundleVersion(customObject) {
 		case "0.1.0":
-			enabledResources = resources["0.1.0"]
+			enabledResources = resources
 		case "1.0.0":
-			enabledResources = resources["1.0.0"]
+			enabledResources = resources
 		default:
 			return enabledResources, microerror.Maskf(invalidVersionError, "version '%s' in version bundle is invalid", keyv2.VersionBundleVersion(customObject))
 		}

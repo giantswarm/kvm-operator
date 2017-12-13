@@ -28,7 +28,6 @@ import (
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv1"
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 	"github.com/giantswarm/kvm-operator/service/keyv1"
-	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv1"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
@@ -242,10 +241,6 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	versionedResources := map[string][]framework.Resource{
-		keyv2.K8sCloudConfig_V_2_0_0: resources,
-	}
-
 	var newWatcherFactory informer.WatcherFactory
 	{
 		newWatcherFactory = func() (watch.Interface, error) {
@@ -286,7 +281,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
-		c.ResourceRouter = NewResourceRouter(versionedResources)
+		c.ResourceRouter = NewResourceRouter(resources)
 		crdFramework, err = framework.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
