@@ -3,12 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
-	"github.com/giantswarm/certificatetpr"
+	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
@@ -18,7 +17,6 @@ import (
 	"github.com/giantswarm/operatorkit/informer"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -94,14 +92,14 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var certWatcher certificatetpr.Searcher
+	var certSearcher certs.Interface
 	{
-		certConfig := certificatetpr.DefaultServiceConfig()
+		c := certs.DefaultConfig()
 
-		certConfig.K8sClient = k8sClient
-		certConfig.Logger = config.Logger
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
 
-		certWatcher, err = certificatetpr.NewService(certConfig)
+		certSearcher, err = certs.NewSearcher(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -123,7 +121,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	{
 		c := configmapv2.DefaultConfig()
 
-		c.CertWatcher = certWatcher
+		c.CertSearcher = certSearcher
 		c.CloudConfig = ccService
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
@@ -231,23 +229,11 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var newWatcherFactory informer.WatcherFactory
-	{
-		newWatcherFactory = func() (watch.Interface, error) {
-			watcher, err := clientSet.ProviderV1alpha1().KVMConfigs("").Watch(apismetav1.ListOptions{})
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			return watcher, nil
-		}
-	}
-
 	var newInformer *informer.Informer
 	{
 		c := informer.DefaultConfig()
 
-		c.WatcherFactory = newWatcherFactory
+		c.Watcher = clientSet.ProviderV1alpha1().KVMConfigs("")
 
 		newInformer, err = informer.New(c)
 		if err != nil {
@@ -354,30 +340,15 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var newWatcherFactory informer.WatcherFactory
-	{
-		newWatcherFactory = func() (watch.Interface, error) {
-			options := apismetav1.ListOptions{
-				LabelSelector: fmt.Sprintf("%s=%s", keyv2.PodWatcherLabel, config.Name),
-			}
-
-			watcher, err := k8sClient.CoreV1().Pods("").Watch(options)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			return watcher, nil
-		}
-	}
-
 	var newInformer *informer.Informer
 	{
 		c := informer.DefaultConfig()
 
-		c.WatcherFactory = newWatcherFactory
+		c.Watcher = k8sClient.CoreV1().Pods("")
 
-		c.RateWait = 10 * time.Second
-		c.ResyncPeriod = 5 * time.Minute
+		c.ListOptions = apismetav1.ListOptions{
+			LabelSelector: fmt.Sprintf("%s=%s", keyv2.PodWatcherLabel, config.Name),
+		}
 
 		newInformer, err = informer.New(c)
 		if err != nil {

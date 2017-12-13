@@ -6,9 +6,9 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
+	"k8s.io/api/extensions/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
-	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 )
 
 func Test_Resource_Ingress_newCreateChange(t *testing.T) {
