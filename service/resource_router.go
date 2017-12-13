@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 )
 
-// NewResourceRouter determines which resources are enabled based upon the
+// newResourceRouter determines which resources are enabled based upon the
 // version in the version bundle.
 func newResourceRouter(resources []framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 	return func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
