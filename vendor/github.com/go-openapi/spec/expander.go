@@ -471,7 +471,7 @@ func expandSchema(target Schema, parentRefs []string, resolver *schemaLoader) (s
 		}
 		*target.Not = *t
 	}
-	for k, _ := range target.Properties {
+	for k := range target.Properties {
 		if t, err = expandSchema(target.Properties[k], parentRefs, resolver); err != nil {
 			return
 		}
@@ -483,13 +483,13 @@ func expandSchema(target Schema, parentRefs []string, resolver *schemaLoader) (s
 		}
 		*target.AdditionalProperties.Schema = *t
 	}
-	for k, _ := range target.PatternProperties {
+	for k := range target.PatternProperties {
 		if t, err = expandSchema(target.PatternProperties[k], parentRefs, resolver); err != nil {
 			return
 		}
 		target.PatternProperties[k] = *t
 	}
-	for k, _ := range target.Dependencies {
+	for k := range target.Dependencies {
 		if target.Dependencies[k].Schema != nil {
 			if t, err = expandSchema(*target.Dependencies[k].Schema, parentRefs, resolver); err != nil {
 				return
@@ -503,7 +503,7 @@ func expandSchema(target Schema, parentRefs []string, resolver *schemaLoader) (s
 		}
 		*target.AdditionalItems.Schema = *t
 	}
-	for k, _ := range target.Definitions {
+	for k := range target.Definitions {
 		if t, err = expandSchema(target.Definitions[k], parentRefs, resolver); err != nil {
 			return
 		}
