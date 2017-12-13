@@ -2,7 +2,7 @@ package service
 
 import "github.com/giantswarm/microerror"
 
-var invalidConfigError  = microerror.New("invalid config")
+var invalidConfigError = microerror.New("invalid config")
 
 // IsInvalidConfig asserts invalidConfigError.
 func IsInvalidConfig(err error) bool {
