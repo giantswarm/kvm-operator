@@ -1,12 +1,12 @@
-hash: bf6078e54b06db40fa1b001179f6baeddfa7c7427b183f2a7f4dc4cffa934294
-updated: 2017-12-13T13:52:46.702346+01:00
+hash: 5a12a34d35fbd313b0b9a348b78ffe763bc722b4ca8ed9ed891f26cc86ed9108
+updated: 2017-12-13T14:00:04.837542+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
   - quantile
 - name: github.com/cenkalti/backoff
-  version: 61153c768f31ee5f130071d08fc82b85208528de
+  version: 309aa717adbf351e92864cbedf9cca0b769a4b5a
 - name: github.com/coreos/go-semver
   version: 8ab6407b697782a06568d4b7f1db25550ec2e4c6
   subpackages:
@@ -35,7 +35,7 @@ imports:
   - pkg/clientset/versioned/typed/core/v1alpha1
   - pkg/clientset/versioned/typed/provider/v1alpha1
 - name: github.com/giantswarm/certs
-  version: 94b0b2abcd4af8ac66643c25bf79f5fe8d7e89a2
+  version: ffb98f4b7dfb936dbe0ffc2447b1d8d99fedb5aa
   subpackages:
   - certstest
 - name: github.com/giantswarm/k8scloudconfig
@@ -120,7 +120,7 @@ imports:
   - proto
   - sortkeys
 - name: github.com/golang/glog
-  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
@@ -235,11 +235,16 @@ imports:
   version: 1c05540f6879653db88113bc4a2b70aec4bd491f
   subpackages:
   - context
+  - html
+  - html/atom
   - http2
   - http2/hpack
   - idna
+  - internal/timeseries
   - lex/httplex
   - publicsuffix
+  - trace
+  - websocket
 - name: golang.org/x/sync
   version: fd80eb99c8f653c847d294a001bdf2a3a6f768f5
   subpackages:
@@ -266,7 +271,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
 - name: k8s.io/api
   version: 4df58c811fe2e65feb879227b2b245e4dc26e7ad
   subpackages:
