@@ -8,15 +8,9 @@ import (
 	"strings"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	cloudconfig "github.com/giantswarm/k8scloudconfig"
 	"github.com/giantswarm/microerror"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
-)
-
-const (
-	K8sCloudConfig_V_1_1_0 = string(cloudconfig.V_1_1_0)
-	K8sCloudConfig_V_2_0_0 = string(cloudconfig.V_2_0_0)
 )
 
 const (

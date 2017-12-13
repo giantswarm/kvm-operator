@@ -10,7 +10,7 @@ import (
 
 // NewResourceRouter determines which resources are enabled based upon the
 // version in the version bundle.
-func NewResourceRouter(resources []framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
+func newResourceRouter(resources []framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 	return func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 		var enabledResources []framework.Resource
 

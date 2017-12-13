@@ -271,7 +271,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
-		c.ResourceRouter = NewResourceRouter(resources)
+		c.ResourceRouter = newResourceRouter(resources)
 
 		crdFramework, err = framework.New(c)
 		if err != nil {
