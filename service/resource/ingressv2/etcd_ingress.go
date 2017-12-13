@@ -2,9 +2,9 @@ package ingressv2
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )

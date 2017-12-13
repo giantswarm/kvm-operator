@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
+	apiv1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
