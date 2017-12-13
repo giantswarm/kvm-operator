@@ -32,7 +32,7 @@ func TestTicker(t *testing.T) {
 	ticker := NewTicker(b)
 
 	var err error
-	for range ticker.C {
+	for _ = range ticker.C {
 		if err = f(); err != nil {
 			t.Log(err)
 			continue
@@ -74,7 +74,7 @@ func TestTickerContext(t *testing.T) {
 	ticker := NewTicker(b)
 
 	var err error
-	for range ticker.C {
+	for _ = range ticker.C {
 		if err = f(); err != nil {
 			t.Log(err)
 			continue

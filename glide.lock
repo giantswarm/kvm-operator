@@ -1,5 +1,5 @@
-hash: 0a6ab4ba817d76d39a806e538645506aa671d715ae8c5dcc6f5a0f27967fdecc
-updated: 2017-12-13T13:41:14.871985+01:00
+hash: bf6078e54b06db40fa1b001179f6baeddfa7c7427b183f2a7f4dc4cffa934294
+updated: 2017-12-13T13:52:46.702346+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
@@ -36,14 +36,14 @@ imports:
   - pkg/clientset/versioned/typed/provider/v1alpha1
 - name: github.com/giantswarm/certs
   version: 94b0b2abcd4af8ac66643c25bf79f5fe8d7e89a2
+  subpackages:
+  - certstest
 - name: github.com/giantswarm/k8scloudconfig
   version: 4b0542adc876f2e34129d95bc06e5557415c320e
   subpackages:
   - v_1_1_0
 - name: github.com/giantswarm/k8shealthz
   version: 5eaeffb4476a420af88b7f95b478fc9fe2da38ac
-- name: github.com/giantswarm/kvmtpr
-  version: 2eb4afb7658d7bd0f2a9a7241f60cecc08212f4e
 - name: github.com/giantswarm/microendpoint
   version: 26dce6e1681c27e7a150bccedb82a45109a0a6be
   subpackages:

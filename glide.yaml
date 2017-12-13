@@ -8,8 +8,6 @@ import:
   version: master
 - package: github.com/giantswarm/certs
   version: testing
-- package: github.com/giantswarm/kvmtpr
-  version: master
 - package: github.com/giantswarm/k8scloudconfig
   version: master
 - package: github.com/giantswarm/k8shealthz
