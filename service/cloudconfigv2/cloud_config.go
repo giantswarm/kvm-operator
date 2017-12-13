@@ -2,7 +2,7 @@ package cloudconfigv2
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certificatetpr"
+	"github.com/giantswarm/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -51,7 +51,7 @@ func New(config Config) (*CloudConfig, error) {
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
@@ -81,7 +81,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certificatetpr.AssetsBundle, node v1alpha1.ClusterNode) (string, error) {
+func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
