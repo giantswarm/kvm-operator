@@ -1,108 +1,108 @@
 package cloudconfigv2
 
 import (
-	"github.com/giantswarm/certificatetpr"
+	"github.com/giantswarm/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
 	"github.com/giantswarm/microerror"
 )
 
 type masterExtension struct {
-	certs certificatetpr.AssetsBundle
+	certs certs.Cluster
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.APIServer.CA),
 			Path:         "/etc/kubernetes/ssl/apiserver-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.APIServer.Crt),
 			Path:         "/etc/kubernetes/ssl/apiserver-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.APIComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.APIServer.Key),
 			Path:         "/etc/kubernetes/ssl/apiserver-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Calico client.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.CalicoClient.CA),
 			Path:         "/etc/kubernetes/ssl/calico/client-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.CalicoClient.Crt),
 			Path:         "/etc/kubernetes/ssl/calico/client-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.CalicoClient.Key),
 			Path:         "/etc/kubernetes/ssl/calico/client-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Etcd client.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.EtcdServer.CA),
 			Path:         "/etc/kubernetes/ssl/etcd/client-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.EtcdServer.Crt),
 			Path:         "/etc/kubernetes/ssl/etcd/client-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.EtcdServer.Key),
 			Path:         "/etc/kubernetes/ssl/etcd/client-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Etcd server.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.EtcdServer.CA),
 			Path:         "/etc/kubernetes/ssl/etcd/server-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.EtcdServer.Crt),
 			Path:         "/etc/kubernetes/ssl/etcd/server-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.EtcdServer.Key),
 			Path:         "/etc/kubernetes/ssl/etcd/server-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Service account.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.ServiceAccount.CA),
 			Path:         "/etc/kubernetes/ssl/service-account-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.ServiceAccount.Crt),
 			Path:         "/etc/kubernetes/ssl/service-account-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.ServiceAccountComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.ServiceAccount.Key),
 			Path:         "/etc/kubernetes/ssl/service-account-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
@@ -192,7 +192,8 @@ ExecStart=/bin/sh -c "\
 	sleep 1m; \
 	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy; \
 	sleep 1m; \
-	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-kube-controllers"
+	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-kube-controllers; \
+	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-dns"
 
 [Install]
 WantedBy=multi-user.target`,
