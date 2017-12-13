@@ -6,11 +6,11 @@ import (
 
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/kvm-operator/service/keyv1"
+	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	currentPod, err := keyv1.ToPod(obj)
+	currentPod, err := keyv2.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

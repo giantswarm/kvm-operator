@@ -1,70 +1,70 @@
 package cloudconfigv2
 
 import (
-	"github.com/giantswarm/certificatetpr"
+	"github.com/giantswarm/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
 	"github.com/giantswarm/microerror"
 )
 
 type workerExtension struct {
-	certs certificatetpr.AssetsBundle
+	certs certs.Cluster
 }
 
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Calico client.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.CalicoClient.CA),
 			Path:         "/etc/kubernetes/ssl/calico/client-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.CalicoClient.Crt),
 			Path:         "/etc/kubernetes/ssl/calico/client-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.CalicoComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.CalicoClient.Key),
 			Path:         "/etc/kubernetes/ssl/calico/client-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Etcd client.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.EtcdServer.CA),
 			Path:         "/etc/kubernetes/ssl/etcd/client-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.EtcdServer.Crt),
 			Path:         "/etc/kubernetes/ssl/etcd/client-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.EtcdComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.EtcdServer.Key),
 			Path:         "/etc/kubernetes/ssl/etcd/client-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		// Kubernetes worker.
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.WorkerComponent, certificatetpr.CA}]),
+			AssetContent: string(e.certs.Worker.CA),
 			Path:         "/etc/kubernetes/ssl/worker-ca.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.WorkerComponent, certificatetpr.Crt}]),
+			AssetContent: string(e.certs.Worker.Crt),
 			Path:         "/etc/kubernetes/ssl/worker-crt.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
 		},
 		{
-			AssetContent: string(e.certs[certificatetpr.AssetsBundleKey{certificatetpr.WorkerComponent, certificatetpr.Key}]),
+			AssetContent: string(e.certs.Worker.Key),
 			Path:         "/etc/kubernetes/ssl/worker-key.pem",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,

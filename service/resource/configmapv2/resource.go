@@ -3,12 +3,12 @@ package configmapv2
 import (
 	"reflect"
 
-	"github.com/giantswarm/certificatetpr"
+	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 )
@@ -22,10 +22,10 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	CertWatcher certificatetpr.Searcher
-	CloudConfig *cloudconfigv2.CloudConfig
-	K8sClient   kubernetes.Interface
-	Logger      micrologger.Logger
+	CertSearcher certs.Interface
+	CloudConfig  *cloudconfigv2.CloudConfig
+	K8sClient    kubernetes.Interface
+	Logger       micrologger.Logger
 }
 
 // DefaultConfig provides a default configuration to create a new config map
@@ -33,27 +33,27 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		CertWatcher: nil,
-		CloudConfig: nil,
-		K8sClient:   nil,
-		Logger:      nil,
+		CertSearcher: nil,
+		CloudConfig:  nil,
+		K8sClient:    nil,
+		Logger:       nil,
 	}
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	certWatcher certificatetpr.Searcher
-	cloudConfig *cloudconfigv2.CloudConfig
-	k8sClient   kubernetes.Interface
-	logger      micrologger.Logger
+	certSearcher certs.Interface
+	cloudConfig  *cloudconfigv2.CloudConfig
+	k8sClient    kubernetes.Interface
+	logger       micrologger.Logger
 }
 
 // New creates a new configured config map resource.
 func New(config Config) (*Resource, error) {
 	// Dependencies.
-	if config.CertWatcher == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.CertWatcher must not be empty")
+	if config.CertSearcher == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.CertSearcher must not be empty")
 	}
 	if config.CloudConfig == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.CloudConfig must not be empty")
@@ -67,9 +67,9 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		// Dependencies.
-		certWatcher: config.CertWatcher,
-		cloudConfig: config.CloudConfig,
-		k8sClient:   config.K8sClient,
+		certSearcher: config.CertSearcher,
+		cloudConfig:  config.CloudConfig,
+		k8sClient:    config.K8sClient,
 		logger: config.Logger.With(
 			"resource", Name,
 		),

@@ -5,11 +5,11 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
+	apiv1 "k8s.io/api/core/v1"
+	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	extensionsv1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 )
