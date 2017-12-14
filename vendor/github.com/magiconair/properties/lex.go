@@ -196,8 +196,9 @@ func lexBeforeKey(l *lexer) stateFn {
 		return lexComment
 
 	case isWhitespace(r):
+		l.acceptRun(whitespace)
 		l.ignore()
-		return lexBeforeKey
+		return lexKey
 
 	default:
 		l.backup()
