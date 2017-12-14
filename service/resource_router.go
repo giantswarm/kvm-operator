@@ -12,22 +12,17 @@ import (
 // version in the version bundle.
 func newResourceRouter(resources map[string][]framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 	return func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
-		var enabledResources []framework.Resource
-
 		customObject, err := keyv2.ToCustomObject(obj)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		switch keyv2.VersionBundleVersion(customObject) {
-		case "0.1.0":
-			enabledResources = resources["0.1.0"]
-		case "1.0.0":
-			enabledResources = resources["1.0.0"]
-		default:
-			return nil, microerror.Maskf(invalidVersionError, "version '%s' in version bundle is invalid", keyv2.VersionBundleVersion(customObject))
+		versionBundleVersion := keyv2.VersionBundleVersion(customObject)
+		resourceList, ok := resources[versionBundleVersion]
+		if ok {
+			return resourceList, nil
 		}
 
-		return enabledResources, nil
+		return nil, microerror.Maskf(invalidVersionError, "version '%s' in version bundle is invalid", versionBundleVersion)
 	}
 }
