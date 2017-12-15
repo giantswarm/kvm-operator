@@ -1,4 +1,4 @@
-package cloudconfigv2
+package cloudconfigv3
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"

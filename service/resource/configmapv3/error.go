@@ -1,4 +1,4 @@
-package configmapv2
+package configmapv3
 
 import "github.com/giantswarm/microerror"
 
