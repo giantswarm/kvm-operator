@@ -13,6 +13,12 @@ type masterExtension struct {
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+
+	encryptionConfig, err := EncryptionConfig(e.keys.APIServerEncryptionKey)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{
@@ -115,6 +121,13 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
+		},
+		// Encryption key
+		{
+			AssetContent: encryptionConfig,
+			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
+			Owner:        FileOwner,
+			Permissions:  0600,
 		},
 	}
 
