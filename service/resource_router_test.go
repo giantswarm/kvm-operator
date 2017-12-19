@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 )
 
-func Test_NewResourceRouter(t *testing.T) {
+func Test_Service_newResourceRouter(t *testing.T) {
 	resourceV1 := []framework.Resource{
 		&servicev2.Resource{},
 	}
@@ -20,19 +20,20 @@ func Test_NewResourceRouter(t *testing.T) {
 		&configmapv3.Resource{},
 	}
 
+	versionedResources := map[string][]framework.Resource{
+		"1.0.0": resourceV1,
+		"2.0.0": resourceV2,
+		"":      resourceV1,
+	}
+
 	testCases := []struct {
-		ctx                context.Context
-		versionedResources map[string][]framework.Resource
-		customObject       interface{}
-		expectedResources  []framework.Resource
+		customObject      v1alpha1.KVMConfig
+		expectedResources []framework.Resource
+		errorMatcher      func(err error) bool
 	}{
-		// Test 1, get resource
+		// Test 0, get resource
 		{
-			ctx: context.TODO(),
-			versionedResources: map[string][]framework.Resource{
-				"1.0.0": resourceV1,
-			},
-			customObject: &v1alpha1.KVMConfig{
+			customObject: v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					VersionBundle: v1alpha1.KVMConfigSpecVersionBundle{
 						Version: "1.0.0",
@@ -40,15 +41,11 @@ func Test_NewResourceRouter(t *testing.T) {
 				},
 			},
 			expectedResources: resourceV1,
+			errorMatcher:      nil,
 		},
-		// Test 2, get correct resources on multiples resources version
+		// Test 1, get correct resources on multiples resources version
 		{
-			ctx: context.TODO(),
-			versionedResources: map[string][]framework.Resource{
-				"1.0.0": resourceV1,
-				"2.0.0": resourceV2,
-			},
-			customObject: &v1alpha1.KVMConfig{
+			customObject: v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					VersionBundle: v1alpha1.KVMConfigSpecVersionBundle{
 						Version: "2.0.0",
@@ -56,16 +53,11 @@ func Test_NewResourceRouter(t *testing.T) {
 				},
 			},
 			expectedResources: resourceV2,
+			errorMatcher:      nil,
 		},
-		// Test 3, get resources from empty Version Bundle
+		// Test 2, get resources from empty Version Bundle
 		{
-			ctx: context.TODO(),
-			versionedResources: map[string][]framework.Resource{
-				"1.0.0": resourceV1,
-				"2.0.0": resourceV2,
-				"":      resourceV1,
-			},
-			customObject: &v1alpha1.KVMConfig{
+			customObject: v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					VersionBundle: v1alpha1.KVMConfigSpecVersionBundle{
 						Version: "",
@@ -73,17 +65,30 @@ func Test_NewResourceRouter(t *testing.T) {
 				},
 			},
 			expectedResources: resourceV1,
+			errorMatcher:      nil,
+		},
+		// Test 3, Invalid version returns an error.
+		{
+			customObject: v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					VersionBundle: v1alpha1.KVMConfigSpecVersionBundle{
+						Version: "",
+					},
+				},
+			},
+			expectedResources: resourceV1,
+			errorMatcher:      IsInvalidVersion,
 		},
 	}
 	for i, tc := range testCases {
-		result := newResourceRouter(tc.versionedResources)
+		result := newResourceRouter(versionedResources)
 
-		resources, err := result(tc.ctx, tc.customObject)
+		resources, err := result(context.TODO(), &tc.customObject)
 		if err != nil {
-			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
+			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
 		}
 		if !reflect.DeepEqual(resources, tc.expectedResources) {
-			t.Fatalf("case %d expected %#v got %#v len(%v)", i+1, tc.expectedResources, resources, len(resources))
+			t.Fatalf("case %d expected %#v got %#v len(%v)", i, tc.expectedResources, resources, len(resources))
 
 		}
 	}
