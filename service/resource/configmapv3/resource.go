@@ -1,29 +1,28 @@
-package configmapv2
+package configmapv3
 
 import (
 	"reflect"
 
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
-
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 )
 
 const (
 	KeyUserData = "user_data"
 	// Name is the identifier of the resource.
-	Name = "configmapv2"
+	Name = "configmapv3"
 )
 
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
 	CertSearcher certs.Interface
-	CloudConfig  *cloudconfigv2.CloudConfig
+	CloudConfig  *cloudconfigv3.CloudConfig
 	K8sClient    kubernetes.Interface
 	Logger       micrologger.Logger
 }
@@ -44,7 +43,7 @@ func DefaultConfig() Config {
 type Resource struct {
 	// Dependencies.
 	certSearcher certs.Interface
-	cloudConfig  *cloudconfigv2.CloudConfig
+	cloudConfig  *cloudconfigv3.CloudConfig
 	k8sClient    kubernetes.Interface
 	logger       micrologger.Logger
 }

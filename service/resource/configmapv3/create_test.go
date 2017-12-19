@@ -1,4 +1,4 @@
-package configmapv2
+package configmapv3
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv2/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv3/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {

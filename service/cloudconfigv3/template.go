@@ -1,4 +1,4 @@
-package cloudconfigv2
+package cloudconfigv3
 
 const (
 	set_ownership_etcd_data_dir_dropin = `[Unit]

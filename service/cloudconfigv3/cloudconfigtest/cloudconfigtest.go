@@ -1,17 +1,16 @@
 package cloudconfigtest
 
 import (
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
 	"github.com/giantswarm/micrologger/microloggertest"
-
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 )
 
-func New() *cloudconfigv2.CloudConfig {
-	c := cloudconfigv2.DefaultConfig()
+func New() *cloudconfigv3.CloudConfig {
+	c := cloudconfigv3.DefaultConfig()
 
 	c.Logger = microloggertest.New()
 
-	newCloudConfig, err := cloudconfigv2.New(c)
+	newCloudConfig, err := cloudconfigv3.New(c)
 	if err != nil {
 		panic(err)
 	}
