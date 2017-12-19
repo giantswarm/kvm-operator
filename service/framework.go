@@ -308,7 +308,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		"2.0.0": resourcesV3,
 		"1.0.0": resourcesV2,
 		"0.1.0": resourcesV2,
-    "":      resourcesV2,
+		"":      resourcesV2,
 	}
 
 	var newInformer *informer.Informer
