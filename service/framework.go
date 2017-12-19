@@ -15,15 +15,18 @@ import (
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
+	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/messagecontext"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
+	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
@@ -105,33 +108,71 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var ccService *cloudconfigv2.CloudConfig
+	var ccServiceV2 *cloudconfigv2.CloudConfig
 	{
 		c := cloudconfigv2.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		ccService, err = cloudconfigv2.New(c)
+		ccServiceV2, err = cloudconfigv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var configMapResource framework.Resource
+	var ccServiceV3 *cloudconfigv3.CloudConfig
+	{
+		c := cloudconfigv3.DefaultConfig()
+
+		c.Logger = config.Logger
+
+		ccServiceV3, err = cloudconfigv3.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var keyWatcher randomkeys.Interface
+	{
+		keyConfig := randomkeys.DefaultConfig()
+		keyConfig.K8sClient = k8sClient
+		keyConfig.Logger = config.Logger
+		keyWatcher, err = randomkeys.NewSearcher(keyConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var configMapResourceV2 framework.Resource
 	{
 		c := configmapv2.DefaultConfig()
 
 		c.CertSearcher = certSearcher
-		c.CloudConfig = ccService
+		c.CloudConfig = ccServiceV2
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		configMapResource, err = configmapv2.New(c)
+		configMapResourceV2, err = configmapv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
+	var configMapResourceV3 framework.Resource
+	{
+		c := configmapv3.DefaultConfig()
+
+		c.CertSearcher = certSearcher
+		c.CloudConfig = ccServiceV3
+		c.K8sClient = k8sClient
+		c.KeyWatcher = keyWatcher
+		c.Logger = config.Logger
+
+		configMapResourceV3, err = configmapv3.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
 	var deploymentResource framework.Resource
 	{
 		c := deploymentv2.DefaultConfig()
@@ -197,12 +238,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
-	var resources []framework.Resource
+	var resourcesV2 []framework.Resource
 	{
-		resources = []framework.Resource{
+		resourcesV2 = []framework.Resource{
 			namespaceResource,
 
-			configMapResource,
+			configMapResourceV2,
 			deploymentResource,
 			ingressResource,
 			pvcResource,
@@ -214,7 +255,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
 		retryWrapConfig.Logger = config.Logger
 
-		resources, err = retryresource.Wrap(resources, retryWrapConfig)
+		resourcesV2, err = retryresource.Wrap(resourcesV2, retryWrapConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -223,7 +264,39 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 
 		metricsWrapConfig.Name = config.Name
 
-		resources, err = metricsresource.Wrap(resources, metricsWrapConfig)
+		resourcesV2, err = metricsresource.Wrap(resourcesV2, metricsWrapConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var resourcesV3 []framework.Resource
+	{
+		resourcesV3 = []framework.Resource{
+			namespaceResource,
+
+			configMapResourceV3,
+			deploymentResource,
+			ingressResource,
+			pvcResource,
+			serviceResource,
+		}
+
+		retryWrapConfig := retryresource.DefaultWrapConfig()
+
+		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
+		retryWrapConfig.Logger = config.Logger
+
+		resourcesV3, err = retryresource.Wrap(resourcesV3, retryWrapConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		metricsWrapConfig := metricsresource.DefaultWrapConfig()
+
+		metricsWrapConfig.Name = config.Name
+
+		resourcesV3, err = metricsresource.Wrap(resourcesV3, metricsWrapConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -232,8 +305,9 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	// We provide a map of resource lists keyed by the version bundle version
 	// to the resource router.
 	versionedResources := map[string][]framework.Resource{
-		"1.0.0": resources,
-		"0.1.0": resources,
+		"2.0.0": resourcesV3,
+		"1.0.0": resourcesV2,
+		"0.1.0": resourcesV2,
 	}
 
 	var newInformer *informer.Informer
