@@ -123,6 +123,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/randomkeys"
+  packages = ["."]
+  revision = "156c1ca72c8b9a1db95bcfa32922debdb5761238"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
   revision = "e22eefeb8e97277bfebe225f77cf0528b69f36b8"
@@ -448,6 +454,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d10a1b7579cdb81cea3f98ca44ef187b9f594765ab2e442a667432a84ea2cf79"
+  inputs-digest = "1b7fc96d2b3efef4501459655a5dc98430f6c7e90bc8786eb8accaee68af16aa"
   solver-name = "gps-cdcl"
   solver-version = 1
