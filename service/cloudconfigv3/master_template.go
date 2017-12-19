@@ -13,7 +13,6 @@ type masterExtension struct {
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-
 	encryptionConfig, err := EncryptionConfig(e.keys.APIServerEncryptionKey)
 	if err != nil {
 		return nil, microerror.Mask(err)

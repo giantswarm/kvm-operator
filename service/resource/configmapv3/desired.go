@@ -43,8 +43,6 @@ func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.Conf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("debug-jgsqware", fmt.Sprintf("key is %v", string(keys.APIServerEncryptionKey)))
-
 	for _, node := range customObject.Spec.Cluster.Masters {
 		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node, keys)
 		if err != nil {

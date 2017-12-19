@@ -2,7 +2,7 @@ package cloudconfigv3
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/randomkeys"
@@ -28,7 +28,7 @@ resources:
 `
 )
 
-func EncryptionConfig(encryptionKey randomkeys.RandomKey) (string, error) {
+func encryptionConfig(encryptionKey randomkeys.RandomKey) (string, error) {
 	tmpl, err := template.New("encryptionConfig").Parse(encryptionConfigTemplate)
 	if err != nil {
 		return "", microerror.Mask(err)
