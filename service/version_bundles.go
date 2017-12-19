@@ -119,7 +119,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Changelogs: []versionbundle.Changelog{
 				{
 					Component:   "kubernetes",
-					Description: "Updated to kubernetes 1.8.4. Fixes a goroutine leak in the k8s api.",
+					Description: "Enable encryption at rest",
 					Kind:        "changed",
 				},
 			},
