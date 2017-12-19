@@ -72,11 +72,11 @@ func Test_Service_newResourceRouter(t *testing.T) {
 			customObject: v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					VersionBundle: v1alpha1.KVMConfigSpecVersionBundle{
-						Version: "",
+						Version: "4.0.0",
 					},
 				},
 			},
-			expectedResources: resourceV1,
+			expectedResources: nil,
 			errorMatcher:      IsInvalidVersion,
 		},
 	}
