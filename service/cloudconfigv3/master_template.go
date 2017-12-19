@@ -2,12 +2,14 @@ package cloudconfigv3
 
 import (
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_2_0_0"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/randomkeys"
 )
 
 type masterExtension struct {
 	certs certs.Cluster
+	keys  randomkeys.Cluster
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
