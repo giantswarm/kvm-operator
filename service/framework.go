@@ -234,6 +234,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	versionedResources := map[string][]framework.Resource{
 		"1.0.0": resources,
 		"0.1.0": resources,
+		"":      resources,
 	}
 
 	var newInformer *informer.Informer
