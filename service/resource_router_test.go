@@ -85,11 +85,15 @@ func Test_Service_newResourceRouter(t *testing.T) {
 
 		resources, err := result(context.TODO(), &tc.customObject)
 		if err != nil {
-			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
-		}
-		if !reflect.DeepEqual(resources, tc.expectedResources) {
-			t.Fatalf("case %d expected %#v got %#v len(%v)", i, tc.expectedResources, resources, len(resources))
-
+			if tc.errorMatcher == nil {
+				t.Fatal("test", i, "expected", nil, "got", "error matcher")
+			} else if !tc.errorMatcher(err) {
+				t.Fatal("test", i, "expected", true, "got", false)
+			}
+		} else {
+			if !reflect.DeepEqual(tc.expectedResources, resources) {
+				t.Fatal("test", i, "expected", tc.expectedResources, "got", resources)
+			}
 		}
 	}
 }
