@@ -2,16 +2,38 @@ package cloudconfigv3
 
 import (
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_1_1_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_2_0_0"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/randomkeys"
 )
 
 type masterExtension struct {
 	certs certs.Cluster
+	keys  randomkeys.Cluster
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	var filesMeta []k8scloudconfig.FileMetadata
+	encryptionConfig, err := encryptionConfig(e.keys.APIServerEncryptionKey)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	filesMeta := []k8scloudconfig.FileMetadata{
+		// set_ownership_etcd_data_dir drop-in
+		{
+			AssetContent: set_ownership_etcd_data_dir_dropin,
+			Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
+			Owner:        FileOwner,
+			Permissions:  FilePermission,
+		},
+		// Encryption key
+		{
+			AssetContent: encryptionConfig,
+			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
+			Owner:        FileOwner,
+			Permissions:  0600,
+		},
+	}
 
 	for _, f := range certs.NewFilesClusterMaster(e.certs) {
 		m := k8scloudconfig.FileMetadata{

@@ -38,8 +38,13 @@ func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.Conf
 		return nil, microerror.Mask(err)
 	}
 
+	keys, err := r.keyWatcher.SearchCluster(keyv2.ClusterID(customObject))
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	for _, node := range customObject.Spec.Cluster.Masters {
-		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node)
+		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node, keys)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

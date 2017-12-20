@@ -8,6 +8,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
+	"github.com/giantswarm/randomkeys/randomkeystest"
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -208,6 +209,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		resourceConfig.CertSearcher = certstest.NewSearcher()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
 		if err != nil {
