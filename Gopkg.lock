@@ -123,6 +123,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/randomkeys"
+  packages = ["."]
+  revision = "156c1ca72c8b9a1db95bcfa32922debdb5761238"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
   revision = "e22eefeb8e97277bfebe225f77cf0528b69f36b8"

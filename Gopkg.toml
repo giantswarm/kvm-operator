@@ -63,4 +63,8 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/giantswarm/randomkeys"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/versionbundle"
