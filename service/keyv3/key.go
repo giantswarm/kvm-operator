@@ -1,4 +1,4 @@
-package keyv2
+package keyv3
 
 import (
 	"fmt"
@@ -37,6 +37,9 @@ const (
 	FlannelEnvPathPrefix = "/run/flannel"
 
 	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
+
+	// default memory for k8s-kvm container.
+	defaultWorkerMemory = "1G"
 )
 
 const (
@@ -112,11 +115,21 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
 
+// MemoryQuantity returns a resource.Quantity that represents the memory to be used by the nodes.
+// It adds the memory from the node definition parameter to the additional memory defined by
+// defaultWorkerMemory.
 func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	q, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
-		return resource.Quantity{}, microerror.Mask(err)
+		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 	}
+	additionalMemory, err := resource.ParseQuantity(defaultWorkerMemory)
+	if err != nil {
+		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from addtional memory")
+	}
+	q.Add(additionalMemory)
+	q.String()
+
 	return q, nil
 }
 

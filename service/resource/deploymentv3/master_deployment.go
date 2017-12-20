@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/core/v1"
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
@@ -232,6 +233,10 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								},
 								Resources: apiv1.ResourceRequirements{
 									Requests: apiv1.ResourceList{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
+									},
+									Limits: map[apiv1.ResourceName]resource.Quantity{
 										apiv1.ResourceCPU:    cpuQuantity,
 										apiv1.ResourceMemory: memoryQuantity,
 									},

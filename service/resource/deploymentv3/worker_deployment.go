@@ -204,6 +204,10 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 										apiv1.ResourceCPU:    cpuQuantity,
 										apiv1.ResourceMemory: memoryQuantity,
 									},
+									Limits: map[apiv1.ResourceName]resource.Quantity{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
+									},
 								},
 								VolumeMounts: []apiv1.VolumeMount{
 									{

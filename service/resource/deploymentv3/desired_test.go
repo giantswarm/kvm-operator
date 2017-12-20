@@ -42,10 +42,10 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							StorageType: "hostPath",
 						},
 						Masters: []v1alpha1.KVMConfigSpecKVMNode{
-							{CPUs: 1, Memory: "1Gi"},
+							{CPUs: 1, Memory: "1G"},
 						},
 						Workers: []v1alpha1.KVMConfigSpecKVMNode{
-							{CPUs: 4, Memory: "8.2G"},
+							{CPUs: 4, Memory: "8G"},
 						},
 					},
 				},
@@ -57,7 +57,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
 					},
 				},
 			},
@@ -65,7 +69,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("4"),
-						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
 					},
 				},
 			},
@@ -92,7 +100,7 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							StorageType: "hostPath",
 						},
 						Masters: []v1alpha1.KVMConfigSpecKVMNode{
-							{CPUs: 1, Memory: "1Gi"},
+							{CPUs: 1, Memory: "1G"},
 						},
 						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
 							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
@@ -100,9 +108,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							},
 						},
 						Workers: []v1alpha1.KVMConfigSpecKVMNode{
-							{CPUs: 4, Memory: "8.2G"},
-							{CPUs: 4, Memory: "8.2G"},
-							{CPUs: 4, Memory: "8.2G"},
+							{CPUs: 4, Memory: "8G"},
+							{CPUs: 4, Memory: "8G"},
+							{CPUs: 4, Memory: "8G"},
 						},
 					},
 				},
@@ -114,7 +122,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
 					},
 				},
 			},
@@ -122,19 +134,31 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("4"),
-						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("4"),
-						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("4"),
-						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
 					},
 				},
 			},
@@ -163,9 +187,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							StorageType: "hostPath",
 						},
 						Masters: []v1alpha1.KVMConfigSpecKVMNode{
-							{CPUs: 1, Memory: "1Gi"},
-							{CPUs: 1, Memory: "1Gi"},
-							{CPUs: 1, Memory: "1Gi"},
+							{CPUs: 1, Memory: "1G"},
+							{CPUs: 1, Memory: "1G"},
+							{CPUs: 1, Memory: "1G"},
 						},
 						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
 							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
@@ -173,9 +197,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							},
 						},
 						Workers: []v1alpha1.KVMConfigSpecKVMNode{
-							{CPUs: 4, Memory: "8.2G"},
-							{CPUs: 4, Memory: "8.2G"},
-							{CPUs: 4, Memory: "8.2G"},
+							{CPUs: 4, Memory: "8G"},
+							{CPUs: 4, Memory: "8G"},
+							{CPUs: 4, Memory: "8G"},
 						},
 					},
 				},
@@ -187,19 +211,31 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("1Gi"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2G"),
 					},
 				},
 			},
@@ -207,19 +243,31 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("4"),
-						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("4"),
-						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("4"),
-						apiv1.ResourceMemory: resource.MustParse("8.2G"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
+					},
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("9G"),
 					},
 				},
 			},
@@ -262,11 +310,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(testGetK8sMasterKVMResources(deployments), tc.ExpectedMastersResources) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, testGetK8sMasterKVMResources(deployments), tc.ExpectedMastersResources)
+			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedMastersResources, testGetK8sMasterKVMResources(deployments))
 		}
 
 		if !reflect.DeepEqual(testGetK8sWorkerKVMResources(deployments), tc.ExpectedWorkersResources) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, testGetK8sWorkerKVMResources(deployments), tc.ExpectedWorkersResources)
+			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedWorkersResources, testGetK8sWorkerKVMResources(deployments))
 		}
 	}
 }
