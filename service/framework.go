@@ -12,6 +12,7 @@ import (
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/operatorkit/informer"
@@ -252,6 +253,10 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
 		message := messagecontext.NewMessage()
 		ctx = messagecontext.NewContext(ctx, message)
+
+		if config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled) {
+			updateallowedcontext.SetUpdateAllowed(ctx)
+		}
 
 		return ctx, nil
 	}
