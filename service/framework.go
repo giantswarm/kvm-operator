@@ -305,7 +305,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	// We provide a map of resource lists keyed by the version bundle version
 	// to the resource router.
 	versionedResources := map[string][]framework.Resource{
-		"2.0.0": resourcesV3,
+		"1.1.0": resourcesV3,
 		"1.0.0": resourcesV2,
 		"0.1.0": resourcesV2,
 		"":      resourcesV2,
