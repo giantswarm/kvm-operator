@@ -28,6 +28,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
+	"github.com/giantswarm/kvm-operator/service/resource/deploymentv3"
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
 	"github.com/giantswarm/kvm-operator/service/resource/podv2"
@@ -173,14 +174,26 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 			return nil, microerror.Mask(err)
 		}
 	}
-	var deploymentResource framework.Resource
+	var deploymentResourceV2 framework.Resource
 	{
 		c := deploymentv2.DefaultConfig()
 
 		c.K8sClient = k8sClient
 		c.Logger = config.Logger
 
-		deploymentResource, err = deploymentv2.New(c)
+		deploymentResourceV2, err = deploymentv2.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+	var deploymentResourceV3 framework.Resource
+	{
+		c := deploymentv3.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		deploymentResourceV3, err = deploymentv3.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -244,7 +257,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 			namespaceResource,
 
 			configMapResourceV2,
-			deploymentResource,
+			deploymentResourceV2,
 			ingressResource,
 			pvcResource,
 			serviceResource,
@@ -276,7 +289,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 			namespaceResource,
 
 			configMapResourceV3,
-			deploymentResource,
+			deploymentResourceV3,
 			ingressResource,
 			pvcResource,
 			serviceResource,
