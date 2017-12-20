@@ -11,7 +11,7 @@ type workerExtension struct {
 }
 
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	var fliesMeta []k8scloudconfig.FileMetadata
+	var filesMeta []k8scloudconfig.FileMetadata
 
 	for _, f := range certs.NewFilesClusterWorker(e.certs) {
 		m := k8scloudconfig.FileMetadata{

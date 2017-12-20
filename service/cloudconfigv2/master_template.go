@@ -11,7 +11,7 @@ type masterExtension struct {
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	var fliesMeta []k8scloudconfig.FileMetadata
+	var filesMeta []k8scloudconfig.FileMetadata
 
 	for _, f := range certs.NewFilesClusterMaster(e.certs) {
 		m := k8scloudconfig.FileMetadata{
