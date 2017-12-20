@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/microerror"
@@ -19,7 +18,6 @@ func newResourceRouter(resources map[string][]framework.Resource) func(ctx conte
 		}
 
 		versionBundleVersion := keyv2.VersionBundleVersion(customObject)
-		fmt.Printf("jgsqware--%v\n", versionBundleVersion)
 		resourceList, ok := resources[versionBundleVersion]
 		if ok {
 			return resourceList, nil
