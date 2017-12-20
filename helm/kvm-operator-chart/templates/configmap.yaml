@@ -9,6 +9,9 @@ data:
       listen:
         address: 'http://0.0.0.0:8000'
     service:
+      guest:
+        update:
+          enabled: '{{ .Values.Installation.V1.Guest.Update.Enabled }}'
       kubernetes:
         address: ''
         inCluster: true
