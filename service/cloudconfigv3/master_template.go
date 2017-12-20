@@ -11,6 +11,18 @@ type masterExtension struct {
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
+	var fliesMeta []k8scloudconfig.FileMetadata
+
+	for _, f := range certs.NewFilesClusterMaster(e.certs) {
+		m := k8scloudconfig.FileMetadata{
+			AssetContent: string(f.Data),
+			Path:         f.AbsolutePath,
+			Owner:        FileOwner,
+			Permissions:  FilePermission,
+		}
+		filesMeta = append(filesMeta, m)
+	}
+
 	filesMeta := []k8scloudconfig.FileMetadata{
 		// Kubernetes API server.
 		{

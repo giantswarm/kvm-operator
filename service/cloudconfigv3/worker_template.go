@@ -11,64 +11,16 @@ type workerExtension struct {
 }
 
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	filesMeta := []k8scloudconfig.FileMetadata{
-		// Calico client.
-		{
-			AssetContent: string(e.certs.CalicoClient.CA),
-			Path:         "/etc/kubernetes/ssl/calico/client-ca.pem",
+	var fliesMeta []k8scloudconfig.FileMetadata
+
+	for _, f := range certs.NewFilesClusterWorker(e.certs) {
+		m := k8scloudconfig.FileMetadata{
+			AssetContent: string(f.Data),
+			Path:         f.AbsolutePath,
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.CalicoClient.Crt),
-			Path:         "/etc/kubernetes/ssl/calico/client-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.CalicoClient.Key),
-			Path:         "/etc/kubernetes/ssl/calico/client-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		// Etcd client.
-		{
-			AssetContent: string(e.certs.EtcdServer.CA),
-			Path:         "/etc/kubernetes/ssl/etcd/client-ca.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.EtcdServer.Crt),
-			Path:         "/etc/kubernetes/ssl/etcd/client-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.EtcdServer.Key),
-			Path:         "/etc/kubernetes/ssl/etcd/client-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		// Kubernetes worker.
-		{
-			AssetContent: string(e.certs.Worker.CA),
-			Path:         "/etc/kubernetes/ssl/worker-ca.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.Worker.Crt),
-			Path:         "/etc/kubernetes/ssl/worker-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.Worker.Key),
-			Path:         "/etc/kubernetes/ssl/worker-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
+		}
+		filesMeta = append(filesMeta, m)
 	}
 
 	var newFiles []k8scloudconfig.FileAsset
