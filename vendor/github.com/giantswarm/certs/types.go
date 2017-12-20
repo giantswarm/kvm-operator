@@ -15,7 +15,7 @@ const (
 	// TODO replace with "giantswarm.io/cluster-id"
 	clusterIDLabel = "clusterID"
 
-	SecretNamesapce = "default"
+	SecretNamespace = "default"
 )
 
 type cert string

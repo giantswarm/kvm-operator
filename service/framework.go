@@ -229,6 +229,14 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	// We provide a map of resource lists keyed by the version bundle version
+	// to the resource router.
+	versionedResources := map[string][]framework.Resource{
+		"1.0.0": resources,
+		"0.1.0": resources,
+		"":      resources,
+	}
+
 	var newInformer *informer.Informer
 	{
 		c := informer.DefaultConfig()
@@ -257,7 +265,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
-		c.ResourceRouter = framework.DefaultResourceRouter(resources)
+		c.ResourceRouter = newResourceRouter(versionedResources)
 
 		crdFramework, err = framework.New(c)
 		if err != nil {
