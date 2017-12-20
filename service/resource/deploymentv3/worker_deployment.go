@@ -1,4 +1,4 @@
-package deploymentv2
+package deploymentv3
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/service/keyv2"
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
 func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
@@ -23,12 +23,12 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
 
-		cpuQuantity, err := keyv2.CPUQuantity(capabilities)
+		cpuQuantity, err := keyv3.CPUQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating CPU quantity")
 		}
 
-		memoryQuantity, err := keyv2.MemoryQuantity(capabilities)
+		memoryQuantity, err := keyv3.MemoryQuantity(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating memory quantity")
 		}
@@ -39,14 +39,14 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				APIVersion: "extensions/v1beta",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: keyv2.DeploymentName(keyv2.WorkerID, workerNode.ID),
+				Name: keyv3.DeploymentName(keyv3.WorkerID, workerNode.ID),
 				Annotations: map[string]string{
-					VersionBundleVersionAnnotation: keyv2.VersionBundleVersion(customObject),
+					VersionBundleVersionAnnotation: keyv3.VersionBundleVersion(customObject),
 				},
 				Labels: map[string]string{
-					"app":      keyv2.WorkerID,
-					"cluster":  keyv2.ClusterID(customObject),
-					"customer": keyv2.ClusterCustomer(customObject),
+					"app":      keyv3.WorkerID,
+					"cluster":  keyv3.ClusterID(customObject),
+					"customer": keyv3.ClusterCustomer(customObject),
 					"node":     workerNode.ID,
 				},
 			},
@@ -57,11 +57,11 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						Name: keyv2.WorkerID,
+						Name: keyv3.WorkerID,
 						Labels: map[string]string{
-							"cluster":  keyv2.ClusterID(customObject),
-							"customer": keyv2.ClusterCustomer(customObject),
-							"app":      keyv2.WorkerID,
+							"cluster":  keyv3.ClusterID(customObject),
+							"customer": keyv3.ClusterCustomer(customObject),
+							"app":      keyv3.WorkerID,
 							"node":     workerNode.ID,
 						},
 						Annotations: map[string]string{},
@@ -70,7 +70,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 						Affinity:    newWorkerPodAfinity(customObject),
 						HostNetwork: true,
 						NodeSelector: map[string]string{
-							"role": keyv2.WorkerID,
+							"role": keyv3.WorkerID,
 						},
 						Volumes: []apiv1.Volume{
 							{
@@ -78,7 +78,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								VolumeSource: apiv1.VolumeSource{
 									ConfigMap: &apiv1.ConfigMapVolumeSource{
 										LocalObjectReference: apiv1.LocalObjectReference{
-											Name: keyv2.ConfigMapName(customObject, workerNode, keyv2.WorkerID),
+											Name: keyv3.ConfigMapName(customObject, workerNode, keyv3.WorkerID),
 										},
 									},
 								},
@@ -101,7 +101,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Name: "flannel",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: keyv2.FlannelEnvPathPrefix,
+										Path: keyv3.FlannelEnvPathPrefix,
 									},
 								},
 							},
@@ -114,9 +114,9 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Command: []string{
 									"/bin/sh",
 									"-c",
-									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + keyv2.NetworkBridgeName(customObject) +
-										" --service.kubernetes.cluster.namespace=" + keyv2.ClusterNamespace(customObject) +
-										" --service.kubernetes.cluster.service=" + keyv2.WorkerID +
+									"/opt/k8s-endpoint-updater update --provider.bridge.name=" + keyv3.NetworkBridgeName(customObject) +
+										" --service.kubernetes.cluster.namespace=" + keyv3.ClusterNamespace(customObject) +
+										" --service.kubernetes.cluster.service=" + keyv3.WorkerID +
 										" --service.kubernetes.inCluster=true" +
 										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
@@ -143,7 +143,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									Privileged: &privileged,
 								},
 								Args: []string{
-									keyv2.WorkerID,
+									keyv3.WorkerID,
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -165,11 +165,11 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									},
 									{
 										Name:  "NETWORK_BRIDGE_NAME",
-										Value: keyv2.NetworkBridgeName(customObject),
+										Value: keyv3.NetworkBridgeName(customObject),
 									},
 									{
 										Name:  "NETWORK_TAP_NAME",
-										Value: keyv2.NetworkTapName(customObject),
+										Value: keyv3.NetworkTapName(customObject),
 									},
 									{
 										Name: "MEMORY",
@@ -178,7 +178,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									},
 									{
 										Name:  "ROLE",
-										Value: keyv2.WorkerID,
+										Value: keyv3.WorkerID,
 									},
 									{
 										Name:  "CLOUD_CONFIG_PATH",
@@ -186,21 +186,25 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: keyv2.InitialDelaySeconds,
-									TimeoutSeconds:      keyv2.TimeoutSeconds,
-									PeriodSeconds:       keyv2.PeriodSeconds,
-									FailureThreshold:    keyv2.FailureThreshold,
-									SuccessThreshold:    keyv2.SuccessThreshold,
+									InitialDelaySeconds: keyv3.InitialDelaySeconds,
+									TimeoutSeconds:      keyv3.TimeoutSeconds,
+									PeriodSeconds:       keyv3.PeriodSeconds,
+									FailureThreshold:    keyv3.FailureThreshold,
+									SuccessThreshold:    keyv3.SuccessThreshold,
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
-											Path: keyv2.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: keyv2.LivenessPort(customObject)},
-											Host: keyv2.ProbeHost,
+											Path: keyv3.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: keyv3.LivenessPort(customObject)},
+											Host: keyv3.ProbeHost,
 										},
 									},
 								},
 								Resources: apiv1.ResourceRequirements{
 									Requests: map[apiv1.ResourceName]resource.Quantity{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
+									},
+									Limits: map[apiv1.ResourceName]resource.Quantity{
 										apiv1.ResourceCPU:    cpuQuantity,
 										apiv1.ResourceMemory: memoryQuantity,
 									},
@@ -222,16 +226,16 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							},
 							{
 								Name:            "k8s-kvm-health",
-								Image:           keyv2.K8SKVMHealthDocker,
+								Image:           keyv3.K8SKVMHealthDocker,
 								ImagePullPolicy: apiv1.PullAlways,
 								Env: []apiv1.EnvVar{
 									{
 										Name:  "LISTEN_ADDRESS",
-										Value: keyv2.HealthListenAddress(customObject),
+										Value: keyv3.HealthListenAddress(customObject),
 									},
 									{
 										Name:  "NETWORK_ENV_FILE_PATH",
-										Value: keyv2.NetworkEnvFilePath(customObject),
+										Value: keyv3.NetworkEnvFilePath(customObject),
 									},
 								},
 								SecurityContext: &apiv1.SecurityContext{
@@ -240,7 +244,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								VolumeMounts: []apiv1.VolumeMount{
 									{
 										Name:      "flannel",
-										MountPath: keyv2.FlannelEnvPathPrefix,
+										MountPath: keyv3.FlannelEnvPathPrefix,
 									},
 								},
 							},

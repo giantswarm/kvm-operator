@@ -1,4 +1,4 @@
-package deploymentv2
+package deploymentv3
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 	"github.com/giantswarm/microerror"
 	"k8s.io/api/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv2"
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := keyv2.ToCustomObject(obj)
+	customObject, err := keyv3.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -33,7 +33,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		}
 		deployments = append(deployments, workerDeployments...)
 
-		if keyv2.HasNodeController(customObject) {
+		if keyv3.HasNodeController(customObject) {
 			nodeControllerDeployment, err := newNodeControllerDeployment(customObject)
 			if err != nil {
 				return nil, microerror.Mask(err)
