@@ -18,7 +18,22 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		return nil, microerror.Mask(err)
 	}
 
-	var filesMeta []k8scloudconfig.FileMetadata
+	filesMeta := []k8scloudconfig.FileMetadata{
+		// set_ownership_etcd_data_dir drop-in
+		{
+			AssetContent: set_ownership_etcd_data_dir_dropin,
+			Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
+			Owner:        FileOwner,
+			Permissions:  FilePermission,
+		},
+		// Encryption key
+		{
+			AssetContent: encryptionConfig,
+			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
+			Owner:        FileOwner,
+			Permissions:  0600,
+		},
+	}
 
 	for _, f := range certs.NewFilesClusterMaster(e.certs) {
 		m := k8scloudconfig.FileMetadata{
@@ -29,22 +44,6 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		}
 		filesMeta = append(filesMeta, m)
 	}
-
-	// set_ownership_etcd_data_dir drop-in
-	filesMeta = append(filesMeta, k8scloudconfig.FileMetadata{
-		AssetContent: set_ownership_etcd_data_dir_dropin,
-		Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
-		Owner:        FileOwner,
-		Permissions:  FilePermission,
-	})
-
-	// Encryption key
-	filesMeta = append(filesMeta, k8scloudconfig.FileMetadata{
-		AssetContent: encryptionConfig,
-		Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
-		Owner:        FileOwner,
-		Permissions:  0600,
-	})
 
 	var newFiles []k8scloudconfig.FileAsset
 
