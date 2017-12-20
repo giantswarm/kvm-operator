@@ -38,7 +38,7 @@ const (
 
 	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 
-	// default memory for k8s-kvm container.
+	// defaultWorkerMemory represents the extra memory to add due to qemu overhead.
 	defaultWorkerMemory = "1G"
 )
 
