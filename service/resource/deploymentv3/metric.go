@@ -1,4 +1,4 @@
-package deploymentv2
+package deploymentv3
 
 import (
 	"github.com/prometheus/client_golang/prometheus"

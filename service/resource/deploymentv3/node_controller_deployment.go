@@ -1,4 +1,4 @@
-package deploymentv2
+package deploymentv3
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/service/keyv2"
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
 func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1.Deployment, error) {
@@ -21,11 +21,11 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 			APIVersion: "extensions/v1beta",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: keyv2.NodeControllerID,
+			Name: keyv3.NodeControllerID,
 			Labels: map[string]string{
-				"cluster":  keyv2.ClusterID(customObject),
-				"customer": keyv2.ClusterCustomer(customObject),
-				"app":      keyv2.NodeControllerID,
+				"cluster":  keyv3.ClusterID(customObject),
+				"customer": keyv3.ClusterCustomer(customObject),
+				"app":      keyv3.NodeControllerID,
 			},
 		},
 		Spec: extensionsv1.DeploymentSpec{
@@ -35,30 +35,30 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 			Replicas: &replicas,
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apismetav1.ObjectMeta{
-					GenerateName: keyv2.NodeControllerID,
+					GenerateName: keyv3.NodeControllerID,
 					Annotations: map[string]string{
-						VersionBundleVersionAnnotation: keyv2.VersionBundleVersion(customObject),
+						VersionBundleVersionAnnotation: keyv3.VersionBundleVersion(customObject),
 					},
 					Labels: map[string]string{
-						"app":      keyv2.NodeControllerID,
-						"cluster":  keyv2.ClusterID(customObject),
-						"customer": keyv2.ClusterCustomer(customObject),
+						"app":      keyv3.NodeControllerID,
+						"cluster":  keyv3.ClusterID(customObject),
+						"customer": keyv3.ClusterCustomer(customObject),
 					},
 				},
 				Spec: apiv1.PodSpec{
 					Containers: []apiv1.Container{
 						{
-							Name:            keyv2.NodeControllerID,
+							Name:            keyv3.NodeControllerID,
 							Image:           customObject.Spec.KVM.NodeController.Docker.Image,
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Args: []string{
-								fmt.Sprintf("-cluster-api=%s", keyv2.ClusterAPIEndpoint(customObject)),
-								fmt.Sprintf("-cluster-id=%s", keyv2.ClusterID(customObject)),
+								fmt.Sprintf("-cluster-api=%s", keyv3.ClusterAPIEndpoint(customObject)),
+								fmt.Sprintf("-cluster-id=%s", keyv3.ClusterID(customObject)),
 							},
 							Env: []apiv1.EnvVar{
 								{
 									Name:  "PROVIDER_HOST_CLUSTER_NAMESPACE",
-									Value: keyv2.ClusterID(customObject),
+									Value: keyv3.ClusterID(customObject),
 								},
 							},
 							LivenessProbe: &apiv1.Probe{
@@ -69,7 +69,7 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 								SuccessThreshold:    1,
 								Handler: apiv1.Handler{
 									HTTPGet: &apiv1.HTTPGetAction{
-										Path: keyv2.HealthEndpoint,
+										Path: keyv3.HealthEndpoint,
 										Port: intstr.IntOrString{IntVal: 8080},
 									},
 								},
