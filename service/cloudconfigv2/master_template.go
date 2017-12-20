@@ -11,109 +11,16 @@ type masterExtension struct {
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	filesMeta := []k8scloudconfig.FileMetadata{
-		// Kubernetes API server.
-		{
-			AssetContent: string(e.certs.APIServer.CA),
-			Path:         "/etc/kubernetes/ssl/apiserver-ca.pem",
+	var filesMeta []k8scloudconfig.FileMetadata
+
+	for _, f := range certs.NewFilesClusterMaster(e.certs) {
+		m := k8scloudconfig.FileMetadata{
+			AssetContent: string(f.Data),
+			Path:         f.AbsolutePath,
 			Owner:        FileOwner,
 			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.APIServer.Crt),
-			Path:         "/etc/kubernetes/ssl/apiserver-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.APIServer.Key),
-			Path:         "/etc/kubernetes/ssl/apiserver-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		// Calico client.
-		{
-			AssetContent: string(e.certs.CalicoClient.CA),
-			Path:         "/etc/kubernetes/ssl/calico/client-ca.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.CalicoClient.Crt),
-			Path:         "/etc/kubernetes/ssl/calico/client-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.CalicoClient.Key),
-			Path:         "/etc/kubernetes/ssl/calico/client-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		// Etcd client.
-		{
-			AssetContent: string(e.certs.EtcdServer.CA),
-			Path:         "/etc/kubernetes/ssl/etcd/client-ca.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.EtcdServer.Crt),
-			Path:         "/etc/kubernetes/ssl/etcd/client-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.EtcdServer.Key),
-			Path:         "/etc/kubernetes/ssl/etcd/client-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		// Etcd server.
-		{
-			AssetContent: string(e.certs.EtcdServer.CA),
-			Path:         "/etc/kubernetes/ssl/etcd/server-ca.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.EtcdServer.Crt),
-			Path:         "/etc/kubernetes/ssl/etcd/server-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.EtcdServer.Key),
-			Path:         "/etc/kubernetes/ssl/etcd/server-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		// Service account.
-		{
-			AssetContent: string(e.certs.ServiceAccount.CA),
-			Path:         "/etc/kubernetes/ssl/service-account-ca.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.ServiceAccount.Crt),
-			Path:         "/etc/kubernetes/ssl/service-account-crt.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		{
-			AssetContent: string(e.certs.ServiceAccount.Key),
-			Path:         "/etc/kubernetes/ssl/service-account-key.pem",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
-		// set_ownership_etcd_data_dir drop-in
-		{
-			AssetContent: set_ownership_etcd_data_dir_dropin,
-			Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
+		}
+		filesMeta = append(filesMeta, m)
 	}
 
 	var newFiles []k8scloudconfig.FileAsset
