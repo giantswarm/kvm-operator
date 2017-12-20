@@ -117,7 +117,7 @@ func (s *Searcher) search(tls *TLS, clusterID string, cert cert) error {
 	// cluster clusterID.
 	selector := fmt.Sprintf("%s=%s, %s=%s", certficateLabel, cert, clusterIDLabel, clusterID)
 
-	watcher, err := s.k8sClient.Core().Secrets(SecretNamesapce).Watch(metav1.ListOptions{
+	watcher, err := s.k8sClient.Core().Secrets(SecretNamespace).Watch(metav1.ListOptions{
 		LabelSelector: selector,
 	})
 	if err != nil {
