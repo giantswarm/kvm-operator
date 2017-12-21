@@ -68,6 +68,22 @@ func (r *Resource) Underlying() framework.Resource {
 	return r
 }
 
+func allNumbersEqual(numbers ...int32) bool {
+	if len(numbers) == 0 {
+		return false
+	}
+
+	first := numbers[0]
+
+	for _, n := range numbers {
+		if n != first {
+			return false
+		}
+	}
+
+	return true
+}
+
 func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bool {
 	for _, l := range list {
 		if l.Name == item.Name {
@@ -88,8 +104,32 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 	return nil, microerror.Mask(notFoundError)
 }
 
-func isDeploymentModified(a, b *v1beta1.Deployment) bool {
-	return !reflect.DeepEqual(a.Spec.Template.Spec, b.Spec.Template.Spec)
+func isDeploymentModified(a, b *v1beta1.Deployment) (bool, error) {
+	aVersion, ok := a.GetAnnotations()[VersionBundleVersionAnnotation]
+	if !ok {
+		return false, microerror.Maskf(missingAnnotationError, VersionBundleVersionAnnotation)
+	}
+	if aVersion == "" {
+		return false, microerror.Maskf(emptyAnnotationError, "'%s' must not be empty", VersionBundleVersionAnnotation)
+	}
+
+	bVersion, ok := b.GetAnnotations()[VersionBundleVersionAnnotation]
+	if !ok {
+		return false, microerror.Maskf(missingAnnotationError, VersionBundleVersionAnnotation)
+	}
+	if bVersion == "" {
+		return false, microerror.Maskf(emptyAnnotationError, "'%s' must not be empty", VersionBundleVersionAnnotation)
+	}
+
+	if aVersion != bVersion {
+		return true, nil
+	}
+
+	if !reflect.DeepEqual(a.Spec.Template.Spec, b.Spec.Template.Spec) {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func toDeployments(v interface{}) ([]*v1beta1.Deployment, error) {
