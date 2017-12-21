@@ -51,7 +51,7 @@ func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customOb
 	for _, d := range deployments {
 		version, ok := d.Annotations[VersionBundleVersionAnnotation]
 		if !ok {
-			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
+			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment '%s': annotation '%s' must not be empty", d.GetName(), VersionBundleVersionAnnotation))
 			continue
 		} else {
 			count, ok := versionCounts[version]
