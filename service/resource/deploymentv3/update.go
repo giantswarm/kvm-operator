@@ -10,7 +10,6 @@ import (
 	"k8s.io/api/extensions/v1beta1"
 
 	"github.com/giantswarm/kvm-operator/service/keyv3"
-	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
@@ -75,21 +74,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	var deploymentsToUpdate []*v1beta1.Deployment
+
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
 		r.logger.LogCtx(ctx, "debug", "finding out which deployments have to be updated")
-
-		// Check if config maps of deployments changed. In case they did, add the
-		// deployments to the list of deployments intended to be updated.
-		m, ok := messagecontext.FromContext(ctx)
-		if ok {
-			for _, name := range m.ConfigMapNames {
-				desiredDeployment, err := getDeploymentByConfigMapName(desiredDeployments, name)
-				if err != nil {
-					return nil, microerror.Mask(err)
-				}
-				deploymentsToUpdate = append(deploymentsToUpdate, desiredDeployment)
-			}
-		}
 
 		// Check if deployments changed. In case they did, add the deployments to
 		// the list of deployments intended to be updated, but only in case they are
