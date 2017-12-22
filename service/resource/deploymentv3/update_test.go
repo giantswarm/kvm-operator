@@ -1179,6 +1179,274 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 				},
 			},
 		},
+
+		// Test 12, is the same as 11 but ensures the update behaviour is preserved
+		// even if no version bundle version annotation is present in the current
+		// state.
+		{
+			Ctx: func() context.Context {
+				ctx := context.Background()
+
+				{
+					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
+					updateallowedcontext.SetUpdateAllowed(ctx)
+				}
+
+				return ctx
+			}(),
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+					},
+				},
+			},
+			CurrentState: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+					Status: extensionsv1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+					Status: extensionsv1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+			},
+			DesiredState: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		// Test 13, is the same as 12 but with an empty version bundle version
+		// annotation.
+		{
+			Ctx: func() context.Context {
+				ctx := context.Background()
+
+				{
+					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
+					updateallowedcontext.SetUpdateAllowed(ctx)
+				}
+
+				return ctx
+			}(),
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+					},
+				},
+			},
+			CurrentState: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+					Status: extensionsv1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+					Status: extensionsv1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+			},
+			DesiredState: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+				{
+					ObjectMeta: apismetav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: extensionsv1.DeploymentSpec{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	var err error

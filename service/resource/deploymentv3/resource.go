@@ -104,32 +104,32 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 	return nil, microerror.Mask(notFoundError)
 }
 
-func isDeploymentModified(a, b *v1beta1.Deployment) (bool, error) {
+func isDeploymentModified(a, b *v1beta1.Deployment) bool {
 	aVersion, ok := a.GetAnnotations()[VersionBundleVersionAnnotation]
 	if !ok {
-		return false, microerror.Maskf(missingAnnotationError, VersionBundleVersionAnnotation)
+		return true
 	}
 	if aVersion == "" {
-		return false, microerror.Maskf(emptyAnnotationError, "'%s' must not be empty", VersionBundleVersionAnnotation)
+		return true
 	}
 
 	bVersion, ok := b.GetAnnotations()[VersionBundleVersionAnnotation]
 	if !ok {
-		return false, microerror.Maskf(missingAnnotationError, VersionBundleVersionAnnotation)
+		return true
 	}
 	if bVersion == "" {
-		return false, microerror.Maskf(emptyAnnotationError, "'%s' must not be empty", VersionBundleVersionAnnotation)
+		return true
 	}
 
 	if aVersion != bVersion {
-		return true, nil
+		return true
 	}
 
 	if !reflect.DeepEqual(a.Spec.Template.Spec, b.Spec.Template.Spec) {
-		return true, nil
+		return true
 	}
 
-	return false, nil
+	return false
 }
 
 func toDeployments(v interface{}) ([]*v1beta1.Deployment, error) {

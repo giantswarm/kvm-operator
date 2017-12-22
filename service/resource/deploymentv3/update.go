@@ -83,7 +83,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		for _, d := range currentDeployments {
 			allReplicasUp := allNumbersEqual(d.Status.AvailableReplicas, d.Status.ReadyReplicas, d.Status.Replicas, d.Status.UpdatedReplicas)
 			if !allReplicasUp {
-				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update any deployment: deployment '%s' must have all replicas up", d.GetName()))
+				r.logger.LogCtx(ctx, "info", fmt.Sprintf("cannot update any deployment: deployment '%s' must have all replicas up", d.GetName()))
 				return nil, nil
 			}
 		}
@@ -102,17 +102,8 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 				return nil, microerror.Mask(err)
 			}
 
-			isModified, err := isDeploymentModified(desiredDeployment, currentDeployment)
-			if IsMissingAnnotation(err) {
-				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment '%s': annotation '%s' must not be missing", currentDeployment.GetName(), VersionBundleVersionAnnotation))
-			} else if IsEmptyAnnotation(err) {
-				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment '%s': annotation '%s' must not be empty", currentDeployment.GetName(), VersionBundleVersionAnnotation))
-			} else if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			if !isModified {
-				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
+			if !isDeploymentModified(desiredDeployment, currentDeployment) {
+				r.logger.LogCtx(ctx, "debug", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
 				continue
 			}
 
