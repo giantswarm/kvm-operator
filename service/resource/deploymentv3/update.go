@@ -73,8 +73,6 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	var deploymentsToUpdate []*v1beta1.Deployment
-
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
 		r.logger.LogCtx(ctx, "debug", "finding out which deployments have to be updated")
 
@@ -118,14 +116,14 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 				continue
 			}
 
-			deploymentsToUpdate = append(deploymentsToUpdate, desiredDeployment)
-			break
+			r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
+
+			return []*v1beta1.Deployment{desiredDeployment}, nil
 		}
 
-		r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d deployment(s) that have to be updated", len(deploymentsToUpdate)))
 	} else {
 		r.logger.LogCtx(ctx, "debug", "not computing update state because deployments are not allowed to be updated")
 	}
 
-	return deploymentsToUpdate, nil
+	return nil, nil
 }
