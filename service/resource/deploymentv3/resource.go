@@ -2,7 +2,6 @@ package deploymentv3
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -108,39 +107,28 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 func isDeploymentModified(a, b *v1beta1.Deployment) bool {
 	aVersion, ok := a.GetAnnotations()[VersionBundleVersionAnnotation]
 	if !ok {
-		fmt.Printf("1\n")
 		return true
 	}
 	if aVersion == "" {
-		fmt.Printf("2\n")
 		return true
 	}
 
 	bVersion, ok := b.GetAnnotations()[VersionBundleVersionAnnotation]
 	if !ok {
-		fmt.Printf("3\n")
 		return true
 	}
 	if bVersion == "" {
-		fmt.Printf("4\n")
 		return true
 	}
 
 	if aVersion != bVersion {
-		fmt.Printf("aVersion: %#v\n", aVersion)
-		fmt.Printf("bVersion: %#v\n", bVersion)
-		fmt.Printf("5\n")
 		return true
 	}
 
-	if !reflect.DeepEqual(a.Spec.Template.Spec, b.Spec.Template.Spec) {
-		fmt.Printf("aSpec: %#v\n", a.Spec.Template.Spec)
-		fmt.Printf("bSpec: %#v\n", b.Spec.Template.Spec)
-		fmt.Printf("6\n")
-		return true
-	}
+	fmt.Printf("aSpec: %#v\n", a.Spec.Template.Spec.String())
+	fmt.Printf("bSpec: %#v\n", b.Spec.Template.Spec.String())
+	fmt.Printf("6\n")
 
-	fmt.Printf("7\n")
 	return false
 }
 
