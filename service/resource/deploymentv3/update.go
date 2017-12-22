@@ -83,7 +83,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		for _, d := range currentDeployments {
 			allReplicasUp := allNumbersEqual(d.Status.AvailableReplicas, d.Status.ReadyReplicas, d.Status.Replicas, d.Status.UpdatedReplicas)
 			if !allReplicasUp {
-				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update any deployment: deployment '%s' must have all replicas up", d.GetName(), VersionBundleVersionAnnotation))
+				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update any deployment: deployment '%s' must have all replicas up", d.GetName()))
 				return nil, nil
 			}
 		}
