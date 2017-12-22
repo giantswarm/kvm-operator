@@ -339,6 +339,9 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
 		if config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled) {
 			updateallowedcontext.SetUpdateAllowed(ctx)
+			config.Logger.LogCtx(ctx, "info", "enabling updates")
+		} else {
+			config.Logger.LogCtx(ctx, "info", "not enabling updates")
 		}
 
 		return ctx, nil
