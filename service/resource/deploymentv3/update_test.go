@@ -189,130 +189,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		//// Test 3, in case current state is modified, the update state should
-		//// contain the updated deployment, in case the update is allowed.
-		//{
-		//Ctx: func() context.Context {
-		//ctx := context.Background()
-		//
-		//{
-		//ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-		//updateallowedcontext.SetUpdateAllowed(ctx)
-		//}
-		//
-		//return ctx
-		//}(),
-		//Obj: &v1alpha1.KVMConfig{
-		//Spec: v1alpha1.KVMConfigSpec{
-		//Cluster: v1alpha1.Cluster{
-		//ID: "al9qy",
-		//},
-		//},
-		//},
-		//CurrentState: []*v1beta1.Deployment{
-		//{
-		//ObjectMeta: apismetav1.ObjectMeta{
-		//Name: "deployment-1",
-		//Annotations: map[string]string{
-		//VersionBundleVersionAnnotation: "1.2.0",
-		//},
-		//},
-		//Spec: extensionsv1.DeploymentSpec{
-		//Template: apiv1.PodTemplateSpec{
-		//Spec: apiv1.PodSpec{
-		//Containers: []apiv1.Container{
-		//{
-		//Name: "deployment-1-container-1",
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//{
-		//ObjectMeta: apismetav1.ObjectMeta{
-		//Name: "deployment-2",
-		//Annotations: map[string]string{
-		//VersionBundleVersionAnnotation: "1.2.0",
-		//},
-		//},
-		//Spec: extensionsv1.DeploymentSpec{
-		//Template: apiv1.PodTemplateSpec{
-		//Spec: apiv1.PodSpec{
-		//Containers: []apiv1.Container{
-		//{
-		//Name: "deployment-2-container-2-modified",
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//DesiredState: []*v1beta1.Deployment{
-		//{
-		//ObjectMeta: apismetav1.ObjectMeta{
-		//Name: "deployment-1",
-		//Annotations: map[string]string{
-		//VersionBundleVersionAnnotation: "1.2.0",
-		//},
-		//},
-		//Spec: extensionsv1.DeploymentSpec{
-		//Template: apiv1.PodTemplateSpec{
-		//Spec: apiv1.PodSpec{
-		//Containers: []apiv1.Container{
-		//{
-		//Name: "deployment-1-container-1",
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//{
-		//ObjectMeta: apismetav1.ObjectMeta{
-		//Name: "deployment-2",
-		//Annotations: map[string]string{
-		//VersionBundleVersionAnnotation: "1.2.0",
-		//},
-		//},
-		//Spec: extensionsv1.DeploymentSpec{
-		//Template: apiv1.PodTemplateSpec{
-		//Spec: apiv1.PodSpec{
-		//Containers: []apiv1.Container{
-		//{
-		//Name: "deployment-2-container-2",
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
-		//{
-		//ObjectMeta: apismetav1.ObjectMeta{
-		//Name: "deployment-2",
-		//Annotations: map[string]string{
-		//VersionBundleVersionAnnotation: "1.2.0",
-		//},
-		//},
-		//Spec: extensionsv1.DeploymentSpec{
-		//Template: apiv1.PodTemplateSpec{
-		//Spec: apiv1.PodSpec{
-		//Containers: []apiv1.Container{
-		//{
-		//Name: "deployment-2-container-2",
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-		//},
-
-		// Test 4, is the same as 4 but with the version bundle version being
+		// Test 3, is the same as 2 but with the version bundle version being
 		// changed.
 		{
 			Ctx: func() context.Context {
@@ -435,130 +312,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 		},
 
-		// // Test 5, in case desired state is modified, the update state should
-		// // contain the updated deployment, in case the update is allowed.
-		// {
-		// 	Ctx: func() context.Context {
-		// 		ctx := context.Background()
-		//
-		// 		{
-		// 			ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-		// 			updateallowedcontext.SetUpdateAllowed(ctx)
-		// 		}
-		//
-		// 		return ctx
-		// 	}(),
-		// 	Obj: &v1alpha1.KVMConfig{
-		// 		Spec: v1alpha1.KVMConfigSpec{
-		// 			Cluster: v1alpha1.Cluster{
-		// 				ID: "al9qy",
-		// 			},
-		// 		},
-		// 	},
-		// 	CurrentState: []*v1beta1.Deployment{
-		// 		{
-		// 			ObjectMeta: apismetav1.ObjectMeta{
-		// 				Name: "deployment-1",
-		// 				Annotations: map[string]string{
-		// 					VersionBundleVersionAnnotation: "1.2.0",
-		// 				},
-		// 			},
-		// 			Spec: extensionsv1.DeploymentSpec{
-		// 				Template: apiv1.PodTemplateSpec{
-		// 					Spec: apiv1.PodSpec{
-		// 						Containers: []apiv1.Container{
-		// 							{
-		// 								Name: "deployment-1-container-1",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 		{
-		// 			ObjectMeta: apismetav1.ObjectMeta{
-		// 				Name: "deployment-2",
-		// 				Annotations: map[string]string{
-		// 					VersionBundleVersionAnnotation: "1.2.0",
-		// 				},
-		// 			},
-		// 			Spec: extensionsv1.DeploymentSpec{
-		// 				Template: apiv1.PodTemplateSpec{
-		// 					Spec: apiv1.PodSpec{
-		// 						Containers: []apiv1.Container{
-		// 							{
-		// 								Name: "deployment-2-container-2",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	DesiredState: []*v1beta1.Deployment{
-		// 		{
-		// 			ObjectMeta: apismetav1.ObjectMeta{
-		// 				Name: "deployment-1",
-		// 				Annotations: map[string]string{
-		// 					VersionBundleVersionAnnotation: "1.2.0",
-		// 				},
-		// 			},
-		// 			Spec: extensionsv1.DeploymentSpec{
-		// 				Template: apiv1.PodTemplateSpec{
-		// 					Spec: apiv1.PodSpec{
-		// 						Containers: []apiv1.Container{
-		// 							{
-		// 								Name: "deployment-1-container-1",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 		{
-		// 			ObjectMeta: apismetav1.ObjectMeta{
-		// 				Name: "deployment-2",
-		// 				Annotations: map[string]string{
-		// 					VersionBundleVersionAnnotation: "1.2.0",
-		// 				},
-		// 			},
-		// 			Spec: extensionsv1.DeploymentSpec{
-		// 				Template: apiv1.PodTemplateSpec{
-		// 					Spec: apiv1.PodSpec{
-		// 						Containers: []apiv1.Container{
-		// 							{
-		// 								Name: "deployment-2-container-2-modified",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
-		// 		{
-		// 			ObjectMeta: apismetav1.ObjectMeta{
-		// 				Name: "deployment-2",
-		// 				Annotations: map[string]string{
-		// 					VersionBundleVersionAnnotation: "1.2.0",
-		// 				},
-		// 			},
-		// 			Spec: extensionsv1.DeploymentSpec{
-		// 				Template: apiv1.PodTemplateSpec{
-		// 					Spec: apiv1.PodSpec{
-		// 						Containers: []apiv1.Container{
-		// 							{
-		// 								Name: "deployment-2-container-2-modified",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// },
-
-		// Test 6, is the same as 6 but with the version bundle version being
+		// Test 4, is the same as 4 but with the version bundle version being
 		// changed.
 		{
 			Ctx: func() context.Context {
@@ -681,7 +435,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 		},
 
-		// Test 7, when deployments should be updaated but their status is not "safe",
+		// Test 5, when deployments should be updaated but their status is not "safe",
 		// the update state should be empty.
 		{
 			Ctx: func() context.Context {
@@ -796,7 +550,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 8, is the same as 8 but with only one deployment not being "safe".
+		// Test 6, is the same as 5 but with only one deployment not being "safe".
 		{
 			Ctx: func() context.Context {
 				ctx := context.Background()
@@ -910,7 +664,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 9, when all deployments are "safe" the update state should only
+		// Test 7, when all deployments are "safe" the update state should only
 		// contain one deployment even though if multiple deployments should be
 		// updated.
 		{
@@ -1046,7 +800,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 		},
 
-		// Test 10, is based of 10 where the next deployment is ready to be updated.
+		// Test 8, is based of 7 where the next deployment is ready to be updated.
 		{
 			Ctx: func() context.Context {
 				ctx := context.Background()
@@ -1180,7 +934,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 		},
 
-		// Test 11, is the same as 11 but ensures the update behaviour is preserved
+		// Test 9, is the same as 8 but ensures the update behaviour is preserved
 		// even if no version bundle version annotation is present in the current
 		// state.
 		{
@@ -1313,7 +1067,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 		},
 
-		// Test 12, is the same as 12 but with an empty version bundle version
+		// Test 10, is the same as 9 but with an empty version bundle version
 		// annotation.
 		{
 			Ctx: func() context.Context {

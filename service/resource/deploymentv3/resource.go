@@ -1,8 +1,6 @@
 package deploymentv3
 
 import (
-	"fmt"
-
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -124,10 +122,6 @@ func isDeploymentModified(a, b *v1beta1.Deployment) bool {
 	if aVersion != bVersion {
 		return true
 	}
-
-	fmt.Printf("aSpec: %#v\n", a.Spec.Template.Spec.String())
-	fmt.Printf("bSpec: %#v\n", b.Spec.Template.Spec.String())
-	fmt.Printf("6\n")
 
 	return false
 }
