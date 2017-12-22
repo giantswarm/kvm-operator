@@ -111,7 +111,6 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 			return []*v1beta1.Deployment{desiredDeployment}, nil
 		}
-
 	} else {
 		r.logger.LogCtx(ctx, "debug", "not computing update state because deployments are not allowed to be updated")
 	}
