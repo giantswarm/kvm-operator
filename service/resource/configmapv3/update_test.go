@@ -25,7 +25,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		ExpectedConfigMapsToUpdate           []*apiv1.ConfigMap
 		ExpectedMessageContextConfigMapNames []string
 	}{
-		// Test 1, in case current state and desired state are empty the update
+		// Test 0, in case current state and desired state are empty the update
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
@@ -42,7 +42,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			ExpectedMessageContextConfigMapNames: nil,
 		},
 
-		// Test 2, in case current state and desired state are equal the update
+		// Test 1, in case current state and desired state are equal the update
 		// state should be empty.
 		{
 			Ctx: context.TODO(),
@@ -77,7 +77,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			ExpectedMessageContextConfigMapNames: nil,
 		},
 
-		// Test 3, in case current state contains two items and desired state is
+		// Test 2, in case current state contains two items and desired state is
 		// contains the same state but one object is modified internally the update
 		// state should contain the the modified item from the current state.
 		{
