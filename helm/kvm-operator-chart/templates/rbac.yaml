@@ -50,7 +50,7 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - persistenvolumeclaims
+      - persistentvolumeclaims
     verbs:
       - get
       - list
@@ -83,7 +83,7 @@ rules:
       - resourcequotas
       - limitranges
       - nodes
-      - persistenvolumes
+      - persistentvolumes
       - podtemplates
       - replicationcontroller
       - serviceaccounts
