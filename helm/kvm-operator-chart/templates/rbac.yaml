@@ -1,0 +1,105 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kvm-operator
+  namespace: giantswarm
+rules:
+  - apiGroups:
+      - "core.giantswarm.io"
+    resources:
+      - storageconfigs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - "provider.giantswarm.io"
+    resources:
+      - kvmconfigs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - list
+      - watch
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - persistenvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - list
+      - watch
+      - create
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - secrets
+      - resourcequotas
+      - limitranges
+      - nodes
+      - persistenvolumes
+      - podtemplates
+      - replicationcontroller
+      - serviceaccounts
+    verbs:
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: userd
+subjects:
+  - kind: ServiceAccount
+    name: kvm-operator
+roleRef:
+  kind: ClusterRole
+  name: kvm-operator
+  apiGroup: rbac.authorization.k8s.io
