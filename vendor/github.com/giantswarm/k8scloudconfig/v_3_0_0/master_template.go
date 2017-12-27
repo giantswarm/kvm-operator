@@ -33,12 +33,12 @@ write_files:
   owner: root
   permissions: 644
   content: |
-    # Calico Version v2.6.4
-    # https://docs.projectcalico.org/v2.6/releases#v2.6.4
+    # Calico Version v3.0.1
+    # https://docs.projectcalico.org/v3.0/releases#v3.0.1
     # This manifest includes the following component versions:
-    #   calico/node:v2.6.4
-    #   calico/cni:v1.11.2
-    #   calico/kube-controllers:v1.0.2
+    #   calico/node:v3.0.1
+    #   calico/cni:v2.0.0
+    #   calico/kube-controllers:v2.0.0
 
     # This ConfigMap is used to configure a self-hosted Calico installation.
     kind: ConfigMap
@@ -56,26 +56,35 @@ write_files:
       # The CNI network configuration to install on each node.
       cni_network_config: |-
         {
-            "name": "k8s-pod-network",
-            "cniVersion": "0.1.0",
-            "type": "calico",
-            "etcd_endpoints": "__ETCD_ENDPOINTS__",
-            "etcd_key_file": "__ETCD_KEY_FILE__",
-            "etcd_cert_file": "__ETCD_CERT_FILE__",
-            "etcd_ca_cert_file": "__ETCD_CA_CERT_FILE__",
-            "log_level": "info",
-            "mtu": {{.Cluster.Calico.MTU}},
-            "ipam": {
-                "type": "calico-ipam"
+          "name": "k8s-pod-network",
+          "cniVersion": "0.3.0",
+          "plugins": [
+            {
+                "type": "calico",
+                "etcd_endpoints": "__ETCD_ENDPOINTS__",
+                "etcd_key_file": "__ETCD_KEY_FILE__",
+                "etcd_cert_file": "__ETCD_CERT_FILE__",
+                "etcd_ca_cert_file": "__ETCD_CA_CERT_FILE__",
+                "log_level": "info",
+                "mtu": {{.Cluster.Calico.MTU}},
+                "ipam": {
+                    "type": "calico-ipam"
+                },
+                "policy": {
+                    "type": "k8s",
+                    "k8s_api_root": "https://__KUBERNETES_SERVICE_HOST__:__KUBERNETES_SERVICE_PORT__",
+                    "k8s_auth_token": "__SERVICEACCOUNT_TOKEN__"
+                },
+                "kubernetes": {
+                    "kubeconfig": "__KUBECONFIG_FILEPATH__"
+                }
             },
-            "policy": {
-                "type": "k8s",
-                "k8s_api_root": "https://__KUBERNETES_SERVICE_HOST__:__KUBERNETES_SERVICE_PORT__",
-                "k8s_auth_token": "__SERVICEACCOUNT_TOKEN__"
-            },
-            "kubernetes": {
-                "kubeconfig": "__KUBECONFIG_FILEPATH__"
+            {
+              "type": "portmap",
+              "snat": true,
+              "capabilities": {"portMappings": true}
             }
+          ]
         }
 
       # If you're using TLS enabled etcd uncomment the following.
@@ -130,7 +139,7 @@ write_files:
             # container programs network policy and routes on each
             # host.
             - name: calico-node
-              image: quay.io/calico/node:v2.6.4
+              image: quay.io/calico/node:v3.0.1
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -224,9 +233,12 @@ write_files:
             # This container installs the Calico CNI binaries
             # and CNI network config file on each node.
             - name: install-cni
-              image: quay.io/calico/cni:v1.11.2
+              image: quay.io/calico/cni:v2.0.0
               command: ["/install-cni.sh"]
               env:
+                # Name of the CNI config file to create.
+                - name: CNI_CONF_NAME
+                  value: "10-calico.conflist"
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
                   valueFrom:
@@ -305,7 +317,7 @@ write_files:
           serviceAccountName: calico-kube-controllers
           containers:
             - name: calico-kube-controllers
-              image: quay.io/calico/kube-controllers:v1.0.2
+              image: quay.io/calico/kube-controllers:v2.0.0
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
