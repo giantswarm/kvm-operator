@@ -360,142 +360,106 @@ write_files:
               hostPath:
                 path: /etc/kubernetes/ssl/etcd
 {{ end -}}
-- path: /srv/kubedns-cm.yaml
-  owner: root
-  permissions: 0644
-  content: |
-    apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: kube-dns
-      namespace: kube-system
-      labels:
-        addonmanager.kubernetes.io/mode: EnsureExists
-- path: /srv/kubedns-sa.yaml
+- path: /srv/coredns.yaml
   owner: root
   permissions: 0644
   content: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
-      name: kube-dns
+      name: coredns
       namespace: kube-system
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
       labels:
-        kubernetes.io/cluster-service: "true"
-        addonmanager.kubernetes.io/mode: Reconcile
-- path: /srv/kubedns-dep.yaml
-  owner: root
-  permissions: 0644
-  content: |
-    apiVersion:  extensions/v1beta1
+        kubernetes.io/bootstrapping: rbac-defaults
+      name: system:coredns
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - endpoints
+      - services
+      - pods
+      - namespaces
+      verbs:
+      - list
+      - watch
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      annotations:
+        rbac.authorization.kubernetes.io/autoupdate: "true"
+      labels:
+        kubernetes.io/bootstrapping: rbac-defaults
+      name: system:coredns
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: system:coredns
+    subjects:
+    - kind: ServiceAccount
+      name: coredns
+      namespace: kube-system
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: coredns
+      namespace: kube-system
+    data:
+      Corefile: |
+        .:53 {
+            errors
+            health
+            kubernetes {{.Cluster.Kubernetes.Domain}} {{.Cluster.Kubernetes.API.ClusterIPRange}} {{.Cluster.Calico.Subnet}}/{{.Cluster.Calico.CIDR}} {
+              pods insecure
+              upstream /etc/resolv.conf
+            }
+            prometheus :9153
+            proxy . /etc/resolv.conf
+            cache 30
+        }
+    ---
+    apiVersion: extensions/v1beta1
     kind: Deployment
     metadata:
-      name: kube-dns
+      name: coredns
       namespace: kube-system
       labels:
-        k8s-app: kube-dns
-        kubernetes.io/cluster-service: "true"
-        addonmanager.kubernetes.io/mode: Reconcile
+        k8s-app: coredns
+        kubernetes.io/name: "CoreDNS"
     spec:
+      replicas: 2
       strategy:
+        type: RollingUpdate
         rollingUpdate:
-          maxSurge: 10%
-          maxUnavailable: 0
-      replicas: 3
+          maxUnavailable: 1
       selector:
         matchLabels:
-          k8s-app: kube-dns
+          k8s-app: coredns
       template:
         metadata:
           labels:
-            k8s-app: kube-dns
-            kubernetes.io/cluster-service: "true"
-          annotations:
-            scheduler.alpha.kubernetes.io/critical-pod: ''
+            k8s-app: coredns
         spec:
+          serviceAccountName: coredns
           tolerations:
-          - key: "CriticalAddonsOnly"
-            operator: "Exists"
+            - key: node-role.kubernetes.io/master
+              effect: NoSchedule
+            - key: "CriticalAddonsOnly"
+              operator: "Exists"
           containers:
-          - name: kubedns
-            image: gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.5
+          - name: coredns
+            image: coredns/coredns:1.0.1
+            imagePullPolicy: IfNotPresent
+            args: [ "-conf", "/etc/coredns/Corefile" ]
             volumeMounts:
-            - name: kube-dns-config
-              mountPath: /kube-dns-config
-            - name: config
-              mountPath: /etc/kubernetes/config/
-              readOnly: false
-            - name: ssl
-              mountPath: /etc/kubernetes/ssl/
-              readOnly: false
-            resources:
-              limits:
-                memory: 170Mi
-              requests:
-                cpu: 100m
-                memory: 70Mi
-            args:
-            # command = "/kube-dns
-            - --dns-port=10053
-            - --domain={{.Cluster.Kubernetes.Domain}}
-            - --config-dir=/kube-dns-config
-            - --v=2
-            - --kubecfg-file=/etc/kubernetes/config/kubelet-kubeconfig.yml
-            - --kube-master-url=https://{{.Cluster.Kubernetes.API.Domain}}
-            env:
-            - name: PROMETHEUS_PORT
-              value: "10055"
-            ports:
-            - containerPort: 10053
-              name: dns-local
-              protocol: UDP
-            - containerPort: 10053
-              name: dns-tcp-local
-              protocol: TCP
-            - containerPort: 10055
-              name: metrics
-              protocol: TCP
-            livenessProbe:
-              httpGet:
-                path: /healthcheck/kubedns
-                port: 10054
-                scheme: HTTP
-              initialDelaySeconds: 60
-              successThreshold: 1
-              failureThreshold: 5
-              timeoutSeconds: 5
-            readinessProbe:
-              httpGet:
-                path: /readiness
-                port: 8081
-                scheme: HTTP
-              initialDelaySeconds: 3
-              timeoutSeconds: 5
-          - name: dnsmasq
-            image: gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.5
-            livenessProbe:
-              httpGet:
-                path: /healthcheck/dnsmasq
-                port: 10054
-                scheme: HTTP
-              initialDelaySeconds: 60
-              timeoutSeconds: 5
-              successThreshold: 1
-              failureThreshold: 5
-            args:
-            - -v=2
-            - -logtostderr
-            - -configDir=/etc/k8s/dns/dnsmasq-nanny
-            - -restartDnsmasq=true
-            - --
-            - -k
-            - --cache-size=1000
-            - --no-resolv
-            - --log-facility=-
-            - --server=127.0.0.1#10053
-            - --server=/{{.Cluster.Kubernetes.Domain}}/127.0.0.1#10053
-            - --server=/in-addr.arpa/127.0.0.1#10053
-            - --server=/ip6.arpa/127.0.0.1#10053
+            - name: config-volume
+              mountPath: /etc/coredns
             ports:
             - containerPort: 53
               name: dns
@@ -503,67 +467,36 @@ write_files:
             - containerPort: 53
               name: dns-tcp
               protocol: TCP
-            resources:
-              requests:
-                cpu: 150m
-                memory: 10Mi
-            volumeMounts:
-            - name: kube-dns-config
-              mountPath: /etc/k8s/dns/dnsmasq-nanny
-          - name: sidecar
-            image: gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.5
             livenessProbe:
               httpGet:
-                path: /metrics
-                port: 10054
+                path: /health
+                port: 8080
                 scheme: HTTP
               initialDelaySeconds: 60
               timeoutSeconds: 5
               successThreshold: 1
               failureThreshold: 5
-            args:
-            - --v=2
-            - --logtostderr
-            - --probe=kubedns,127.0.0.1:10053,kubernetes.default.svc.{{.Cluster.Kubernetes.Domain}},5,A
-            - --probe=dnsmasq,127.0.0.1:53,kubernetes.default.svc.{{.Cluster.Kubernetes.Domain}},5,A
-            ports:
-            - containerPort: 10054
-              name: metrics
-              protocol: TCP
-            resources:
-              requests:
-                memory: 20Mi
-                cpu: 10m
-          dnsPolicy: Default  # Don't use cluster DNS.
-          serviceAccountName: kube-dns
+          dnsPolicy: Default
           volumes:
-          - name: kube-dns-config
-            configMap:
-              name: kube-dns
-              optional: true
-          - name: config
-            hostPath:
-              path: /etc/kubernetes/config/
-          - name: ssl
-            hostPath:
-              path: /etc/kubernetes/ssl/
-- path: /srv/kubedns-svc.yaml
-  owner: root
-  permissions: 0644
-  content: |
+            - name: config-volume
+              configMap:
+                name: coredns
+                items:
+                - key: Corefile
+                  path: Corefile
+    ---
     apiVersion: v1
     kind: Service
     metadata:
       name: kube-dns
       namespace: kube-system
       labels:
-        k8s-app: kube-dns
+        k8s-app: coredns
         kubernetes.io/cluster-service: "true"
-        addonmanager.kubernetes.io/mode: Reconcile
-        kubernetes.io/name: "KubeDNS"
+        kubernetes.io/name: "CoreDNS"
     spec:
       selector:
-        k8s-app: kube-dns
+        k8s-app: coredns
       clusterIP: {{.Cluster.Kubernetes.DNS.IP}}
       ports:
       - name: dns
@@ -959,20 +892,6 @@ write_files:
       name: calico-node
       apiGroup: rbac.authorization.k8s.io
     ---
-    ## DNS
-    kind: ClusterRoleBinding
-    apiVersion: rbac.authorization.k8s.io/v1beta1
-    metadata:
-      name: kube-dns
-    subjects:
-    - kind: ServiceAccount
-      name: kube-dns
-      namespace: kube-system
-    roleRef:
-      kind: ClusterRole
-      name: system:kube-dns
-      apiGroup: rbac.authorization.k8s.io
-    ---
     ## IC
     kind: ClusterRoleBinding
     apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1241,9 +1160,6 @@ write_files:
       name: calico-kube-controllers
       namespace: kube-system
     - kind: ServiceAccount
-      name: kube-dns
-      namespace: kube-system
-    - kind: ServiceAccount
       name: kube-proxy
       namespace: kube-system
     - kind: ServiceAccount
@@ -1371,10 +1287,7 @@ write_files:
       {{ end -}}
       MANIFESTS="${MANIFESTS} kube-proxy-sa.yaml"
       MANIFESTS="${MANIFESTS} kube-proxy-ds.yaml"
-      MANIFESTS="${MANIFESTS} kubedns-cm.yaml"
-      MANIFESTS="${MANIFESTS} kubedns-sa.yaml"
-      MANIFESTS="${MANIFESTS} kubedns-dep.yaml"
-      MANIFESTS="${MANIFESTS} kubedns-svc.yaml"
+      MANIFESTS="${MANIFESTS} coredns.yaml"
       MANIFESTS="${MANIFESTS} default-backend-dep.yml"
       MANIFESTS="${MANIFESTS} default-backend-svc.yml"
       MANIFESTS="${MANIFESTS} ingress-controller-cm.yml"

@@ -3,7 +3,7 @@ package cloudconfigv3
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_2_0_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_0_0"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/randomkeys"
@@ -57,6 +57,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 
 	var params k8scloudconfig.Params
 	{
+		params.ApiserverEncryptionKey = "UShZb2zOWvY5Svkf8+oSSa0dEZxprPWz0xYYsAsFuP0="
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &masterExtension{
 			certs: certs,
@@ -67,7 +68,11 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
 	{
-		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.MasterTemplate, params)
+		c := k8scloudconfig.DefaultCloudConfigConfig()
+		c.Params = params
+		c.Template = k8scloudconfig.MasterTemplate
+
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(c)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
@@ -88,6 +93,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 
 	var params k8scloudconfig.Params
 	{
+		params.ApiserverEncryptionKey = "UShZb2zOWvY5Svkf8+oSSa0dEZxprPWz0xYYsAsFuP0="
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &workerExtension{
 			certs: certs,
@@ -97,7 +103,11 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
 	{
-		newCloudConfig, err = k8scloudconfig.NewCloudConfig(k8scloudconfig.WorkerTemplate, params)
+		c := k8scloudconfig.DefaultCloudConfigConfig()
+		c.Params = params
+		c.Template = k8scloudconfig.WorkerTemplate
+
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(c)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
