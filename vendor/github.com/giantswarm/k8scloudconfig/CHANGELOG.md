@@ -25,6 +25,7 @@ version directory, and then changes are introduced.
 - Update calico to 3.0.1.
 - Update hyperkube to v1.9.0.
 - Use vanilla (previously coreos) hyperkube image.
+- kube-dns replaced with CoreDNS 1.0.1.
 
 ### Removed
 - Remove calico-ipip-pinger.
