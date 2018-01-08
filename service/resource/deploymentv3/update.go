@@ -97,6 +97,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		for _, currentDeployment := range currentDeployments {
 			desiredDeployment, err := getDeploymentByName(desiredDeployments, currentDeployment.Name)
 			if IsNotFound(err) {
+				// NOTE that this case indicates we should remove the current deployment
+				// eventually.
+				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("not updating deployment '%s': no desired deployment found", currentDeployment.GetName()))
 				continue
 			} else if err != nil {
 				return nil, microerror.Mask(err)

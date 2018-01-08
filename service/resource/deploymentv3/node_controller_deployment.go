@@ -22,6 +22,9 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: keyv3.NodeControllerID,
+			Annotations: map[string]string{
+				VersionBundleVersionAnnotation: keyv3.VersionBundleVersion(customObject),
+			},
 			Labels: map[string]string{
 				"cluster":  keyv3.ClusterID(customObject),
 				"customer": keyv3.ClusterCustomer(customObject),
@@ -36,9 +39,6 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: apismetav1.ObjectMeta{
 					GenerateName: keyv3.NodeControllerID,
-					Annotations: map[string]string{
-						VersionBundleVersionAnnotation: keyv3.VersionBundleVersion(customObject),
-					},
 					Labels: map[string]string{
 						"app":      keyv3.NodeControllerID,
 						"cluster":  keyv3.ClusterID(customObject),

@@ -1,6 +1,8 @@
 package deploymentv3
 
 import (
+	"fmt"
+
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -105,24 +107,30 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 func isDeploymentModified(a, b *v1beta1.Deployment) bool {
 	aVersion, ok := a.GetAnnotations()[VersionBundleVersionAnnotation]
 	if !ok {
+		fmt.Printf("1\n")
 		return true
 	}
 	if aVersion == "" {
+		fmt.Printf("2\n")
 		return true
 	}
 
 	bVersion, ok := b.GetAnnotations()[VersionBundleVersionAnnotation]
 	if !ok {
+		fmt.Printf("3\n")
 		return true
 	}
 	if bVersion == "" {
+		fmt.Printf("4\n")
 		return true
 	}
 
 	if aVersion != bVersion {
+		fmt.Printf("5\n")
 		return true
 	}
 
+	fmt.Printf("6\n")
 	return false
 }
 
