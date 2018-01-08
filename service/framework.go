@@ -25,7 +25,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
 	"github.com/giantswarm/kvm-operator/service/keyv2"
-	"github.com/giantswarm/kvm-operator/service/messagecontext"
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
@@ -338,11 +338,18 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 	}
 
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		message := messagecontext.NewMessage()
-		ctx = messagecontext.NewContext(ctx, message)
+		{
+			customObject, err := keyv3.ToCustomObject(obj)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
 
-		if config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled) {
-			updateallowedcontext.SetUpdateAllowed(ctx)
+			updateEnabled := config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled)
+			versionBundleVersion := keyv3.VersionBundleVersion(customObject)
+
+			if updateEnabled && versionBundleVersion >= "1.1.0" {
+				updateallowedcontext.SetUpdateAllowed(ctx)
+			}
 		}
 
 		return ctx, nil

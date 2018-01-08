@@ -88,18 +88,6 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 	return nil, microerror.Mask(notFoundError)
 }
 
-func getDeploymentByConfigMapName(list []*v1beta1.Deployment, name string) (*v1beta1.Deployment, error) {
-	for _, l := range list {
-		for _, v := range l.Spec.Template.Spec.Volumes {
-			if v.VolumeSource.ConfigMap.LocalObjectReference.Name == name {
-				return l, nil
-			}
-		}
-	}
-
-	return nil, microerror.Mask(notFoundError)
-}
-
 func isDeploymentModified(a, b *v1beta1.Deployment) bool {
 	return !reflect.DeepEqual(a.Spec.Template.Spec, b.Spec.Template.Spec)
 }

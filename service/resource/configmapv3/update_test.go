@@ -14,7 +14,6 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv3/cloudconfigtest"
-	"github.com/giantswarm/kvm-operator/service/messagecontext"
 )
 
 func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
@@ -138,68 +137,6 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			},
 			ExpectedMessageContextConfigMapNames: nil,
 		},
-
-		// Test 4, same as 3 but ensuring the right config map names are written to
-		// the message context.
-		{
-			Ctx: messagecontext.NewContext(context.Background(), messagecontext.NewMessage()),
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.Cluster{
-						ID: "al9qy",
-					},
-				},
-			},
-			CurrentState: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-2",
-					},
-					Data: map[string]string{
-						"key2": "val2-modified",
-					},
-				},
-			},
-			DesiredState: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-1",
-					},
-					Data: map[string]string{
-						"key1": "val1",
-					},
-				},
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-2",
-					},
-					Data: map[string]string{
-						"key2": "val2",
-					},
-				},
-			},
-			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
-				{
-					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "config-map-2",
-					},
-					Data: map[string]string{
-						"key2": "val2",
-					},
-				},
-			},
-			ExpectedMessageContextConfigMapNames: []string{
-				"config-map-2",
-			},
-		},
 	}
 
 	var err error
@@ -229,13 +166,6 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		}
 		if !reflect.DeepEqual(configMapsToUpdate, tc.ExpectedConfigMapsToUpdate) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)
-		}
-
-		m, ok := messagecontext.FromContext(tc.Ctx)
-		if ok {
-			if !reflect.DeepEqual(m.ConfigMapNames, tc.ExpectedMessageContextConfigMapNames) {
-				t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedMessageContextConfigMapNames, m.ConfigMapNames)
-			}
 		}
 	}
 }
