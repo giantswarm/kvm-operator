@@ -51,7 +51,7 @@ func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customOb
 	for _, d := range deployments {
 		version, ok := d.Annotations[VersionBundleVersionAnnotation]
 		if !ok {
-			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
+			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
 			continue
 		} else {
 			count, ok := versionCounts[version]
@@ -66,7 +66,7 @@ func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customOb
 	for version, count := range versionCounts {
 		split := strings.Split(version, ".")
 		if len(split) != 3 {
-			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current version bundle version metric: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
+			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
 			continue
 		}
 
