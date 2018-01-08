@@ -66,7 +66,7 @@ func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customOb
 	for version, count := range versionCounts {
 		split := strings.Split(version, ".")
 		if len(split) != 3 {
-			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", VersionBundleVersionAnnotation))
+			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment: invalid version format, expected '<major>.<minor>.<patch>', got '%s'", version))
 			continue
 		}
 
