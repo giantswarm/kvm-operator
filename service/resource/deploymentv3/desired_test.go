@@ -22,8 +22,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		ExpectedMastersResources []apiv1.ResourceRequirements
 		ExpectedWorkersResources []apiv1.ResourceRequirements
 	}{
-		// Test 0 ensures there is one deployment for master and worker each when there
-		// is one master and one worker node in the custom object.
+		// Test 0 ensures there is one deployment for master and worker each when
+		// there is one master and one worker node in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -78,8 +78,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			},
 		},
 
-		// Test 1 ensures there is one deployment for master and worker each when there
-		// is one master and three worker nodes in the custom object.
+		// Test 1 ensures there is one deployment for master and worker each when
+		// there is one master and three worker nodes in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -163,8 +163,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			},
 		},
 
-		// Test 2 ensures there is one deployment for master and worker each when there
-		// are three master and three worker nodes in the custom object.
+		// Test 2 ensures there is one deployment for master and worker each when
+		// there are three master and three worker nodes in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{

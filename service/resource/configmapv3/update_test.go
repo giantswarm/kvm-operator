@@ -157,15 +157,15 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 	for i, tc := range testCases {
 		updateState, err := newResource.newUpdateChange(tc.Ctx, tc.Obj, tc.CurrentState, tc.DesiredState)
 		if err != nil {
-			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
+			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
 		}
 
 		configMapsToUpdate, ok := updateState.([]*apiv1.ConfigMap)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, updateState)
+			t.Fatalf("case %d expected %T got %T", i, []*apiv1.ConfigMap{}, updateState)
 		}
 		if !reflect.DeepEqual(configMapsToUpdate, tc.ExpectedConfigMapsToUpdate) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)
+			t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)
 		}
 	}
 }
