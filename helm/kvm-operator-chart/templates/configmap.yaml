@@ -11,7 +11,7 @@ data:
     service:
       guest:
         update:
-          enabled: '{{ .Values.Installation.V1.Guest.Update.Enabled }}'
+          enabled: {{ .Values.Installation.V1.Guest.Update.Enabled }}
       kubernetes:
         address: ''
         inCluster: true
