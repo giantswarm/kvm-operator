@@ -69,11 +69,11 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							keyv3.DrainingNodesFinalizer,
 						},
 						Labels: map[string]string{
-							"app":         keyv3.WorkerID,
-							"cluster":     keyv3.ClusterID(customObject),
-							"customer":    keyv3.ClusterCustomer(customObject),
-							"pod-watcher": keyv3.PodWatcherLabel,
-							"node":        workerNode.ID,
+							"app":                 keyv3.WorkerID,
+							"cluster":             keyv3.ClusterID(customObject),
+							"customer":            keyv3.ClusterCustomer(customObject),
+							"node":                workerNode.ID,
+							keyv3.PodWatcherLabel: "kvm-operator",
 						},
 					},
 					Spec: apiv1.PodSpec{

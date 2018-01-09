@@ -453,7 +453,7 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 		c.Watcher = k8sClient.CoreV1().Pods("")
 
 		c.ListOptions = apismetav1.ListOptions{
-			LabelSelector: fmt.Sprintf("pod-watcher=%s", keyv3.PodWatcherLabel),
+			LabelSelector: fmt.Sprintf("%s=%s", keyv3.PodWatcherLabel, config.Name),
 		}
 		fmt.Printf("c.ListOptions: %#v\n", c.ListOptions)
 
