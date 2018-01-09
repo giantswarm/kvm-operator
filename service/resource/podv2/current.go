@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/framework/context/canceledcontext"
+	"github.com/giantswarm/operatorkit/framework/context/reconciliationcanceledcontext"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -28,8 +28,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 		r.logger.LogCtx(ctx, "debug", "cannot find the current version of the reconciled pod in the Kubernetes API")
 
-		canceledcontext.SetCanceled(ctx)
-		if canceledcontext.IsCanceled(ctx) {
+		reconciliationcanceledcontext.SetCanceled(ctx)
+		if reconciliationcanceledcontext.IsCanceled(ctx) {
 			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
 
 			return nil, nil

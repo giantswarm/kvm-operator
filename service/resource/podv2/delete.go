@@ -10,7 +10,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv2"
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	podToDelete, err := keyv2.ToPod(obj)
+	podToDelete, err := keyv3.ToPod(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -77,7 +77,7 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentPod, err := keyv2.ToPod(obj)
+	currentPod, err := keyv3.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -99,7 +99,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		var changed bool
 
 		for _, f := range currentPod.GetFinalizers() {
-			if f == keyv2.DrainingNodesFinalizer {
+			if f == keyv3.DrainingNodesFinalizer {
 				changed = true
 				continue
 			}

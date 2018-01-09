@@ -40,11 +40,7 @@ const (
 )
 
 const (
-	DrainingNodesFinalizer = "kvm-operator.giantswarm.io/draining-nodes"
-)
-
-const (
-	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
+	PodWatcherLabel = "giantswarm.io/pod-watcher"
 )
 
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
