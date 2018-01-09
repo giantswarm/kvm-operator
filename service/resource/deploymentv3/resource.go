@@ -1,8 +1,6 @@
 package deploymentv3
 
 import (
-	"reflect"
-
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -68,6 +66,22 @@ func (r *Resource) Underlying() framework.Resource {
 	return r
 }
 
+func allNumbersEqual(numbers ...int32) bool {
+	if len(numbers) == 0 {
+		return false
+	}
+
+	first := numbers[0]
+
+	for _, n := range numbers {
+		if n != first {
+			return false
+		}
+	}
+
+	return true
+}
+
 func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bool {
 	for _, l := range list {
 		if l.Name == item.Name {
@@ -89,7 +103,27 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 }
 
 func isDeploymentModified(a, b *v1beta1.Deployment) bool {
-	return !reflect.DeepEqual(a.Spec.Template.Spec, b.Spec.Template.Spec)
+	aVersion, ok := a.GetAnnotations()[VersionBundleVersionAnnotation]
+	if !ok {
+		return true
+	}
+	if aVersion == "" {
+		return true
+	}
+
+	bVersion, ok := b.GetAnnotations()[VersionBundleVersionAnnotation]
+	if !ok {
+		return true
+	}
+	if bVersion == "" {
+		return true
+	}
+
+	if aVersion != bVersion {
+		return true
+	}
+
+	return false
 }
 
 func toDeployments(v interface{}) ([]*v1beta1.Deployment, error) {
