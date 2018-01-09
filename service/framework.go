@@ -24,7 +24,6 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
-	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/keyv3"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
@@ -454,7 +453,7 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 		c.Watcher = k8sClient.CoreV1().Pods("")
 
 		c.ListOptions = apismetav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", keyv2.PodWatcherLabel, config.Name),
+			LabelSelector: fmt.Sprintf("%s=%s", keyv3.PodWatcherLabel, config.Name),
 		}
 
 		newInformer, err = informer.New(c)
