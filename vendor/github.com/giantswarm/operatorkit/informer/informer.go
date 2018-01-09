@@ -19,6 +19,7 @@ package informer
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -390,6 +391,8 @@ func (i *Informer) sendCachedEvents(ctx context.Context, deleteChan, updateChan 
 func (i *Informer) streamEvents(ctx context.Context, eventChan chan watch.Event) error {
 	watcher, err := i.watcher.Watch(i.listOptions)
 	if err != nil {
+		fmt.Printf("i.listOptions: %#v\n", i.listOptions)
+		fmt.Printf("err: %#v\n", err)
 		return microerror.Mask(err)
 	}
 
