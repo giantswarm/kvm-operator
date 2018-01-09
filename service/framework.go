@@ -455,7 +455,6 @@ func newPodFramework(config Config) (*framework.Framework, error) {
 		c.ListOptions = apismetav1.ListOptions{
 			LabelSelector: fmt.Sprintf("%s=%s", keyv3.PodWatcherLabel, config.Name),
 		}
-		fmt.Printf("c.ListOptions: %#v\n", c.ListOptions)
 
 		newInformer, err = informer.New(c)
 		if err != nil {
