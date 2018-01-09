@@ -8,11 +8,11 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv2"
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	reconciledPod, err := keyv2.ToPod(obj)
+	reconciledPod, err := keyv3.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
