@@ -2,7 +2,6 @@ package deploymentv3
 
 import (
 	"context"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -23,8 +22,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		ExpectedMastersResources []apiv1.ResourceRequirements
 		ExpectedWorkersResources []apiv1.ResourceRequirements
 	}{
-		// Test 1 ensures there is one deployment for master and worker each when there
-		// is one master and one worker node in the custom object.
+		// Test 0 ensures there is one deployment for master and worker each when
+		// there is one master and one worker node in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -79,8 +78,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			},
 		},
 
-		// Test 2 ensures there is one deployment for master and worker each when there
-		// is one master and three worker nodes in the custom object.
+		// Test 1 ensures there is one deployment for master and worker each when
+		// there is one master and three worker nodes in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -164,8 +163,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			},
 		},
 
-		// Test 3 ensures there is one deployment for master and worker each when there
-		// are three master and three worker nodes in the custom object.
+		// Test 2 ensures there is one deployment for master and worker each when
+		// there are three master and three worker nodes in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -289,32 +288,46 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	for i, tc := range testCases {
 		result, err := newResource.GetDesiredState(context.TODO(), tc.Obj)
 		if err != nil {
-			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
+			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
 		}
 
 		deployments, ok := result.([]*v1beta1.Deployment)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*v1beta1.Deployment{}, result)
+			t.Fatalf("case %d expected %T got %T", i, []*v1beta1.Deployment{}, result)
 		}
 
 		if testGetMasterCount(deployments) != tc.ExpectedMasterCount {
-			t.Fatalf("case %d expected %d master nodes got %d", i+1, tc.ExpectedMasterCount, testGetMasterCount(deployments))
+			t.Fatalf("case %d expected %d master nodes got %d", i, tc.ExpectedMasterCount, testGetMasterCount(deployments))
 		}
 
 		if testGetWorkerCount(deployments) != tc.ExpectedWorkerCount {
-			t.Fatalf("case %d expected %d worker nodes got %d", i+1, tc.ExpectedWorkerCount, testGetWorkerCount(deployments))
+			t.Fatalf("case %d expected %d worker nodes got %d", i, tc.ExpectedWorkerCount, testGetWorkerCount(deployments))
 		}
 
 		if len(deployments) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount {
-			t.Fatalf("case %d expected %d nodes got %d", i+1, tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount, len(deployments))
+			t.Fatalf("case %d expected %d nodes got %d", i, tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount, len(deployments))
 		}
 
-		if !reflect.DeepEqual(testGetK8sMasterKVMResources(deployments), tc.ExpectedMastersResources) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedMastersResources, testGetK8sMasterKVMResources(deployments))
+		for j, r := range testGetK8sMasterKVMResources(deployments) {
+			expectedCPU := tc.ExpectedMastersResources[j].Requests.Cpu()
+			if r.Requests.Cpu().Cmp(*expectedCPU) != 0 {
+				t.Fatalf("case %d expected %#v got %#v", i, expectedCPU, r.Requests.Cpu())
+			}
+			expectedMemory := tc.ExpectedMastersResources[j].Requests.Memory()
+			if r.Requests.Memory().Cmp(*expectedMemory) != 0 {
+				t.Fatalf("case %d expected %#v got %#v", i, expectedMemory, r.Requests.Memory())
+			}
 		}
 
-		if !reflect.DeepEqual(testGetK8sWorkerKVMResources(deployments), tc.ExpectedWorkersResources) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedWorkersResources, testGetK8sWorkerKVMResources(deployments))
+		for j, r := range testGetK8sWorkerKVMResources(deployments) {
+			expectedCPU := tc.ExpectedWorkersResources[j].Requests.Cpu()
+			if r.Requests.Cpu().Cmp(*expectedCPU) != 0 {
+				t.Fatalf("case %d expected %#v got %#v", i, expectedCPU, r.Requests.Cpu())
+			}
+			expectedMemory := tc.ExpectedWorkersResources[j].Requests.Memory()
+			if r.Requests.Memory().Cmp(*expectedMemory) != 0 {
+				t.Fatalf("case %d expected %#v got %#v", i, expectedMemory, r.Requests.Memory())
+			}
 		}
 	}
 }
