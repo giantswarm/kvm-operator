@@ -4,92 +4,72 @@ metadata:
   name: kvm-operator
 rules:
   - apiGroups:
-      - "core.giantswarm.io"
+      - cluster.giantswarm.io
+    resources:
+      - kvmes
+    verbs:
+      - "*"
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - "*"
+  - apiGroups:
+      - extensions
+    resources:
+      - thirdpartyresources
+    verbs:
+      - "*"
+  - apiGroups:
+      - core.giantswarm.io
     resources:
       - storageconfigs
     verbs:
-      - get
-      - list
-      - watch
-      - create
-      - update
-      - patch
-      - delete
+      - "*"
   - apiGroups:
-      - "provider.giantswarm.io"
+      - provider.giantswarm.io
     resources:
       - kvmconfigs
     verbs:
-      - get
-      - list
-      - watch
-      - create
-      - update
-      - patch
-      - delete
+      - "*"
   - apiGroups:
       - ""
     resources:
       - namespaces
     verbs:
       - get
-      - list
-      - watch
       - create
-      - update
-      - patch
       - delete
   - apiGroups:
       - ""
     resources:
       - endpoints
-    verbs:
-      - list
-      - watch
-      - create
-  - apiGroups:
-      - ""
-    resources:
-      - persistentvolumeclaims
-    verbs:
-      - get
-      - list
-      - watch
-      - create
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - list
-      - watch
-      - create
-      - update
-      - delete
-  - apiGroups:
-      - ""
-    resources:
       - services
     verbs:
       - list
       - watch
       - create
-      - delete
   - apiGroups:
       - ""
     resources:
-      - pods
       - secrets
-      - resourcequotas
-      - limitranges
-      - nodes
-      - persistentvolumes
-      - podtemplates
-      - replicationcontroller
-      - serviceaccounts
     verbs:
-      - list
+      - get
       - watch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      - kvm-operator-configmap
+    verbs:
+      - get
+  - nonResourceURLs:
+      - "/"
+      - "/healthz"
+    verbs:
+      - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -98,7 +78,35 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: kvm-operator
+    namespace: giantswarm
 roleRef:
   kind: ClusterRole
   name: kvm-operator
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kvm-operator-psp
+rules:
+  - apiGroups:
+      - extensions
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+    resourceNames:
+      - kvm-operator-psp
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kvm-operator-psp
+subjects:
+  - kind: ServiceAccount
+    name: kvm-operator
+    namespace: giantswarm
+roleRef:
+  kind: ClusterRole
+  name: kvm-operator-psp
   apiGroup: rbac.authorization.k8s.io

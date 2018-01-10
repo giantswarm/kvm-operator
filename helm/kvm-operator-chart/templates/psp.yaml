@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: kvm-operator-psp
+spec:
+  privileged: false
+  fsGroup:
+    rule: RunAsAny
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+    - 'secret'
+    - 'configMap'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
