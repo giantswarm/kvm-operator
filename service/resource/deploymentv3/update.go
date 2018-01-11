@@ -73,37 +73,50 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	var deploymentsToUpdate []*v1beta1.Deployment
-
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
 		r.logger.LogCtx(ctx, "debug", "finding out which deployments have to be updated")
 
-		// Check if deployments changed. In case they did, add the deployments to
-		// the list of deployments intended to be updated, but only in case they are
-		// not already being tracked.
+		// Updates can be quite disruptive. We have to be very careful with updating
+		// resources that potentially imply disrupting customer workloads. We have
+		// to check the state of all deployments before we can safely go ahead with
+		// the update procedure.
+		for _, d := range currentDeployments {
+			allReplicasUp := allNumbersEqual(d.Status.AvailableReplicas, d.Status.ReadyReplicas, d.Status.Replicas, d.Status.UpdatedReplicas)
+			if !allReplicasUp {
+				r.logger.LogCtx(ctx, "info", fmt.Sprintf("cannot update any deployment: deployment '%s' must have all replicas up", d.GetName()))
+				return nil, nil
+			}
+		}
+
+		// We select one deployment to be updated per reconciliation loop. Therefore
+		// we have to check its state on the version bundle level to see if a
+		// deployment is already up to date. We also check if there are any other
+		// changes on the pod specs. In case there are not, we check the next one.
+		// The first one not being up to date will be chosen to be updated next and
+		// the loop will be broken immediatelly.
 		for _, currentDeployment := range currentDeployments {
 			desiredDeployment, err := getDeploymentByName(desiredDeployments, currentDeployment.Name)
 			if IsNotFound(err) {
+				// NOTE that this case indicates we should remove the current deployment
+				// eventually.
+				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("not updating deployment '%s': no desired deployment found", currentDeployment.GetName()))
 				continue
 			} else if err != nil {
 				return nil, microerror.Mask(err)
 			}
 
 			if !isDeploymentModified(desiredDeployment, currentDeployment) {
+				r.logger.LogCtx(ctx, "debug", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
 				continue
 			}
 
-			if containsDeployment(deploymentsToUpdate, desiredDeployment) {
-				continue
-			}
+			r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
 
-			deploymentsToUpdate = append(deploymentsToUpdate, desiredDeployment)
+			return []*v1beta1.Deployment{desiredDeployment}, nil
 		}
-
-		r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d deployments that have to be updated", len(deploymentsToUpdate)))
 	} else {
 		r.logger.LogCtx(ctx, "debug", "not computing update state because deployments are not allowed to be updated")
 	}
 
-	return deploymentsToUpdate, nil
+	return nil, nil
 }

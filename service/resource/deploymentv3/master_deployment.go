@@ -217,6 +217,13 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 										Value: "/cloudconfig/user_data",
 									},
 								},
+								Lifecycle: &apiv1.Lifecycle{
+									PreStop: &apiv1.Handler{
+										Exec: &apiv1.ExecAction{
+											Command: []string{"/qemu-shutdown"},
+										},
+									},
+								},
 								LivenessProbe: &apiv1.Probe{
 									InitialDelaySeconds: keyv3.InitialDelaySeconds,
 									TimeoutSeconds:      keyv3.TimeoutSeconds,

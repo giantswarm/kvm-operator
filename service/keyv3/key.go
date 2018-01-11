@@ -128,7 +128,6 @@ func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) 
 		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from addtional memory")
 	}
 	q.Add(additionalMemory)
-	q.String()
 
 	return q, nil
 }
