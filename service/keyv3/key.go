@@ -40,6 +40,10 @@ const (
 
 	// defaultWorkerMemory represents the extra memory to add due to qemu overhead.
 	defaultWorkerMemory = "1G"
+
+	// kvm endpoint annotations
+	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService = "endpoint.kvm.giantswarm.io/service"
 )
 
 const (

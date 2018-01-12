@@ -94,7 +94,10 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							"customer": keyv2.ClusterCustomer(customObject),
 							"node":     masterNode.ID,
 						},
-						Annotations: map[string]string{},
+						Annotations: map[string]string{
+							keyv2.AnnotationIp:      "",
+							keyv2.AnnotationService: keyv2.MasterID,
+						},
 					},
 					Spec: apiv1.PodSpec{
 						Affinity:    newMasterPodAfinity(customObject),

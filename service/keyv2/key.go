@@ -37,6 +37,10 @@ const (
 	FlannelEnvPathPrefix = "/run/flannel"
 
 	K8SKVMHealthDocker = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
+
+	// kvm endpoint annotations
+	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService = "endpoint.kvm.giantswarm.io/service"
 )
 
 const (

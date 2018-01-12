@@ -64,7 +64,10 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							"app":      keyv3.WorkerID,
 							"node":     workerNode.ID,
 						},
-						Annotations: map[string]string{},
+						Annotations: map[string]string{
+							keyv3.AnnotationIp:      "",
+							keyv3.AnnotationService: keyv3.WorkerID,
+						},
 					},
 					Spec: apiv1.PodSpec{
 						Affinity:    newWorkerPodAfinity(customObject),
