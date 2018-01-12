@@ -24,10 +24,12 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv4"
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/keyv3"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
+	"github.com/giantswarm/kvm-operator/service/resource/configmapv4"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv3"
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
@@ -134,6 +136,18 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	var ccServiceV4 *cloudconfigv4.CloudConfig
+	{
+		c := cloudconfigv4.DefaultConfig()
+
+		c.Logger = config.Logger
+
+		ccServiceV4, err = cloudconfigv4.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var keyWatcher randomkeys.Interface
 	{
 		keyConfig := randomkeys.DefaultConfig()
@@ -175,6 +189,23 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 			return nil, microerror.Mask(err)
 		}
 	}
+
+	var configMapResourceV4 framework.Resource
+	{
+		c := configmapv4.DefaultConfig()
+
+		c.CertSearcher = certSearcher
+		c.CloudConfig = ccServiceV4
+		c.K8sClient = k8sClient
+		c.KeyWatcher = keyWatcher
+		c.Logger = config.Logger
+
+		configMapResourceV4, err = configmapv4.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var deploymentResourceV2 framework.Resource
 	{
 		c := deploymentv2.DefaultConfig()
@@ -316,9 +347,42 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	var resourcesV4 []framework.Resource
+	{
+		resourcesV4 = []framework.Resource{
+			namespaceResource,
+
+			configMapResourceV4,
+			deploymentResourceV3,
+			ingressResource,
+			pvcResource,
+			serviceResource,
+		}
+
+		retryWrapConfig := retryresource.DefaultWrapConfig()
+
+		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
+		retryWrapConfig.Logger = config.Logger
+
+		resourcesV4, err = retryresource.Wrap(resourcesV4, retryWrapConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		metricsWrapConfig := metricsresource.DefaultWrapConfig()
+
+		metricsWrapConfig.Name = config.Name
+
+		resourcesV4, err = metricsresource.Wrap(resourcesV4, metricsWrapConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	// We provide a map of resource lists keyed by the version bundle version
 	// to the resource router.
 	versionedResources := map[string][]framework.Resource{
+		"1.1.1": resourcesV4,
 		"1.1.0": resourcesV3,
 		"1.0.0": resourcesV2,
 		"0.1.0": resourcesV2,
