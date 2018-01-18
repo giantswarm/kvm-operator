@@ -34,7 +34,7 @@ const (
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
-	ServiceAccountName="kvm-operator"
+	ServiceAccountName = "kvm-operator"
 
 	FlannelEnvPathPrefix = "/run/flannel"
 
