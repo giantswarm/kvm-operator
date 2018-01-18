@@ -21,9 +21,7 @@ rules:
       - deployments
       - ingresses
     verbs:
-      - get
-      - list
-      - update
+      - "*"
   - apiGroups:
       - core.giantswarm.io
     resources:
@@ -79,10 +77,7 @@ rules:
     resources:
       - configmaps
     verbs:
-      - create
-      - get
-      - list
-      - update
+      - "*"
   - nonResourceURLs:
       - "/"
       - "/healthz"

@@ -34,6 +34,8 @@ const (
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
+	ServiceAccountName="kvm-operator"
+
 	FlannelEnvPathPrefix = "/run/flannel"
 
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
