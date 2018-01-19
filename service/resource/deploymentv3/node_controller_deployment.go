@@ -46,7 +46,7 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 					},
 				},
 				Spec: apiv1.PodSpec{
-					ServiceAccountName: keyv3.ServiceAccountName,
+					ServiceAccountName: keyv3.ServiceAccountName(customObject),
 					Containers: []apiv1.Container{
 						{
 							Name:            keyv3.NodeControllerID,

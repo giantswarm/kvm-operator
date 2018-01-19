@@ -34,8 +34,6 @@ const (
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
-	ServiceAccountName = "kvm-operator"
-
 	FlannelEnvPathPrefix = "/run/flannel"
 
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
@@ -179,6 +177,10 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	}
 
 	return names
+}
+
+func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
+	return ClusterID(customObject)
 }
 
 func StorageType(customObject v1alpha1.KVMConfig) string {
