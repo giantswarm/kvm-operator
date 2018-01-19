@@ -1,4 +1,4 @@
-package serviceaccountv2
+package serviceaccountv3
 
 import (
 	"github.com/giantswarm/microerror"
@@ -10,7 +10,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "serviceaccountv2"
+	Name = "serviceaccountv3"
 )
 
 // Config represents the configuration used to create a new cloud config resource.
