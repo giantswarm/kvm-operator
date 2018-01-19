@@ -75,7 +75,7 @@ func toServiceAccount(v interface{}) (*apiv1.ServiceAccount, error) {
 
 	serviceAccount, ok := v.(*apiv1.ServiceAccount)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*apiv1.ServiceAccount{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", apiv1.ServiceAccount{}, v)
 	}
 
 	return serviceAccount, nil

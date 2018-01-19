@@ -115,7 +115,7 @@ func Test_Resource_ServiceAccount_newDeleteChange(t *testing.T) {
 				t.Fatal("case", i+1, "expected", tc.ExpectedServiceAccount, "got", result)
 			}
 		} else {
-			name := result.(*apiv1.Namespace).Name
+			name := result.(*apiv1.ServiceAccount).Name
 			if tc.ExpectedServiceAccount.Name != name {
 				t.Fatal("case", i+1, "expected", tc.ExpectedServiceAccount.Name, "got", name)
 			}
