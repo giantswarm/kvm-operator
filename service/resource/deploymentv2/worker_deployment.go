@@ -112,7 +112,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 						Containers: []apiv1.Container{
 							{
 								Name:            "k8s-endpoint-updater",
-								Image:           customObject.Spec.KVM.EndpointUpdater.Docker.Image,
+								Image:           keyv2.K8SEndpointUpdaterDocker,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								Command: []string{
 									"/bin/sh",
