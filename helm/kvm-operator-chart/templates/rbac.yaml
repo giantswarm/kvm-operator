@@ -65,6 +65,7 @@ rules:
       - pods
     verbs:
       - watch
+      - update
   - apiGroups:
       - ""
     resources:
