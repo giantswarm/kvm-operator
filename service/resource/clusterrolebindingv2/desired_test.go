@@ -1,13 +1,13 @@
 package clusterrolebindingv2
 
 import (
-	"testing"
 	"context"
+	"testing"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/client-go/kubernetes/fake"
 )
 

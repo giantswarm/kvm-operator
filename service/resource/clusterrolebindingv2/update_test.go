@@ -14,11 +14,11 @@ import (
 
 func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 	testCases := []struct {
-		Ctx                                           context.Context
-		Obj                                           interface{}
-		CurrentState                                  interface{}
-		DesiredState                                  interface{}
-		ExpectedClusterRoleBindinsToUpdate            []*apiv1.ClusterRoleBinding
+		Ctx                                context.Context
+		Obj                                interface{}
+		CurrentState                       interface{}
+		DesiredState                       interface{}
+		ExpectedClusterRoleBindinsToUpdate []*apiv1.ClusterRoleBinding
 	}{
 		// Test 1, in case current state and desired state are empty the update
 		// state should be empty.
@@ -31,9 +31,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:                                  []*apiv1.ClusterRoleBinding{},
-			DesiredState:                                  []*apiv1.ClusterRoleBinding{},
-			ExpectedClusterRoleBindinsToUpdate:            nil,
+			CurrentState:                       []*apiv1.ClusterRoleBinding{},
+			DesiredState:                       []*apiv1.ClusterRoleBinding{},
+			ExpectedClusterRoleBindinsToUpdate: nil,
 		},
 
 		// Test 2, in case current state and desired state are equal the update
@@ -85,7 +85,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedClusterRoleBindinsToUpdate:            nil,
+			ExpectedClusterRoleBindinsToUpdate: nil,
 		},
 
 		// Test 3, in case current state contains two items and desired state is

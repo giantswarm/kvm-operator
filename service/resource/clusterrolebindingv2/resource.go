@@ -20,8 +20,8 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	K8sClient    kubernetes.Interface
-	Logger       micrologger.Logger
+	K8sClient kubernetes.Interface
+	Logger    micrologger.Logger
 }
 
 // DefaultConfig provides a default configuration to create a new config map
@@ -29,16 +29,16 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		K8sClient:    nil,
-		Logger:       nil,
+		K8sClient: nil,
+		Logger:    nil,
 	}
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	k8sClient    kubernetes.Interface
-	logger       micrologger.Logger
+	k8sClient kubernetes.Interface
+	logger    micrologger.Logger
 }
 
 // New creates a new configured config map resource.
@@ -53,7 +53,7 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		// Dependencies.
-		k8sClient:    config.K8sClient,
+		k8sClient: config.K8sClient,
 		logger: config.Logger.With(
 			"resource", Name,
 		),
