@@ -6,13 +6,10 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
-
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv2/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
@@ -22,7 +19,6 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		CurrentState                                  interface{}
 		DesiredState                                  interface{}
 		ExpectedClusterRoleBindinsToUpdate            []*apiv1.ClusterRoleBinding
-		ExpectedMessageContextClusterRoleBindingNames []string
 	}{
 		// Test 1, in case current state and desired state are empty the update
 		// state should be empty.
@@ -38,7 +34,6 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			CurrentState:                                  []*apiv1.ClusterRoleBinding{},
 			DesiredState:                                  []*apiv1.ClusterRoleBinding{},
 			ExpectedClusterRoleBindinsToUpdate:            nil,
-			ExpectedMessageContextClusterRoleBindingNames: nil,
 		},
 
 		// Test 2, in case current state and desired state are equal the update
@@ -91,7 +86,6 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 				},
 			},
 			ExpectedClusterRoleBindinsToUpdate:            nil,
-			ExpectedMessageContextClusterRoleBindingNames: nil,
 		},
 
 		// Test 3, in case current state contains two items and desired state is
@@ -157,14 +151,14 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					RoleRef: apiv1.RoleRef{
 						APIGroup: apiv1.GroupName,
 						Kind:     "ClusterRole",
-						Name:     "cluster-role-2",
+						Name:     "cluster-role-3",
 					},
 				},
 			},
 			ExpectedClusterRoleBindinsToUpdate: []*apiv1.ClusterRoleBinding{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
-						Name: "cluster-role-binding-2",
+						Name: "cluster-role-binding-1",
 					},
 					Subjects: []apiv1.Subject{
 						{
@@ -176,11 +170,10 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					RoleRef: apiv1.RoleRef{
 						APIGroup: apiv1.GroupName,
 						Kind:     "ClusterRole",
-						Name:     "cluster-role-1",
+						Name:     "cluster-role-3",
 					},
 				},
 			},
-			ExpectedMessageContextClusterRoleBindingNames: nil,
 		},
 	}
 
@@ -188,8 +181,6 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := DefaultConfig()
-		resourceConfig.CertSearcher = certstest.NewSearcher()
-		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)

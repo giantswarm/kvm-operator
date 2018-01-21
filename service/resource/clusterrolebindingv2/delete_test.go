@@ -5,13 +5,10 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
-
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv2/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
@@ -266,8 +263,6 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := DefaultConfig()
-		resourceConfig.CertSearcher = certstest.NewSearcher()
-		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
