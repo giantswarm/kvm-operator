@@ -13,8 +13,6 @@ import (
 const (
 	// Name is the identifier of the resource.
 	Name = "clusterrolebindingv3"
-
-	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
 // Config represents the configuration used to create a new config map resource.
@@ -72,7 +70,9 @@ func (r *Resource) Underlying() framework.Resource {
 
 func containsClusterRoleBinding(list []*apiv1.ClusterRoleBinding, item *apiv1.ClusterRoleBinding) bool {
 	_, err := getClusterRoleBindingByName(list, item.Name)
-	if err != nil {
+	if IsNotFound(err) {
+		return false
+	} else if err != nil {
 		return false
 	}
 

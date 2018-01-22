@@ -39,10 +39,6 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	delete, err := r.newDeleteChangeForUpdatePatch(ctx, obj, currentState, desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
 	update, err := r.newUpdateChange(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -50,14 +46,13 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 
 	patch := framework.NewPatch()
 	patch.SetCreateChange(create)
-	patch.SetDeleteChange(delete)
 	patch.SetUpdateChange(update)
 
 	return patch, nil
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	clusterRoleBindings, err := toClusterRoleBindings(currentState)
+	currentClusterRoleBindings, err := toClusterRoleBindings(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -70,7 +65,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	{
 		r.logger.LogCtx(ctx, "debug", "finding out which cluster role bindings have to be updated")
 
-		for _, clusterRoleBinding := range clusterRoleBindings {
+		for _, clusterRoleBinding := range currentClusterRoleBindings {
 			desiredClusterRoleBinding, err := getClusterRoleBindingByName(desiredClusterRoleBindings, clusterRoleBinding.Name)
 			if IsNotFound(err) {
 				continue
