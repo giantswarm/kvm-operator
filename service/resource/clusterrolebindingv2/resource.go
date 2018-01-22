@@ -13,8 +13,6 @@ import (
 const (
 	// Name is the identifier of the resource.
 	Name = "clusterrolebindingv2"
-
-	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
 // Config represents the configuration used to create a new config map resource.

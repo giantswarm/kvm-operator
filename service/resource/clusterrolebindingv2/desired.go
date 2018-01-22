@@ -40,9 +40,6 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: keyv2.ClusterID(customObject),
-			Annotations: map[string]string{
-				VersionBundleVersionAnnotation: keyv2.VersionBundleVersion(customObject),
-			},
 			Labels: map[string]string{
 				"app":         "kvm-operator",
 				"cluster-id":  keyv2.ClusterID(customObject),
@@ -72,9 +69,6 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: keyv2.ClusterID(customObject) + "-psp",
-			Annotations: map[string]string{
-				VersionBundleVersionAnnotation: keyv2.VersionBundleVersion(customObject),
-			},
 			Labels: map[string]string{
 				"app":         "kvm-operator",
 				"cluster-id":  keyv2.ClusterID(customObject),
