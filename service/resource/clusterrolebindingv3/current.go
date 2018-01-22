@@ -8,25 +8,41 @@ import (
 	apiv1 "k8s.io/api/rbac/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
+	customObject, err := keyv3.ToCustomObject(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
 	r.logger.LogCtx(ctx, "debug", "looking for a list of cluster role bindings in the Kubernetes API")
 
 	var currentClusterRoleBinding []*apiv1.ClusterRoleBinding
 	{
-		clusterRoleBindingList, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().List(apismetav1.ListOptions{})
+		clusterRoleBinding, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Get(keyv3.ClusterRoleBindingName(customObject), apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "debug", "did not find any cluster role binding in the Kubernetes API")
+			r.logger.LogCtx(ctx, "debug", "did not find cluster role binding in the Kubernetes API")
+			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "debug", "found a list of cluster role bindings in the Kubernetes API")
+			r.logger.LogCtx(ctx, "debug", "found a list of cluster role binding in the Kubernetes API")
 
-			for _, item := range clusterRoleBindingList.Items {
-				c := item
-				currentClusterRoleBinding = append(currentClusterRoleBinding, &c)
-			}
+			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBinding)
+		}
+
+		clusterRoleBindingPSP, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Get(keyv3.ClusterRoleBindingPSPName(customObject), apismetav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			r.logger.LogCtx(ctx, "debug", "did not find cluster role binding psp in the Kubernetes API")
+			// fall through
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		} else {
+			r.logger.LogCtx(ctx, "debug", "found a list of cluster role binding psp in the Kubernetes API")
+
+			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBindingPSP)
 		}
 	}
 
