@@ -156,5 +156,61 @@ func newVersionBundles() []versionbundle.Bundle {
 			Version:      "1.1.0",
 			WIP:          true,
 		},
+		{
+			Changelogs: []versionbundle.Changelog{
+				{
+					Component:   "kubernetes",
+					Description: "Fix audit logging",
+					Kind:        "changed",
+				},
+				{
+					Component:   "calico",
+					Description: "Update calico to 2.6.5",
+					Kind:        "changed",
+				},
+				{
+					Component:   "calico",
+					Description: "Remove calico-ipip-pinger",
+					Kind:        "removed",
+				},
+				{
+					Component:   "calico",
+					Description: "Remove calico-node-controller",
+					Kind:        "removed",
+				},
+			},
+			Components: []versionbundle.Component{
+				{
+					Name:    "calico",
+					Version: "2.6.5",
+				},
+				{
+					Name:    "docker",
+					Version: "1.12.6",
+				},
+				{
+					Name:    "etcd",
+					Version: "3.2.7",
+				},
+				{
+					Name:    "kubedns",
+					Version: "1.14.5",
+				},
+				{
+					Name:    "kubernetes",
+					Version: "1.8.4",
+				},
+				{
+					Name:    "nginx-ingress-controller",
+					Version: "0.9.0",
+				},
+			},
+			Dependencies: []versionbundle.Dependency{},
+			Deprecated:   false,
+			Name:         "kvm-operator",
+			Time:         time.Date(2018, time.January, 19, 10, 00, 0, 0, time.UTC),
+			Version:      "1.1.1",
+			WIP:          false,
+		},
 	}
 }
