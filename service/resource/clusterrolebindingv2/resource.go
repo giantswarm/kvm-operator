@@ -68,13 +68,15 @@ func (r *Resource) Underlying() framework.Resource {
 	return r
 }
 
-func containsClusterRoleBinding(list []*apiv1.ClusterRoleBinding, item *apiv1.ClusterRoleBinding) bool {
+func containsClusterRoleBinding(list []*apiv1.ClusterRoleBinding, item *apiv1.ClusterRoleBinding) (bool, error) {
 	_, err := getClusterRoleBindingByName(list, item.Name)
-	if err != nil {
-		return false
+	if IsNotFound(err) {
+		return false, nil
+	} else if err != nil {
+		return false, microerror.Mask(err)
 	}
 
-	return true
+	return true, nil
 }
 
 func getClusterRoleBindingByName(list []*apiv1.ClusterRoleBinding, name string) (*apiv1.ClusterRoleBinding, error) {
