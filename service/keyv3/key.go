@@ -179,6 +179,10 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	return names
 }
 
+func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
+	return ClusterID(customObject)
+}
+
 func StorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }
