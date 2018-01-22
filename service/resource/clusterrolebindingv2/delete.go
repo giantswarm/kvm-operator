@@ -20,7 +20,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(clusterRoleBindingsToDelete) != 0 {
 		r.logger.LogCtx(ctx, "debug", "deleting the cluster role bindings in the Kubernetes API")
 
-		// Create the cluster role bindings in the Kubernetes API.
+		// Delete the cluster role bindings in the Kubernetes API.
 		for _, clusterRoleBinding := range clusterRoleBindingsToDelete {
 			err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Delete(clusterRoleBinding.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
@@ -65,31 +65,6 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 
 	for _, currentClusterRoleBinding := range currentClusterRoleBindings {
 		if containsClusterRoleBinding(desiredClusterRoleBindings, currentClusterRoleBinding) {
-			clusterRoleBindingsToDelete = append(clusterRoleBindingsToDelete, currentClusterRoleBinding)
-		}
-	}
-
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d cluster role bindings that have to be deleted", len(clusterRoleBindingsToDelete)))
-
-	return clusterRoleBindingsToDelete, nil
-}
-
-func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentClusterRoleBindings, err := toClusterRoleBindings(currentState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	desiredClusterRoleBindings, err := toClusterRoleBindings(desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	r.logger.LogCtx(ctx, "debug", "finding out which cluster role bindings have to be deleted")
-
-	var clusterRoleBindingsToDelete []*apiv1.ClusterRoleBinding
-
-	for _, currentClusterRoleBinding := range currentClusterRoleBindings {
-		if !containsClusterRoleBinding(desiredClusterRoleBindings, currentClusterRoleBinding) {
 			clusterRoleBindingsToDelete = append(clusterRoleBindingsToDelete, currentClusterRoleBinding)
 		}
 	}
