@@ -26,6 +26,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/keyv3"
+	"github.com/giantswarm/kvm-operator/service/resource/clusterrolebindingv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
@@ -145,6 +146,19 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	var clusterRoleBindingResourceV2 framework.Resource
+	{
+		c := clusterrolebindingv2.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		clusterRoleBindingResourceV2, err = clusterrolebindingv2.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var configMapResourceV2 framework.Resource
 	{
 		c := configmapv2.DefaultConfig()
@@ -257,6 +271,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV2 = []framework.Resource{
 			namespaceResource,
 
+			clusterRoleBindingResourceV2,
 			configMapResourceV2,
 			deploymentResourceV2,
 			ingressResource,

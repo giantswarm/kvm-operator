@@ -6,8 +6,8 @@ import (
 
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/rbac/v1beta1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
