@@ -1,4 +1,4 @@
-package clusterrolebindingv2
+package clusterrolebindingv3
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	apiv1 "k8s.io/api/rbac/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/keyv2"
+	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := keyv2.ToCustomObject(obj)
+	customObject, err := keyv3.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -39,21 +39,21 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 			APIVersion: apiv1.GroupName,
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: keyv2.ClusterID(customObject),
+			Name: keyv3.ClusterID(customObject),
 			Annotations: map[string]string{
-				VersionBundleVersionAnnotation: keyv2.VersionBundleVersion(customObject),
+				VersionBundleVersionAnnotation: keyv3.VersionBundleVersion(customObject),
 			},
 			Labels: map[string]string{
 				"app":         "kvm-operator",
-				"cluster-id":  keyv2.ClusterID(customObject),
-				"customer-id": keyv2.ClusterCustomer(customObject),
+				"cluster-id":  keyv3.ClusterID(customObject),
+				"customer-id": keyv3.ClusterCustomer(customObject),
 			},
 		},
 		Subjects: []apiv1.Subject{
 			{
 				Kind:      apiv1.ServiceAccountKind,
-				Namespace: keyv2.ClusterID(customObject),
-				Name:      keyv2.ClusterID(customObject),
+				Namespace: keyv3.ClusterID(customObject),
+				Name:      keyv3.ClusterID(customObject),
 			},
 		},
 		RoleRef: apiv1.RoleRef{
@@ -71,21 +71,21 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 			APIVersion: apiv1.GroupName,
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: keyv2.ClusterID(customObject) + "-psp",
+			Name: keyv3.ClusterID(customObject) + "-psp",
 			Annotations: map[string]string{
-				VersionBundleVersionAnnotation: keyv2.VersionBundleVersion(customObject),
+				VersionBundleVersionAnnotation: keyv3.VersionBundleVersion(customObject),
 			},
 			Labels: map[string]string{
 				"app":         "kvm-operator",
-				"cluster-id":  keyv2.ClusterID(customObject),
-				"customer-id": keyv2.ClusterCustomer(customObject),
+				"cluster-id":  keyv3.ClusterID(customObject),
+				"customer-id": keyv3.ClusterCustomer(customObject),
 			},
 		},
 		Subjects: []apiv1.Subject{
 			{
 				Kind:      apiv1.ServiceAccountKind,
-				Namespace: keyv2.ClusterID(customObject),
-				Name:      keyv2.ClusterID(customObject),
+				Namespace: keyv3.ClusterID(customObject),
+				Name:      keyv3.ClusterID(customObject),
 			},
 		},
 		RoleRef: apiv1.RoleRef{
