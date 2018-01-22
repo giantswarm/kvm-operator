@@ -12,7 +12,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "clusterrolebindingv2"
+	Name = "clusterrolebindingv3"
 )
 
 // Config represents the configuration used to create a new config map resource.
