@@ -33,10 +33,6 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		},
 	}
 
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
 	r.logger.LogCtx(ctx, "debug", "computed the new service account")
 
 	return serviceAccount, nil
