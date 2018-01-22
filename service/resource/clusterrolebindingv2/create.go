@@ -22,7 +22,6 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 		for _, clusterRoleBinding := range clusterRoleBindingsToCreate {
 			_, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Create(clusterRoleBinding)
 			if apierrors.IsAlreadyExists(err) {
-				// fall through
 			} else if err != nil {
 				return microerror.Mask(err)
 			}
