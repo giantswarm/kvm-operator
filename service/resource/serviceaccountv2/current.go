@@ -2,6 +2,7 @@ package serviceaccountv2
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/core/v1"
@@ -23,7 +24,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var currentServiceAccount *apiv1.ServiceAccount
 	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(keyv2.ServiceAccountName(customObject), apismetav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		r.logger.LogCtx(ctx, "debug", "did not find the service account in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", fmt.Sprintf("did not find the service account %s for namespace %s in the Kubernetes API", keyv2.ServiceAccountName(customObject), namespace))
+		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
 	} else {
