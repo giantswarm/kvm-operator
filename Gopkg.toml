@@ -30,7 +30,7 @@
   name = "github.com/giantswarm/certs"
 
 [[constraint]]
-  branch = "master"
+  branch = "kube-state-metrics"
   name = "github.com/giantswarm/k8scloudconfig"
 
 [[constraint]]
