@@ -106,6 +106,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 						NodeSelector: map[string]string{
 							"role": keyv3.MasterID,
 						},
+						ServiceAccountName: keyv3.ServiceAccountName(customObject),
 						Volumes: []apiv1.Volume{
 							{
 								Name: "cloud-config",
