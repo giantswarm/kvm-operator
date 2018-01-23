@@ -39,6 +39,7 @@ rules:
     resources:
       - namespaces
       - clusterrolebindings
+      - serviceaccounts
     verbs:
       - get
       - create
