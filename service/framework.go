@@ -271,11 +271,11 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV2 = []framework.Resource{
 			namespaceResource,
 
+			serviceAccountResource,
 			configMapResourceV2,
 			deploymentResourceV2,
 			ingressResource,
 			pvcResource,
-			serviceAccountResource,
 			serviceResource,
 		}
 

@@ -24,11 +24,13 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(keyv2.ServiceAccountName(customObject), apismetav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		r.logger.LogCtx(ctx, "debug", "did not find the service account in the Kubernetes API")
+		//when is not found api still returning non nil so it fails the create/update actions
+		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "debug", "found a service account in the Kubernetes API")
 	}
-
-	r.logger.LogCtx(ctx, "debug", "found a service account in the Kubernetes API")
 
 	return currentServiceAccount, nil
 }
