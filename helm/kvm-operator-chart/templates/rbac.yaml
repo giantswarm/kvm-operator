@@ -1,0 +1,127 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kvm-operator
+rules:
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - "*"
+  - apiGroups:
+      - extensions
+    resources:
+      - thirdpartyresources
+    verbs:
+      - "*"
+  - apiGroups:
+      - extensions
+    resources:
+      - deployments
+      - ingresses
+    verbs:
+      - "*"
+  - apiGroups:
+      - core.giantswarm.io
+    resources:
+      - storageconfigs
+    verbs:
+      - "*"
+  - apiGroups:
+      - provider.giantswarm.io
+    resources:
+      - kvmconfigs
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - clusterrolebindings
+    verbs:
+      - get
+      - create
+      - delete
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+      - services
+    verbs:
+      - get 
+      - list
+      - watch
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - watch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - "*"
+  - nonResourceURLs:
+      - "/"
+      - "/healthz"
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kvm-operator
+subjects:
+  - kind: ServiceAccount
+    name: kvm-operator
+    namespace: giantswarm
+roleRef:
+  kind: ClusterRole
+  name: kvm-operator
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kvm-operator-psp
+rules:
+  - apiGroups:
+      - extensions
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+    resourceNames:
+      - kvm-operator-psp
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kvm-operator-psp
+subjects:
+  - kind: ServiceAccount
+    name: kvm-operator
+    namespace: giantswarm
+roleRef:
+  kind: ClusterRole
+  name: kvm-operator-psp
+  apiGroup: rbac.authorization.k8s.io

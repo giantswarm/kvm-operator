@@ -26,6 +26,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
 	"github.com/giantswarm/kvm-operator/service/keyv2"
 	"github.com/giantswarm/kvm-operator/service/keyv3"
+	"github.com/giantswarm/kvm-operator/service/resource/clusterrolebindingv2"
+	"github.com/giantswarm/kvm-operator/service/resource/clusterrolebindingv3"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
@@ -34,6 +36,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
 	"github.com/giantswarm/kvm-operator/service/resource/podv2"
 	"github.com/giantswarm/kvm-operator/service/resource/pvcv2"
+	"github.com/giantswarm/kvm-operator/service/resource/serviceaccountv2"
+	"github.com/giantswarm/kvm-operator/service/resource/serviceaccountv3"
 	"github.com/giantswarm/kvm-operator/service/resource/servicev2"
 )
 
@@ -145,6 +149,32 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	var clusterRoleBindingResourceV2 framework.Resource
+	{
+		c := clusterrolebindingv2.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		clusterRoleBindingResourceV2, err = clusterrolebindingv2.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var clusterRoleBindingResourceV3 framework.Resource
+	{
+		c := clusterrolebindingv3.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		clusterRoleBindingResourceV3, err = clusterrolebindingv3.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var configMapResourceV2 framework.Resource
 	{
 		c := configmapv2.DefaultConfig()
@@ -239,6 +269,32 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	var serviceAccountResourceV2 framework.Resource
+	{
+		c := serviceaccountv2.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		serviceAccountResourceV2, err = serviceaccountv2.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var serviceAccountResourceV3 framework.Resource
+	{
+		c := serviceaccountv3.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		serviceAccountResourceV3, err = serviceaccountv3.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var serviceResource framework.Resource
 	{
 		c := servicev2.DefaultConfig()
@@ -257,6 +313,8 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV2 = []framework.Resource{
 			namespaceResource,
 
+			serviceAccountResourceV2,
+			clusterRoleBindingResourceV2,
 			configMapResourceV2,
 			deploymentResourceV2,
 			ingressResource,
@@ -289,6 +347,8 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV3 = []framework.Resource{
 			namespaceResource,
 
+			serviceAccountResourceV3,
+			clusterRoleBindingResourceV3,
 			configMapResourceV3,
 			deploymentResourceV3,
 			ingressResource,

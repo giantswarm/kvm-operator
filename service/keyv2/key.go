@@ -72,6 +72,14 @@ func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
 
+func ClusterRoleBindingName(customObject v1alpha1.KVMConfig) string {
+	return ClusterID(customObject)
+}
+
+func ClusterRoleBindingPSPName(customObject v1alpha1.KVMConfig) string {
+	return ClusterID(customObject) + "-psp"
+}
+
 func ConfigMapName(customObject v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
 }
@@ -164,6 +172,10 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	}
 
 	return names
+}
+
+func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
+	return ClusterID(customObject)
 }
 
 func StorageType(customObject v1alpha1.KVMConfig) string {
