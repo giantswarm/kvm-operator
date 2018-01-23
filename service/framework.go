@@ -313,12 +313,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV2 = []framework.Resource{
 			namespaceResource,
 
+			serviceAccountResourceV2,
 			clusterRoleBindingResourceV2,
 			configMapResourceV2,
 			deploymentResourceV2,
 			ingressResource,
 			pvcResource,
-			serviceAccountResourceV2,
 			serviceResource,
 		}
 
@@ -347,12 +347,12 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV3 = []framework.Resource{
 			namespaceResource,
 
+			serviceAccountResourceV3,
 			clusterRoleBindingResourceV3,
 			configMapResourceV3,
 			deploymentResourceV3,
 			ingressResource,
 			pvcResource,
-			serviceAccountResourceV3,
 			serviceResource,
 		}
 
