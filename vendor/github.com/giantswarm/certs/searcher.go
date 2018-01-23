@@ -65,13 +65,13 @@ func (s *Searcher) SearchCluster(clusterID string) (Cluster, error) {
 
 	certificates := []struct {
 		TLS  *TLS
-		Cert cert
+		Cert Cert
 	}{
-		{TLS: &cluster.APIServer, Cert: apiCert},
-		{TLS: &cluster.CalicoClient, Cert: calicoCert},
-		{TLS: &cluster.EtcdServer, Cert: etcdCert},
-		{TLS: &cluster.ServiceAccount, Cert: serviceAccountCert},
-		{TLS: &cluster.Worker, Cert: workerCert},
+		{TLS: &cluster.APIServer, Cert: APICert},
+		{TLS: &cluster.CalicoClient, Cert: CalicoCert},
+		{TLS: &cluster.EtcdServer, Cert: EtcdCert},
+		{TLS: &cluster.ServiceAccount, Cert: ServiceAccountCert},
+		{TLS: &cluster.Worker, Cert: WorkerCert},
 	}
 
 	for _, c := range certificates {
@@ -89,10 +89,10 @@ func (s *Searcher) SearchMonitoring(clusterID string) (Monitoring, error) {
 
 	certificates := []struct {
 		TLS  *TLS
-		Cert cert
+		Cert Cert
 	}{
-		{TLS: &monitoring.KubeStateMetrics, Cert: kubeStateMetricsCert},
-		{TLS: &monitoring.Prometheus, Cert: prometheusCert},
+		{TLS: &monitoring.KubeStateMetrics, Cert: KubeStateMetricsCert},
+		{TLS: &monitoring.Prometheus, Cert: PrometheusCert},
 	}
 
 	for _, c := range certificates {
@@ -105,14 +105,14 @@ func (s *Searcher) SearchMonitoring(clusterID string) (Monitoring, error) {
 	return monitoring, nil
 }
 
-func (s *Searcher) searchError(tls *TLS, clusterID string, cert cert, err error) error {
+func (s *Searcher) searchError(tls *TLS, clusterID string, cert Cert, err error) error {
 	if err != nil {
 		return err
 	}
 	return s.search(tls, clusterID, cert)
 }
 
-func (s *Searcher) search(tls *TLS, clusterID string, cert cert) error {
+func (s *Searcher) search(tls *TLS, clusterID string, cert Cert) error {
 	// Select only secrets that match the given certificate and the given
 	// cluster clusterID.
 	selector := fmt.Sprintf("%s=%s, %s=%s", certficateLabel, cert, clusterIDLabel, clusterID)
@@ -153,7 +153,7 @@ func (s *Searcher) search(tls *TLS, clusterID string, cert cert) error {
 	}
 }
 
-func fillTLSFromSecret(tls *TLS, obj runtime.Object, clusterID string, cert cert) error {
+func fillTLSFromSecret(tls *TLS, obj runtime.Object, clusterID string, cert Cert) error {
 	secret, ok := obj.(*corev1.Secret)
 	if !ok || secret == nil {
 		return microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", secret, obj)
