@@ -26,9 +26,9 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		r.logger.LogCtx(ctx, "debug", "did not find the service account in the Kubernetes API")
 	} else if err != nil {
 		return nil, microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "debug", "found a service account in the Kubernetes API")
 	}
-
-	r.logger.LogCtx(ctx, "debug", "found a service account in the Kubernetes API")
 
 	return currentServiceAccount, nil
 }

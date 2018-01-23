@@ -54,7 +54,11 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	var serviceAccountToCreate *apiv1.ServiceAccount
 	if currentServiceAccount == nil {
+		r.logger.LogCtx(ctx, "debug", fmt.Sprintf("did not service account found on current state"))
 		serviceAccountToCreate = desiredServiceAccount
+	}
+	if desiredServiceAccount == nil {
+		r.logger.LogCtx(ctx, "debug", fmt.Sprintf("there is no service account found on desired state"))
 	}
 
 	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found out that service account that has to be created"))

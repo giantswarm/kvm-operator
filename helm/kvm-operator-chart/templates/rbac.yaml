@@ -38,6 +38,7 @@ rules:
       - ""
     resources:
       - namespaces
+      - clusterrolebindings
     verbs:
       - get
       - create
