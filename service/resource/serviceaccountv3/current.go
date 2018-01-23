@@ -25,11 +25,14 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(keyv3.ServiceAccountName(customObject), apismetav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		r.logger.LogCtx(ctx, "debug", "did not find the service account in the Kubernetes API")
+		//When service account is not found api still returning non nil value so it can break create/update/delete
+		// and is why force the return value to nil
+		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "debug", "found a service account in the Kubernetes API")
 	}
-
-	r.logger.LogCtx(ctx, "debug", "found a service account in the Kubernetes API")
 
 	return currentServiceAccount, nil
 }

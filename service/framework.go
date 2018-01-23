@@ -303,11 +303,11 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV3 = []framework.Resource{
 			namespaceResource,
 
+			serviceAccountResourceV3,
 			configMapResourceV3,
 			deploymentResourceV3,
 			ingressResource,
 			pvcResource,
-			serviceAccountResourceV3,
 			serviceResource,
 		}
 
