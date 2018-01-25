@@ -46,8 +46,8 @@ func DefaultConfig() Config {
 }
 
 type Service struct {
-	KVMConfigFramework *framework.Framework
 	Healthz            *healthz.Service
+	KVMConfigFramework *framework.Framework
 	PodFramework       *framework.Framework
 	Version            *version.Service
 
@@ -166,8 +166,8 @@ func New(config Config) (*Service, error) {
 	}
 
 	newService := &Service{
-		KVMConfigFramework: kvmConfigFramework,
 		Healthz:            healthzService,
+		KVMConfigFramework: kvmConfigFramework,
 		PodFramework:       podFramework,
 		Version:            versionService,
 
