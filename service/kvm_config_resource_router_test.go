@@ -81,7 +81,7 @@ func Test_Service_newResourceRouter(t *testing.T) {
 		},
 	}
 	for i, tc := range testCases {
-		result := newResourceRouter(versionedResources)
+		result := newKVMConfigResourceRouter(versionedResources)
 
 		resources, err := result(context.TODO(), &tc.customObject)
 		if err != nil {

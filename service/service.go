@@ -77,7 +77,7 @@ func New(config Config) (*Service, error) {
 
 	var crdFramework *framework.Framework
 	{
-		crdFramework, err = newCRDFramework(config)
+		crdFramework, err = newKVMConfigFramework(config)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
