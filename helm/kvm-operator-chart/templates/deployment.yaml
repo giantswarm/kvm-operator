@@ -22,6 +22,7 @@ spec:
           items:
           - key: config.yml
             path: config.yml
+      serviceAccountName: kvm-operator
       containers:
       - name: kvm-operator
         image: quay.io/giantswarm/kvm-operator:[[ .SHA ]]
