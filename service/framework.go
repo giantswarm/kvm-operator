@@ -34,6 +34,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
 	"github.com/giantswarm/kvm-operator/service/resource/podv2"
 	"github.com/giantswarm/kvm-operator/service/resource/pvcv2"
+	"github.com/giantswarm/kvm-operator/service/resource/serviceaccountv3"
 	"github.com/giantswarm/kvm-operator/service/resource/servicev2"
 )
 
@@ -239,6 +240,19 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		}
 	}
 
+	var serviceAccountResourceV3 framework.Resource
+	{
+		c := serviceaccountv3.DefaultConfig()
+
+		c.K8sClient = k8sClient
+		c.Logger = config.Logger
+
+		serviceAccountResourceV3, err = serviceaccountv3.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var serviceResource framework.Resource
 	{
 		c := servicev2.DefaultConfig()
@@ -289,6 +303,7 @@ func newCRDFramework(config Config) (*framework.Framework, error) {
 		resourcesV3 = []framework.Resource{
 			namespaceResource,
 
+			serviceAccountResourceV3,
 			configMapResourceV3,
 			deploymentResourceV3,
 			ingressResource,
