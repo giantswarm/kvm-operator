@@ -1,15 +1,15 @@
-package service
+package kvmconfigv2
 
 import (
 	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/certs"
-	"github.com/giantswarm/kvm-operator/service/cloudconfigv3"
-	"github.com/giantswarm/kvm-operator/service/resource/configmapv3"
-	"github.com/giantswarm/kvm-operator/service/resource/deploymentv3"
+	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
+	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
+	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
 	"github.com/giantswarm/kvm-operator/service/resource/namespacev2"
 	"github.com/giantswarm/kvm-operator/service/resource/pvcv2"
-	"github.com/giantswarm/kvm-operator/service/resource/serviceaccountv3"
+	"github.com/giantswarm/kvm-operator/service/resource/serviceaccountv2"
 	"github.com/giantswarm/kvm-operator/service/resource/servicev2"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -20,7 +20,11 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type kvmConfigResourcesV3Config struct {
+const (
+	ResourceRetries uint64 = 3
+)
+
+type ResourcesConfig struct {
 	// Dependencies.
 
 	CertsSearcher      certs.Interface
@@ -34,18 +38,7 @@ type kvmConfigResourcesV3Config struct {
 	Name string
 }
 
-func defaultKVMConfigResourcesV3Config() kvmConfigResourcesV3Config {
-	return kvmConfigResourcesV3Config{
-		CertsSearcher:      nil,
-		K8sClient:          nil,
-		Logger:             nil,
-		RandomkeysSearcher: nil,
-
-		Name: "",
-	}
-}
-
-func newKVMConfigResourcesV3(config kvmConfigResourcesV3Config) ([]framework.Resource, error) {
+func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 	var err error
 
 	if config.CertsSearcher == nil {
@@ -65,13 +58,13 @@ func newKVMConfigResourcesV3(config kvmConfigResourcesV3Config) ([]framework.Res
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
 
-	var ccServiceV3 *cloudconfigv3.CloudConfig
+	var ccServiceV2 *cloudconfigv2.CloudConfig
 	{
-		c := cloudconfigv3.DefaultConfig()
+		c := cloudconfigv2.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		ccServiceV3, err = cloudconfigv3.New(c)
+		ccServiceV2, err = cloudconfigv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -90,43 +83,42 @@ func newKVMConfigResourcesV3(config kvmConfigResourcesV3Config) ([]framework.Res
 		}
 	}
 
-	var serviceAccountResourceV3 framework.Resource
+	var serviceAccountResourceV2 framework.Resource
 	{
-		c := serviceaccountv3.DefaultConfig()
+		c := serviceaccountv2.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		serviceAccountResourceV3, err = serviceaccountv3.New(c)
+		serviceAccountResourceV2, err = serviceaccountv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var configMapResourceV3 framework.Resource
+	var configMapResourceV2 framework.Resource
 	{
-		c := configmapv3.DefaultConfig()
+		c := configmapv2.DefaultConfig()
 
 		c.CertSearcher = config.CertsSearcher
-		c.CloudConfig = ccServiceV3
+		c.CloudConfig = ccServiceV2
 		c.K8sClient = config.K8sClient
-		c.KeyWatcher = config.RandomkeysSearcher
 		c.Logger = config.Logger
 
-		configMapResourceV3, err = configmapv3.New(c)
+		configMapResourceV2, err = configmapv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var deploymentResourceV3 framework.Resource
+	var deploymentResourceV2 framework.Resource
 	{
-		c := deploymentv3.DefaultConfig()
+		c := deploymentv2.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		deploymentResourceV3, err = deploymentv3.New(c)
+		deploymentResourceV2, err = deploymentv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -173,9 +165,9 @@ func newKVMConfigResourcesV3(config kvmConfigResourcesV3Config) ([]framework.Res
 
 	resources := []framework.Resource{
 		namespaceResource,
-		serviceAccountResourceV3,
-		configMapResourceV3,
-		deploymentResourceV3,
+		serviceAccountResourceV2,
+		configMapResourceV2,
+		deploymentResourceV2,
 		ingressResource,
 		pvcResource,
 		serviceResource,

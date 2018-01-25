@@ -1,4 +1,4 @@
-package service
+package podv2
 
 import (
 	"github.com/cenkalti/backoff"
@@ -11,28 +11,19 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type podResourcesV2Config struct {
-	// Dependencies.
+const (
+	ResourceRetries uint64 = 3
+)
 
+type ResourcesConfig struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
-
-	// Settings.
 
 	// Name is the project name.
 	Name string
 }
 
-func defaultPodResourcesV2Config() podResourcesV2Config {
-	return podResourcesV2Config{
-		K8sClient: nil,
-		Logger:    nil,
-
-		Name: "",
-	}
-}
-
-func newPodResourcesV2(config podResourcesV2Config) ([]framework.Resource, error) {
+func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 	var err error
 
 	var podResource framework.Resource
