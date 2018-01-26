@@ -54,13 +54,13 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
 
-	var ccServiceV3 *cloudconfigv3.CloudConfig
+	var cloudConfig *cloudconfigv3.CloudConfig
 	{
 		c := cloudconfigv3.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		ccServiceV3, err = cloudconfigv3.New(c)
+		cloudConfig, err = cloudconfigv3.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -79,43 +79,43 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		}
 	}
 
-	var serviceAccountResourceV3 framework.Resource
+	var serviceAccountResource framework.Resource
 	{
 		c := serviceaccountv3.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		serviceAccountResourceV3, err = serviceaccountv3.New(c)
+		serviceAccountResource, err = serviceaccountv3.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var configMapResourceV3 framework.Resource
+	var configMapResource framework.Resource
 	{
 		c := configmapv3.DefaultConfig()
 
 		c.CertSearcher = config.CertsSearcher
-		c.CloudConfig = ccServiceV3
+		c.CloudConfig = cloudConfig
 		c.K8sClient = config.K8sClient
 		c.KeyWatcher = config.RandomkeysSearcher
 		c.Logger = config.Logger
 
-		configMapResourceV3, err = configmapv3.New(c)
+		configMapResource, err = configmapv3.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var deploymentResourceV3 framework.Resource
+	var deploymentResource framework.Resource
 	{
 		c := deploymentv3.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		deploymentResourceV3, err = deploymentv3.New(c)
+		deploymentResource, err = deploymentv3.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -162,9 +162,9 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 
 	resources := []framework.Resource{
 		namespaceResource,
-		serviceAccountResourceV3,
-		configMapResourceV3,
-		deploymentResourceV3,
+		serviceAccountResource,
+		configMapResource,
+		deploymentResource,
 		ingressResource,
 		pvcResource,
 		serviceResource,
