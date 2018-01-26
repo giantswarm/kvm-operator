@@ -58,13 +58,13 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
 
-	var ccServiceV2 *cloudconfigv2.CloudConfig
+	var cloudConfig *cloudconfigv2.CloudConfig
 	{
 		c := cloudconfigv2.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		ccServiceV2, err = cloudconfigv2.New(c)
+		cloudConfig, err = cloudconfigv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -83,42 +83,42 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		}
 	}
 
-	var serviceAccountResourceV2 framework.Resource
+	var serviceAccountResource framework.Resource
 	{
 		c := serviceaccountv2.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		serviceAccountResourceV2, err = serviceaccountv2.New(c)
+		serviceAccountResource, err = serviceaccountv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var configMapResourceV2 framework.Resource
+	var configMapResource framework.Resource
 	{
 		c := configmapv2.DefaultConfig()
 
 		c.CertSearcher = config.CertsSearcher
-		c.CloudConfig = ccServiceV2
+		c.CloudConfig = cloudConfig
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		configMapResourceV2, err = configmapv2.New(c)
+		configMapResource, err = configmapv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var deploymentResourceV2 framework.Resource
+	var deploymentResource framework.Resource
 	{
 		c := deploymentv2.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		deploymentResourceV2, err = deploymentv2.New(c)
+		deploymentResource, err = deploymentv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -165,9 +165,9 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 
 	resources := []framework.Resource{
 		namespaceResource,
-		serviceAccountResourceV2,
-		configMapResourceV2,
-		deploymentResourceV2,
+		serviceAccountResource,
+		configMapResource,
+		deploymentResource,
 		ingressResource,
 		pvcResource,
 		serviceResource,
