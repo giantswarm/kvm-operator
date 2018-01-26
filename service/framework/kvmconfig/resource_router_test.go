@@ -1,4 +1,4 @@
-package service
+package kvmconfig
 
 import (
 	"context"

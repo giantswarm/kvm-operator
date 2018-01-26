@@ -1,4 +1,4 @@
-package service
+package podv2
 
 import "github.com/giantswarm/microerror"
 

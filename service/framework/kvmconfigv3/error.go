@@ -1,4 +1,4 @@
-package service
+package kvmconfigv3
 
 import "github.com/giantswarm/microerror"
 
