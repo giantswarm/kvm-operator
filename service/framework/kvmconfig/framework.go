@@ -170,7 +170,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		c.Informer = newInformer
 		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
-		c.ResourceRouter = newKVMConfigResourceRouter(versionedResources)
+		c.ResourceRouter = newResourceRouter(versionedResources)
 
 		crdFramework, err = framework.New(c)
 		if err != nil {

@@ -9,9 +9,9 @@ import (
 	"github.com/giantswarm/kvm-operator/service/keyv3"
 )
 
-// newKVMConfigResourceRouter determines which resources are enabled based upon the
+// newResourceRouter determines which resources are enabled based upon the
 // version in the version bundle.
-func newKVMConfigResourceRouter(resources map[string][]framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
+func newResourceRouter(resources map[string][]framework.Resource) func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 	return func(ctx context.Context, obj interface{}) ([]framework.Resource, error) {
 		customObject, err := keyv3.ToCustomObject(obj)
 		if err != nil {
