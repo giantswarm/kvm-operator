@@ -180,19 +180,6 @@ func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	return customObject, nil
 }
 
-func ToPod(v interface{}) (*apiv1.Pod, error) {
-	if v == nil {
-		return nil, nil
-	}
-
-	pod, ok := v.(*apiv1.Pod)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &apiv1.Pod{}, v)
-	}
-
-	return pod, nil
-}
-
 func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.VersionBundle.Version
 }
