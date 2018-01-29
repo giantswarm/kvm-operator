@@ -67,14 +67,15 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		}
 	}
 
-	var clusterRoleBindingV3 framework.Resource
+	var clusterRoleBinding framework.Resource
 	{
 		c := clusterrolebindingv3.DefaultConfig()
 
-		c.K8sClient = k8sClient
+		c.K8sClient = config.K8sClient
+		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		clusterRoleBindingV3, err = clusterrolebindingv3.New(c)
+		clusterRoleBinding, err = clusterrolebindingv3.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -177,7 +178,7 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 	resources := []framework.Resource{
 		namespaceResource,
 		serviceAccountResource,
-		clusterRoleBindingV3,
+		clusterRoleBinding,
 		configMapResource,
 		deploymentResource,
 		ingressResource,
