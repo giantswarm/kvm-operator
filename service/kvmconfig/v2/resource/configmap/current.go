@@ -1,4 +1,4 @@
-package configmapv3
+package configmap
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/keyv3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := keyv3.ToCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -21,7 +21,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentConfigMaps []*apiv1.ConfigMap
 	{
-		namespace := keyv3.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customObject)
 		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(apismetav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)

@@ -1,4 +1,4 @@
-package kvmconfigv3
+package v2
 
 import (
 	"github.com/cenkalti/backoff"
@@ -11,14 +11,14 @@ import (
 	"github.com/giantswarm/randomkeys"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/cloudconfigv3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/resource/configmapv3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/resource/deploymentv3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/resource/serviceaccountv3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/deployment"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/ingress"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/namespace"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/pvc"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/service"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/serviceaccount"
 )
 
 const (
@@ -26,10 +26,14 @@ const (
 )
 
 type ResourcesConfig struct {
+	// Dependencies.
+
 	CertsSearcher      certs.Interface
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
+
+	// Settings.
 
 	// Name is the project name.
 	Name string
@@ -55,13 +59,13 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
 
-	var cloudConfig *cloudconfigv3.CloudConfig
+	var cloudConfig *cloudconfig.CloudConfig
 	{
-		c := cloudconfigv3.DefaultConfig()
+		c := cloudconfig.DefaultConfig()
 
 		c.Logger = config.Logger
 
-		cloudConfig, err = cloudconfigv3.New(c)
+		cloudConfig, err = cloudconfig.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -82,12 +86,12 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 
 	var serviceAccountResource framework.Resource
 	{
-		c := serviceaccountv3.DefaultConfig()
+		c := serviceaccount.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		serviceAccountResource, err = serviceaccountv3.New(c)
+		serviceAccountResource, err = serviceaccount.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -95,15 +99,14 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 
 	var configMapResource framework.Resource
 	{
-		c := configmapv3.DefaultConfig()
+		c := configmap.DefaultConfig()
 
 		c.CertSearcher = config.CertsSearcher
 		c.CloudConfig = cloudConfig
 		c.K8sClient = config.K8sClient
-		c.KeyWatcher = config.RandomkeysSearcher
 		c.Logger = config.Logger
 
-		configMapResource, err = configmapv3.New(c)
+		configMapResource, err = configmap.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -111,12 +114,12 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 
 	var deploymentResource framework.Resource
 	{
-		c := deploymentv3.DefaultConfig()
+		c := deployment.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		deploymentResource, err = deploymentv3.New(c)
+		deploymentResource, err = deployment.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

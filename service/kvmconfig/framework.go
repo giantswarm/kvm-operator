@@ -17,8 +17,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/keyv3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/resourcesv2"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/resourcesv3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
 )
 
 type FrameworkConfig struct {
@@ -99,7 +99,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.Name,
 		}
 
-		resourcesV2, err = kvmconfigv2.NewResources(c)
+		resourcesV2, err = v2.NewResources(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

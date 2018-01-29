@@ -1,4 +1,4 @@
-package configmapv3
+package configmap
 
 import (
 	"context"
@@ -8,11 +8,12 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 	apiv1 "k8s.io/api/core/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/keyv3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/messagecontext"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
-	customObject, err := keyv3.ToCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -25,7 +26,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 		r.logger.LogCtx(ctx, "debug", "updating the config maps in the Kubernetes API")
 
 		// Create the config maps in the Kubernetes API.
-		namespace := keyv3.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToUpdate {
 			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Update(configMap)
 			if err != nil {
@@ -86,6 +87,10 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			}
 
 			if isConfigMapModified(desiredConfigMap, currentConfigMap) {
+				m, ok := messagecontext.FromContext(ctx)
+				if ok {
+					m.ConfigMapNames = append(m.ConfigMapNames, desiredConfigMap.Name)
+				}
 				configMapsToUpdate = append(configMapsToUpdate, desiredConfigMap)
 			}
 		}

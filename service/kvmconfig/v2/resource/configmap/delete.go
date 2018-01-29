@@ -1,4 +1,4 @@
-package configmapv3
+package configmap
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/keyv3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := keyv3.ToCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -27,7 +27,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		r.logger.LogCtx(ctx, "debug", "deleting the config maps in the Kubernetes API")
 
 		// Create the config maps in the Kubernetes API.
-		namespace := keyv3.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customObject)
 		for _, configMap := range configMapsToDelete {
 			err := r.k8sClient.CoreV1().ConfigMaps(namespace).Delete(configMap.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {

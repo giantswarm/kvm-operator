@@ -1,4 +1,4 @@
-package configmapv3
+package configmap
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/keyv3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := keyv3.ToCustomObject(obj)
+	customObject, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -33,23 +33,18 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.ConfigMap, error) {
 	var configMaps []*apiv1.ConfigMap
 
-	certs, err := r.certSearcher.SearchCluster(keyv3.ClusterID(customObject))
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	keys, err := r.keyWatcher.SearchCluster(keyv3.ClusterID(customObject))
+	certs, err := r.certSearcher.SearchCluster(key.ClusterID(customObject))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	for _, node := range customObject.Spec.Cluster.Masters {
-		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node, keys)
+		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, keyv3.MasterID)
+		configMap, err := r.newConfigMap(customObject, template, node, key.MasterID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -63,7 +58,7 @@ func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.Conf
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, keyv3.WorkerID)
+		configMap, err := r.newConfigMap(customObject, template, node, key.WorkerID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -84,10 +79,10 @@ func (r *Resource) newConfigMap(customObject v1alpha1.KVMConfig, template string
 	{
 		newConfigMap = &apiv1.ConfigMap{
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: keyv3.ConfigMapName(customObject, node, prefix),
+				Name: key.ConfigMapName(customObject, node, prefix),
 				Labels: map[string]string{
-					"cluster":  keyv3.ClusterID(customObject),
-					"customer": keyv3.ClusterCustomer(customObject),
+					"cluster":  key.ClusterID(customObject),
+					"customer": key.ClusterCustomer(customObject),
 				},
 			},
 			Data: map[string]string{
