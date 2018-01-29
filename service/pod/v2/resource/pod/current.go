@@ -1,4 +1,4 @@
-package podv2
+package pod
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/kvm-operator/service/pod/keyv2"
+	"github.com/giantswarm/kvm-operator/service/pod/v2/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	currentPod, err := keyv2.ToPod(obj)
+	currentPod, err := key.ToPod(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

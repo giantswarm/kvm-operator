@@ -1,14 +1,15 @@
-package podv2
+package v2
 
 import (
 	"github.com/cenkalti/backoff"
-	"github.com/giantswarm/kvm-operator/service/pod/resource/podv2"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/kvm-operator/service/pod/v2/resource/pod"
 )
 
 const (
@@ -28,12 +29,12 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 
 	var podResource framework.Resource
 	{
-		c := podv2.DefaultConfig()
+		c := pod.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		podResource, err = podv2.New(c)
+		podResource, err = pod.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

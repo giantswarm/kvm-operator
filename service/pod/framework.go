@@ -10,8 +10,8 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/pod/keyv2"
-	"github.com/giantswarm/kvm-operator/service/pod/resourcesv2"
+	"github.com/giantswarm/kvm-operator/service/pod/v2"
+	"github.com/giantswarm/kvm-operator/service/pod/v2/key"
 )
 
 type FrameworkConfig struct {
@@ -37,14 +37,14 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var resourcesV2 []framework.Resource
 	{
-		c := podv2.ResourcesConfig{
+		c := v2.ResourcesConfig{
 			Logger:    config.Logger,
 			K8sClient: config.K8sClient,
 
 			Name: config.Name,
 		}
 
-		resourcesV2, err = podv2.NewResources(c)
+		resourcesV2, err = v2.NewResources(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -57,7 +57,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		c.Watcher = config.K8sClient.CoreV1().Pods("")
 
 		c.ListOptions = apismetav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", keyv2.PodWatcherLabel, config.Name),
+			LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
 		}
 
 		newInformer, err = informer.New(c)
