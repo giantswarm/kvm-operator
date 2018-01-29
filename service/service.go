@@ -6,12 +6,18 @@ import (
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/client/k8sclient"
+	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/spf13/viper"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/service/framework/kvmconfig"
+	"github.com/giantswarm/kvm-operator/service/framework/pod"
 	"github.com/giantswarm/kvm-operator/service/healthz"
 )
 
@@ -40,47 +46,61 @@ func DefaultConfig() Config {
 }
 
 type Service struct {
-	CRDFramework *framework.Framework
-	Healthz      *healthz.Service
-	PodFramework *framework.Framework
-	Version      *version.Service
+	Healthz            *healthz.Service
+	KVMConfigFramework *framework.Framework
+	PodFramework       *framework.Framework
+	Version            *version.Service
 
 	bootOnce sync.Once
 }
 
 func New(config Config) (*Service, error) {
+	var err error
+
+	if config.Logger == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
+	}
 	if config.Flag == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Flag must not be empty")
+	}
+	if config.Name == "" {
+		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
 	if config.Viper == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Viper must not be empty")
 	}
 
-	var err error
-
-	var k8sClient kubernetes.Interface
+	var restConfig *rest.Config
 	{
-		k8sConfig := k8sclient.DefaultConfig()
+		c := k8srestconfig.DefaultConfig()
 
-		k8sConfig.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
-		k8sConfig.Logger = config.Logger
-		k8sConfig.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
-		k8sConfig.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
-		k8sConfig.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
-		k8sConfig.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
+		c.Logger = config.Logger
 
-		k8sClient, err = k8sclient.New(k8sConfig)
+		c.Address = config.Viper.GetString(config.Flag.Service.Kubernetes.Address)
+		c.InCluster = config.Viper.GetBool(config.Flag.Service.Kubernetes.InCluster)
+		c.TLS.CAFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CAFile)
+		c.TLS.CrtFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.CrtFile)
+		c.TLS.KeyFile = config.Viper.GetString(config.Flag.Service.Kubernetes.TLS.KeyFile)
+
+		restConfig, err = k8srestconfig.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var crdFramework *framework.Framework
-	{
-		crdFramework, err = newCRDFramework(config)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
+	g8sClient, err := versioned.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	k8sClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	k8sExtClient, err := apiextensionsclient.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
 	var healthzService *healthz.Service
@@ -96,9 +116,34 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var kvmConfigFramework *framework.Framework
+	{
+		c := kvmconfig.FrameworkConfig{
+			G8sClient:    g8sClient,
+			K8sClient:    k8sClient,
+			K8sExtClient: k8sExtClient,
+			Logger:       config.Logger,
+
+			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled),
+			Name:               config.Name,
+		}
+
+		kvmConfigFramework, err = kvmconfig.NewFramework(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var podFramework *framework.Framework
 	{
-		podFramework, err = newPodFramework(config)
+		c := pod.FrameworkConfig{
+			K8sClient: k8sClient,
+			Logger:    config.Logger,
+
+			Name: config.Name,
+		}
+
+		podFramework, err = pod.NewFramework(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -121,10 +166,10 @@ func New(config Config) (*Service, error) {
 	}
 
 	newService := &Service{
-		CRDFramework: crdFramework,
-		Healthz:      healthzService,
-		PodFramework: podFramework,
-		Version:      versionService,
+		Healthz:            healthzService,
+		KVMConfigFramework: kvmConfigFramework,
+		PodFramework:       podFramework,
+		Version:            versionService,
 
 		bootOnce: sync.Once{},
 	}
@@ -134,7 +179,7 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.CRDFramework.Boot()
+		go s.KVMConfigFramework.Boot()
 		go s.PodFramework.Boot()
 	})
 }
