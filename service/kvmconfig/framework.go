@@ -16,9 +16,9 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/keyv3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/resourcesv3"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
 )
 
 type FrameworkConfig struct {
@@ -90,7 +90,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var resourcesV2 []framework.Resource
 	{
-		c := kvmconfigv2.ResourcesConfig{
+		c := v2.ResourcesConfig{
 			CertsSearcher:      certsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
@@ -107,7 +107,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var resourcesV3 []framework.Resource
 	{
-		c := kvmconfigv3.ResourcesConfig{
+		c := v3.ResourcesConfig{
 			CertsSearcher:      certsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
@@ -116,7 +116,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.Name,
 		}
 
-		resourcesV3, err = kvmconfigv3.NewResources(c)
+		resourcesV3, err = v3.NewResources(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -147,12 +147,12 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 	// TODO route initCtx func together with resources.
 	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
 		{
-			customObject, err := keyv3.ToCustomObject(obj)
+			customObject, err := key.ToCustomObject(obj)
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
 
-			versionBundleVersion := keyv3.VersionBundleVersion(customObject)
+			versionBundleVersion := key.VersionBundleVersion(customObject)
 
 			if config.GuestUpdateEnabled && versionBundleVersion >= "1.1.0" {
 				updateallowedcontext.SetUpdateAllowed(ctx)

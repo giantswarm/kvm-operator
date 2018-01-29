@@ -8,17 +8,17 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/operatorkit/framework"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/resource/configmapv3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/resource/servicev2"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/service"
 )
 
 func Test_Service_newResourceRouter(t *testing.T) {
 	resourceV1 := []framework.Resource{
-		&servicev2.Resource{},
+		&service.Resource{},
 	}
 	resourceV2 := []framework.Resource{
-		&servicev2.Resource{},
-		&configmapv3.Resource{},
+		&service.Resource{},
+		&configmap.Resource{},
 	}
 
 	versionedResources := map[string][]framework.Resource{

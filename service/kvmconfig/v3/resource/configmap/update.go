@@ -8,8 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 	apiv1 "k8s.io/api/core/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/messagecontext"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
@@ -87,10 +86,6 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			}
 
 			if isConfigMapModified(desiredConfigMap, currentConfigMap) {
-				m, ok := messagecontext.FromContext(ctx)
-				if ok {
-					m.ConfigMapNames = append(m.ConfigMapNames, desiredConfigMap.Name)
-				}
 				configMapsToUpdate = append(configMapsToUpdate, desiredConfigMap)
 			}
 		}
