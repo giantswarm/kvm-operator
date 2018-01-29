@@ -4,6 +4,7 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/kvm-operator/service/cloudconfigv2"
+	"github.com/giantswarm/kvm-operator/service/resource/clusterrolebindingv2"
 	"github.com/giantswarm/kvm-operator/service/resource/configmapv2"
 	"github.com/giantswarm/kvm-operator/service/resource/deploymentv2"
 	"github.com/giantswarm/kvm-operator/service/resource/ingressv2"
@@ -65,6 +66,19 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		c.Logger = config.Logger
 
 		cloudConfig, err = cloudconfigv2.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var clusterRoleBinding framework.Resource
+	{
+		c := clusterrolebindingv2.DefaultConfig()
+
+		c.K8sClient = config.K8sClient
+		c.Logger = config.Logger
+
+		clusterRoleBinding, err = clusterrolebindingv2.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -166,6 +180,7 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 	resources := []framework.Resource{
 		namespaceResource,
 		serviceAccountResource,
+		clusterRoleBinding,
 		configMapResource,
 		deploymentResource,
 		ingressResource,
