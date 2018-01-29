@@ -1,9 +1,0 @@
-package podv2
-
-import (
-	"context"
-)
-
-func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	return nil, nil
-}

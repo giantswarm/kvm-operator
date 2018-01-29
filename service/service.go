@@ -16,9 +16,9 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 
 	"github.com/giantswarm/kvm-operator/flag"
-	"github.com/giantswarm/kvm-operator/service/framework/kvmconfig"
-	"github.com/giantswarm/kvm-operator/service/framework/pod"
 	"github.com/giantswarm/kvm-operator/service/healthz"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig"
+	"github.com/giantswarm/kvm-operator/service/pod"
 )
 
 type Config struct {
