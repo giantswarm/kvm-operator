@@ -17,8 +17,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
+	v2key "github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
+	v3key "github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
 )
 
 type FrameworkConfig struct {
@@ -33,8 +34,6 @@ type FrameworkConfig struct {
 }
 
 func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
-	var err error
-
 	if config.G8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.G8sClient must not be empty")
 	}
@@ -50,6 +49,8 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 	if config.Name == "" {
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
+
+	var err error
 
 	var crdClient *k8scrdclient.CRDClient
 	{
@@ -88,7 +89,27 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
-	var resourcesV2 []framework.Resource
+	v2ResourceSetHandles := func(obj interface{}) bool {
+		customObject, err := v2key.ToCustomObject(obj)
+		if err != nil {
+			return false
+		}
+		versionBundleVersion := v2key.VersionBundleVersion(customObject)
+
+		if versionBundleVersion >= "1.0.0" {
+			return true
+		}
+		if versionBundleVersion >= "0.1.0" {
+			return true
+		}
+		if versionBundleVersion >= "" {
+			return true
+		}
+
+		return false
+	}
+
+	var v2Resources []framework.Resource
 	{
 		c := v2.ResourcesConfig{
 			CertsSearcher:      certsSearcher,
@@ -99,13 +120,35 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.Name,
 		}
 
-		resourcesV2, err = v2.NewResources(c)
+		v2Resources, err = v2.NewResources(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var resourcesV3 []framework.Resource
+	v3ResourceSetHandles := func(obj interface{}) bool {
+		customObject, err := v3key.ToCustomObject(obj)
+		if err != nil {
+			return false
+		}
+		versionBundleVersion := v3key.VersionBundleVersion(customObject)
+
+		if versionBundleVersion >= "1.1.0" {
+			return true
+		}
+
+		return false
+	}
+
+	v3InitCtx := func(ctx context.Context, obj interface{}) (context.Context, error) {
+		if config.GuestUpdateEnabled {
+			updateallowedcontext.SetUpdateAllowed(ctx)
+		}
+
+		return ctx, nil
+	}
+
+	var v3Resources []framework.Resource
 	{
 		c := v3.ResourcesConfig{
 			CertsSearcher:      certsSearcher,
@@ -116,20 +159,10 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.Name,
 		}
 
-		resourcesV3, err = v3.NewResources(c)
+		v3Resources, err = v3.NewResources(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
-	}
-
-	// versionedResources is a map of VersionBundle.Version to a resources
-	// which handle it. The same set of resources may handle multiple
-	// version bundles.
-	versionedResources := map[string][]framework.Resource{
-		"1.1.0": resourcesV3,
-		"1.0.0": resourcesV2,
-		"0.1.0": resourcesV2,
-		"":      resourcesV2,
 	}
 
 	var newInformer *informer.Informer
@@ -144,22 +177,43 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
-	// TODO route initCtx func together with resources.
-	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		{
-			customObject, err := key.ToCustomObject(obj)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
+	var v2ResourceSet *framework.ResourceSet
+	{
+		c := framework.ResourceSetConfig{}
 
-			versionBundleVersion := key.VersionBundleVersion(customObject)
+		c.Handles = v2ResourceSetHandles
+		c.Logger = config.Logger
+		c.Resources = v2Resources
 
-			if config.GuestUpdateEnabled && versionBundleVersion >= "1.1.0" {
-				updateallowedcontext.SetUpdateAllowed(ctx)
-			}
+		v2ResourceSet, err = framework.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var v3ResourceSet *framework.ResourceSet
+	{
+		c := framework.ResourceSetConfig{}
+
+		c.Handles = v3ResourceSetHandles
+		c.InitCtx = v3InitCtx
+		c.Logger = config.Logger
+		c.Resources = v3Resources
+	}
+
+	var resourceRouter *framework.ResourceRouter
+	{
+		c := framework.ResourceRouterConfig{}
+
+		c.ResourceSets = []*framework.ResourceSet{
+			v2ResourceSet,
+			v3ResourceSet,
 		}
 
-		return ctx, nil
+		resourceRouter, err = framework.NewResourceRouter(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	var crdFramework *framework.Framework
@@ -169,9 +223,8 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		c.CRD = v1alpha1.NewKVMConfigCRD()
 		c.CRDClient = crdClient
 		c.Informer = newInformer
-		c.InitCtxFunc = initCtxFunc
 		c.Logger = config.Logger
-		c.ResourceRouter = newResourceRouter(versionedResources)
+		c.ResourceRouter = resourceRouter
 
 		crdFramework, err = framework.New(c)
 		if err != nil {
