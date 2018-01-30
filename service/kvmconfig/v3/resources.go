@@ -11,14 +11,14 @@ import (
 	"github.com/giantswarm/randomkeys"
 	"k8s.io/client-go/kubernetes"
 
-	// TODO copy missing v2 resources and veresion messagecontext.
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/ingress"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/namespace"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/pvc"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/service"
+	// TODO veresion messagecontext.
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/configmap"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/deployment"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/ingress"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/namespace"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/pvc"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/service"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/serviceaccount"
 )
 
