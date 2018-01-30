@@ -35,7 +35,11 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
 
-	var resourcesV2 []framework.Resource
+	v2ResourceSetHandles := func(obj interface{}) bool {
+		return true
+	}
+
+	var v2Resources []framework.Resource
 	{
 		c := v2.ResourcesConfig{
 			Logger:    config.Logger,
@@ -44,7 +48,21 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.Name,
 		}
 
-		resourcesV2, err = v2.NewResources(c)
+		v2Resources, err = v2.NewResources(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var v2ResourceSet *framework.ResourceSet
+	{
+		c := framework.ResourceSetConfig{}
+
+		c.Handles = v2ResourceSetHandles
+		c.Logger = config.Logger
+		c.Resources = v2Resources
+
+		v2ResourceSet, err = framework.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -66,13 +84,27 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
+	var resourceRouter *framework.ResourceRouter
+	{
+		c := framework.ResourceRouterConfig{}
+
+		c.ResourceSets = []*framework.ResourceSet{
+			v2ResourceSet,
+		}
+
+		resourceRouter, err = framework.NewResourceRouter(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var podFramework *framework.Framework
 	{
 		c := framework.DefaultConfig()
 
 		c.Informer = newInformer
 		c.Logger = config.Logger
-		c.ResourceRouter = framework.DefaultResourceRouter(resourcesV2)
+		c.ResourceRouter = resourceRouter
 
 		podFramework, err = framework.New(c)
 		if err != nil {
