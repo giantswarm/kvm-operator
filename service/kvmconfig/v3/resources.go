@@ -11,7 +11,6 @@ import (
 	"github.com/giantswarm/randomkeys"
 	"k8s.io/client-go/kubernetes"
 
-	// TODO veresion messagecontext.
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/configmap"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/deployment"
