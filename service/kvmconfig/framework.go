@@ -199,6 +199,11 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		c.InitCtx = v3InitCtx
 		c.Logger = config.Logger
 		c.Resources = v3Resources
+
+		v3ResourceSet, err = framework.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	var resourceRouter *framework.ResourceRouter
