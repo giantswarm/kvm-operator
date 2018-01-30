@@ -96,13 +96,13 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 		versionBundleVersion := v2key.VersionBundleVersion(customObject)
 
-		if versionBundleVersion >= "1.0.0" {
+		if versionBundleVersion == "1.0.0" {
 			return true
 		}
-		if versionBundleVersion >= "0.1.0" {
+		if versionBundleVersion == "0.1.0" {
 			return true
 		}
-		if versionBundleVersion >= "" {
+		if versionBundleVersion == "" {
 			return true
 		}
 
@@ -133,7 +133,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 		versionBundleVersion := v3key.VersionBundleVersion(customObject)
 
-		if versionBundleVersion >= "1.1.0" {
+		if versionBundleVersion == "1.1.0" {
 			return true
 		}
 
