@@ -58,7 +58,7 @@
   name = "github.com/giantswarm/microstorage"
 
 [[constraint]]
-  branch = "resource-router-set"
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
 
 [[constraint]]
