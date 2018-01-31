@@ -5,6 +5,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/framework/context/reconciliationcanceledcontext"
 	apiv1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,6 +28,8 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		}
 
 		r.logger.LogCtx(ctx, "debug", "deleted the namespace in the Kubernetes API")
+		reconciliationcanceledcontext.SetCanceled(ctx)
+		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for custom object")
 	} else {
 		r.logger.LogCtx(ctx, "debug", "the namespace does not need to be deleted from the Kubernetes API")
 	}
