@@ -33,13 +33,11 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		}
 		deployments = append(deployments, workerDeployments...)
 
-		if key.HasNodeController(customObject) {
-			nodeControllerDeployment, err := newNodeControllerDeployment(customObject)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-			deployments = append(deployments, nodeControllerDeployment)
+		nodeControllerDeployment, err := newNodeControllerDeployment(customObject)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
+		deployments = append(deployments, nodeControllerDeployment)
 	}
 
 	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("computed the %d new deployments", len(deployments)))
