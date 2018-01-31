@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
 	"k8s.io/api/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/messagecontext"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/messagecontext"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
