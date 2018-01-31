@@ -36,8 +36,9 @@ const (
 
 	FlannelEnvPathPrefix = "/run/flannel"
 
-	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
-	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
+	K8SEndpointUpdaterDocker  = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
+	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
+	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:e63163a2fc0a34a519cdd5c787b3e2e4cbadd5a2"
 
 	// defaultWorkerMemory represents the extra memory to add due to qemu overhead.
 	defaultWorkerMemory = "1G"
@@ -91,13 +92,6 @@ func DeploymentName(prefix string, nodeID string) string {
 
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
-}
-
-func HasNodeController(customObject v1alpha1.KVMConfig) bool {
-	if customObject.Spec.KVM.NodeController != (v1alpha1.KVMConfigSpecKVMNodeController{}) {
-		return true
-	}
-	return false
 }
 
 func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {

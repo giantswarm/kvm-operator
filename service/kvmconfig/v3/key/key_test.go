@@ -45,55 +45,6 @@ func Test_ClusterCustomer(t *testing.T) {
 	}
 }
 
-func Test_HasNodeController(t *testing.T) {
-	testCases := []struct {
-		Obj            v1alpha1.KVMConfig
-		ExpectedResult bool
-	}{
-		{
-			Obj: v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					KVM: v1alpha1.KVMConfigSpecKVM{
-						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
-							Docker: v1alpha1.KVMConfigSpecKVMK8sKVMDocker{
-								Image: "123",
-							},
-						},
-						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
-							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
-								Image: "123",
-							},
-						},
-					},
-				},
-			},
-			ExpectedResult: true,
-		},
-		{
-			Obj: v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					KVM: v1alpha1.KVMConfigSpecKVM{
-						K8sKVM: v1alpha1.KVMConfigSpecKVMK8sKVM{
-							Docker: v1alpha1.KVMConfigSpecKVMK8sKVMDocker{
-								Image: "123",
-							},
-						},
-					},
-				},
-			},
-			ExpectedResult: false,
-		},
-	}
-
-	for i, tc := range testCases {
-		ActualResult := HasNodeController(tc.Obj)
-
-		if ActualResult != tc.ExpectedResult {
-			t.Fatalf("Case %d expected %t got %t", i+1, tc.ExpectedResult, ActualResult)
-		}
-	}
-}
-
 func Test_NetworkDNSBlock(t *testing.T) {
 	dnsServers := NetworkDNSBlock([]net.IP{
 		net.ParseIP("8.8.8.8"),

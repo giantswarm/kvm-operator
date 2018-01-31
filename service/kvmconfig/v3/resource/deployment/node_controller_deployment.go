@@ -50,7 +50,7 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 					Containers: []apiv1.Container{
 						{
 							Name:            key.NodeControllerID,
-							Image:           customObject.Spec.KVM.NodeController.Docker.Image,
+							Image:           key.NodeControllerDockerImage,
 							ImagePullPolicy: apiv1.PullIfNotPresent,
 							Args: []string{
 								fmt.Sprintf("-cluster-api=%s", key.ClusterAPIEndpoint(customObject)),
