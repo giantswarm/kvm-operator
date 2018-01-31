@@ -12,7 +12,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/messagecontext"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/messagecontext"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/cloudconfig/cloudconfigtest"
 )
 
