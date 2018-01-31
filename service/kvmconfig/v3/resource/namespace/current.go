@@ -40,13 +40,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// any further resource from being processed.
 	if namespace != nil && namespace.Status.Phase == "Terminating" {
 		r.logger.LogCtx(ctx, "debug", "namespace is in state 'Terminating'")
-
 		reconciliationcanceledcontext.SetCanceled(ctx)
-		if reconciliationcanceledcontext.IsCanceled(ctx) {
-			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for custom object")
+		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for custom object")
 
-			return nil, nil
-		}
+		return nil, nil
 	}
 
 	return namespace, nil
