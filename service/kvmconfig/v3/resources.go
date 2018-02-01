@@ -1,17 +1,21 @@
 package v3
 
 import (
+	"context"
+
 	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"github.com/giantswarm/randomkeys"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/configmap"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/deployment"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/ingress"
@@ -25,17 +29,19 @@ const (
 	ResourceRetries uint64 = 3
 )
 
-type ResourcesConfig struct {
+type ResourceSetConfig struct {
 	CertsSearcher      certs.Interface
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 
+	GuestUpdateEnabled    bool
+	HandledVersionBundles []string
 	// Name is the project name.
 	Name string
 }
 
-func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
+func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 	var err error
 
 	if config.CertsSearcher == nil {
@@ -51,6 +57,9 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.RandomkeysSearcher must not be empty")
 	}
 
+	if config.HandledVersionBundles == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.HandledVersionBundles must not be empty")
+	}
 	if config.Name == "" {
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
@@ -193,5 +202,45 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		}
 	}
 
-	return resources, nil
+	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
+		if config.GuestUpdateEnabled {
+			updateallowedcontext.SetUpdateAllowed(ctx)
+		}
+
+		return ctx, nil
+	}
+
+	handlesFunc := func(obj interface{}) bool {
+		kvmConfig, err := key.ToCustomObject(obj)
+		if err != nil {
+			return false
+		}
+		versionBundleVersion := key.VersionBundleVersion(kvmConfig)
+
+		for _, v := range config.HandledVersionBundles {
+			if versionBundleVersion == v {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	var resourceSet *framework.ResourceSet
+	{
+		c := framework.ResourceSetConfig{
+
+			Handles:   handlesFunc,
+			InitCtx:   initCtxFunc,
+			Logger:    config.Logger,
+			Resources: resources,
+		}
+
+		resourceSet, err = framework.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	return resourceSet, nil
 }

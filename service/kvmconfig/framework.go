@@ -1,8 +1,6 @@
 package kvmconfig
 
 import (
-	"context"
-
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
@@ -10,16 +8,13 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
-	v2key "github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
-	v3key "github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
 )
 
 type FrameworkConfig struct {
@@ -89,82 +84,6 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
-	v2ResourceSetHandles := func(obj interface{}) bool {
-		customObject, err := v2key.ToCustomObject(obj)
-		if err != nil {
-			return false
-		}
-		versionBundleVersion := v2key.VersionBundleVersion(customObject)
-
-		if versionBundleVersion == "1.0.0" {
-			return true
-		}
-		if versionBundleVersion == "0.1.0" {
-			return true
-		}
-		if versionBundleVersion == "" {
-			return true
-		}
-
-		return false
-	}
-
-	var v2Resources []framework.Resource
-	{
-		c := v2.ResourcesConfig{
-			CertsSearcher:      certsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			Name: config.Name,
-		}
-
-		v2Resources, err = v2.NewResources(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	v3ResourceSetHandles := func(obj interface{}) bool {
-		customObject, err := v3key.ToCustomObject(obj)
-		if err != nil {
-			return false
-		}
-		versionBundleVersion := v3key.VersionBundleVersion(customObject)
-
-		if versionBundleVersion == "1.1.0" {
-			return true
-		}
-
-		return false
-	}
-
-	v3InitCtx := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		if config.GuestUpdateEnabled {
-			updateallowedcontext.SetUpdateAllowed(ctx)
-		}
-
-		return ctx, nil
-	}
-
-	var v3Resources []framework.Resource
-	{
-		c := v3.ResourcesConfig{
-			CertsSearcher:      certsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			Name: config.Name,
-		}
-
-		v3Resources, err = v3.NewResources(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var newInformer *informer.Informer
 	{
 		c := informer.DefaultConfig()
@@ -179,13 +98,19 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var v2ResourceSet *framework.ResourceSet
 	{
-		c := framework.ResourceSetConfig{}
+		c := v2.ResourceSetConfig{
+			CertsSearcher:      certsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
 
-		c.Handles = v2ResourceSetHandles
-		c.Logger = config.Logger
-		c.Resources = v2Resources
+			HandledVersionBundles: []string{
+				"1.1.0",
+			},
+			Name: config.Name,
+		}
 
-		v2ResourceSet, err = framework.NewResourceSet(c)
+		v2ResourceSet, err = v2.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -193,14 +118,21 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var v3ResourceSet *framework.ResourceSet
 	{
-		c := framework.ResourceSetConfig{}
+		c := v3.ResourceSetConfig{
+			CertsSearcher:      certsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
 
-		c.Handles = v3ResourceSetHandles
-		c.InitCtx = v3InitCtx
-		c.Logger = config.Logger
-		c.Resources = v3Resources
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			HandledVersionBundles: []string{
+				"1.0.0",
+				"0.1.0",
+			},
+			Name: config.Name,
+		}
 
-		v3ResourceSet, err = framework.NewResourceSet(c)
+		v3ResourceSet, err = v3.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
