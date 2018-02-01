@@ -50,7 +50,7 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				},
 			},
 			ExpectedMasterCount:   1,
-			ExpectedNodeCtrlCount: 0,
+			ExpectedNodeCtrlCount: 1,
 			ExpectedWorkerCount:   1,
 			ExpectedMastersResources: []apiv1.ResourceRequirements{
 				{
@@ -100,11 +100,6 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 						},
 						Masters: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 1, Memory: "1G"},
-						},
-						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
-							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
-								Image: "123",
-							},
 						},
 						Workers: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 4, Memory: "8G"},
@@ -189,11 +184,6 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 							{CPUs: 1, Memory: "1G"},
 							{CPUs: 1, Memory: "1G"},
 							{CPUs: 1, Memory: "1G"},
-						},
-						NodeController: v1alpha1.KVMConfigSpecKVMNodeController{
-							Docker: v1alpha1.KVMConfigSpecKVMNodeControllerDocker{
-								Image: "123",
-							},
 						},
 						Workers: []v1alpha1.KVMConfigSpecKVMNode{
 							{CPUs: 4, Memory: "8G"},
