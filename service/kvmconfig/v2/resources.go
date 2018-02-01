@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/key"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/clusterrolebinding"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/configmap"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/resource/deployment"
@@ -26,21 +27,18 @@ const (
 	ResourceRetries uint64 = 3
 )
 
-type ResourcesConfig struct {
-	// Dependencies.
-
+type ResourceSetConfig struct {
 	CertsSearcher      certs.Interface
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 
-	// Settings.
-
+	HandledVersionBundles []string
 	// Name is the project name.
 	Name string
 }
 
-func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
+func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 	var err error
 
 	if config.CertsSearcher == nil {
@@ -211,5 +209,35 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		}
 	}
 
-	return resources, nil
+	handlesFunc := func(obj interface{}) bool {
+		kvmConfig, err := key.ToCustomObject(obj)
+		if err != nil {
+			return false
+		}
+		versionBundleVersion := key.VersionBundleVersion(kvmConfig)
+
+		for _, v := range config.HandledVersionBundles {
+			if versionBundleVersion == v {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	var resourceSet *framework.ResourceSet
+	{
+		c := framework.ResourceSetConfig{
+			Handles:   handlesFunc,
+			Logger:    config.Logger,
+			Resources: resources,
+		}
+
+		resourceSet, err = framework.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	return resourceSet, nil
 }
