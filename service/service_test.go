@@ -49,10 +49,10 @@ func Test_Service_New(t *testing.T) {
 
 		if err != nil {
 			if test.expectedErrorHandler == nil {
-				t.Fatalf("%v: unexpected error returned: %v", index, err)
+				t.Fatalf("%v: unexpected error returned: %#v", index, err)
 			}
 			if !test.expectedErrorHandler(err) {
-				t.Fatalf("%v: incorrect error returned: %v", index, err)
+				t.Fatalf("%v: incorrect error returned: %#v", index, err)
 			}
 		}
 	}
