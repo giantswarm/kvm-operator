@@ -105,7 +105,8 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			HandledVersionBundles: []string{
-				"1.1.0",
+				"1.0.0",
+				"0.1.0",
 			},
 			Name: config.Name,
 		}
@@ -126,8 +127,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			HandledVersionBundles: []string{
-				"1.0.0",
-				"0.1.0",
+				"1.1.0",
 			},
 			Name: config.Name,
 		}
