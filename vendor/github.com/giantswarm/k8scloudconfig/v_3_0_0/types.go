@@ -1,8 +1,6 @@
 package v_3_0_0
 
 import (
-	"errors"
-
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 )
 
@@ -47,10 +45,6 @@ type Params struct {
 }
 
 func (p *Params) Validate() error {
-	if p.ApiserverEncryptionKey == "" {
-		return errors.New("ApiserverEncryptionKey must not be empty")
-	}
-
 	return nil
 }
 
