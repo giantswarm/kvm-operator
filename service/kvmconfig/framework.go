@@ -107,6 +107,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			HandledVersionBundles: []string{
 				"1.0.0",
 				"0.1.0",
+				"", // This is for legacy custom objects.
 			},
 			Name: config.Name,
 		}
