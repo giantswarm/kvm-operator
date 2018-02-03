@@ -108,7 +108,6 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c := clusterrolebinding.DefaultConfig()
 
 		c.K8sClient = config.K8sClient
-		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
 		clusterRoleBinding, err = clusterrolebinding.New(c)
