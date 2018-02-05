@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
+func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 	testCases := []struct {
 		Ctx                                context.Context
 		Obj                                interface{}
@@ -180,9 +180,10 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 	var err error
 	var newResource *Resource
 	{
-		resourceConfig := DefaultConfig()
-		resourceConfig.K8sClient = fake.NewSimpleClientset()
-		resourceConfig.Logger = microloggertest.New()
+		resourceConfig := Config{
+			K8sClient: fake.NewSimpleClientset(),
+			Logger:    microloggertest.New(),
+		}
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
