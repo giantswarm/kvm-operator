@@ -68,3 +68,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/prometheus/client_golang"

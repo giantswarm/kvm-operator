@@ -12,6 +12,10 @@ type Cluster struct {
 	EtcdServer     TLS
 }
 
+type Draining struct {
+	NodeOperator TLS
+}
+
 type Monitoring struct {
 	Prometheus       TLS
 	KubeStateMetrics TLS

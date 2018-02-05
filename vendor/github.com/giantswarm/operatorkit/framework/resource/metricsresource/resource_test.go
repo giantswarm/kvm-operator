@@ -8,40 +8,6 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 )
 
-// Test_MetricsResource_ProcessCreate_ResourceOrder ensures the resource's
-// methods are executed as expected when creating resources using the wrapping
-// prometheus resource.
-func Test_MetricsResource_ProcessCreate_ResourceOrder(t *testing.T) {
-	tr := &testResource{}
-	rs := []framework.Resource{
-		tr,
-	}
-
-	config := DefaultWrapConfig()
-	config.Name = t.Name()
-	wrapped, err := Wrap(rs, config)
-	if err != nil {
-		t.Fatal("expected", nil, "got", err)
-	}
-
-	err = framework.ProcessCreate(context.TODO(), nil, wrapped)
-	if err != nil {
-		t.Fatal("expected", nil, "got", err)
-	}
-
-	e := []string{
-		"GetCurrentState",
-		"GetDesiredState",
-		"NewUpdatePatch",
-		"ApplyCreatePatch",
-		"ApplyDeletePatch",
-		"ApplyUpdatePatch",
-	}
-	if !reflect.DeepEqual(e, tr.Order) {
-		t.Fatal("expected", e, "got", tr.Order)
-	}
-}
-
 // Test_MetricsResource_ProcessDelete_ResourceOrder ensures the resource's
 // methods are executed as expected when deleting resources using the wrapping
 // prometheus resource.
@@ -51,9 +17,10 @@ func Test_MetricsResource_ProcessDelete_ResourceOrder(t *testing.T) {
 		tr,
 	}
 
-	config := DefaultWrapConfig()
-	config.Name = t.Name()
-	wrapped, err := Wrap(rs, config)
+	c := WrapConfig{
+		Name: t.Name(),
+	}
+	wrapped, err := Wrap(rs, c)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -85,9 +52,10 @@ func Test_MetricsResource_ProcessUpdate_ResourceOrder(t *testing.T) {
 		tr,
 	}
 
-	config := DefaultWrapConfig()
-	config.Name = t.Name()
-	wrapped, err := Wrap(rs, config)
+	c := WrapConfig{
+		Name: t.Name(),
+	}
+	wrapped, err := Wrap(rs, c)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
