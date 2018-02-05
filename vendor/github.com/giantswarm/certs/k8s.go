@@ -30,6 +30,7 @@ const (
 	EtcdCert             Cert = "etcd"
 	FlanneldCert         Cert = "flanneld"
 	KubeStateMetricsCert Cert = "kube-state-metrics"
+	NodeOperatorCert     Cert = "node-operator"
 	PrometheusCert       Cert = "prometheus"
 	ServiceAccountCert   Cert = "service-account"
 	WorkerCert           Cert = "worker"
@@ -42,6 +43,7 @@ var AllCerts = []Cert{
 	EtcdCert,
 	FlanneldCert,
 	KubeStateMetricsCert,
+	NodeOperatorCert,
 	PrometheusCert,
 	ServiceAccountCert,
 	WorkerCert,

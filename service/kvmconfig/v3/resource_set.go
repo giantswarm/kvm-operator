@@ -182,7 +182,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 
 	// Wrap resources with retry and metrics.
 	{
-		retryWrapConfig := retryresource.DefaultWrapConfig()
+		retryWrapConfig := retryresource.WrapConfig{}
 
 		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
 		retryWrapConfig.Logger = config.Logger
@@ -192,7 +192,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 			return nil, microerror.Mask(err)
 		}
 
-		metricsWrapConfig := metricsresource.DefaultWrapConfig()
+		metricsWrapConfig := metricsresource.WrapConfig{}
 
 		metricsWrapConfig.Name = config.Name
 
