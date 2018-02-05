@@ -173,7 +173,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							},
 							{
 								Name:            "k8s-kvm",
-								Image:           customObject.Spec.KVM.K8sKVM.Docker.Image,
+								Image:           key.K8SKVMDockerImage,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,

@@ -37,6 +37,7 @@ const (
 	FlannelEnvPathPrefix = "/run/flannel"
 
 	K8SEndpointUpdaterDocker  = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
+	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:dff62e2b9050b8c16b0fe0a837af113b62db9c0a"
 	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:e63163a2fc0a34a519cdd5c787b3e2e4cbadd5a2"
 
