@@ -100,7 +100,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var podFramework *framework.Framework
 	{
-		c := framework.DefaultConfig()
+		c := framework.Config{}
 
 		c.Informer = newInformer
 		c.Logger = config.Logger

@@ -16,14 +16,16 @@ func Test_Service_New(t *testing.T) {
 	}{
 		// Test that the default config is invalid.
 		{
-			config:               DefaultConfig,
+			config: func() Config {
+				return Config{}
+			},
 			expectedErrorHandler: IsInvalidConfig,
 		},
 
 		// Test a production-like config is valid.
 		{
 			config: func() Config {
-				config := DefaultConfig()
+				config := Config{}
 
 				config.Logger = microloggertest.New()
 

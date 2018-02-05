@@ -32,19 +32,6 @@ type Config struct {
 	Viper       *viper.Viper
 }
 
-func DefaultConfig() Config {
-	return Config{
-		Logger: nil,
-
-		Description: "",
-		Flag:        nil,
-		GitCommit:   "",
-		Name:        "",
-		Source:      "",
-		Viper:       nil,
-	}
-}
-
 type Service struct {
 	Healthz            *healthz.Service
 	KVMConfigFramework *framework.Framework
@@ -157,7 +144,7 @@ func New(config Config) (*Service, error) {
 		versionConfig.GitCommit = config.GitCommit
 		versionConfig.Name = config.Name
 		versionConfig.Source = config.Source
-		versionConfig.VersionBundles = newVersionBundles()
+		versionConfig.VersionBundles = NewVersionBundles()
 
 		versionService, err = version.New(versionConfig)
 		if err != nil {
