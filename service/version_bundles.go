@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/versionbundle"
 )
 
-func newVersionBundles() []versionbundle.Bundle {
+func NewVersionBundles() []versionbundle.Bundle {
 	return []versionbundle.Bundle{
 		{
 			Changelogs: []versionbundle.Changelog{
