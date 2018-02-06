@@ -185,9 +185,9 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 	}
 
 	resources := []framework.Resource{
+		clusterRoleBinding,
 		namespaceResource,
 		serviceAccountResource,
-		clusterRoleBinding,
 		configMapResource,
 		deploymentResource,
 		ingressResource,
