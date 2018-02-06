@@ -16,7 +16,6 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/clusterrolebinding"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/configmap"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/deployment"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/resource/ingress"
@@ -103,19 +102,6 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var clusterRoleBinding framework.Resource
-	{
-		c := clusterrolebinding.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-		}
-
-		clusterRoleBinding, err = clusterrolebinding.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var configMapResource framework.Resource
 	{
 		c := configmap.DefaultConfig()
@@ -185,7 +171,6 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 	}
 
 	resources := []framework.Resource{
-		clusterRoleBinding,
 		namespaceResource,
 		serviceAccountResource,
 		configMapResource,
