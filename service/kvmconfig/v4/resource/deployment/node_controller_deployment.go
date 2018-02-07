@@ -9,7 +9,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4/key"
 )
 
 func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1.Deployment, error) {

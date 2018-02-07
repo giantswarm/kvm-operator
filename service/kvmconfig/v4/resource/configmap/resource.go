@@ -11,7 +11,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4/cloudconfig"
 )
 
 const (
