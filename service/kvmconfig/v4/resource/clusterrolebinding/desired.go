@@ -42,8 +42,8 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 			Name: key.ClusterRoleBindingName(customObject),
 			Labels: map[string]string{
 				"app":         "kvm-operator",
-				"cluster-id":  key.ClusterID(customObject),
-				"customer-id": key.ClusterCustomer(customObject),
+				"giantswarm.io/cluster-id":  key.ClusterID(customObject),
+				"giantswarm.io/customer-id": key.ClusterCustomer(customObject),
 			},
 		},
 		Subjects: []apiv1.Subject{
@@ -71,8 +71,8 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 			Name: key.ClusterRoleBindingPSPName(customObject),
 			Labels: map[string]string{
 				"app":         "kvm-operator",
-				"cluster-id":  key.ClusterID(customObject),
-				"customer-id": key.ClusterCustomer(customObject),
+				"giantswarm.io/cluster-id":  key.ClusterID(customObject),
+				"giantswarm.io/customer-id": key.ClusterCustomer(customObject),
 			},
 		},
 		Subjects: []apiv1.Subject{

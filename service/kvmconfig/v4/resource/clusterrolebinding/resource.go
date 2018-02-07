@@ -17,21 +17,18 @@ const (
 
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
-	// Dependencies.
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 }
 
 // Resource implements the config map resource.
 type Resource struct {
-	// Dependencies.
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 }
 
 // New creates a new configured config map resource.
 func New(config Config) (*Resource, error) {
-	// Dependencies.
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
@@ -40,7 +37,6 @@ func New(config Config) (*Resource, error) {
 	}
 
 	newService := &Resource{
-		// Dependencies.
 		k8sClient: config.K8sClient,
 		logger: config.Logger.With(
 			"resource", Name,
@@ -76,7 +72,7 @@ func getClusterRoleBindingByName(list []*apiv1.ClusterRoleBinding, name string) 
 		}
 	}
 
-	return nil, microerror.Mask(notFoundError)
+	return nil, microerror.Maskf(notFoundError, "cluster role binding '%s' not found", name)
 }
 
 func isClusterRoleBindingModified(a, b *apiv1.ClusterRoleBinding) bool {
