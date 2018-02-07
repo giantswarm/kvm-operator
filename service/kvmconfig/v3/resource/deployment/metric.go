@@ -19,7 +19,3 @@ var versionBundleVersionGauge = prometheus.NewGaugeVec(
 	},
 	[]string{"major", "minor", "patch"},
 )
-
-func init() {
-	prometheus.MustRegister(versionBundleVersionGauge)
-}
