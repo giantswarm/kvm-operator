@@ -169,7 +169,6 @@ func NewVersionBundles() []versionbundle.Bundle {
 					Component:   "kubernetes",
 					Description: "Fix audit log.",
 					Kind:        "fixed",
-
 				},
 			},
 			Components: []versionbundle.Component{
