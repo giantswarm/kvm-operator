@@ -160,9 +160,16 @@ func NewVersionBundles() []versionbundle.Bundle {
 		{
 			Changelogs: []versionbundle.Changelog{
 				{
+
 					Component:   "CoreOS",
 					Description: "Updated CoreOS version to " + keyv4.CoreosVersion,
 					Kind:        "changed",
+				},
+				{
+					Component:   "kubernetes",
+					Description: "Fix audit log.",
+					Kind:        "fixed",
+
 				},
 			},
 			Components: []versionbundle.Component{
