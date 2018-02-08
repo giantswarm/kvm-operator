@@ -11,6 +11,7 @@ import (
 	"k8s.io/api/extensions/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/metric"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4/key"
 )
 
@@ -36,7 +37,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 				currentDeployments = append(currentDeployments, &d)
 			}
 
-			r.updateVersionBundleVersionGauge(ctx, customObject, versionBundleVersionGauge, currentDeployments)
+			r.updateVersionBundleVersionGauge(ctx, customObject, metric.VersionBundleVersionGauge, currentDeployments)
 		}
 	}
 
@@ -49,9 +50,9 @@ func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customOb
 	versionCounts := map[string]float64{}
 
 	for _, d := range deployments {
-		version, ok := d.Annotations[VersionBundleVersionAnnotation]
+		version, ok := d.Annotations[key.VersionBundleVersionAnnotation]
 		if !ok {
-			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment: annotation '%s' must not be empty", VersionBundleVersionAnnotation))
+			r.logger.LogCtx(ctx, "warning", fmt.Sprintf("cannot update current deployment: annotation '%s' must not be empty", key.VersionBundleVersionAnnotation))
 			continue
 		} else {
 			count, ok := versionCounts[version]
