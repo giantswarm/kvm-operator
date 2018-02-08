@@ -3,7 +3,6 @@ package service
 import (
 	"time"
 
-	keyv4 "github.com/giantswarm/kvm-operator/service/kvmconfig/v4/key"
 	"github.com/giantswarm/versionbundle"
 )
 
@@ -161,8 +160,8 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Changelogs: []versionbundle.Changelog{
 				{
 
-					Component:   "CoreOS",
-					Description: "Updated CoreOS version to " + keyv4.CoreosVersion,
+					Component:   "Container linux",
+					Description: "Updated Container linux version to 1632.2.1.",
 					Kind:        "changed",
 				},
 				{
@@ -177,8 +176,8 @@ func NewVersionBundles() []versionbundle.Bundle {
 					Version: "2.6.2",
 				},
 				{
-					Name:    "CoreOS",
-					Version: keyv4.CoreosVersion,
+					Name:    "container-linux",
+					Version: "1632.2.1",
 				},
 				{
 					Name:    "docker",
