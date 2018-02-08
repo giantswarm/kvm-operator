@@ -181,7 +181,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				},
 				{
 					Name:    "docker",
-					Version: "17.09.1",
+					Version: "17.09.0",
 				},
 				{
 					Name:    "etcd",
