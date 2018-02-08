@@ -38,8 +38,7 @@ type ResourceSetConfig struct {
 
 	GuestUpdateEnabled    bool
 	HandledVersionBundles []string
-	// Name is the project name.
-	Name string
+	ProjectName           string
 }
 
 func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
@@ -61,8 +60,8 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 	if config.HandledVersionBundles == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.HandledVersionBundles must not be empty")
 	}
-	if config.Name == "" {
-		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
+	if config.ProjectName == "" {
+		return nil, microerror.Maskf(invalidConfigError, "config.ProjectName must not be empty")
 	}
 
 	var cloudConfig *cloudconfig.CloudConfig
@@ -209,7 +208,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 
 		metricsWrapConfig := metricsresource.WrapConfig{}
 
-		metricsWrapConfig.Name = config.Name
+		metricsWrapConfig.Name = config.ProjectName
 
 		resources, err = metricsresource.Wrap(resources, metricsWrapConfig)
 		if err != nil {
