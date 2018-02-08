@@ -160,8 +160,8 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Changelogs: []versionbundle.Changelog{
 				{
 
-					Component:   "Container linux",
-					Description: "Updated Container linux version to 1632.2.1.",
+					Component:   "containerlinux",
+					Description: "Updated containerlinux version to 1632.2.1.",
 					Kind:        "changed",
 				},
 				{
@@ -176,7 +176,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 					Version: "2.6.2",
 				},
 				{
-					Name:    "container-linux",
+					Name:    "containerlinux",
 					Version: "1632.2.1",
 				},
 				{
