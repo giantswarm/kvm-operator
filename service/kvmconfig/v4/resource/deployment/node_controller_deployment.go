@@ -23,7 +23,7 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: key.NodeControllerID,
 			Annotations: map[string]string{
-				VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+				key.VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
 			},
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),

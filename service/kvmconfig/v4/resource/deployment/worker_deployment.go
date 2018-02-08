@@ -41,7 +41,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
 				Annotations: map[string]string{
-					VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
+					key.VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
 				},
 				Labels: map[string]string{
 					"app":      key.WorkerID,

@@ -6,6 +6,8 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 	"k8s.io/api/extensions/v1beta1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4/key"
 )
 
 const (
@@ -103,7 +105,7 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 }
 
 func isDeploymentModified(a, b *v1beta1.Deployment) bool {
-	aVersion, ok := a.GetAnnotations()[VersionBundleVersionAnnotation]
+	aVersion, ok := a.GetAnnotations()[key.VersionBundleVersionAnnotation]
 	if !ok {
 		return true
 	}
@@ -111,7 +113,7 @@ func isDeploymentModified(a, b *v1beta1.Deployment) bool {
 		return true
 	}
 
-	bVersion, ok := b.GetAnnotations()[VersionBundleVersionAnnotation]
+	bVersion, ok := b.GetAnnotations()[key.VersionBundleVersionAnnotation]
 	if !ok {
 		return true
 	}
