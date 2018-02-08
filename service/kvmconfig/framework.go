@@ -15,6 +15,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4"
 )
 
 type FrameworkConfig struct {
@@ -96,7 +97,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
-	var v2ResourceSet *framework.ResourceSet
+	var resourceSetV2 *framework.ResourceSet
 	{
 		c := v2.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -112,13 +113,13 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.Name,
 		}
 
-		v2ResourceSet, err = v2.NewResourceSet(c)
+		resourceSetV2, err = v2.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var v3ResourceSet *framework.ResourceSet
+	var resourceSetV3 *framework.ResourceSet
 	{
 		c := v3.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -133,7 +134,28 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.Name,
 		}
 
-		v3ResourceSet, err = v3.NewResourceSet(c)
+		resourceSetV3, err = v3.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var resourceSetV4 *framework.ResourceSet
+	{
+		c := v4.ResourceSetConfig{
+			CertsSearcher:      certsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			HandledVersionBundles: []string{
+				"1.1.1",
+			},
+			ProjectName: config.Name,
+		}
+
+		resourceSetV4, err = v4.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -144,8 +166,9 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		c := framework.ResourceRouterConfig{}
 
 		c.ResourceSets = []*framework.ResourceSet{
-			v2ResourceSet,
-			v3ResourceSet,
+			resourceSetV2,
+			resourceSetV3,
+			resourceSetV4,
 		}
 
 		resourceRouter, err = framework.NewResourceRouter(c)
