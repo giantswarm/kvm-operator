@@ -156,5 +156,46 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Version:      "1.1.0",
 			WIP:          false,
 		},
+		{
+			Changelogs: []versionbundle.Changelog{
+				{
+					Component:   "TODO",
+					Description: "TODO",
+					Kind:        "changed",
+				},
+			},
+			Components: []versionbundle.Component{
+				{
+					Name:    "calico",
+					Version: "2.6.2",
+				},
+				{
+					Name:    "docker",
+					Version: "1.12.6",
+				},
+				{
+					Name:    "etcd",
+					Version: "3.2.7",
+				},
+				{
+					Name:    "kubedns",
+					Version: "1.14.5",
+				},
+				{
+					Name:    "kubernetes",
+					Version: "1.8.4",
+				},
+				{
+					Name:    "nginx-ingress-controller",
+					Version: "0.9.0",
+				},
+			},
+			Dependencies: []versionbundle.Dependency{},
+			Deprecated:   false,
+			Name:         "kvm-operator",
+			Time:         time.Date(2018, time.February, 8, 6, 25, 0, 0, time.UTC),
+			Version:      "1.1.1",
+			WIP:          true,
+		},
 	}
 }
