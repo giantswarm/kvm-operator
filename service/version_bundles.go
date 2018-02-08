@@ -161,7 +161,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				{
 
 					Component:   "containerlinux",
-					Description: "Updated containerlinux version to 1632.2.1.",
+					Description: "Updated containerlinux version to 1576.5.0.",
 					Kind:        "changed",
 				},
 				{
@@ -177,7 +177,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				},
 				{
 					Name:    "containerlinux",
-					Version: "1632.2.1",
+					Version: "1576.5.0",
 				},
 				{
 					Name:    "docker",
