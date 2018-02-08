@@ -159,9 +159,9 @@ func NewVersionBundles() []versionbundle.Bundle {
 		{
 			Changelogs: []versionbundle.Changelog{
 				{
-					Component:   "TODO",
-					Description: "TODO",
-					Kind:        "changed",
+					Component:   "kubernetes",
+					Description: "Fix audit log.",
+					Kind:        "fixed",
 				},
 			},
 			Components: []versionbundle.Component{
