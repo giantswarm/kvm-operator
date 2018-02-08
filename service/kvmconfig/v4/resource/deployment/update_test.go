@@ -13,6 +13,8 @@ import (
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
+
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4/key"
 )
 
 func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
@@ -55,7 +57,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -76,7 +78,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -111,7 +113,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -130,7 +132,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -151,7 +153,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -170,7 +172,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -214,7 +216,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -233,7 +235,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.1.0",
+							key.VersionBundleVersionAnnotation: "1.1.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -254,7 +256,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -273,7 +275,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -294,7 +296,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -337,7 +339,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -356,7 +358,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -377,7 +379,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -396,7 +398,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -417,7 +419,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -460,7 +462,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -485,7 +487,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -512,7 +514,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -531,7 +533,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -574,7 +576,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -599,7 +601,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -626,7 +628,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -645,7 +647,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -690,7 +692,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -715,7 +717,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -742,7 +744,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -761,7 +763,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -782,7 +784,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -824,7 +826,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -849,7 +851,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.2.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -876,7 +878,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -895,7 +897,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -916,7 +918,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -960,7 +962,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1009,7 +1011,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1028,7 +1030,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1049,7 +1051,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1092,7 +1094,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1117,7 +1119,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "",
+							key.VersionBundleVersionAnnotation: "",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1144,7 +1146,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1163,7 +1165,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{
@@ -1184,7 +1186,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							VersionBundleVersionAnnotation: "1.3.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: extensionsv1.DeploymentSpec{

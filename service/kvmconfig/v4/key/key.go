@@ -49,6 +49,8 @@ const (
 	// kvm endpoint annotations
 	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
 	AnnotationService = "endpoint.kvm.giantswarm.io/service"
+
+	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
