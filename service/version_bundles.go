@@ -159,6 +159,12 @@ func NewVersionBundles() []versionbundle.Bundle {
 		{
 			Changelogs: []versionbundle.Changelog{
 				{
+
+					Component:   "containerlinux",
+					Description: "Updated containerlinux version to 1576.5.0.",
+					Kind:        "changed",
+				},
+				{
 					Component:   "kubernetes",
 					Description: "Fix audit log.",
 					Kind:        "fixed",
@@ -170,8 +176,12 @@ func NewVersionBundles() []versionbundle.Bundle {
 					Version: "2.6.2",
 				},
 				{
+					Name:    "containerlinux",
+					Version: "1576.5.0",
+				},
+				{
 					Name:    "docker",
-					Version: "1.12.6",
+					Version: "17.09.0",
 				},
 				{
 					Name:    "etcd",

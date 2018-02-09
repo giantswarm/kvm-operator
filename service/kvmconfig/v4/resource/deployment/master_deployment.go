@@ -123,7 +123,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Name: "images",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: "/home/core/images/",
+										Path: key.CoreosImageDir,
 									},
 								},
 							},
@@ -185,6 +185,10 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									{
 										Name:  "CORES",
 										Value: fmt.Sprintf("%d", capabilities.CPUs),
+									},
+									{
+										Name:  "COREOS_VERSION",
+										Value: key.CoreosVersion,
 									},
 									{
 										Name:  "DISK",
