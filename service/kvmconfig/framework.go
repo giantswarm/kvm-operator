@@ -150,7 +150,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			HandledVersionBundles: []string{
-				"1.1.1",
+				"1.2.0",
 			},
 			ProjectName: config.Name,
 		}
