@@ -13,32 +13,32 @@ func NewVersionBundles() []versionbundle.Bundle {
 				{
 					Component:   "calico",
 					Description: "Calico version updated.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 				{
 					Component:   "docker",
 					Description: "Docker version updated.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 				{
 					Component:   "etcd",
 					Description: "Etcd version updated.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 				{
 					Component:   "kubedns",
 					Description: "KubeDNS version updated.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 				{
 					Component:   "kubernetes",
 					Description: "Kubernetes version updated.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 				{
 					Component:   "nginx-ingress-controller",
 					Description: "Nginx-ingress-controller version updated.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 			},
 			Components: []versionbundle.Component{
@@ -79,7 +79,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				{
 					Component:   "kubernetes",
 					Description: "Updated to kubernetes 1.8.4. Fixes a goroutine leak in the k8s api.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 			},
 			Components: []versionbundle.Component{
@@ -120,7 +120,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				{
 					Component:   "kubernetes",
 					Description: "Enable encryption at rest",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 			},
 			Components: []versionbundle.Component{
@@ -150,7 +150,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				},
 			},
 			Dependencies: []versionbundle.Dependency{},
-			Deprecated:   false,
+			Deprecated:   true,
 			Name:         "kvm-operator",
 			Time:         time.Date(2017, time.December, 19, 10, 00, 0, 0, time.UTC),
 			Version:      "1.1.0",
@@ -162,11 +162,11 @@ func NewVersionBundles() []versionbundle.Bundle {
 
 					Component:   "containerlinux",
 					Description: "Updated containerlinux version to 1576.5.0.",
-					Kind:        "changed",
+					Kind:        versionbundle.KindChanged,
 				},
 				{
 					Component:   "kubernetes",
-					Description: "Fix audit log.",
+					Description: "Fixed audit log.",
 					Kind:        "fixed",
 				},
 			},
@@ -204,8 +204,8 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Deprecated:   false,
 			Name:         "kvm-operator",
 			Time:         time.Date(2018, time.February, 8, 6, 25, 0, 0, time.UTC),
-			Version:      "1.1.1",
-			WIP:          true,
+			Version:      "1.2.0",
+			WIP:          false,
 		},
 	}
 }
