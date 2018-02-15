@@ -201,7 +201,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 				},
 			},
 			Dependencies: []versionbundle.Dependency{},
-			Deprecated:   false,
+			Deprecated:   true,
 			Name:         "kvm-operator",
 			Time:         time.Date(2018, time.February, 8, 6, 25, 0, 0, time.UTC),
 			Version:      "1.2.0",
@@ -291,7 +291,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 			Name:         "kvm-operator",
 			Time:         time.Date(2018, time.February, 15, 2, 27, 0, 0, time.UTC),
 			Version:      "2.0.0",
-			WIP:          true,
+			WIP:          false,
 		},
 	}
 }
