@@ -16,6 +16,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v5"
 )
 
 type FrameworkConfig struct {
@@ -161,6 +162,27 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
+	var resourceSetV5 *framework.ResourceSet
+	{
+		c := v5.ResourceSetConfig{
+			CertsSearcher:      certsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			HandledVersionBundles: []string{
+				"2.0.0",
+			},
+			ProjectName: config.Name,
+		}
+
+		resourceSetV5, err = v5.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceRouter *framework.ResourceRouter
 	{
 		c := framework.ResourceRouterConfig{}
@@ -169,6 +191,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			resourceSetV2,
 			resourceSetV3,
 			resourceSetV4,
+			resourceSetV5,
 		}
 
 		resourceRouter, err = framework.NewResourceRouter(c)
