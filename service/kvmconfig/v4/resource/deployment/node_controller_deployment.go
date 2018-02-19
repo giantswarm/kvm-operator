@@ -63,7 +63,7 @@ func newNodeControllerDeployment(customObject v1alpha1.KVMConfig) (*extensionsv1
 								},
 							},
 							LivenessProbe: &apiv1.Probe{
-								InitialDelaySeconds: 15,
+								InitialDelaySeconds: 75,
 								TimeoutSeconds:      1,
 								PeriodSeconds:       10,
 								FailureThreshold:    3,
