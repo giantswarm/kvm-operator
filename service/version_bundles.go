@@ -299,11 +299,16 @@ func NewVersionBundles() []versionbundle.Bundle {
 					Description: "Updated KVM node controller with pod status bugfix.",
 					Kind:        versionbundle.KindChanged,
 				},
+				{
+					Component:   "Calico",
+					Description: "Updated to 3.0.2.",
+					Kind:        versionbundle.KindChanged,
+				},
 			},
 			Components: []versionbundle.Component{
 				{
 					Name:    "calico",
-					Version: "3.0.1",
+					Version: "3.0.2",
 				},
 				{
 					Name:    "containerlinux",
