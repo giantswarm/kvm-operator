@@ -11,7 +11,9 @@ version directory, and then changes are introduced.
 
 ## [v3.1.1] WIP
 
-TBD
+### Changed
+- Change etcd data path to /var/lib/etcd.
+- Fix `StartLimitIntervalSec` parameter location in `etcd3` systemd unit.
 
 ## [v3.1.0]
 
