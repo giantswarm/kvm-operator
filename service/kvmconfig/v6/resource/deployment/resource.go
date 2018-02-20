@@ -7,7 +7,7 @@ import (
 	"k8s.io/api/extensions/v1beta1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v5/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v6/key"
 )
 
 const (

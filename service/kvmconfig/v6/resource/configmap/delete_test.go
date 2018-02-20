@@ -12,7 +12,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v5/cloudconfig/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v6/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
