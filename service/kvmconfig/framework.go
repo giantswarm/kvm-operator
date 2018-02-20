@@ -186,7 +186,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var resourceSetV6 *framework.ResourceSet
 	{
-		c := v5.ResourceSetConfig{
+		c := v6.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
