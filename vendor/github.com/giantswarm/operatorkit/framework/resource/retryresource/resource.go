@@ -10,11 +10,7 @@ import (
 	"github.com/giantswarm/micrologger"
 
 	"github.com/giantswarm/operatorkit/framework"
-)
-
-const (
-	// Name is the identifier of the resource.
-	Name = "retry"
+	"github.com/giantswarm/operatorkit/framework/resource/internal"
 )
 
 type Config struct {
@@ -45,7 +41,7 @@ func New(config Config) (*Resource, error) {
 
 	r := &Resource{
 		logger: config.Logger.With(
-			"underlyingResource", config.Resource.Underlying().Name(),
+			"underlyingResource", config.Resource.Name(),
 		),
 		resource: config.Resource,
 
@@ -69,7 +65,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	n := func(err error, dur time.Duration) {
-		r.logger.LogCtx(ctx, "warning", fmt.Sprintf("retrying 'GetCurrentState' due to error (%s)", err.Error()))
+		r.logger.LogCtx(ctx, "function", "GetCurrentState", "level", "warning", "message", "retrying due to error", "stack", fmt.Sprintf("%#v", err))
 	}
 
 	err = backoff.RetryNotify(o, r.backOff, n)
@@ -94,7 +90,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	}
 
 	n := func(err error, dur time.Duration) {
-		r.logger.LogCtx(ctx, "warning", fmt.Sprintf("retrying 'GetDesiredState' due to error (%s)", err.Error()))
+		r.logger.LogCtx(ctx, "function", "GetDesiredState", "level", "warning", "message", "retrying due to error", "stack", fmt.Sprintf("%#v", err))
 	}
 
 	err = backoff.RetryNotify(o, r.backOff, n)
@@ -119,7 +115,7 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 	}
 
 	n := func(err error, dur time.Duration) {
-		r.logger.LogCtx(ctx, "warning", fmt.Sprintf("retrying 'NewUpdatePatch' due to error (%s)", err.Error()))
+		r.logger.LogCtx(ctx, "function", "NewUpdatePatch", "level", "warning", "message", "retrying due to error", "stack", fmt.Sprintf("%#v", err))
 	}
 
 	err = backoff.RetryNotify(o, r.backOff, n)
@@ -144,7 +140,7 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 	}
 
 	n := func(err error, dur time.Duration) {
-		r.logger.LogCtx(ctx, "warning", fmt.Sprintf("retrying 'NewDeletePatch' due to error (%s)", err.Error()))
+		r.logger.LogCtx(ctx, "function", "NewDeletePatch", "level", "warning", "message", "retrying due to error", "stack", fmt.Sprintf("%#v", err))
 	}
 
 	err = backoff.RetryNotify(o, r.backOff, n)
@@ -156,7 +152,7 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) Name() string {
-	return Name
+	return r.Underlying().Name()
 }
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState interface{}) error {
@@ -170,7 +166,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState inter
 	}
 
 	n := func(err error, dur time.Duration) {
-		r.logger.LogCtx(ctx, "warning", fmt.Sprintf("retrying 'ApplyCreatePatch' due to error (%s)", err.Error()))
+		r.logger.LogCtx(ctx, "function", "ApplyCreatePatch", "level", "warning", "message", "retrying due to error", "stack", fmt.Sprintf("%#v", err))
 	}
 
 	err := backoff.RetryNotify(o, r.backOff, n)
@@ -192,7 +188,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteState inter
 	}
 
 	n := func(err error, dur time.Duration) {
-		r.logger.LogCtx(ctx, "warning", fmt.Sprintf("retrying 'ApplyDeletePatch' due to error (%s)", err.Error()))
+		r.logger.LogCtx(ctx, "function", "ApplyDeletePatch", "level", "warning", "message", "retrying due to error", "stack", fmt.Sprintf("%#v", err))
 	}
 
 	err := backoff.RetryNotify(o, r.backOff, n)
@@ -214,7 +210,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 	}
 
 	n := func(err error, dur time.Duration) {
-		r.logger.LogCtx(ctx, "warning", fmt.Sprintf("retrying 'ApplyUpdatePatch' due to error (%s)", err.Error()))
+		r.logger.LogCtx(ctx, "function", "ApplyUpdatePatch", "level", "warning", "message", "retrying due to error", "stack", fmt.Sprintf("%#v", err))
 	}
 
 	err := backoff.RetryNotify(o, r.backOff, n)
@@ -226,5 +222,13 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 }
 
 func (r *Resource) Underlying() framework.Resource {
-	return r.resource.Underlying()
+	underlying := r.resource
+	for {
+		wrapper, ok := underlying.(internal.Wrapper)
+		if ok {
+			underlying = wrapper.Underlying()
+		} else {
+			return underlying
+		}
+	}
 }

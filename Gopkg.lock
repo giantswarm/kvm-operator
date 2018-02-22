@@ -43,8 +43,8 @@
     ".",
     "log"
   ]
-  revision = "2dd44038f0b95ae693b266c5f87593b5d2fdd78d"
-  version = "v2.5.0"
+  revision = "26b41036311f2da8242db402557a0dbd09dc83da"
+  version = "v2.6.0"
 
 [[projects]]
   name = "github.com/emicklei/go-restful-swagger12"
@@ -75,7 +75,7 @@
     "pkg/clientset/versioned/typed/core/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1"
   ]
-  revision = "126d661f3fb1c668afd2e542f51d0d95f714b67b"
+  revision = "3b000f9f8d05f3feabce9971affed05036ec29f7"
 
 [[projects]]
   branch = "master"
@@ -84,7 +84,7 @@
     ".",
     "certstest"
   ]
-  revision = "cb5abd709cb670baae7fbbf0699c5545771ef393"
+  revision = "9aa7011ea95ba44609752bbcd4b07cf94cc8e95a"
 
 [[projects]]
   branch = "master"
@@ -93,15 +93,16 @@
     "v_1_1_0",
     "v_2_0_0",
     "v_2_0_1",
-    "v_3_1_0"
+    "v_3_1_0",
+    "v_3_1_1"
   ]
-  revision = "f4c63a2fdfa26a77246c443ffeb76e3946509a9d"
+  revision = "97efe5007351cbc155b468295f8ab9ed55a5d4da"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/k8shealthz"
   packages = ["."]
-  revision = "5eaeffb4476a420af88b7f95b478fc9fe2da38ac"
+  revision = "9abe467ab9085610b261319dfe875c6d13537b06"
 
 [[projects]]
   branch = "master"
@@ -150,7 +151,7 @@
     "loggermeta",
     "microloggertest"
   ]
-  revision = "216e9191d90f55723bfc0e93801af96e6b80eb12"
+  revision = "379c14c9508f2a9e69c7458e7e4d5444103c3abe"
 
 [[projects]]
   branch = "master"
@@ -172,11 +173,12 @@
     "framework/context/resourcecanceledcontext",
     "framework/context/updateallowedcontext",
     "framework/context/updatenecessarycontext",
+    "framework/resource/internal",
     "framework/resource/metricsresource",
     "framework/resource/retryresource",
     "informer"
   ]
-  revision = "59017b0b706ef7d1e4002591e685fa96bcf08432"
+  revision = "f4c75a611fb7c27327d9b8580a6758fee7d7bb66"
 
 [[projects]]
   branch = "master"
@@ -225,7 +227,7 @@
   branch = "master"
   name = "github.com/go-openapi/spec"
   packages = ["."]
-  revision = "f3499b5df53897321d6f5e9c22cf19309d41d3bc"
+  revision = "1de3e0542de65ad8d75452a595886fdd0befb363"
 
 [[projects]]
   branch = "master"
@@ -349,8 +351,8 @@
 [[projects]]
   name = "github.com/json-iterator/go"
   packages = ["."]
-  revision = "28452fcdec4e44348d2af0d91d1e9e38da3a9e0a"
-  version = "1.0.5"
+  revision = "be70f29b04dea7efb4d82a8989c33aee989b74d1"
+  version = "1.1.0"
 
 [[projects]]
   branch = "master"
@@ -373,8 +375,8 @@
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
-  revision = "d419a98cdbed11a922bf76f257b7c4be79b50e73"
-  version = "v1.7.4"
+  revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
+  version = "v1.7.6"
 
 [[projects]]
   branch = "master"
@@ -396,7 +398,7 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "a4e142e9c047c904fa2f1e144d9a84e6133024bc"
+  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -423,7 +425,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "9bb6ab929dcbe1c8393cd9ef70387cb69811bd1c"
+  revision = "e69720d204a4aa3b0c65dc91208645ba0a52b9cd"
 
 [[projects]]
   branch = "master"
@@ -450,7 +452,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "cb4147076ac75738c9a7d279075a253c0cc5acbd"
+  revision = "282c8707aa210456a825798969cc27edda34992a"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -464,8 +466,8 @@
 [[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
-  revision = "acbeb36b902d72a7a4c18e8f3241075e7ab763e4"
-  version = "v1.1.0"
+  revision = "8965335b8c7107321228e3e3702cab9832751bac"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/spf13/cobra"
@@ -498,6 +500,15 @@
   version = "v1.2.15"
 
 [[projects]]
+  name = "github.com/v2pro/plz"
+  packages = [
+    "concurrent",
+    "reflect2"
+  ]
+  revision = "571356917fca907b069b7b47a14cd32ba0b340d4"
+  version = "0.9.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = [
@@ -508,7 +519,7 @@
     "lex/httplex",
     "publicsuffix"
   ]
-  revision = "2fb46b16b8dda405028c50f7c7f0f9dd1fa6bfb1"
+  revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
 
 [[projects]]
   branch = "master"
@@ -523,7 +534,6 @@
   revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -542,7 +552,8 @@
     "unicode/rangetable",
     "width"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   name = "gopkg.in/inf.v0"
@@ -723,11 +734,11 @@
   branch = "master"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/common"]
-  revision = "275e2ce91dec4c05a4094a7b1daee5560b555ac9"
+  revision = "50ae88d24ede7b8bad68e23c805b5d3da5c8abaf"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bceb7abe701f1a234915c36e4a60361f27b9b3a0b006e8131914c98034631600"
+  inputs-digest = "2eab09864b8c1bbc54be6b33b4bab5b3ddd5a27bffda2ae49a26c8988d0f20a4"
   solver-name = "gps-cdcl"
   solver-version = 1
