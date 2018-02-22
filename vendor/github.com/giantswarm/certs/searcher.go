@@ -111,7 +111,6 @@ func (s *Searcher) SearchMonitoring(clusterID string) (Monitoring, error) {
 		TLS  *TLS
 		Cert Cert
 	}{
-		{TLS: &monitoring.KubeStateMetrics, Cert: KubeStateMetricsCert},
 		{TLS: &monitoring.Prometheus, Cert: PrometheusCert},
 	}
 
