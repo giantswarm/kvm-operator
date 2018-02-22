@@ -147,6 +147,7 @@ func (f *Framework) DeleteFunc(obj interface{}) {
 
 // UpdateFunc executes the framework's ProcessUpdate function.
 func (f *Framework) UpdateFunc(oldObj, newObj interface{}) {
+	fmt.Printf("5\n")
 	obj := newObj
 
 	// DeleteFunc/UpdateFunc is synchronized to make sure only one of them is
@@ -157,17 +158,20 @@ func (f *Framework) UpdateFunc(oldObj, newObj interface{}) {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
 
+	fmt.Printf("6\n")
 	resourceSet, err := f.resourceRouter.ResourceSet(obj)
 	if err != nil {
 		f.logger.Log("event", "update", "function", "UpdateFunc", "level", "error", "message", "stop framework reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
 		return
 	}
+	fmt.Printf("7\n")
 
 	ctx, err := resourceSet.InitCtx(context.Background(), obj)
 	if err != nil {
 		f.logger.LogCtx(ctx, "event", "update", "function", "UpdateFunc", "level", "error", "message", "stop framework reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
 		return
 	}
+	fmt.Printf("8\n")
 
 	err = ProcessUpdate(ctx, obj, resourceSet.Resources())
 	if err != nil {
@@ -345,7 +349,9 @@ func ProcessDelete(ctx context.Context, obj interface{}, resources []Resource) e
 // ProcessEvents takes the event channels created by the operatorkit informer
 // and executes the framework's event functions accordingly.
 func (f *Framework) ProcessEvents(ctx context.Context, deleteChan chan watch.Event, updateChan chan watch.Event, errChan chan error) {
+	fmt.Printf("2\n")
 	operation := func() error {
+		fmt.Printf("3\n")
 		for {
 			select {
 			case e := <-deleteChan:
@@ -353,6 +359,7 @@ func (f *Framework) ProcessEvents(ctx context.Context, deleteChan chan watch.Eve
 				f.DeleteFunc(e.Object)
 				t.ObserveDuration()
 			case e := <-updateChan:
+				fmt.Printf("4\n")
 				t := prometheus.NewTimer(frameworkHistogram.WithLabelValues("update"))
 				f.UpdateFunc(nil, e.Object)
 				t.ObserveDuration()
@@ -393,11 +400,15 @@ func (f *Framework) ProcessEvents(ctx context.Context, deleteChan chan watch.Eve
 //     }
 //
 func ProcessUpdate(ctx context.Context, obj interface{}, resources []Resource) error {
+	fmt.Printf("9\n")
 	if len(resources) == 0 {
 		return microerror.Maskf(executionFailedError, "resources must not be empty")
 	}
 
+	fmt.Printf("10\n")
 	for _, r := range resources {
+		fmt.Printf("%#v\n", r.Name())
+		fmt.Printf("11\n")
 		var err error
 
 		var currentState interface{}
@@ -420,6 +431,7 @@ func ProcessUpdate(ctx context.Context, obj interface{}, resources []Resource) e
 				return microerror.Mask(err)
 			}
 		}
+		fmt.Printf("12\n")
 
 		var desiredState interface{}
 		{
@@ -441,6 +453,7 @@ func ProcessUpdate(ctx context.Context, obj interface{}, resources []Resource) e
 				return microerror.Mask(err)
 			}
 		}
+		fmt.Printf("13\n")
 
 		var patch *Patch
 		{
@@ -462,6 +475,7 @@ func ProcessUpdate(ctx context.Context, obj interface{}, resources []Resource) e
 				return microerror.Mask(err)
 			}
 		}
+		fmt.Printf("14\n")
 
 		{
 			if reconciliationcanceledcontext.IsCanceled(ctx) {
@@ -487,6 +501,7 @@ func ProcessUpdate(ctx context.Context, obj interface{}, resources []Resource) e
 				}
 			}
 		}
+		fmt.Printf("15\n")
 
 		{
 			if reconciliationcanceledcontext.IsCanceled(ctx) {
@@ -512,6 +527,7 @@ func ProcessUpdate(ctx context.Context, obj interface{}, resources []Resource) e
 				}
 			}
 		}
+		fmt.Printf("15\n")
 
 		{
 			if reconciliationcanceledcontext.IsCanceled(ctx) {
@@ -559,6 +575,7 @@ func (f *Framework) bootWithError(ctx context.Context) error {
 	f.logger.LogCtx(ctx, "function", "bootWithError", "level", "debug", "message", "starting list-watch")
 
 	deleteChan, updateChan, errChan := f.informer.Watch(ctx)
+	fmt.Printf("1\n")
 	f.ProcessEvents(ctx, deleteChan, updateChan, errChan)
 
 	return nil

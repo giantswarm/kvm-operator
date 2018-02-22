@@ -223,11 +223,15 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 
 func (r *Resource) Underlying() framework.Resource {
 	underlying := r.resource
+	fmt.Printf("underlying 1: %#v\n", underlying)
 	for {
 		wrapper, ok := underlying.(internal.Wrapper)
+		fmt.Printf("wrapper: %#v\n", wrapper)
 		if ok {
 			underlying = wrapper.Underlying()
+			fmt.Printf("underlying 2: %#v\n", underlying)
 		} else {
+			fmt.Printf("underlying 3: %#v\n", underlying)
 			return underlying
 		}
 	}
