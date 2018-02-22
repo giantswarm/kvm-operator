@@ -173,12 +173,11 @@
     "framework/context/resourcecanceledcontext",
     "framework/context/updateallowedcontext",
     "framework/context/updatenecessarycontext",
-    "framework/resource/internal",
     "framework/resource/metricsresource",
     "framework/resource/retryresource",
     "informer"
   ]
-  revision = "f4c75a611fb7c27327d9b8580a6758fee7d7bb66"
+  revision = "4e0c85cbae5a9822a53ae0a63a8dcd363ac03a3d"
 
 [[projects]]
   branch = "master"
