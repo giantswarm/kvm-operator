@@ -190,34 +190,27 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		serviceResource,
 	}
 
-	// Wrap resources with retry and metrics.
 	{
-		retryWrapConfig := retryresource.WrapConfig{}
-
-		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
-		retryWrapConfig.Logger = config.Logger
-
-		resources, err = retryresource.Wrap(resources, retryWrapConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
+		c := retryresource.WrapConfig{
+			BackOffFactory: func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) },
+			Logger:         config.Logger,
 		}
 
-		metricsWrapConfig := metricsresource.WrapConfig{}
-
-		metricsWrapConfig.Name = config.ProjectName
-
-		resources, err = metricsresource.Wrap(resources, metricsWrapConfig)
+		resources, err = retryresource.Wrap(resources, c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		if config.GuestUpdateEnabled {
-			updateallowedcontext.SetUpdateAllowed(ctx)
+	{
+		c := metricsresource.WrapConfig{
+			Name: config.ProjectName,
 		}
 
-		return ctx, nil
+		resources, err = metricsresource.Wrap(resources, c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	handlesFunc := func(obj interface{}) bool {
@@ -233,10 +226,17 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		return false
 	}
 
+	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
+		if config.GuestUpdateEnabled {
+			updateallowedcontext.SetUpdateAllowed(ctx)
+		}
+
+		return ctx, nil
+	}
+
 	var resourceSet *framework.ResourceSet
 	{
 		c := framework.ResourceSetConfig{
-
 			Handles:   handlesFunc,
 			InitCtx:   initCtxFunc,
 			Logger:    config.Logger,
