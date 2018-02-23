@@ -35,10 +35,8 @@ type ResourceSetConfig struct {
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 
-	GuestUpdateEnabled    bool
-	HandledVersionBundles []string
-	// Name is the project name.
-	Name string
+	GuestUpdateEnabled bool
+	Name               string
 }
 
 func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
@@ -57,9 +55,6 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.RandomkeysSearcher must not be empty")
 	}
 
-	if config.HandledVersionBundles == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.HandledVersionBundles must not be empty")
-	}
 	if config.Name == "" {
 		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
 	}
@@ -215,12 +210,9 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		if err != nil {
 			return false
 		}
-		versionBundleVersion := key.VersionBundleVersion(kvmConfig)
 
-		for _, v := range config.HandledVersionBundles {
-			if versionBundleVersion == v {
-				return true
-			}
+		if key.VersionBundleVersion(kvmConfig) == VersionBundle().Version {
+			return true
 		}
 
 		return false

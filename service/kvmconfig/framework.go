@@ -130,10 +130,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			HandledVersionBundles: []string{
-				"1.1.0",
-			},
-			Name: config.Name,
+			Name:               config.Name,
 		}
 
 		resourceSetV3, err = v3.NewResourceSet(c)
@@ -151,10 +148,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			HandledVersionBundles: []string{
-				"1.2.0",
-			},
-			ProjectName: config.Name,
+			ProjectName:        config.Name,
 		}
 
 		resourceSetV4, err = v4.NewResourceSet(c)
@@ -172,10 +166,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			HandledVersionBundles: []string{
-				"2.0.0",
-			},
-			ProjectName: config.Name,
+			ProjectName:        config.Name,
 		}
 
 		resourceSetV5, err = v5.NewResourceSet(c)
@@ -193,10 +184,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			HandledVersionBundles: []string{
-				"2.0.1",
-			},
-			ProjectName: config.Name,
+			ProjectName:        config.Name,
 		}
 
 		resourceSetV6, err = v6.NewResourceSet(c)
