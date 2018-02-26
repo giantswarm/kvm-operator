@@ -19,6 +19,16 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Updated to 3.0.2.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kubelet",
+				Description: "Tune kubelet flags for protecting key units (kubelet and container runtime) from workload overloads.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "etcd",
+				Description: "Updated to 3.3.1.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -35,7 +45,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "etcd",
-				Version: "3.2.7",
+				Version: "3.3.1",
 			},
 			{
 				Name:    "coredns",
