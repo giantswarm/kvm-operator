@@ -43,8 +43,11 @@ const (
 	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:7146561e54142d4f986daee0206336ebee3ceb18"
 
-	// defaultWorkerMemory represents the extra memory to add due to qemu overhead.
-	defaultWorkerMemory = "1G"
+	// constants for calculation qemu memory overhead.
+	baseWorkerMemoryOverhead     = 512
+	baseWorkerOverheadMultiplier = 2
+	baseWorkerOverheadModulator  = 12
+	workerIOOverhead             = "512M"
 
 	// kvm endpoint annotations
 	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
@@ -127,15 +130,38 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 // It adds the memory from the node definition parameter to the additional memory defined by
 // defaultWorkerMemory.
 func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
-	q, err := resource.ParseQuantity(n.Memory)
+	q, err := resource.ParseQuantity(n.Memory + "i")
 	if err != nil {
 		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 	}
-	additionalMemory, err := resource.ParseQuantity(defaultWorkerMemory)
+	// IO overhead for qemu is around 512M memory
+	IOOverhead, err := resource.ParseQuantity(workerIOOverhead)
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from addtional memory")
+		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from io overhead")
 	}
-	q.Add(additionalMemory)
+	q.Add(IOOverhead)
+
+	// memory overhead is more complex as it increases with the size of the memory
+	// basic calculation is (2 + (memory % 12))*512M
+	// examples:
+	// Memory under 15G >> overhead 1536M (1.5Gi)
+	// memory between 15 - 30G >> overhead 2048M
+	// memory between 30 - 45G >> overhead 2560M
+	var overheadMultiplier int
+	{
+		i, err := strconv.Atoi(n.Memory[:len(n.Memory)-1])
+		if err != nil {
+			return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
+		}
+		overheadMultiplier = baseWorkerOverheadMultiplier + i%baseWorkerOverheadModulator
+	}
+	workerMemoryOverhead := strconv.Itoa(baseWorkerMemoryOverhead*overheadMultiplier) + "M"
+
+	memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
+	if err != nil {
+		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from memory overhead")
+	}
+	q.Add(memOverhead)
 
 	return q, nil
 }

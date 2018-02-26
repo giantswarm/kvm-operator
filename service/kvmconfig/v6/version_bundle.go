@@ -29,6 +29,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Updated to 3.3.1.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "qemu",
+				Description: "Fixed formula for calculating qemu memory overhead.",
+				Kind:        versionbundle.KindFixed,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
