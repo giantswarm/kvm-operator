@@ -24,7 +24,7 @@ func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 			Annotations: map[string]string{
 				"giantswarm.io/prometheus-cluster": key.ClusterID(customObject),
 				"prometheus.io/path":               "/healthz",
-				"prometheus.io/port":               "'30010'",
+				"prometheus.io/port":               "30010",
 				"prometheus.io/scheme":             "http",
 				"prometheus.io/scrape":             "true",
 			},

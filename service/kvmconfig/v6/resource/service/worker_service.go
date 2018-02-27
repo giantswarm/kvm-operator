@@ -24,7 +24,7 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 			},
 			Annotations: map[string]string{
 				"prometheus.io/path":   "/healthz",
-				"prometheus.io/port":   "'30010'",
+				"prometheus.io/port":   "30010",
 				"prometheus.io/scheme": "http",
 				"prometheus.io/scrape": "true",
 			},
