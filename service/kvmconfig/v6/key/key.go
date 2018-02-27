@@ -44,8 +44,9 @@ const (
 	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:7146561e54142d4f986daee0206336ebee3ceb18"
 
 	// constants for calculation qemu memory overhead.
+	baseMasterMemoryOverhead     = "1G"
 	baseWorkerMemoryOverhead     = 512
-	baseWorkerOverheadMultiplier = 1
+	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
 	workerIOOverhead             = "512M"
 
@@ -130,10 +131,27 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 // It adds the memory from the node definition parameter to the additional memory calculated on the node role
 func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode, role string) (resource.Quantity, error) {
 	var q resource.Quantity
+	var err error
 	if role == MasterID {
+		q, err = resource.ParseQuantity(n.Memory)
+		if err != nil {
+			return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
+		}
+		additionalMemory, err := resource.ParseQuantity(baseMasterMemoryOverhead)
+		if err != nil {
+			return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from addtional memory")
+		}
+		q.Add(additionalMemory)
 
 	} else if role == WorkerID {
-		q, err := resource.ParseQuantity(n.Memory + "i")
+		i, err := strconv.Atoi(n.Memory[:len(n.Memory)-1])
+		if err != nil {
+			return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
+		}
+		// base worker memory calculated in MB
+		baseMemoryMB := strconv.Itoa(i * 1024)
+
+		q, err = resource.ParseQuantity(baseMemoryMB + "M")
 		if err != nil {
 			return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 		}
@@ -143,21 +161,13 @@ func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode, role string) (resource.Quan
 			return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from io overhead")
 		}
 		q.Add(IOOverhead)
-
 		// memory overhead is more complex as it increases with the size of the memory
-		// basic calculation is (1 + (memory % 12))*512M
+		// basic calculation is (2 + (memory / 12))*512M
 		// examples:
 		// Memory under 15G >> overhead 1024M
 		// memory between 15 - 30G >> overhead 1536M
 		// memory between 30 - 45G >> overhead 2048M
-		var overheadMultiplier int
-		{
-			i, err := strconv.Atoi(n.Memory[:len(n.Memory)-1])
-			if err != nil {
-				return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
-			}
-			overheadMultiplier = baseWorkerOverheadMultiplier + i%baseWorkerOverheadModulator
-		}
+		overheadMultiplier := int(baseWorkerOverheadMultiplier + i/baseWorkerOverheadModulator)
 		workerMemoryOverhead := strconv.Itoa(baseWorkerMemoryOverhead*overheadMultiplier) + "M"
 
 		memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
