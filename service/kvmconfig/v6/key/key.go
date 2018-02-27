@@ -150,11 +150,13 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	if err != nil {
 		return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
 	}
+
 	// base worker memory calculated in MB
-	q, err := resource.ParseQuantity(fmt.Sprintf("%dM", mQuantity.Value()*1024))
+	q, err := resource.ParseQuantity(fmt.Sprintf("%dM", mQuantity.ScaledValue(resource.Giga)*1024))
 	if err != nil {
 		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 	}
+	fmt.Printf("parsed %#v\n", q)
 	// IO overhead for qemu is around 512M memory
 	IOOverhead := resource.MustParse(workerIOOverhead)
 
@@ -165,7 +167,7 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	// Memory under 15G >> overhead 1024M
 	// memory between 15 - 30G >> overhead 1536M
 	// memory between 30 - 45G >> overhead 2048M
-	overheadMultiplier := int(baseWorkerOverheadMultiplier + mQuantity.Value()/baseWorkerOverheadModulator)
+	overheadMultiplier := int(baseWorkerOverheadMultiplier + mQuantity.ScaledValue(resource.Giga)/baseWorkerOverheadModulator)
 	workerMemoryOverhead := strconv.Itoa(baseWorkerMemoryOverheadMB*overheadMultiplier) + "M"
 
 	memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
