@@ -157,8 +157,8 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 	}
 	// IO overhead for qemu is around 512M memory
-	IOOverhead := resource.MustParse(workerIOOverhead)
-	q.Add(IOOverhead)
+	ioOverhead := resource.MustParse(workerIOOverhead)
+	q.Add(ioOverhead)
 
 	// memory overhead is more complex as it increases with the size of the memory
 	// basic calculation is (2 + (memory / 12))*512M
