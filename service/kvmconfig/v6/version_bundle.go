@@ -31,7 +31,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "monitoring",
-				Description: "Added configuration fro monitoring endpoint IP addresses.",
+				Description: "Added configuration for monitoring endpoint IP addresses.",
 				Kind:        versionbundle.KindAdded,
 			},
 		},
