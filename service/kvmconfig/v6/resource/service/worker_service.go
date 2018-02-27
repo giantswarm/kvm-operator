@@ -22,6 +22,12 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 				"customer": key.ClusterCustomer(customObject),
 				"app":      key.WorkerID,
 			},
+			Annotations: map[string]string{
+				"prometheus.io/path":   "/healthz",
+				"prometheus.io/port":   "'30010'",
+				"prometheus.io/scheme": "http",
+				"prometheus.io/scrape": "true",
+			},
 		},
 		Spec: apiv1.ServiceSpec{
 			Type: apiv1.ServiceTypeLoadBalancer,
