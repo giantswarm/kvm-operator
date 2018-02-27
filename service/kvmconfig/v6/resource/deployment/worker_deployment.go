@@ -28,7 +28,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 			return nil, microerror.Maskf(err, "creating CPU quantity")
 		}
 
-		memoryQuantity, err := key.MemoryQuantity(capabilities, key.WorkerID)
+		memoryQuantity, err := key.MemoryQuantityWorker(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(err, "creating memory quantity")
 		}
