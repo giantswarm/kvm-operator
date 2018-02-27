@@ -45,7 +45,7 @@ const (
 
 	// constants for calculation qemu memory overhead.
 	baseWorkerMemoryOverhead     = 512
-	baseWorkerOverheadMultiplier = 2
+	baseWorkerOverheadMultiplier = 1
 	baseWorkerOverheadModulator  = 12
 	workerIOOverhead             = "512M"
 
@@ -127,41 +127,45 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 }
 
 // MemoryQuantity returns a resource.Quantity that represents the memory to be used by the nodes.
-// It adds the memory from the node definition parameter to the additional memory defined by
-// defaultWorkerMemory.
-func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
-	q, err := resource.ParseQuantity(n.Memory + "i")
-	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
-	}
-	// IO overhead for qemu is around 512M memory
-	IOOverhead, err := resource.ParseQuantity(workerIOOverhead)
-	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from io overhead")
-	}
-	q.Add(IOOverhead)
+// It adds the memory from the node definition parameter to the additional memory calculated on the node role
+func MemoryQuantity(n v1alpha1.KVMConfigSpecKVMNode, role string) (resource.Quantity, error) {
+	var q resource.Quantity
+	if role == MasterID {
 
-	// memory overhead is more complex as it increases with the size of the memory
-	// basic calculation is (2 + (memory % 12))*512M
-	// examples:
-	// Memory under 15G >> overhead 1536M (1.5Gi)
-	// memory between 15 - 30G >> overhead 2048M
-	// memory between 30 - 45G >> overhead 2560M
-	var overheadMultiplier int
-	{
-		i, err := strconv.Atoi(n.Memory[:len(n.Memory)-1])
+	} else if role == WorkerID {
+		q, err := resource.ParseQuantity(n.Memory + "i")
 		if err != nil {
-			return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
+			return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 		}
-		overheadMultiplier = baseWorkerOverheadMultiplier + i%baseWorkerOverheadModulator
-	}
-	workerMemoryOverhead := strconv.Itoa(baseWorkerMemoryOverhead*overheadMultiplier) + "M"
+		// IO overhead for qemu is around 512M memory
+		IOOverhead, err := resource.ParseQuantity(workerIOOverhead)
+		if err != nil {
+			return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from io overhead")
+		}
+		q.Add(IOOverhead)
 
-	memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
-	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from memory overhead")
+		// memory overhead is more complex as it increases with the size of the memory
+		// basic calculation is (1 + (memory % 12))*512M
+		// examples:
+		// Memory under 15G >> overhead 1024M
+		// memory between 15 - 30G >> overhead 1536M
+		// memory between 30 - 45G >> overhead 2048M
+		var overheadMultiplier int
+		{
+			i, err := strconv.Atoi(n.Memory[:len(n.Memory)-1])
+			if err != nil {
+				return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
+			}
+			overheadMultiplier = baseWorkerOverheadMultiplier + i%baseWorkerOverheadModulator
+		}
+		workerMemoryOverhead := strconv.Itoa(baseWorkerMemoryOverhead*overheadMultiplier) + "M"
+
+		memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
+		if err != nil {
+			return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from memory overhead")
+		}
+		q.Add(memOverhead)
 	}
-	q.Add(memOverhead)
 
 	return q, nil
 }
