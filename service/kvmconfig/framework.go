@@ -195,14 +195,16 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var resourceRouter *framework.ResourceRouter
 	{
-		c := framework.ResourceRouterConfig{}
+		c := framework.ResourceRouterConfig{
+			Logger: config.Logger,
 
-		c.ResourceSets = []*framework.ResourceSet{
-			resourceSetV2,
-			resourceSetV3,
-			resourceSetV4,
-			resourceSetV5,
-			resourceSetV6,
+			ResourceSets: []*framework.ResourceSet{
+				resourceSetV2,
+				resourceSetV3,
+				resourceSetV4,
+				resourceSetV5,
+				resourceSetV6,
+			},
 		}
 
 		resourceRouter, err = framework.NewResourceRouter(c)
