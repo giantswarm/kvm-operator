@@ -33,8 +33,8 @@ func VersionBundle() versionbundle.Bundle {
 				Component:   "qemu",
 				Description: "Fixed formula for calculating qemu memory overhead.",
 				Kind:        versionbundle.KindFixed,
-      },
-      {
+			},
+			{
 				Component:   "monitoring",
 				Description: "Added configuration for monitoring endpoint IP addresses.",
 				Kind:        versionbundle.KindAdded,
