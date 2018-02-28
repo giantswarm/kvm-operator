@@ -29,6 +29,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Updated to 3.3.1.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "monitoring",
+				Description: "Added configuration for monitoring endpoint IP addresses.",
+				Kind:        versionbundle.KindAdded,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
