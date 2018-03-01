@@ -59,7 +59,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "coredns",
-				Version: "1.0.5",
+				Version: "1.0.6",
 			},
 			{
 				Name:    "kubernetes",
@@ -67,14 +67,14 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "nginx-ingress-controller",
-				Version: "0.10.2",
+				Version: "0.11.0",
 			},
 		},
 		Dependencies: []versionbundle.Dependency{},
 		Deprecated:   false,
 		Name:         "kvm-operator",
-		Time:         time.Date(2018, time.February, 20, 2, 57, 0, 0, time.UTC),
-		Version:      "2.0.1",
+		Time:         time.Date(2018, time.March, 1, 2, 57, 0, 0, time.UTC),
+		Version:      "2.1.1",
 		WIP:          true,
 	}
 }
