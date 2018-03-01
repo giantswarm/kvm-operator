@@ -86,7 +86,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Dependencies: []versionbundle.Dependency{},
-		Deprecated:   false,
+		Deprecated:   true,
 		Name:         "kvm-operator",
 		Time:         time.Date(2018, time.February, 15, 2, 27, 0, 0, time.UTC),
 		Version:      "2.0.0",
