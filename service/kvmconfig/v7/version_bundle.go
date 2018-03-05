@@ -40,7 +40,7 @@ func VersionBundle() versionbundle.Bundle {
 				Kind:        versionbundle.KindAdded,
 			},
 			{
-				Component:   "kubernetes",
+				Component:   "cloudconfig",
 				Description: "Enable aggregation layer to be able to extend kubernetes API.",
 				Kind:        versionbundle.KindChanged,
 			},
