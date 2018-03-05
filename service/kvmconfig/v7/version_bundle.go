@@ -39,6 +39,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Added configuration for monitoring endpoint IP addresses.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "cloudconfig",
+				Description: "Enable aggregation layer to be able to extend kubernetes API.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
