@@ -10,38 +10,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "kvm-node-controller",
-				Description: "Updated KVM node controller with pod status bugfix.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "Calico",
-				Description: "Updated to 3.0.2.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "kubelet",
-				Description: "Tune kubelet flags for protecting key units (kubelet and container runtime) from workload overloads.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "etcd",
-				Description: "Updated to 3.3.1.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "qemu",
-				Description: "Fixed formula for calculating qemu memory overhead.",
-				Kind:        versionbundle.KindFixed,
-			},
-			{
-				Component:   "monitoring",
-				Description: "Added configuration for monitoring endpoint IP addresses.",
-				Kind:        versionbundle.KindAdded,
-			},
-			{
 				Component:   "cloudconfig",
-				Description: "Enable aggregation layer to be able to extend kubernetes API.",
+				Description: "Removed set-ownership-etcd-data-dir.service.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -78,7 +48,7 @@ func VersionBundle() versionbundle.Bundle {
 		Dependencies: []versionbundle.Dependency{},
 		Deprecated:   false,
 		Name:         "kvm-operator",
-		Time:         time.Date(2018, time.March, 1, 2, 57, 0, 0, time.UTC),
+		Time:         time.Date(2018, time.March, 7, 2, 57, 0, 0, time.UTC),
 		Version:      "2.1.1",
 		WIP:          true,
 	}
