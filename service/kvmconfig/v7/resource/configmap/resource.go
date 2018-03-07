@@ -77,9 +77,7 @@ func New(config Config) (*Resource, error) {
 		cloudConfig:  config.CloudConfig,
 		k8sClient:    config.K8sClient,
 		keyWatcher:   config.KeyWatcher,
-		logger: config.Logger.With(
-			"resource", Name,
-		),
+		logger:       config.Logger,
 	}
 
 	return newService, nil
