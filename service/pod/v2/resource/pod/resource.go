@@ -38,9 +38,7 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		k8sClient: config.K8sClient,
-		logger: config.Logger.With(
-			"resource", Name,
-		),
+		logger:    config.Logger,
 	}
 
 	return newService, nil
