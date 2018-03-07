@@ -5,7 +5,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v7/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v8/key"
 )
 
 func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
