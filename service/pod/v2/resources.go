@@ -34,7 +34,12 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		podResource, err = pod.New(c)
+		ops, err := pod.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		podResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -67,4 +72,18 @@ func NewResources(config ResourcesConfig) ([]framework.Resource, error) {
 	}
 
 	return resources, nil
+}
+
+func toCRUDResource(logger micrologger.Logger, ops framework.CRUDResourceOps) (*framework.CRUDResource, error) {
+	c := framework.CRUDResourceConfig{
+		Logger: logger,
+		Ops:    ops,
+	}
+
+	r, err := framework.NewCRUDResource(c)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	return r, nil
 }

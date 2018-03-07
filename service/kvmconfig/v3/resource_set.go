@@ -78,7 +78,12 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		namespaceResource, err = namespace.New(c)
+		ops, err := namespace.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		namespaceResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -91,7 +96,12 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		serviceAccountResource, err = serviceaccount.New(c)
+		ops, err := serviceaccount.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		serviceAccountResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -107,7 +117,12 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c.KeyWatcher = config.RandomkeysSearcher
 		c.Logger = config.Logger
 
-		configMapResource, err = configmap.New(c)
+		ops, err := configmap.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		configMapResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -120,7 +135,12 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		deploymentResource, err = deployment.New(c)
+		ops, err := deployment.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		deploymentResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -133,7 +153,12 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		ingressResource, err = ingress.New(c)
+		ops, err := ingress.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		ingressResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -146,7 +171,12 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		pvcResource, err = pvc.New(c)
+		ops, err := pvc.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		pvcResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -159,7 +189,12 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
-		serviceResource, err = service.New(c)
+		ops, err := service.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		serviceResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -235,4 +270,18 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 	}
 
 	return resourceSet, nil
+}
+
+func toCRUDResource(logger micrologger.Logger, ops framework.CRUDResourceOps) (*framework.CRUDResource, error) {
+	c := framework.CRUDResourceConfig{
+		Logger: logger,
+		Ops:    ops,
+	}
+
+	r, err := framework.NewCRUDResource(c)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	return r, nil
 }
