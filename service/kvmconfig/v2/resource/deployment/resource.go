@@ -5,7 +5,6 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/framework"
 	"k8s.io/api/extensions/v1beta1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -62,10 +61,6 @@ func New(config Config) (*Resource, error) {
 
 func (r *Resource) Name() string {
 	return Name
-}
-
-func (r *Resource) Underlying() framework.Resource {
-	return r
 }
 
 func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bool {
