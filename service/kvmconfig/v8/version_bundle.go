@@ -10,8 +10,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "cloudconfig",
-				Description: "Put your description here",
+				Component:   "containerlinux",
+				Description: "Updated to version 1632.3.0.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -22,7 +22,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1576.5.0",
+				Version: "1632.3.0",
 			},
 			{
 				Name:    "docker",
