@@ -14,6 +14,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Updated to version 1632.3.0.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "cloudconfig",
+				Description: "Removed set-ownership-etcd-data-dir.service.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
