@@ -2244,6 +2244,20 @@ coreos:
 
       [Install]
       WantedBy=multi-user.target
+  - name: set-ownership-etcd-data-dir.service
+    enable: true
+    command: start
+    content: |
+      [Unit]
+      Description=Set ownership to etcd3 data dir
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      TimeoutStartSec=0
+      ExecStartPre=/bin/bash -c "/usr/bin/mkdir -p /var/lib/etcd; /usr/bin/chown etcd:etcd /var/lib/etcd"
+      ExecStart=/usr/bin/chmod -R 700 /var/lib/etcd
   - name: docker.service
     enable: true
     command: start
