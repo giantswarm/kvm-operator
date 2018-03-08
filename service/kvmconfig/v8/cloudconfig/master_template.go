@@ -19,13 +19,6 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 
 	filesMeta := []k8scloudconfig.FileMetadata{
-		// set_ownership_etcd_data_dir drop-in
-		{
-			AssetContent: set_ownership_etcd_data_dir_dropin,
-			Path:         "/etc/systemd/system/set-ownership-etcd-data-dir.service.d/00-after-mount.conf",
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
-		},
 		// Encryption key
 		{
 			AssetContent: encryptionConfig,
