@@ -70,12 +70,14 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var newInformer *informer.Informer
 	{
-		c := informer.DefaultConfig()
+		c := informer.Config{
+			Watcher: config.K8sClient.CoreV1().Pods(""),
 
-		c.Watcher = config.K8sClient.CoreV1().Pods("")
-
-		c.ListOptions = apismetav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
+			ListOptions: apismetav1.ListOptions{
+				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.Name),
+			},
+			RateWait:     informer.DefaultRateWait,
+			ResyncPeriod: informer.DefaultResyncPeriod,
 		}
 
 		newInformer, err = informer.New(c)
