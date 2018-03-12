@@ -55,6 +55,6 @@ func VersionBundle() versionbundle.Bundle {
 		Name:         "kvm-operator",
 		Time:         time.Date(2018, time.March, 7, 2, 57, 0, 0, time.UTC),
 		Version:      "2.1.1",
-		WIP:          true,
+		WIP:          false,
 	}
 }
