@@ -10,13 +10,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "containerlinux",
-				Description: "Updated to version 1632.3.0.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Removed set-ownership-etcd-data-dir.service.",
+				Component:   "component",
+				Description: "Put your description here",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -54,7 +49,7 @@ func VersionBundle() versionbundle.Bundle {
 		Deprecated:   false,
 		Name:         "kvm-operator",
 		Time:         time.Date(2018, time.March, 7, 2, 57, 0, 0, time.UTC),
-		Version:      "2.1.1",
-		WIP:          false,
+		Version:      "2.1.2",
+		WIP:          true,
 	}
 }
