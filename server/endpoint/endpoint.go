@@ -7,27 +7,14 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 
-	"github.com/giantswarm/kvm-operator/server/middleware"
 	"github.com/giantswarm/kvm-operator/service"
 )
 
 // Config represents the configuration used to create a endpoint.
 type Config struct {
 	// Dependencies.
-	Logger     micrologger.Logger
-	Middleware *middleware.Middleware
-	Service    *service.Service
-}
-
-// DefaultConfig provides a default configuration to create a new endpoint by
-// best effort.
-func DefaultConfig() Config {
-	return Config{
-		// Dependencies.
-		Logger:     nil,
-		Middleware: nil,
-		Service:    nil,
-	}
+	Logger  micrologger.Logger
+	Service *service.Service
 }
 
 // New creates a new configured endpoint.
