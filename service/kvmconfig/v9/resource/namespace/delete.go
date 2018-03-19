@@ -18,7 +18,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if namespaceToDelete != nil {
-		r.logger.LogCtx(ctx, "debug", "deleting the namespace in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the namespace in the Kubernetes API")
 
 		err = r.k8sClient.CoreV1().Namespaces().Delete(namespaceToDelete.Name, &apismetav1.DeleteOptions{})
 		if apierrors.IsNotFound(err) {
@@ -27,11 +27,11 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "debug", "deleted the namespace in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the namespace in the Kubernetes API")
 		reconciliationcanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for custom object")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for custom object")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the namespace does not need to be deleted from the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the namespace does not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -59,14 +59,14 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "finding out if the namespace has to be deleted")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the namespace has to be deleted")
 
 	var namespaceToDelete *apiv1.Namespace
 	if currentNamespace != nil {
 		namespaceToDelete = desiredNamespace
 	}
 
-	r.logger.LogCtx(ctx, "debug", "found out if the namespace has to be deleted")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "found out if the namespace has to be deleted")
 
 	return namespaceToDelete, nil
 }

@@ -23,7 +23,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if len(deploymentsToUpdate) != 0 {
-		r.logger.LogCtx(ctx, "debug", "updating the deployments in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updating the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToUpdate {
@@ -33,9 +33,9 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "debug", "updated the deployments in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updated the deployments in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the deployments do not need to be updated in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the deployments do not need to be updated in the Kubernetes API")
 	}
 
 	return nil
@@ -74,7 +74,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
-		r.logger.LogCtx(ctx, "debug", "finding out which deployments have to be updated")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be updated")
 
 		// Updates can be quite disruptive. We have to be very careful with updating
 		// resources that potentially imply disrupting customer workloads. We have
@@ -83,7 +83,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		for _, d := range currentDeployments {
 			allReplicasUp := allNumbersEqual(d.Status.AvailableReplicas, d.Status.ReadyReplicas, d.Status.Replicas, d.Status.UpdatedReplicas)
 			if !allReplicasUp {
-				r.logger.LogCtx(ctx, "info", fmt.Sprintf("cannot update any deployment: deployment '%s' must have all replicas up", d.GetName()))
+				r.logger.LogCtx(ctx, "level", "info", "message", fmt.Sprintf("cannot update any deployment: deployment '%s' must have all replicas up", d.GetName()))
 				return nil, nil
 			}
 		}
@@ -99,23 +99,23 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			if IsNotFound(err) {
 				// NOTE that this case indicates we should remove the current deployment
 				// eventually.
-				r.logger.LogCtx(ctx, "warning", fmt.Sprintf("not updating deployment '%s': no desired deployment found", currentDeployment.GetName()))
+				r.logger.LogCtx(ctx, "level", "warning", "message", fmt.Sprintf("not updating deployment '%s': no desired deployment found", currentDeployment.GetName()))
 				continue
 			} else if err != nil {
 				return nil, microerror.Mask(err)
 			}
 
 			if !isDeploymentModified(desiredDeployment, currentDeployment) {
-				r.logger.LogCtx(ctx, "debug", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
 				continue
 			}
 
-			r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
 
 			return []*v1beta1.Deployment{desiredDeployment}, nil
 		}
 	} else {
-		r.logger.LogCtx(ctx, "debug", "not computing update state because deployments are not allowed to be updated")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "not computing update state because deployments are not allowed to be updated")
 	}
 
 	return nil, nil

@@ -17,36 +17,36 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	r.logger.LogCtx(ctx, "debug", "looking for a list of cluster role bindings in the Kubernetes API")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for a list of cluster role bindings in the Kubernetes API")
 
 	var currentClusterRoleBinding []*apiv1.ClusterRoleBinding
 	{
 		clusterRoleBinding, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Get(key.ClusterRoleBindingName(customObject), apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "debug", "did not find cluster role binding in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find cluster role binding in the Kubernetes API")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "debug", "found a list of cluster role binding in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found a list of cluster role binding in the Kubernetes API")
 
 			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBinding)
 		}
 
 		clusterRoleBindingPSP, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Get(key.ClusterRoleBindingPSPName(customObject), apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "debug", "did not find cluster role binding psp in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find cluster role binding psp in the Kubernetes API")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "debug", "found a list of cluster role binding psp in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found a list of cluster role binding psp in the Kubernetes API")
 
 			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBindingPSP)
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found a list of %d cluster role bindings in the Kubernetes API", len(currentClusterRoleBinding)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found a list of %d cluster role bindings in the Kubernetes API", len(currentClusterRoleBinding)))
 
 	return currentClusterRoleBinding, nil
 }

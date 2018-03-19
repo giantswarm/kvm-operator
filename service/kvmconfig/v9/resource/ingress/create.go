@@ -22,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(ingressesToCreate) != 0 {
-		r.logger.LogCtx(ctx, "debug", "creating the ingresses in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the ingresses in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToCreate {
@@ -34,9 +34,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "debug", "created the ingresses in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created the ingresses in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the ingresses do not need to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the ingresses do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -52,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "finding out which ingresses have to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which ingresses have to be created")
 
 	var ingressesToCreate []*v1beta1.Ingress
 
@@ -62,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d ingresses that have to be created", len(ingressesToCreate)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d ingresses that have to be created", len(ingressesToCreate)))
 
 	return ingressesToCreate, nil
 }

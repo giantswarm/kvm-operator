@@ -18,7 +18,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "looking for PVCs in the Kubernetes API")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for PVCs in the Kubernetes API")
 
 	var PVCs []*apiv1.PersistentVolumeClaim
 
@@ -28,17 +28,17 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	for _, name := range pvcNames {
 		manifest, err := r.k8sClient.Core().PersistentVolumeClaims(namespace).Get(name, apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "debug", "did not find a PVC in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find a PVC in the Kubernetes API")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "debug", "found a PVC in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found a PVC in the Kubernetes API")
 			PVCs = append(PVCs, manifest)
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d PVCs in the Kubernetes API", len(PVCs)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d PVCs in the Kubernetes API", len(PVCs)))
 
 	return PVCs, nil
 }

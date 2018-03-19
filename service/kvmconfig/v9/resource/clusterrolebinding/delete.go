@@ -18,7 +18,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(clusterRoleBindingsToDelete) != 0 {
-		r.logger.LogCtx(ctx, "debug", "deleting the cluster role bindings in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the cluster role bindings in the Kubernetes API")
 
 		// Delete the cluster role bindings in the Kubernetes API.
 		for _, clusterRoleBinding := range clusterRoleBindingsToDelete {
@@ -29,9 +29,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "debug", "deleted the cluster role bindings in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the cluster role bindings in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the cluster role bindings do not need to be deleted from the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the cluster role bindings do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -59,7 +59,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "finding out which cluster role bindings have to be deleted")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which cluster role bindings have to be deleted")
 
 	var clusterRoleBindingsToDelete []*apiv1.ClusterRoleBinding
 
@@ -69,7 +69,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d cluster role bindings that have to be deleted", len(clusterRoleBindingsToDelete)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d cluster role bindings that have to be deleted", len(clusterRoleBindingsToDelete)))
 
 	return clusterRoleBindingsToDelete, nil
 }

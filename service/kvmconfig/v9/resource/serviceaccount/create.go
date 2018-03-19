@@ -23,7 +23,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 	// Create the service account in the Kubernetes API.
 	if serviceAccountToCreate != nil {
-		r.logger.LogCtx(ctx, "debug", "creating the service account in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the service account in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		_, err := r.k8sClient.CoreV1().ServiceAccounts(namespace).Create(serviceAccountToCreate)
@@ -32,9 +32,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "debug", "created the service account in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created the service account in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the service account does not need to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the service account does not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -50,14 +50,14 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "finding out which service account has to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which service account has to be created")
 
 	var serviceAccountToCreate *apiv1.ServiceAccount
 	if currentServiceAccount == nil {
 		serviceAccountToCreate = desiredServiceAccount
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found out that service account that has to be created"))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found out that service account that has to be created"))
 
 	return serviceAccountToCreate, nil
 }

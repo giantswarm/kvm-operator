@@ -18,14 +18,14 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "computing the new cluster role bindings")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new cluster role bindings")
 
 	clusterRoleBindings, err := r.newClusterRoleBindings(customObject)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("computed the %d new cluster role bindings", len(clusterRoleBindings)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed the %d new cluster role bindings", len(clusterRoleBindings)))
 
 	return clusterRoleBindings, nil
 }
