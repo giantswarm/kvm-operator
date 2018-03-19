@@ -16,7 +16,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "computing the new service account")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new service account")
 
 	serviceAccount := &apiv1.ServiceAccount{
 		TypeMeta: apismetav1.TypeMeta{
@@ -33,7 +33,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		},
 	}
 
-	r.logger.LogCtx(ctx, "debug", "computed the new service account")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computed the new service account")
 
 	return serviceAccount, nil
 }

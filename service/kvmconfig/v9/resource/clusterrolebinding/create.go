@@ -17,7 +17,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 	// Create the cluster role bindings in the Kubernetes API.
 	if len(clusterRoleBindingsToCreate) != 0 {
-		r.logger.LogCtx(ctx, "debug", "creating the cluster role bindings in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the cluster role bindings in the Kubernetes API")
 
 		for _, clusterRoleBinding := range clusterRoleBindingsToCreate {
 			_, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Create(clusterRoleBinding)
@@ -27,9 +27,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "debug", "created the cluster role bindings in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created the cluster role bindings in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the cluster role bindings do not need to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the cluster role bindings do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -45,7 +45,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "finding out which cluster role bindings have to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which cluster role bindings have to be created")
 
 	var clusterRoleBindingsToCreate []*apiv1.ClusterRoleBinding
 
@@ -55,7 +55,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d cluster role bindings that have to be created", len(clusterRoleBindingsToCreate)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d cluster role bindings that have to be created", len(clusterRoleBindingsToCreate)))
 
 	return clusterRoleBindingsToCreate, nil
 }

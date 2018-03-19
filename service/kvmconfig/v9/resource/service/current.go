@@ -18,7 +18,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "looking for services in the Kubernetes API")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for services in the Kubernetes API")
 
 	var services []*apiv1.Service
 
@@ -31,17 +31,17 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	for _, name := range serviceNames {
 		manifest, err := r.k8sClient.CoreV1().Services(namespace).Get(name, apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "debug", "did not find a service in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find a service in the Kubernetes API")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "debug", "found a service in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found a service in the Kubernetes API")
 			services = append(services, manifest)
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d services in the Kubernetes API", len(services)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d services in the Kubernetes API", len(services)))
 
 	return services, nil
 }

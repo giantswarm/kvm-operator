@@ -18,7 +18,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "looking for ingresses in the Kubernetes API")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for ingresses in the Kubernetes API")
 
 	var ingresses []*v1beta1.Ingress
 
@@ -31,17 +31,17 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	for _, name := range ingressNames {
 		manifest, err := r.k8sClient.Extensions().Ingresses(namespace).Get(name, apismetav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "debug", "did not find a ingress in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find a ingress in the Kubernetes API")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "debug", "found a ingress in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found a ingress in the Kubernetes API")
 			ingresses = append(ingresses, manifest)
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d ingresses in the Kubernetes API", len(ingresses)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d ingresses in the Kubernetes API", len(ingresses)))
 
 	return ingresses, nil
 }

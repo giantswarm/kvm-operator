@@ -23,7 +23,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if serviceAccountToDelete != nil {
-		r.logger.LogCtx(ctx, "debug", "deleting the service account in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the service account in the Kubernetes API")
 
 		// Delete service account in the Kubernetes API.
 		namespace := key.ClusterNamespace(customObject)
@@ -33,9 +33,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "debug", "deleted the service account in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the service account in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the service account does not need to be deleted from the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the service account does not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -63,14 +63,14 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "finding out which service account has to be deleted")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which service account has to be deleted")
 
 	var serviceAccountToDelete *apiv1.ServiceAccount
 	if currentServiceAccount != nil {
 		serviceAccountToDelete = desiredServiceAccount
 	}
 
-	r.logger.LogCtx(ctx, "debug", "found out service account that has to be deleted")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "found out service account that has to be deleted")
 
 	return serviceAccountToDelete, nil
 }

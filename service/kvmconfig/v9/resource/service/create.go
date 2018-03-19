@@ -22,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(servicesToCreate) != 0 {
-		r.logger.LogCtx(ctx, "debug", "creating the services in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the services in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, service := range servicesToCreate {
@@ -34,9 +34,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "debug", "created the services in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created the services in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the services do not need to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the services do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -52,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "finding out which services have to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which services have to be created")
 
 	var servicesToCreate []*apiv1.Service
 
@@ -62,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d services that have to be created", len(servicesToCreate)))
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d services that have to be created", len(servicesToCreate)))
 
 	return servicesToCreate, nil
 }

@@ -22,7 +22,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if len(configMapsToUpdate) != 0 {
-		r.logger.LogCtx(ctx, "debug", "updating the config maps in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updating the config maps in the Kubernetes API")
 
 		// Create the config maps in the Kubernetes API.
 		namespace := key.ClusterNamespace(customObject)
@@ -33,9 +33,9 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "debug", "updated the config maps in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updated the config maps in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "debug", "the config maps do not need to be updated in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "the config maps do not need to be updated in the Kubernetes API")
 	}
 
 	return nil
@@ -75,7 +75,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	var configMapsToUpdate []*apiv1.ConfigMap
 	{
-		r.logger.LogCtx(ctx, "debug", "finding out which config maps have to be updated")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be updated")
 
 		for _, currentConfigMap := range currentConfigMaps {
 			desiredConfigMap, err := getConfigMapByName(desiredConfigMaps, currentConfigMap.Name)
@@ -90,7 +90,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			}
 		}
 
-		r.logger.LogCtx(ctx, "debug", fmt.Sprintf("found %d config maps that have to be updated", len(configMapsToUpdate)))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d config maps that have to be updated", len(configMapsToUpdate)))
 	}
 
 	return configMapsToUpdate, nil
