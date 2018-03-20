@@ -84,10 +84,11 @@ func main() {
 			Logger:        newLogger,
 			ServerFactory: newServerFactory,
 
-			Description: description,
-			GitCommit:   gitCommit,
-			Name:        name,
-			Source:      source,
+			Description:    description,
+			GitCommit:      gitCommit,
+			Name:           name,
+			Source:         source,
+			VersionBundles: service.NewVersionBundles(),
 		}
 
 		newCommand, err = command.New(c)
