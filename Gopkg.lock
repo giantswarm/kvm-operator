@@ -154,15 +154,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/giantswarm/microstorage"
-  packages = [
-    ".",
-    "memory"
-  ]
-  revision = "4411a6307c6b844b7f9e68aaba37407b41b1c4d7"
-
-[[projects]]
-  branch = "master"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -742,6 +733,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e3e49425fac840bf6707b54f78afc871b6756fb4f876ba4d203cd21b2937a191"
+  inputs-digest = "ce4d6cf2bbdf85aea5deea898efbab1785ef080729d0a1c98f6c99a232419c42"
   solver-name = "gps-cdcl"
   solver-version = 1
