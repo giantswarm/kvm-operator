@@ -16,7 +16,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "cloudconfig",
-				Description: "Nginx-ingress-controller updated to version 0.12.0",
+				Description: "Nginx Ingress Controller updated to version 0.12.0",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -43,11 +43,11 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.9.2",
+				Version: "1.9.5",
 			},
 			{
 				Name:    "nginx-ingress-controller",
-				Version: "0.11.0",
+				Version: "0.12.0",
 			},
 		},
 		Dependencies: []versionbundle.Dependency{},
