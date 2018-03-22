@@ -57,7 +57,7 @@
   name = "github.com/giantswarm/micrologger"
 
 [[constraint]]
-  branch = "master"
+  branch = "add-finalizers"
   name = "github.com/giantswarm/operatorkit"
 
 [[constraint]]
