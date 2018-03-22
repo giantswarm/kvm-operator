@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/framework/context/reconciliationcanceledcontext"
@@ -42,8 +43,13 @@ type Config struct {
 	// and different resources can be executed depending on the runtime object
 	// being reconciled.
 	ResourceRouter *ResourceRouter
+	RestClient     rest.Interface
 
 	BackOffFactory func() backoff.BackOff
+	// Name is the name which the framework uses on finalizers for resources.
+	// The name used should be unique in the kubernetes cluster, to ensure that
+	// two operators which handle the same resource add two distinct finalizers.
+	Name string
 }
 
 type Framework struct {
@@ -52,11 +58,13 @@ type Framework struct {
 	informer       informer.Interface
 	logger         micrologger.Logger
 	resourceRouter *ResourceRouter
+	restClient     rest.Interface
 
 	bootOnce sync.Once
 	mutex    sync.Mutex
 
 	backOffFactory func() backoff.BackOff
+	name           string
 }
 
 // New creates a new configured operator framework.
@@ -70,8 +78,14 @@ func New(config Config) (*Framework, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
+	if config.Name == "" {
+		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
+	}
 	if config.ResourceRouter == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.ResourceRouter must not be empty")
+	}
+	if config.RestClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.RestClient must not be empty")
 	}
 
 	if config.BackOffFactory == nil {
@@ -83,7 +97,9 @@ func New(config Config) (*Framework, error) {
 		crdClient:      config.CRDClient,
 		informer:       config.Informer,
 		logger:         config.Logger,
+		name:           config.Name,
 		resourceRouter: config.ResourceRouter,
+		restClient:     config.RestClient,
 
 		bootOnce: sync.Once{},
 		mutex:    sync.Mutex{},
@@ -150,6 +166,12 @@ func (f *Framework) DeleteFunc(obj interface{}) {
 		f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "error", "message", "stop framework reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
 		return
 	}
+
+	err = f.removeFinalizer(ctx, obj)
+	if err != nil {
+		f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "error", "message", "stop framework reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
+		return
+	}
 }
 
 // ProcessEvents takes the event channels created by the operatorkit informer
@@ -196,6 +218,18 @@ func (f *Framework) UpdateFunc(oldObj, newObj interface{}) {
 	// run into race conditions.
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
+
+	ok, err := f.addFinalizer(obj)
+	if err != nil {
+		f.logger.Log("event", "update", "function", "UpdateFunc", "level", "error", "message", "stop framework reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
+		return
+	}
+	if ok {
+		// A finalizer was added, this causes a new update event, so we stop
+		// reconciling here and will pick up the new event.
+		f.logger.Log("event", "update", "function", "UpdateFunc", "level", "debug", "message", "stop framework reconciliation due to finalizer added")
+		return
+	}
 
 	resourceSet, err := f.resourceRouter.ResourceSet(obj)
 	if IsNoResourceSet(err) {
