@@ -96,9 +96,10 @@
     "v_3_1_0",
     "v_3_1_1",
     "v_3_2_1",
-    "v_3_2_2"
+    "v_3_2_2",
+    "v_3_2_3"
   ]
-  revision = "c6099588bb65d48b8e122c21cfadc57972e0d158"
+  revision = "367b2c0706ffc1e6f5b7e065e4d7ea597328c5db"
 
 [[projects]]
   branch = "master"
@@ -733,6 +734,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ce4d6cf2bbdf85aea5deea898efbab1785ef080729d0a1c98f6c99a232419c42"
+  inputs-digest = "ae70d27d484a1e0be471c9246641070427b93cb43f892cf0a3e8a59d70ad157d"
   solver-name = "gps-cdcl"
   solver-version = 1
