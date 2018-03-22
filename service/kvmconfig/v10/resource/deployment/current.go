@@ -12,7 +12,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/metric"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v9/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
