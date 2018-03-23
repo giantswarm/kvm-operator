@@ -10,8 +10,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "component",
-				Description: "Add your change here.",
+				Component:   "cloudconfig",
+				Description: "Improved encryption key injection.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},

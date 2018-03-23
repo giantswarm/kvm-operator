@@ -69,10 +69,10 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var certsSearcher certs.Interface
 	{
-		c := certs.DefaultConfig()
-
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := certs.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
 
 		certsSearcher, err = certs.NewSearcher(c)
 		if err != nil {

@@ -27,21 +27,13 @@ type Config struct {
 	Logger    micrologger.Logger
 }
 
-func DefaultConfig() Config {
-	return Config{
-		// Dependencies.
-		K8sClient: nil,
-		Logger:    nil,
-	}
-}
-
 func NewSearcher(config Config) (*Searcher, error) {
 	// Dependencies.
 	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
 	s := &Searcher{
@@ -82,6 +74,26 @@ func (s *Searcher) SearchCluster(clusterID string) (Cluster, error) {
 	}
 
 	return cluster, nil
+}
+
+func (s *Searcher) SearchClusterOperator(clusterID string) (ClusterOperator, error) {
+	var clusterOperator ClusterOperator
+
+	certificates := []struct {
+		TLS  *TLS
+		Cert Cert
+	}{
+		{TLS: &clusterOperator.APIServer, Cert: ClusterOperatorAPICert},
+	}
+
+	for _, c := range certificates {
+		err := s.search(c.TLS, clusterID, c.Cert)
+		if err != nil {
+			return ClusterOperator{}, microerror.Mask(err)
+		}
+	}
+
+	return clusterOperator, nil
 }
 
 func (s *Searcher) SearchDraining(clusterID string) (Draining, error) {
