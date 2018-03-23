@@ -87,7 +87,7 @@
   revision = "9383ad5288f22c6fa4ab5412d37fecefdc81d37c"
 
 [[projects]]
-  branch = "xh3b4sd-3-2-4-fix-encryption-key"
+  branch = "master"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -100,7 +100,7 @@
     "v_3_2_3",
     "v_3_2_4"
   ]
-  revision = "7879395016ed4773330775e5278e2e636539f9b7"
+  revision = "a6b64cf872dbacff3dd96d0a743d2920a6aad0c0"
 
 [[projects]]
   branch = "master"
@@ -735,6 +735,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fa039552511925a78bdc01227d5a37628f1c21b024107a73fe7514d122234432"
+  inputs-digest = "dfdf08989ad35258b8b00d35ae51654c91b79340916f7c2857cf56a07a10151a"
   solver-name = "gps-cdcl"
   solver-version = 1
