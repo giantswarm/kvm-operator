@@ -47,12 +47,6 @@
   version = "v2.6.0"
 
 [[projects]]
-  name = "github.com/emicklei/go-restful-swagger12"
-  packages = ["."]
-  revision = "dcef7f55730566d41eae5db10e7d6981829720f6"
-  version = "1.0.1"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
@@ -65,7 +59,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
+  branch = "bump-k8s-libs"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -75,16 +69,16 @@
     "pkg/clientset/versioned/typed/core/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1"
   ]
-  revision = "6379f6848b80a4cdf0b5071a6bba51bed1d53c91"
+  revision = "b6f0d0cfc1a5e9134ae0a6479be0bf72eeaabcb9"
 
 [[projects]]
-  branch = "master"
+  branch = "bump-k8s-libs"
   name = "github.com/giantswarm/certs"
   packages = [
     ".",
     "certstest"
   ]
-  revision = "9aa7011ea95ba44609752bbcd4b07cf94cc8e95a"
+  revision = "da0b2d593b2284abea845d872376375e834d993a"
 
 [[projects]]
   branch = "master"
@@ -98,7 +92,7 @@
     "v_3_2_1",
     "v_3_2_2"
   ]
-  revision = "c6099588bb65d48b8e122c21cfadc57972e0d158"
+  revision = "367b2c0706ffc1e6f5b7e065e4d7ea597328c5db"
 
 [[projects]]
   branch = "master"
@@ -153,7 +147,7 @@
   revision = "2aaea11da0707ebb7f9fbabb07028a37b00efc16"
 
 [[projects]]
-  branch = "master"
+  branch = "bump-k8s-libs"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -168,16 +162,16 @@
     "framework/resource/retryresource",
     "informer"
   ]
-  revision = "d2b591431f19bc9035bafce284b903eafe85ae80"
+  revision = "ab009f84c1822c7d8271e49883f77d09d22dad00"
 
 [[projects]]
-  branch = "master"
+  branch = "bump-k8s-libs"
   name = "github.com/giantswarm/randomkeys"
   packages = [
     ".",
     "randomkeystest"
   ]
-  revision = "156c1ca72c8b9a1db95bcfa32922debdb5761238"
+  revision = "a3213c6205cd96761f652fa7820c496b27e30ab0"
 
 [[projects]]
   branch = "master"
@@ -331,7 +325,7 @@
     "json/scanner",
     "json/token"
   ]
-  revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
+  revision = "f40e974e75af4e271d97ce0fc917af5898ae7bda"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -377,7 +371,7 @@
     "jlexer",
     "jwriter"
   ]
-  revision = "f594efddfa171111dc4349cd6e78e8f61dc7936f"
+  revision = "517203d186eb343d3df4068565cc0446b450d2c4"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -525,7 +519,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "7ceb54c8418b8f9cdf0177b511d5cbb06e9fae39"
+  revision = "bb729a57828d76e3050e664d86aa052741ab620f"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -565,6 +559,8 @@
   name = "k8s.io/api"
   packages = [
     "admissionregistration/v1alpha1",
+    "admissionregistration/v1beta1",
+    "apps/v1",
     "apps/v1beta1",
     "apps/v1beta2",
     "authentication/v1",
@@ -578,6 +574,7 @@
     "batch/v2alpha1",
     "certificates/v1beta1",
     "core/v1",
+    "events/v1beta1",
     "extensions/v1beta1",
     "networking/v1",
     "policy/v1beta1",
@@ -587,10 +584,11 @@
     "scheduling/v1alpha1",
     "settings/v1alpha1",
     "storage/v1",
+    "storage/v1alpha1",
     "storage/v1beta1"
   ]
-  revision = "9b9dca205a15b6ce9ef10091f05d60a13fdcf418"
-  version = "kubernetes-1.8.5"
+  revision = "acf347b865f29325eb61f4cd2df11e86e073a5ee"
+  version = "kubernetes-1.9.3"
 
 [[projects]]
   name = "k8s.io/apiextensions-apiserver"
@@ -601,13 +599,12 @@
     "pkg/client/clientset/clientset/scheme",
     "pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
   ]
-  revision = "996a70a27a0dcf53642ca52601b9107cb2ad810a"
-  version = "kubernetes-1.8.4"
+  revision = "f1425805c0335c1f5b23e70f0154747b3df5a16a"
+  version = "kubernetes-1.9.3"
 
 [[projects]]
   name = "k8s.io/apimachinery"
   packages = [
-    "pkg/api/equality",
     "pkg/api/errors",
     "pkg/api/meta",
     "pkg/api/resource",
@@ -617,7 +614,6 @@
     "pkg/apis/meta/v1alpha1",
     "pkg/conversion",
     "pkg/conversion/queryparams",
-    "pkg/conversion/unstructured",
     "pkg/fields",
     "pkg/labels",
     "pkg/runtime",
@@ -648,8 +644,8 @@
     "pkg/watch",
     "third_party/forked/golang/reflect"
   ]
-  revision = "5134afd2c0c91158afac0d8a28bd2177185a3bcc"
-  version = "kubernetes-1.8.3"
+  revision = "19e3f5aa3adca672c153d324e6b7d82ff8935f03"
+  version = "kubernetes-1.9.3"
 
 [[projects]]
   name = "k8s.io/client-go"
@@ -661,6 +657,10 @@
     "kubernetes/scheme",
     "kubernetes/typed/admissionregistration/v1alpha1",
     "kubernetes/typed/admissionregistration/v1alpha1/fake",
+    "kubernetes/typed/admissionregistration/v1beta1",
+    "kubernetes/typed/admissionregistration/v1beta1/fake",
+    "kubernetes/typed/apps/v1",
+    "kubernetes/typed/apps/v1/fake",
     "kubernetes/typed/apps/v1beta1",
     "kubernetes/typed/apps/v1beta1/fake",
     "kubernetes/typed/apps/v1beta2",
@@ -687,6 +687,8 @@
     "kubernetes/typed/certificates/v1beta1/fake",
     "kubernetes/typed/core/v1",
     "kubernetes/typed/core/v1/fake",
+    "kubernetes/typed/events/v1beta1",
+    "kubernetes/typed/events/v1beta1/fake",
     "kubernetes/typed/extensions/v1beta1",
     "kubernetes/typed/extensions/v1beta1/fake",
     "kubernetes/typed/networking/v1",
@@ -705,6 +707,8 @@
     "kubernetes/typed/settings/v1alpha1/fake",
     "kubernetes/typed/storage/v1",
     "kubernetes/typed/storage/v1/fake",
+    "kubernetes/typed/storage/v1alpha1",
+    "kubernetes/typed/storage/v1alpha1/fake",
     "kubernetes/typed/storage/v1beta1",
     "kubernetes/typed/storage/v1beta1/fake",
     "pkg/version",
@@ -717,12 +721,13 @@
     "tools/pager",
     "tools/reference",
     "transport",
+    "util/buffer",
     "util/cert",
     "util/flowcontrol",
     "util/integer"
   ]
-  revision = "1b75876d45719a84085528ee621939b0c68a4b85"
-  version = "kubernetes-1.8.5"
+  revision = "9389c055a838d4f208b699b3c7c51b70f2368861"
+  version = "kubernetes-1.9.1"
 
 [[projects]]
   branch = "master"
@@ -733,6 +738,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ce4d6cf2bbdf85aea5deea898efbab1785ef080729d0a1c98f6c99a232419c42"
+  inputs-digest = "a59cb6dfdf97011e8e6c3ef00908bddccd86bbf65b37a4d885fd997047a400e5"
   solver-name = "gps-cdcl"
   solver-version = 1
