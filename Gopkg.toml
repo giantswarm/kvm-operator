@@ -33,7 +33,7 @@
   name = "github.com/giantswarm/certs"
 
 [[constraint]]
-  branch = "master"
+  branch = "xh3b4sd-3-2-4-fix-encryption-key"
   name = "github.com/giantswarm/k8scloudconfig"
 
 [[constraint]]
