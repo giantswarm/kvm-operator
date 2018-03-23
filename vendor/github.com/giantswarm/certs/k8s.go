@@ -25,20 +25,22 @@ type Cert string
 
 // These constants used as Cert parsing a secret received from the API.
 const (
-	APICert            Cert = "api"
-	CalicoCert         Cert = "calico"
-	EtcdCert           Cert = "etcd"
-	FlanneldCert       Cert = "flanneld"
-	NodeOperatorCert   Cert = "node-operator"
-	PrometheusCert     Cert = "prometheus"
-	ServiceAccountCert Cert = "service-account"
-	WorkerCert         Cert = "worker"
+	APICert                Cert = "api"
+	CalicoCert             Cert = "calico"
+	ClusterOperatorAPICert Cert = "cluster-operator-api"
+	EtcdCert               Cert = "etcd"
+	FlanneldCert           Cert = "flanneld"
+	NodeOperatorCert       Cert = "node-operator"
+	PrometheusCert         Cert = "prometheus"
+	ServiceAccountCert     Cert = "service-account"
+	WorkerCert             Cert = "worker"
 )
 
 // AllCerts lists all certificates that can be created by cert-operator.
 var AllCerts = []Cert{
 	APICert,
 	CalicoCert,
+	ClusterOperatorAPICert,
 	EtcdCert,
 	FlanneldCert,
 	NodeOperatorCert,

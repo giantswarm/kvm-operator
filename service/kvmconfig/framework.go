@@ -13,6 +13,7 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4"
@@ -68,10 +69,10 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var certsSearcher certs.Interface
 	{
-		c := certs.DefaultConfig()
-
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := certs.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
 
 		certsSearcher, err = certs.NewSearcher(c)
 		if err != nil {
@@ -253,6 +254,24 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
+	var resourceSetV10 *framework.ResourceSet
+	{
+		c := v10.ResourceSetConfig{
+			CertsSearcher:      certsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			ProjectName:        config.Name,
+		}
+
+		resourceSetV10, err = v10.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceRouter *framework.ResourceRouter
 	{
 		c := framework.ResourceRouterConfig{
@@ -267,6 +286,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 				resourceSetV7,
 				resourceSetV8,
 				resourceSetV9,
+				resourceSetV10,
 			},
 		}
 

@@ -10,8 +10,13 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "component",
-				Description: "Put your description here",
+				Component:   "cloudconfig",
+				Description: "Kubernetes updated to version 1.9.5.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Nginx Ingress Controller updated to version 0.12.0",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -38,11 +43,11 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.9.2",
+				Version: "1.9.5",
 			},
 			{
 				Name:    "nginx-ingress-controller",
-				Version: "0.11.0",
+				Version: "0.12.0",
 			},
 		},
 		Dependencies: []versionbundle.Dependency{},
@@ -50,6 +55,6 @@ func VersionBundle() versionbundle.Bundle {
 		Name:         "kvm-operator",
 		Time:         time.Date(2018, time.March, 13, 12, 30, 0, 0, time.UTC),
 		Version:      "2.1.2",
-		WIP:          true,
+		WIP:          false,
 	}
 }
