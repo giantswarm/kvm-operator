@@ -1,32 +1,54 @@
 package cloudconfig
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_2_3"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_2_4"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/randomkeys"
 )
 
+// NewMasterTemplate generates a new worker cloud config template and returns it
+// as a base64 encoded string.
+func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, randomKeys randomkeys.Cluster) (string, error) {
+	var err error
+
+	var params k8scloudconfig.Params
+	{
+		params.APIServerEncryptionKey = string(randomKeys.APIServerEncryptionKey)
+		params.Cluster = customObject.Spec.Cluster
+		params.Extension = &masterExtension{
+			certs: certs,
+		}
+		params.Node = node
+	}
+
+	var newCloudConfig *k8scloudconfig.CloudConfig
+	{
+		cloudConfigConfig := k8scloudconfig.DefaultCloudConfigConfig()
+		cloudConfigConfig.Params = params
+		cloudConfigConfig.Template = k8scloudconfig.MasterTemplate
+
+		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+
+		err = newCloudConfig.ExecuteTemplate()
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+	}
+
+	return newCloudConfig.Base64(), nil
+}
+
 type masterExtension struct {
 	certs certs.Cluster
-	keys  randomkeys.Cluster
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	encryptionConfig, err := encryptionConfig(e.keys.APIServerEncryptionKey)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	filesMeta := []k8scloudconfig.FileMetadata{
-		// Encryption key
-		{
-			AssetContent: encryptionConfig,
-			Path:         "/etc/kubernetes/encryption/k8s-encryption-config.yaml",
-			Owner:        FileOwner,
-			Permissions:  0600,
-		},
-	}
+	var filesMeta []k8scloudconfig.FileMetadata
 
 	for _, f := range certs.NewFilesClusterMaster(e.certs) {
 		m := k8scloudconfig.FileMetadata{
