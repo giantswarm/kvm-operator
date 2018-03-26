@@ -303,8 +303,11 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		c.CRD = v1alpha1.NewKVMConfigCRD()
 		c.CRDClient = crdClient
 		c.Informer = newInformer
+		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 		c.ResourceRouter = resourceRouter
+
+		c.Name = config.Name
 
 		crdFramework, err = framework.New(c)
 		if err != nil {
