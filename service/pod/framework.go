@@ -107,8 +107,11 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		c := framework.Config{}
 
 		c.Informer = newInformer
+		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 		c.ResourceRouter = resourceRouter
+
+		c.Name = config.Name
 
 		podFramework, err = framework.New(c)
 		if err != nil {

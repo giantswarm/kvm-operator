@@ -164,7 +164,7 @@
     "framework/resource/retryresource",
     "informer"
   ]
-  revision = "e785d24fd81b018fa0ebe1fa7874e306a413461a"
+  revision = "1aeeea68c3d286464683f126b4d4c87d885b40ce"
 
 [[projects]]
   branch = "master"
@@ -552,10 +552,10 @@
   version = "v0.9.0"
 
 [[projects]]
+  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
-  version = "v2.1.1"
+  revision = "4fc5987536ef307a24ca299aee7ae301cde3d221"
 
 [[projects]]
   name = "k8s.io/api"
