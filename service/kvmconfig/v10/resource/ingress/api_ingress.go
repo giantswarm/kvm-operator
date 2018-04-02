@@ -23,7 +23,7 @@ func newAPIIngress(customObject v1alpha1.KVMConfig) *extensionsv1.Ingress {
 				"app":      key.MasterID,
 			},
 			Annotations: map[string]string{
-				"ingress.kubernetes.io/ssl-passthrough": "true",
+				"nginx.ingress.kubernetes.io/ssl-passthrough": "true",
 			},
 		},
 		Spec: extensionsv1.IngressSpec{
