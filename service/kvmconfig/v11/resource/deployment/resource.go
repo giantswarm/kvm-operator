@@ -6,12 +6,12 @@ import (
 	"k8s.io/api/extensions/v1beta1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/key"
 )
 
 const (
 	// Name is the identifier of the resource.
-	Name = "deploymentv10"
+	Name = "deploymentv11"
 )
 
 // Config represents the configuration used to create a new deployment resource.

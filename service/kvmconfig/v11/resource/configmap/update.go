@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/framework"
 	apiv1 "k8s.io/api/core/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/key"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
