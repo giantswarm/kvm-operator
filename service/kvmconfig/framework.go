@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4"
@@ -272,6 +273,24 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
+	var resourceSetV11 *framework.ResourceSet
+	{
+		c := v11.ResourceSetConfig{
+			CertsSearcher:      certsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			ProjectName:        config.Name,
+		}
+
+		resourceSetV11, err = v11.NewResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceRouter *framework.ResourceRouter
 	{
 		c := framework.ResourceRouterConfig{
@@ -287,6 +306,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 				resourceSetV8,
 				resourceSetV9,
 				resourceSetV10,
+				resourceSetV11,
 			},
 		}
 

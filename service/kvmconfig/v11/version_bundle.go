@@ -10,13 +10,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "cloudconfig",
-				Description: "Improved encryption key injection.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "kvmconfig",
-				Description: "Updated ingress annotations for api and etcd.",
+				Component:   "components",
+				Description: "Put your description here.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -53,8 +48,8 @@ func VersionBundle() versionbundle.Bundle {
 		Dependencies: []versionbundle.Dependency{},
 		Deprecated:   false,
 		Name:         "kvm-operator",
-		Time:         time.Date(2018, time.March, 22, 15, 30, 0, 0, time.UTC),
-		Version:      "2.1.3",
-		WIP:          false,
+		Time:         time.Date(2018, time.April, 04, 17, 32, 0, 0, time.UTC),
+		Version:      "2.1.4",
+		WIP:          true,
 	}
 }
