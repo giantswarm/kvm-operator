@@ -14,6 +14,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Improved encryption key injection.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kvmconfig",
+				Description: "Updated ingress annotations for api and etcd.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
