@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"k8s.io/api/extensions/v1beta1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10/key"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/key"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
