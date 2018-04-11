@@ -1,24 +1,25 @@
-package v2
+package v11
 
 import (
 	"github.com/cenkalti/backoff"
-	"github.com/giantswarm/kvm-operator/service/pod/v2/resource/pod"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
 	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/pod"
 )
 
-type ResourceSetConfig struct {
+type DrainerResourceSetConfig struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
 	ProjectName string
 }
 
-func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
+func NewDrainerResourceSet(config DrainerResourceSetConfig) (*framework.ResourceSet, error) {
 	var err error
 
 	handlesFunc := func(obj interface{}) bool {
@@ -65,7 +66,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var resourceSet *framework.ResourceSet
+	var drainerResourceSet *framework.ResourceSet
 	{
 		c := framework.ResourceSetConfig{
 			Handles:   handlesFunc,
@@ -73,11 +74,11 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 			Resources: resources,
 		}
 
-		resourceSet, err = framework.NewResourceSet(c)
+		drainerResourceSet, err = framework.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	return resourceSet, nil
+	return drainerResourceSet, nil
 }

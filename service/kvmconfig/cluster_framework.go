@@ -25,32 +25,19 @@ import (
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v9"
 )
 
-type FrameworkConfig struct {
+type ClusterFrameworkConfig struct {
 	G8sClient    versioned.Interface
 	K8sClient    kubernetes.Interface
 	K8sExtClient apiextensionsclient.Interface
 	Logger       micrologger.Logger
 
 	GuestUpdateEnabled bool
-	// Name is the name of the project.
-	Name string
+	ProjectName        string
 }
 
-func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
+func NewClusterFramework(config ClusterFrameworkConfig) (*framework.Framework, error) {
 	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.G8sClient must not be empty")
-	}
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
-	}
-	if config.K8sExtClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sExtClient must not be empty")
-	}
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
-	}
-	if config.Name == "" {
-		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
 	}
 
 	var err error
@@ -120,7 +107,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 				"0.1.0",
 				"", // This is for legacy custom objects.
 			},
-			Name: config.Name,
+			Name: config.ProjectName,
 		}
 
 		resourceSetV2, err = v2.NewResourceSet(c)
@@ -138,7 +125,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			Name:               config.Name,
+			Name:               config.ProjectName,
 		}
 
 		resourceSetV3, err = v3.NewResourceSet(c)
@@ -156,7 +143,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
 		resourceSetV4, err = v4.NewResourceSet(c)
@@ -174,7 +161,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
 		resourceSetV5, err = v5.NewResourceSet(c)
@@ -192,7 +179,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
 		resourceSetV6, err = v6.NewResourceSet(c)
@@ -210,7 +197,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
 		resourceSetV7, err = v7.NewResourceSet(c)
@@ -228,7 +215,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
 		resourceSetV8, err = v8.NewResourceSet(c)
@@ -246,7 +233,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
 		resourceSetV9, err = v9.NewResourceSet(c)
@@ -264,7 +251,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
 		resourceSetV10, err = v10.NewResourceSet(c)
@@ -275,17 +262,17 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 
 	var resourceSetV11 *framework.ResourceSet
 	{
-		c := v11.ResourceSetConfig{
+		c := v11.ClusterResourceSetConfig{
 			CertsSearcher:      certsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.Name,
+			ProjectName:        config.ProjectName,
 		}
 
-		resourceSetV11, err = v11.NewResourceSet(c)
+		resourceSetV11, err = v11.NewClusterResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -316,24 +303,24 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
-	var crdFramework *framework.Framework
+	var clusterFramework *framework.Framework
 	{
-		c := framework.Config{}
+		c := framework.Config{
+			CRD:            v1alpha1.NewKVMConfigCRD(),
+			CRDClient:      crdClient,
+			Informer:       newInformer,
+			K8sClient:      config.K8sClient,
+			Logger:         config.Logger,
+			ResourceRouter: resourceRouter,
 
-		c.CRD = v1alpha1.NewKVMConfigCRD()
-		c.CRDClient = crdClient
-		c.Informer = newInformer
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
-		c.ResourceRouter = resourceRouter
+			Name: config.ProjectName,
+		}
 
-		c.Name = config.Name
-
-		crdFramework, err = framework.New(c)
+		clusterFramework, err = framework.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	return crdFramework, nil
+	return clusterFramework, nil
 }

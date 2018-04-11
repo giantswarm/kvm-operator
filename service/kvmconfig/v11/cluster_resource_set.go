@@ -26,11 +26,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/serviceaccount"
 )
 
-const (
-	ResourceRetries uint64 = 3
-)
-
-type ResourceSetConfig struct {
+type ClusterResourceSetConfig struct {
 	CertsSearcher      certs.Interface
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
@@ -40,25 +36,8 @@ type ResourceSetConfig struct {
 	ProjectName        string
 }
 
-func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
+func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.ResourceSet, error) {
 	var err error
-
-	if config.CertsSearcher == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.CertsSearcher must not be empty")
-	}
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
-	}
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
-	}
-	if config.RandomkeysSearcher == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.RandomkeysSearcher must not be empty")
-	}
-
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "config.ProjectName must not be empty")
-	}
 
 	var cloudConfig *cloudconfig.CloudConfig
 	{
@@ -232,7 +211,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 
 	{
 		c := retryresource.WrapConfig{
-			BackOffFactory: func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) },
+			BackOffFactory: func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), uint64(3)) },
 			Logger:         config.Logger,
 		}
 
@@ -274,7 +253,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		return ctx, nil
 	}
 
-	var resourceSet *framework.ResourceSet
+	var clusterResourceSet *framework.ResourceSet
 	{
 		c := framework.ResourceSetConfig{
 			Handles:   handlesFunc,
@@ -283,13 +262,13 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 			Resources: resources,
 		}
 
-		resourceSet, err = framework.NewResourceSet(c)
+		clusterResourceSet, err = framework.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	return resourceSet, nil
+	return clusterResourceSet, nil
 }
 
 func toCRUDResource(logger micrologger.Logger, ops framework.CRUDResourceOps) (*framework.CRUDResource, error) {

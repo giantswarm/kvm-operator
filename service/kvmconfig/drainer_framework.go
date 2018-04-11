@@ -1,4 +1,4 @@
-package pod
+package kvmconfig
 
 import (
 	"fmt"
@@ -10,27 +10,22 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/pod/v2"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11"
+	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/key"
 )
 
-const (
-	PodWatcherLabel = "giantswarm.io/pod-watcher"
-)
-
-type FrameworkConfig struct {
+type DrainerFrameworkConfig struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
 	ProjectName string
 }
 
-func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
+func NewDrainerFramework(config DrainerFrameworkConfig) (*framework.Framework, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
-	}
+
 	if config.ProjectName == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
 	}
@@ -43,7 +38,7 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Watcher: config.K8sClient.CoreV1().Pods(""),
 
 			ListOptions: apismetav1.ListOptions{
-				LabelSelector: fmt.Sprintf("%s=%s", PodWatcherLabel, config.ProjectName),
+				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.ProjectName),
 			},
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,
@@ -55,12 +50,12 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 		}
 	}
 
-	resourceRouter, err := newResourceRouter(config)
+	resourceRouter, err := newDrainerResourceRouter(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	var podFramework *framework.Framework
+	var drainerFramework *framework.Framework
 	{
 		c := framework.Config{
 			Informer:       newInformer,
@@ -71,28 +66,28 @@ func NewFramework(config FrameworkConfig) (*framework.Framework, error) {
 			Name: config.ProjectName,
 		}
 
-		podFramework, err = framework.New(c)
+		drainerFramework, err = framework.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	return podFramework, nil
+	return drainerFramework, nil
 }
 
-func newResourceRouter(config FrameworkConfig) (*framework.ResourceRouter, error) {
+func newDrainerResourceRouter(config DrainerFrameworkConfig) (*framework.ResourceRouter, error) {
 	var err error
 
-	var resourceSetV2 *framework.ResourceSet
+	var resourceSetV11 *framework.ResourceSet
 	{
-		c := v2.ResourceSetConfig{
+		c := v11.DrainerResourceSetConfig{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
 		}
 
-		resourceSetV2, err = v2.NewResourceSet(c)
+		resourceSetV11, err = v11.NewDrainerResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -104,7 +99,7 @@ func newResourceRouter(config FrameworkConfig) (*framework.ResourceRouter, error
 			Logger: config.Logger,
 
 			ResourceSets: []*framework.ResourceSet{
-				resourceSetV2,
+				resourceSetV11,
 			},
 		}
 

@@ -9,7 +9,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
@@ -57,6 +57,10 @@ const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
+const (
+	PodWatcherLabel = "giantswarm.io/pod-watcher"
+)
+
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
 }
@@ -69,7 +73,7 @@ func ClusterID(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.ID
 }
 
-func ClusterIDFromPod(pod *apiv1.Pod) string {
+func ClusterIDFromPod(pod *corev1.Pod) string {
 	l, ok := pod.Labels["cluster"]
 	if ok {
 		return l
@@ -236,6 +240,19 @@ func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	customObject := *customObjectPointer
 
 	return customObject, nil
+}
+
+func ToPod(v interface{}) (*corev1.Pod, error) {
+	if v == nil {
+		return nil, nil
+	}
+
+	pod, ok := v.(*corev1.Pod)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &corev1.Pod{}, v)
+	}
+
+	return pod, nil
 }
 
 func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
