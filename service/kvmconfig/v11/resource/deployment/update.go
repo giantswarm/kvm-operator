@@ -91,7 +91,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		// We select one deployment to be updated per reconciliation loop. Therefore
 		// we have to check its state on the version bundle level to see if a
 		// deployment is already up to date. We also check if there are any other
-		// changes on the pod specs. In case there are not, we check the next one.
+		// changes on the pod specs. In case there are none, we check the next one.
 		// The first one not being up to date will be chosen to be updated next and
 		// the loop will be broken immediatelly.
 		for _, currentDeployment := range currentDeployments {

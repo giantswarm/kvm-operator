@@ -42,8 +42,6 @@ type Service struct {
 }
 
 func New(config Config) (*Service, error) {
-	var err error
-
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
@@ -56,6 +54,8 @@ func New(config Config) (*Service, error) {
 	if config.Viper == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Viper must not be empty")
 	}
+
+	var err error
 
 	var restConfig *rest.Config
 	{
@@ -129,7 +129,7 @@ func New(config Config) (*Service, error) {
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
-			Name: config.Name,
+			ProjectName: config.Name,
 		}
 
 		podFramework, err = pod.NewFramework(c)

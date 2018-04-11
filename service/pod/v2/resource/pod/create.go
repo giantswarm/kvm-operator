@@ -4,6 +4,6 @@ import (
 	"context"
 )
 
-func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
+func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	return nil
 }

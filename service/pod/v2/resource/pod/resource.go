@@ -7,19 +7,12 @@ import (
 )
 
 const (
-	Name = "pod"
+	Name = "podv2"
 )
 
 type Config struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
-}
-
-func DefaultConfig() Config {
-	return Config{
-		K8sClient: nil,
-		Logger:    nil,
-	}
 }
 
 type Resource struct {
@@ -29,10 +22,10 @@ type Resource struct {
 
 func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
 	newService := &Resource{
