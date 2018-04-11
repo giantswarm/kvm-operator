@@ -1,4 +1,4 @@
-package kvmconfig
+package controller
 
 import "github.com/giantswarm/microerror"
 

@@ -8,7 +8,7 @@ import (
 	"k8s.io/api/extensions/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v3/key"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {

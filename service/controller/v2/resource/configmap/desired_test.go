@@ -11,7 +11,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2/cloudconfig/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/controller/v2/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {

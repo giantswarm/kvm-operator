@@ -6,7 +6,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v10/key"
 )
 
 func newAPIIngress(customObject v1alpha1.KVMConfig) *extensionsv1.Ingress {

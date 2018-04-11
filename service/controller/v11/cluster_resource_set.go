@@ -14,16 +14,16 @@ import (
 	"github.com/giantswarm/randomkeys"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/key"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/clusterrolebinding"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/configmap"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/deployment"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/ingress"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/namespace"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/pvc"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/service"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/resource/serviceaccount"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/clusterrolebinding"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/deployment"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/ingress"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/namespace"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/pvc"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/service"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/serviceaccount"
 )
 
 type ClusterResourceSetConfig struct {

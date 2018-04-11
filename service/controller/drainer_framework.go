@@ -1,4 +1,4 @@
-package kvmconfig
+package controller
 
 import (
 	"fmt"
@@ -10,8 +10,8 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v11"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
 )
 
 type DrainerFrameworkConfig struct {

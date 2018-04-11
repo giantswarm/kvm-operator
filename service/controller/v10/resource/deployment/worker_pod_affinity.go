@@ -5,7 +5,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v10/key"
 )
 
 func newWorkerPodAfinity(customObject v1alpha1.KVMConfig) *apiv1.Affinity {

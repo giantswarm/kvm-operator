@@ -9,7 +9,7 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {

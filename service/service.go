@@ -16,8 +16,8 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/service/controller"
 	"github.com/giantswarm/kvm-operator/service/healthz"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig"
 )
 
 type Config struct {
@@ -106,7 +106,7 @@ func New(config Config) (*Service, error) {
 
 	var clusterFramework *framework.Framework
 	{
-		c := kvmconfig.ClusterFrameworkConfig{
+		c := controller.ClusterFrameworkConfig{
 			G8sClient:    g8sClient,
 			K8sClient:    k8sClient,
 			K8sExtClient: k8sExtClient,
@@ -116,7 +116,7 @@ func New(config Config) (*Service, error) {
 			ProjectName:        config.Name,
 		}
 
-		clusterFramework, err = kvmconfig.NewClusterFramework(c)
+		clusterFramework, err = controller.NewClusterFramework(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -124,14 +124,14 @@ func New(config Config) (*Service, error) {
 
 	var drainerFramework *framework.Framework
 	{
-		c := kvmconfig.DrainerFrameworkConfig{
+		c := controller.DrainerFrameworkConfig{
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
 			ProjectName: config.Name,
 		}
 
-		drainerFramework, err = kvmconfig.NewDrainerFramework(c)
+		drainerFramework, err = controller.NewDrainerFramework(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

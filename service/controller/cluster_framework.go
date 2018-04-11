@@ -1,4 +1,4 @@
-package kvmconfig
+package controller
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
@@ -13,16 +13,16 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v10"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v11"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v2"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v3"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v4"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v5"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v6"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v7"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v8"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig/v9"
+	"github.com/giantswarm/kvm-operator/service/controller/v10"
+	"github.com/giantswarm/kvm-operator/service/controller/v11"
+	"github.com/giantswarm/kvm-operator/service/controller/v2"
+	"github.com/giantswarm/kvm-operator/service/controller/v3"
+	"github.com/giantswarm/kvm-operator/service/controller/v4"
+	"github.com/giantswarm/kvm-operator/service/controller/v5"
+	"github.com/giantswarm/kvm-operator/service/controller/v6"
+	"github.com/giantswarm/kvm-operator/service/controller/v7"
+	"github.com/giantswarm/kvm-operator/service/controller/v8"
+	"github.com/giantswarm/kvm-operator/service/controller/v9"
 )
 
 type ClusterFrameworkConfig struct {
