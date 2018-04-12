@@ -10,8 +10,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "components",
-				Description: "Put your description here.",
+				Component:   "kubernetes",
+				Description: "Updated Kubernets to 1.10.0.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -38,7 +38,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.9.5",
+				Version: "1.10.0",
 			},
 			{
 				Name:    "nginx-ingress-controller",
