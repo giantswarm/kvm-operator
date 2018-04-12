@@ -16,9 +16,8 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/service/controller"
 	"github.com/giantswarm/kvm-operator/service/healthz"
-	"github.com/giantswarm/kvm-operator/service/kvmconfig"
-	"github.com/giantswarm/kvm-operator/service/pod"
 )
 
 type Config struct {
@@ -33,10 +32,10 @@ type Config struct {
 }
 
 type Service struct {
-	Healthz            *healthz.Service
-	KVMConfigFramework *framework.Framework
-	PodFramework       *framework.Framework
-	Version            *version.Service
+	Healthz          *healthz.Service
+	ClusterFramework *framework.Framework
+	DrainerFramework *framework.Framework
+	Version          *version.Service
 
 	bootOnce sync.Once
 }
@@ -105,34 +104,34 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var kvmConfigFramework *framework.Framework
+	var clusterFramework *framework.Framework
 	{
-		c := kvmconfig.FrameworkConfig{
+		c := controller.ClusterFrameworkConfig{
 			G8sClient:    g8sClient,
 			K8sClient:    k8sClient,
 			K8sExtClient: k8sExtClient,
 			Logger:       config.Logger,
 
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled),
-			Name:               config.Name,
+			ProjectName:        config.Name,
 		}
 
-		kvmConfigFramework, err = kvmconfig.NewFramework(c)
+		clusterFramework, err = controller.NewClusterFramework(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var podFramework *framework.Framework
+	var drainerFramework *framework.Framework
 	{
-		c := pod.FrameworkConfig{
+		c := controller.DrainerFrameworkConfig{
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
 			ProjectName: config.Name,
 		}
 
-		podFramework, err = pod.NewFramework(c)
+		drainerFramework, err = controller.NewDrainerFramework(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -155,10 +154,10 @@ func New(config Config) (*Service, error) {
 	}
 
 	newService := &Service{
-		Healthz:            healthzService,
-		KVMConfigFramework: kvmConfigFramework,
-		PodFramework:       podFramework,
-		Version:            versionService,
+		Healthz:          healthzService,
+		ClusterFramework: clusterFramework,
+		DrainerFramework: drainerFramework,
+		Version:          versionService,
 
 		bootOnce: sync.Once{},
 	}
@@ -168,7 +167,7 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.KVMConfigFramework.Boot()
-		go s.PodFramework.Boot()
+		go s.ClusterFramework.Boot()
+		go s.DrainerFramework.Boot()
 	})
 }
