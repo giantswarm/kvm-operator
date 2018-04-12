@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -58,7 +59,12 @@ const (
 )
 
 const (
-	PodWatcherLabel = "giantswarm.io/pod-watcher"
+	DrainingNodesFinalizer = "kvm-operator.giantswarm.io/node-drainer"
+	PodWatcherLabel        = "kvm-operator.giantswarm.io/pod-watcher"
+)
+
+const (
+	PodDeletionGracePeriod = 5 * time.Minute
 )
 
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
