@@ -11,7 +11,7 @@ func VersionBundle() versionbundle.Bundle {
 		Changelogs: []versionbundle.Changelog{
 			{
 				Component:   "kubernetes",
-				Description: "Updated Kubernets to 1.10.0.",
+				Description: "Updated to 1.10.0.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
