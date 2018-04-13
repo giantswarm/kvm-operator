@@ -4,7 +4,7 @@ import "github.com/giantswarm/microerror"
 
 var executionError = microerror.New("execution error")
 
-func IsExecutionError(err error) bool {
+func IsExecution(err error) bool {
 	return microerror.Cause(err) == executionError
 }
 
@@ -22,12 +22,12 @@ func IsInvalidSecret(err error) bool {
 
 var timeoutError = microerror.New("timeout")
 
-func IsTimeoutError(err error) bool {
+func IsTimeout(err error) bool {
 	return microerror.Cause(err) == timeoutError
 }
 
 var wrongTypeError = microerror.New("wrong type")
 
-func IsWrongTypeError(err error) bool {
+func IsWrongType(err error) bool {
 	return microerror.Cause(err) == wrongTypeError
 }

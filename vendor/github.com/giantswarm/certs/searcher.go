@@ -15,20 +15,26 @@ import (
 )
 
 const (
-	// watchTimeOut is the time to wait on watches against the Kubernetes API
-	// before giving up and throwing an error.
-	watchTimeOut = 90 * time.Second
+	// DefaultWatchTimeout is the time to wait on watches against the Kubernetes
+	// API before giving up and throwing an error.
+	DefaultWatchTimeout = 90 * time.Second
 )
 
 type Config struct {
-	// Dependencies.
-
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
+
+	WatchTimeout time.Duration
+}
+
+type Searcher struct {
+	k8sClient kubernetes.Interface
+	logger    micrologger.Logger
+
+	watchTimeout time.Duration
 }
 
 func NewSearcher(config Config) (*Searcher, error) {
-	// Dependencies.
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
@@ -36,20 +42,18 @@ func NewSearcher(config Config) (*Searcher, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
+	if config.WatchTimeout == 0 {
+		config.WatchTimeout = DefaultWatchTimeout
+	}
+
 	s := &Searcher{
-		// Dependencies.
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
+
+		watchTimeout: config.WatchTimeout,
 	}
 
 	return s, nil
-}
-
-type Searcher struct {
-	// Dependencies.
-
-	k8sClient kubernetes.Interface
-	logger    micrologger.Logger
 }
 
 func (s *Searcher) SearchCluster(clusterID string) (Cluster, error) {
@@ -178,7 +182,7 @@ func (s *Searcher) search(tls *TLS, clusterID string, cert Cert) error {
 			case watch.Error:
 				return microerror.Maskf(executionError, "watching secrets, selector = %q: %v", selector, apierrors.FromObject(event.Object))
 			}
-		case <-time.After(watchTimeOut):
+		case <-time.After(s.watchTimeout):
 			return microerror.Maskf(timeoutError, "waiting secrets, selector = %q", selector)
 		}
 	}
