@@ -19,6 +19,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 
 	privileged := true
 	replicas := int32(1)
+	podDeletionGracePeriod := int64(key.PodDeletionGracePeriod.Seconds())
 
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
@@ -58,11 +59,15 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: key.WorkerID,
+						Finalizers: []string{
+							key.DrainingNodesFinalizer,
+						},
 						Labels: map[string]string{
-							"cluster":  key.ClusterID(customObject),
-							"customer": key.ClusterCustomer(customObject),
-							"app":      key.WorkerID,
-							"node":     workerNode.ID,
+							"cluster":           key.ClusterID(customObject),
+							"customer":          key.ClusterCustomer(customObject),
+							"app":               key.WorkerID,
+							"node":              workerNode.ID,
+							key.PodWatcherLabel: "kvm-operator",
 						},
 						Annotations: map[string]string{
 							key.AnnotationIp:      "",
@@ -75,7 +80,8 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 						NodeSelector: map[string]string{
 							"role": key.WorkerID,
 						},
-						ServiceAccountName: key.ServiceAccountName(customObject),
+						ServiceAccountName:            key.ServiceAccountName(customObject),
+						TerminationGracePeriodSeconds: &podDeletionGracePeriod,
 						Volumes: []apiv1.Volume{
 							{
 								Name: "cloud-config",
