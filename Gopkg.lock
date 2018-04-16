@@ -69,7 +69,7 @@
     "pkg/clientset/versioned/typed/core/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1"
   ]
-  revision = "2a517245443e2473ea3d49024e325c5ddae329c0"
+  revision = "292a0157b9683e2593f1d65e2e52c5ff2859f124"
 
 [[projects]]
   branch = "master"
@@ -78,7 +78,7 @@
     ".",
     "certstest"
   ]
-  revision = "25f23b0e8cccf531f2f88554d498a9d54d29ca03"
+  revision = "7be474c80bf0e824b1e575d21fb699686c0a9e4d"
 
 [[projects]]
   branch = "master"
@@ -165,7 +165,7 @@
     "framework/resource/retryresource",
     "informer"
   ]
-  revision = "ab7825b0d283f56220137f4d5c9c7e9b35ed59ac"
+  revision = "ebc742775a50bb8fbad485cfef9c95e3d4a066a2"
 
 [[projects]]
   branch = "master"
@@ -214,7 +214,7 @@
   branch = "master"
   name = "github.com/go-openapi/spec"
   packages = ["."]
-  revision = "370d9e047557906322be8396e77cb0376be6cb96"
+  revision = "bcff419492eeeb01f76e77d2ebc714dc97b607f5"
 
 [[projects]]
   branch = "master"
@@ -425,7 +425,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "e11c6ff8170beca9d5fd8b938e71165eeec53ac6"
+  revision = "f1323f902ca878b3a87e1a76458be272fe1efe0d"
 
 [[projects]]
   branch = "master"
@@ -510,7 +510,7 @@
     "lex/httplex",
     "publicsuffix"
   ]
-  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
+  revision = "500e7a4f953ddaf55d316b4d3adc516aa0379622"
 
 [[projects]]
   branch = "master"
@@ -522,7 +522,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "f6f352972f061230a99fbf49d1eb8073ebdb36cb"
+  revision = "2f57af4873d00d535c5c9028850aa2152e6a5566"
 
 [[projects]]
   name = "golang.org/x/text"

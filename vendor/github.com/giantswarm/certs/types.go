@@ -5,11 +5,12 @@ type TLS struct {
 }
 
 type Cluster struct {
-	APIServer      TLS
-	Worker         TLS
-	ServiceAccount TLS
-	CalicoClient   TLS
-	EtcdServer     TLS
+	APIServer        TLS
+	CalicoClient     TLS
+	CalicoEtcdClient TLS
+	EtcdServer       TLS
+	ServiceAccount   TLS
+	Worker           TLS
 }
 
 type ClusterOperator struct {
@@ -21,6 +22,6 @@ type Draining struct {
 }
 
 type Monitoring struct {
-	Prometheus       TLS
 	KubeStateMetrics TLS
+	Prometheus       TLS
 }
