@@ -2,6 +2,7 @@ package v11
 
 import (
 	"github.com/cenkalti/backoff"
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -13,6 +14,7 @@ import (
 )
 
 type DrainerResourceSetConfig struct {
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
@@ -29,6 +31,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*framework.Resource
 	var podResource framework.Resource
 	{
 		c := pod.Config{
+			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 		}

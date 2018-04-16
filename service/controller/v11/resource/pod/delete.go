@@ -2,11 +2,14 @@ package pod
 
 import (
 	"context"
+	"fmt"
 
+	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	providerv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/framework/context/reconciliationcanceledcontext"
+	"github.com/giantswarm/operatorkit/framework/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
@@ -23,13 +26,13 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	var currentPod *corev1.Pod
 	{
 		currentPod, err = r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(reconciledPod.Name, metav1.GetOptions{})
-		if errors.IsNotFound(err) {
+		if apierrors.IsNotFound(err) {
 			// In case we reconcile a pod we cannot find anymore this means the
 			// informer's watch event is outdated and the pod got already deleted in the
 			// Kubernetes API. This is a normal transition behaviour, so we just ignore
 			// it and assume we are done.
 			r.logger.LogCtx(ctx, "debug", "cannot find the current version of the reconciled pod in the Kubernetes API")
-			reconciliationcanceledcontext.SetCanceled(ctx)
+			resourcecanceledcontext.SetCanceled(ctx)
 			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
 
 			return nil
@@ -40,13 +43,46 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 	r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
 
-	// TODO drain guest cluster node and only remove the finalizer as soon as the
-	// guest cluster node associated with the reconciled host cluster pod is
-	// drained.
+	customObject, err := r.getCustomObjectFromPod(ctx, reconciledPod)
+	if err != nil {
+		return microerror.Mask(err)
+	}
 
-	// TODO go ahead and do not block once the draining is initialized. Using
-	// finalizers on the pods the delete event will be replayed and we can check
-	// if the draining completed on the next reconciliation loop.
+	n := reconciledPod.GetNamespace()
+	p := reconciledPod.GetName()
+	o := metav1.GetOptions{}
+
+	nodeConfig, err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Get(p, o)
+	if apierrors.IsNotFound(err) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "did not find node config for guest cluster node")
+
+		err := r.createNodeConfig(ctx, customObject, p)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		resourcecanceledcontext.SetCanceled(ctx)
+		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+
+	} else if err != nil {
+		return microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "found node config for the guest cluster")
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for inspection of the reconciled pod")
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "inspecting node config for the guest cluster")
+
+	if !nodeConfig.Status.HasFinalCondition() {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has no final state")
+		resourcecanceledcontext.SetCanceled(ctx)
+		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+
+		return nil
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has final state")
 
 	// Here we remove the 'draining-nodes' finalizer from the reconciled pod, if
 	// any. This frees the garbage collection lock in the Kubernetes API and makes
@@ -80,7 +116,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			r.logger.LogCtx(ctx, "debug", "updating the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
 
 			_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
-			if errors.IsConflict(err) {
+			if apierrors.IsConflict(err) {
 				// The reconciled pod may be updated by other processes or even humans
 				// meanwhile. In case the resource version we currently know does not
 				// match the latest existing one, we give up here and wait for the
@@ -111,6 +147,83 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	} else {
 		r.logger.LogCtx(ctx, "debug", "the pod does not need to be updated nor to be deleted in the Kubernetes API")
+	}
+
+	err = r.deleteNodeConfig(ctx, nodeConfig)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	return nil
+}
+
+func (r *Resource) createNodeConfig(ctx context.Context, customObject providerv1alpha1.KVMConfig, name string) error {
+	r.logger.LogCtx(ctx, "level", "debug", "message", "creating node config for guest cluster node")
+
+	n := customObject.GetNamespace()
+	c := &corev1alpha1.NodeConfig{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+		},
+		Spec: corev1alpha1.NodeConfigSpec{
+			Guest: corev1alpha1.NodeConfigSpecGuest{
+				Cluster: corev1alpha1.NodeConfigSpecGuestCluster{
+					API: corev1alpha1.NodeConfigSpecGuestClusterAPI{
+						Endpoint: key.ClusterAPIEndpoint(customObject),
+					},
+					ID: key.ClusterID(customObject),
+				},
+				Node: corev1alpha1.NodeConfigSpecGuestNode{
+					Name: name,
+				},
+			},
+			VersionBundle: corev1alpha1.NodeConfigSpecVersionBundle{
+				Version: "0.1.0",
+			},
+		},
+	}
+
+	_, err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Create(c)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "created node config for guest cluster node")
+
+	return nil
+}
+
+func (r *Resource) getCustomObjectFromPod(ctx context.Context, pod *corev1.Pod) (providerv1alpha1.KVMConfig, error) {
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("looking for kvm config associated to pod '%s'", pod.GetName()))
+
+	n := corev1.NamespaceAll
+	i := pod.GetNamespace()
+	o := metav1.GetOptions{}
+
+	m, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(n).Get(i, o)
+	if err != nil {
+		return providerv1alpha1.KVMConfig{}, microerror.Mask(err)
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found kvm config associated to pod '%s'", pod.GetName()))
+
+	return *m, nil
+}
+
+func (r *Resource) deleteNodeConfig(ctx context.Context, nodeConfig *corev1alpha1.NodeConfig) error {
+	r.logger.LogCtx(ctx, "level", "debug", "message", "deleting node config for guest cluster node")
+
+	n := nodeConfig.GetNamespace()
+	i := nodeConfig.GetName()
+	o := &metav1.DeleteOptions{}
+
+	err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Delete(i, o)
+	if apierrors.IsNotFound(err) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "node config for guest cluster node already deleted")
+	} else if err != nil {
+		return microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted node config for guest cluster node")
 	}
 
 	return nil

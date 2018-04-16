@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/framework"
@@ -15,6 +16,7 @@ import (
 )
 
 type DrainerFrameworkConfig struct {
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
@@ -81,6 +83,7 @@ func newDrainerResourceRouter(config DrainerFrameworkConfig) (*framework.Resourc
 	var resourceSetV11 *framework.ResourceSet
 	{
 		c := v11.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 
