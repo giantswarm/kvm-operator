@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
@@ -60,6 +62,8 @@ func NewClusterFramework(config ClusterFrameworkConfig) (*framework.Framework, e
 		c := certs.Config{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			WatchTimeout: 5 * time.Second,
 		}
 
 		certsSearcher, err = certs.NewSearcher(c)
