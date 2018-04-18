@@ -36,7 +36,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		{
+		if key.IsInDeletionState(customObject) {
 			n := key.ClusterNamespace(customObject)
 			list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
 			if err != nil {
