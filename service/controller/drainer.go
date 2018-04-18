@@ -5,7 +5,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -22,7 +22,7 @@ type DrainerConfig struct {
 }
 
 type Drainer struct {
-	*framework.Framework
+	*controller.Controller
 }
 
 func NewDrainer(config DrainerConfig) (*Drainer, error) {
@@ -59,9 +59,9 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 		return nil, microerror.Mask(err)
 	}
 
-	var operatorkitController *framework.Framework
+	var operatorkitController *controller.Controller
 	{
-		c := framework.Config{
+		c := controller.Config{
 			Informer:       newInformer,
 			K8sClient:      config.K8sClient,
 			Logger:         config.Logger,
@@ -70,23 +70,23 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			Name: config.ProjectName,
 		}
 
-		operatorkitController, err = framework.New(c)
+		operatorkitController, err = controller.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	d := &Drainer{
-		Framework: operatorkitController,
+		Controller: operatorkitController,
 	}
 
 	return d, nil
 }
 
-func newDrainerResourceRouter(config DrainerConfig) (*framework.ResourceRouter, error) {
+func newDrainerResourceRouter(config DrainerConfig) (*controller.ResourceRouter, error) {
 	var err error
 
-	var resourceSetV11 *framework.ResourceSet
+	var resourceSetV11 *controller.ResourceSet
 	{
 		c := v11.DrainerResourceSetConfig{
 			K8sClient: config.K8sClient,
@@ -101,17 +101,17 @@ func newDrainerResourceRouter(config DrainerConfig) (*framework.ResourceRouter, 
 		}
 	}
 
-	var resourceRouter *framework.ResourceRouter
+	var resourceRouter *controller.ResourceRouter
 	{
-		c := framework.ResourceRouterConfig{
+		c := controller.ResourceRouterConfig{
 			Logger: config.Logger,
 
-			ResourceSets: []*framework.ResourceSet{
+			ResourceSets: []*controller.ResourceSet{
 				resourceSetV11,
 			},
 		}
 
-		resourceRouter, err = framework.NewResourceRouter(c)
+		resourceRouter, err = controller.NewResourceRouter(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
