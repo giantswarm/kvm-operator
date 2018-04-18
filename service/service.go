@@ -7,7 +7,6 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
-	"github.com/giantswarm/operatorkit/framework"
 	"github.com/spf13/viper"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
@@ -32,12 +31,12 @@ type Config struct {
 }
 
 type Service struct {
-	Healthz          *healthz.Service
-	ClusterFramework *framework.Framework
-	DrainerFramework *framework.Framework
-	Version          *version.Service
+	Healthz *healthz.Service
+	Version *version.Service
 
-	bootOnce sync.Once
+	bootOnce          sync.Once
+	clusterController *controller.Cluster
+	drainerController *controller.Drainer
 }
 
 func New(config Config) (*Service, error) {
@@ -104,9 +103,9 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var clusterFramework *framework.Framework
+	var clusterController *controller.Cluster
 	{
-		c := controller.ClusterFrameworkConfig{
+		c := controller.ClusterConfig{
 			G8sClient:    g8sClient,
 			K8sClient:    k8sClient,
 			K8sExtClient: k8sExtClient,
@@ -116,15 +115,15 @@ func New(config Config) (*Service, error) {
 			ProjectName:        config.Name,
 		}
 
-		clusterFramework, err = controller.NewClusterFramework(c)
+		clusterController, err = controller.NewCluster(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var drainerFramework *framework.Framework
+	var drainerController *controller.Drainer
 	{
-		c := controller.DrainerFrameworkConfig{
+		c := controller.DrainerConfig{
 			G8sClient: g8sClient,
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
@@ -132,7 +131,7 @@ func New(config Config) (*Service, error) {
 			ProjectName: config.Name,
 		}
 
-		drainerFramework, err = controller.NewDrainerFramework(c)
+		drainerController, err = controller.NewDrainer(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -155,12 +154,12 @@ func New(config Config) (*Service, error) {
 	}
 
 	newService := &Service{
-		Healthz:          healthzService,
-		ClusterFramework: clusterFramework,
-		DrainerFramework: drainerFramework,
-		Version:          versionService,
+		Healthz: healthzService,
+		Version: versionService,
 
-		bootOnce: sync.Once{},
+		bootOnce:          sync.Once{},
+		clusterController: clusterController,
+		drainerController: drainerController,
 	}
 
 	return newService, nil
@@ -168,7 +167,7 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.ClusterFramework.Boot()
-		go s.DrainerFramework.Boot()
+		go s.clusterController.Boot()
+		go s.drainerController.Boot()
 	})
 }

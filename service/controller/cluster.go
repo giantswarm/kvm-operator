@@ -27,7 +27,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v9"
 )
 
-type ClusterFrameworkConfig struct {
+type ClusterConfig struct {
 	G8sClient    versioned.Interface
 	K8sClient    kubernetes.Interface
 	K8sExtClient apiextensionsclient.Interface
@@ -37,7 +37,11 @@ type ClusterFrameworkConfig struct {
 	ProjectName        string
 }
 
-func NewClusterFramework(config ClusterFrameworkConfig) (*framework.Framework, error) {
+type Cluster struct {
+	*framework.Framework
+}
+
+func NewCluster(config ClusterConfig) (*Cluster, error) {
 	if config.G8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
 	}
@@ -307,7 +311,7 @@ func NewClusterFramework(config ClusterFrameworkConfig) (*framework.Framework, e
 		}
 	}
 
-	var clusterFramework *framework.Framework
+	var operatorkitController *framework.Framework
 	{
 		c := framework.Config{
 			CRD:            v1alpha1.NewKVMConfigCRD(),
@@ -320,11 +324,15 @@ func NewClusterFramework(config ClusterFrameworkConfig) (*framework.Framework, e
 			Name: config.ProjectName,
 		}
 
-		clusterFramework, err = framework.New(c)
+		operatorkitController, err = framework.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	return clusterFramework, nil
+	c := &Cluster{
+		Framework: operatorkitController,
+	}
+
+	return c, nil
 }

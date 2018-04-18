@@ -15,7 +15,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
 )
 
-type DrainerFrameworkConfig struct {
+type DrainerConfig struct {
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
@@ -23,7 +23,11 @@ type DrainerFrameworkConfig struct {
 	ProjectName string
 }
 
-func NewDrainerFramework(config DrainerFrameworkConfig) (*framework.Framework, error) {
+type Drainer struct {
+	*framework.Framework
+}
+
+func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
@@ -57,7 +61,7 @@ func NewDrainerFramework(config DrainerFrameworkConfig) (*framework.Framework, e
 		return nil, microerror.Mask(err)
 	}
 
-	var drainerFramework *framework.Framework
+	var operatorkitController *framework.Framework
 	{
 		c := framework.Config{
 			Informer:       newInformer,
@@ -68,16 +72,20 @@ func NewDrainerFramework(config DrainerFrameworkConfig) (*framework.Framework, e
 			Name: config.ProjectName,
 		}
 
-		drainerFramework, err = framework.New(c)
+		operatorkitController, err = framework.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	return drainerFramework, nil
+	d := &Drainer{
+		Framework: operatorkitController,
+	}
+
+	return d, nil
 }
 
-func newDrainerResourceRouter(config DrainerFrameworkConfig) (*framework.ResourceRouter, error) {
+func newDrainerResourceRouter(config DrainerConfig) (*framework.ResourceRouter, error) {
 	var err error
 
 	var resourceSetV11 *framework.ResourceSet
