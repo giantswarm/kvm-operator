@@ -65,9 +65,9 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	{
 		c := controller.Config{
 			Informer:       newInformer,
-			K8sClient:      config.K8sClient,
 			Logger:         config.Logger,
 			ResourceRouter: resourceRouter,
+			RESTClient:     config.K8sClient.CoreV1().RESTClient(),
 
 			Name: config.ProjectName,
 		}
