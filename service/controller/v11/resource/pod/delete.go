@@ -43,13 +43,13 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 	r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
 
-	customObject, err := r.getCustomObjectFromPod(ctx, reconciledPod)
+	customObject, err := r.getCustomObjectFromPod(ctx, currentPod)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	n := reconciledPod.GetNamespace()
-	p := reconciledPod.GetName()
+	n := currentPod.GetNamespace()
+	p := currentPod.GetName()
 	o := metav1.GetOptions{}
 
 	nodeConfig, err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Get(p, o)
@@ -196,7 +196,7 @@ func (r *Resource) createNodeConfig(ctx context.Context, customObject providerv1
 func (r *Resource) getCustomObjectFromPod(ctx context.Context, pod *corev1.Pod) (providerv1alpha1.KVMConfig, error) {
 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("looking for kvm config associated to pod '%s'", pod.GetName()))
 
-	n := corev1.NamespaceAll
+	n := corev1.NamespaceDefault
 	i := pod.GetNamespace()
 	o := metav1.GetOptions{}
 
