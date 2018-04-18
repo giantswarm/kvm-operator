@@ -5,9 +5,9 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
-	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
+	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
+	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/pod"
@@ -21,14 +21,14 @@ type DrainerResourceSetConfig struct {
 	ProjectName string
 }
 
-func NewDrainerResourceSet(config DrainerResourceSetConfig) (*framework.ResourceSet, error) {
+func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
 	handlesFunc := func(obj interface{}) bool {
 		return true
 	}
 
-	var podResource framework.Resource
+	var podResource controller.Resource
 	{
 		c := pod.Config{
 			G8sClient: config.G8sClient,
@@ -42,7 +42,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	resources := []framework.Resource{
+	resources := []controller.Resource{
 		podResource,
 	}
 
@@ -69,15 +69,15 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var drainerResourceSet *framework.ResourceSet
+	var drainerResourceSet *controller.ResourceSet
 	{
-		c := framework.ResourceSetConfig{
+		c := controller.ResourceSetConfig{
 			Handles:   handlesFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}
 
-		drainerResourceSet, err = framework.NewResourceSet(c)
+		drainerResourceSet, err = controller.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -7,7 +7,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
+	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/api/extensions/v1beta1"
 	extensionsv1 "k8s.io/api/extensions/v1beta1"

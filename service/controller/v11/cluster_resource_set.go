@@ -7,10 +7,10 @@ import (
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/context/updateallowedcontext"
-	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
-	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
+	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
+	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
+	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"github.com/giantswarm/randomkeys"
 	"k8s.io/client-go/kubernetes"
 
@@ -36,7 +36,7 @@ type ClusterResourceSetConfig struct {
 	ProjectName        string
 }
 
-func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.ResourceSet, error) {
+func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
 	var cloudConfig *cloudconfig.CloudConfig
@@ -51,7 +51,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var clusterRoleBindingResource framework.Resource
+	var clusterRoleBindingResource controller.Resource
 	{
 		c := clusterrolebinding.Config{
 			K8sClient: config.K8sClient,
@@ -69,7 +69,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var namespaceResource framework.Resource
+	var namespaceResource controller.Resource
 	{
 		c := namespace.DefaultConfig()
 
@@ -87,7 +87,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var serviceAccountResource framework.Resource
+	var serviceAccountResource controller.Resource
 	{
 		c := serviceaccount.DefaultConfig()
 
@@ -105,7 +105,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var configMapResource framework.Resource
+	var configMapResource controller.Resource
 	{
 		c := configmap.DefaultConfig()
 
@@ -126,7 +126,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var deploymentResource framework.Resource
+	var deploymentResource controller.Resource
 	{
 		c := deployment.DefaultConfig()
 
@@ -144,7 +144,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var ingressResource framework.Resource
+	var ingressResource controller.Resource
 	{
 		c := ingress.DefaultConfig()
 
@@ -162,7 +162,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var pvcResource framework.Resource
+	var pvcResource controller.Resource
 	{
 		c := pvc.DefaultConfig()
 
@@ -180,7 +180,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	var serviceResource framework.Resource
+	var serviceResource controller.Resource
 	{
 		c := service.DefaultConfig()
 
@@ -198,7 +198,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		}
 	}
 
-	resources := []framework.Resource{
+	resources := []controller.Resource{
 		clusterRoleBindingResource,
 		namespaceResource,
 		serviceAccountResource,
@@ -253,16 +253,16 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 		return ctx, nil
 	}
 
-	var clusterResourceSet *framework.ResourceSet
+	var clusterResourceSet *controller.ResourceSet
 	{
-		c := framework.ResourceSetConfig{
+		c := controller.ResourceSetConfig{
 			Handles:   handlesFunc,
 			InitCtx:   initCtxFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}
 
-		clusterResourceSet, err = framework.NewResourceSet(c)
+		clusterResourceSet, err = controller.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -271,13 +271,13 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*framework.Resource
 	return clusterResourceSet, nil
 }
 
-func toCRUDResource(logger micrologger.Logger, ops framework.CRUDResourceOps) (*framework.CRUDResource, error) {
-	c := framework.CRUDResourceConfig{
+func toCRUDResource(logger micrologger.Logger, ops controller.CRUDResourceOps) (*controller.CRUDResource, error) {
+	c := controller.CRUDResourceConfig{
 		Logger: logger,
 		Ops:    ops,
 	}
 
-	r, err := framework.NewCRUDResource(c)
+	r, err := controller.NewCRUDResource(c)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

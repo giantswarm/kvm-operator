@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
-	"github.com/giantswarm/operatorkit/framework"
+	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -38,7 +38,7 @@ type ClusterConfig struct {
 }
 
 type Cluster struct {
-	*framework.Framework
+	*controller.Controller
 }
 
 func NewCluster(config ClusterConfig) (*Cluster, error) {
@@ -102,7 +102,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV2 *framework.ResourceSet
+	var resourceSetV2 *controller.ResourceSet
 	{
 		c := v2.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -124,7 +124,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV3 *framework.ResourceSet
+	var resourceSetV3 *controller.ResourceSet
 	{
 		c := v3.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -142,7 +142,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV4 *framework.ResourceSet
+	var resourceSetV4 *controller.ResourceSet
 	{
 		c := v4.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -160,7 +160,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV5 *framework.ResourceSet
+	var resourceSetV5 *controller.ResourceSet
 	{
 		c := v5.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -178,7 +178,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV6 *framework.ResourceSet
+	var resourceSetV6 *controller.ResourceSet
 	{
 		c := v6.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -196,7 +196,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV7 *framework.ResourceSet
+	var resourceSetV7 *controller.ResourceSet
 	{
 		c := v7.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -214,7 +214,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV8 *framework.ResourceSet
+	var resourceSetV8 *controller.ResourceSet
 	{
 		c := v8.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -232,7 +232,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV9 *framework.ResourceSet
+	var resourceSetV9 *controller.ResourceSet
 	{
 		c := v9.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -250,7 +250,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV10 *framework.ResourceSet
+	var resourceSetV10 *controller.ResourceSet
 	{
 		c := v10.ResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -268,7 +268,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV11 *framework.ResourceSet
+	var resourceSetV11 *controller.ResourceSet
 	{
 		c := v11.ClusterResourceSetConfig{
 			CertsSearcher:      certsSearcher,
@@ -286,12 +286,12 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceRouter *framework.ResourceRouter
+	var resourceRouter *controller.ResourceRouter
 	{
-		c := framework.ResourceRouterConfig{
+		c := controller.ResourceRouterConfig{
 			Logger: config.Logger,
 
-			ResourceSets: []*framework.ResourceSet{
+			ResourceSets: []*controller.ResourceSet{
 				resourceSetV2,
 				resourceSetV3,
 				resourceSetV4,
@@ -305,15 +305,15 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			},
 		}
 
-		resourceRouter, err = framework.NewResourceRouter(c)
+		resourceRouter, err = controller.NewResourceRouter(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	var operatorkitController *framework.Framework
+	var operatorkitController *controller.Controller
 	{
-		c := framework.Config{
+		c := controller.Config{
 			CRD:            v1alpha1.NewKVMConfigCRD(),
 			CRDClient:      crdClient,
 			Informer:       newInformer,
@@ -324,14 +324,14 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Name: config.ProjectName,
 		}
 
-		operatorkitController, err = framework.New(c)
+		operatorkitController, err = controller.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	c := &Cluster{
-		Framework: operatorkitController,
+		Controller: operatorkitController,
 	}
 
 	return c, nil

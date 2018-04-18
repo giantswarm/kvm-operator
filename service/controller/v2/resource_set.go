@@ -5,9 +5,9 @@ import (
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/framework"
-	"github.com/giantswarm/operatorkit/framework/resource/metricsresource"
-	"github.com/giantswarm/operatorkit/framework/resource/retryresource"
+	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
+	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"github.com/giantswarm/randomkeys"
 	"k8s.io/client-go/kubernetes"
 
@@ -37,7 +37,7 @@ type ResourceSetConfig struct {
 	Name string
 }
 
-func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
+func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
 	if config.CertsSearcher == nil {
@@ -69,7 +69,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var namespaceResource framework.Resource
+	var namespaceResource controller.Resource
 	{
 		c := namespace.DefaultConfig()
 
@@ -87,7 +87,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var serviceAccountResource framework.Resource
+	var serviceAccountResource controller.Resource
 	{
 		c := serviceaccount.DefaultConfig()
 
@@ -105,7 +105,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var configMapResource framework.Resource
+	var configMapResource controller.Resource
 	{
 		c := configmap.DefaultConfig()
 
@@ -125,7 +125,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var deploymentResource framework.Resource
+	var deploymentResource controller.Resource
 	{
 		c := deployment.DefaultConfig()
 
@@ -143,7 +143,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var ingressResource framework.Resource
+	var ingressResource controller.Resource
 	{
 		c := ingress.DefaultConfig()
 
@@ -161,7 +161,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var pvcResource framework.Resource
+	var pvcResource controller.Resource
 	{
 		c := pvc.DefaultConfig()
 
@@ -179,7 +179,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	var serviceResource framework.Resource
+	var serviceResource controller.Resource
 	{
 		c := service.DefaultConfig()
 
@@ -197,7 +197,7 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		}
 	}
 
-	resources := []framework.Resource{
+	resources := []controller.Resource{
 		namespaceResource,
 		serviceAccountResource,
 		configMapResource,
@@ -245,15 +245,15 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 		return false
 	}
 
-	var resourceSet *framework.ResourceSet
+	var resourceSet *controller.ResourceSet
 	{
-		c := framework.ResourceSetConfig{
+		c := controller.ResourceSetConfig{
 			Handles:   handlesFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}
 
-		resourceSet, err = framework.NewResourceSet(c)
+		resourceSet, err = controller.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -262,13 +262,13 @@ func NewResourceSet(config ResourceSetConfig) (*framework.ResourceSet, error) {
 	return resourceSet, nil
 }
 
-func toCRUDResource(logger micrologger.Logger, ops framework.CRUDResourceOps) (*framework.CRUDResource, error) {
-	c := framework.CRUDResourceConfig{
+func toCRUDResource(logger micrologger.Logger, ops controller.CRUDResourceOps) (*controller.CRUDResource, error) {
+	c := controller.CRUDResourceConfig{
 		Logger: logger,
 		Ops:    ops,
 	}
 
-	r, err := framework.NewCRUDResource(c)
+	r, err := controller.NewCRUDResource(c)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
