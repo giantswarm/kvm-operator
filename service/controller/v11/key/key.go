@@ -130,7 +130,7 @@ func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 }
 
 func IsInDeletionState(customObject v1alpha1.KVMConfig) bool {
-	customObject.GetDeletionTimestamp() != nil
+	return customObject.GetDeletionTimestamp() != nil
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
