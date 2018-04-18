@@ -181,7 +181,7 @@ func (r *Resource) createNodeConfig(ctx context.Context, pod *corev1.Pod) error 
 		},
 	}
 
-	_, err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Create(c)
+	_, err = r.g8sClient.CoreV1alpha1().NodeConfigs(n).Create(c)
 	if err != nil {
 		return microerror.Mask(err)
 	}

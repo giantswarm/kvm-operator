@@ -36,21 +36,6 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		if key.IsInDeletionState(customObject) {
-			n := key.ClusterNamespace(customObject)
-			list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
-			if err != nil {
-				return microerror.Mask(err)
-			}
-			if len(list.Items) != 0 {
-				r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of deployments due to existing pods")
-
-				// TODO control flow via more proper mechanism via something like the
-				// context like it is done for cancelation already.
-				return microerror.Maskf(deletionMustBeRetriedError, "pods still exist")
-			}
-		}
-
 		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the deployments in the Kubernetes API")
 	} else {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "the deployments do not need to be deleted from the Kubernetes API")
