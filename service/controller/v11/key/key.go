@@ -50,11 +50,14 @@ const (
 	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
 	workerIOOverhead             = "512M"
+)
 
+const (
 	// kvm endpoint annotations
 	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
 	AnnotationService = "endpoint.kvm.giantswarm.io/service"
 
+	APIEndpointAnnotation          = "giantswarm.io/api-endpoint"
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 

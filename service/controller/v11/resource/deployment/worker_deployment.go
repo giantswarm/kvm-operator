@@ -58,6 +58,11 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
+						Annotations: map[string]string{
+							key.APIEndpointAnnotation: key.ClusterAPIEndpoint(customObject),
+							key.AnnotationIp:          "",
+							key.AnnotationService:     key.WorkerID,
+						},
 						Name: key.WorkerID,
 						Finalizers: []string{
 							key.DrainingNodesFinalizer,
@@ -68,10 +73,6 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							"app":               key.WorkerID,
 							"node":              workerNode.ID,
 							key.PodWatcherLabel: "kvm-operator",
-						},
-						Annotations: map[string]string{
-							key.AnnotationIp:      "",
-							key.AnnotationService: key.WorkerID,
 						},
 					},
 					Spec: apiv1.PodSpec{

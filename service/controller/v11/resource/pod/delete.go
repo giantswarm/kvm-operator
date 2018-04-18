@@ -2,10 +2,8 @@ package pod
 
 import (
 	"context"
-	"fmt"
 
 	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
-	providerv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
@@ -43,11 +41,6 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 	r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
 
-	customObject, err := r.getCustomObjectFromPod(ctx, currentPod)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
 	n := currentPod.GetNamespace()
 	p := currentPod.GetName()
 	o := metav1.GetOptions{}
@@ -56,7 +49,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	if apierrors.IsNotFound(err) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "did not find node config for guest cluster node")
 
-		err := r.createNodeConfig(ctx, customObject, p)
+		err := r.createNodeConfig(ctx, currentPod)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -157,24 +150,29 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	return nil
 }
 
-func (r *Resource) createNodeConfig(ctx context.Context, customObject providerv1alpha1.KVMConfig, name string) error {
+func (r *Resource) createNodeConfig(ctx context.Context, pod *corev1.Pod) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "creating node config for guest cluster node")
 
-	n := key.ClusterID(customObject)
+	apiEndpoint, err := apiEndpointFromAnnotations(pod.GetAnnotations())
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	n := pod.GetNamespace()
 	c := &corev1alpha1.NodeConfig{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
+			Name: pod.GetName(),
 		},
 		Spec: corev1alpha1.NodeConfigSpec{
 			Guest: corev1alpha1.NodeConfigSpecGuest{
 				Cluster: corev1alpha1.NodeConfigSpecGuestCluster{
 					API: corev1alpha1.NodeConfigSpecGuestClusterAPI{
-						Endpoint: key.ClusterAPIEndpoint(customObject),
+						Endpoint: apiEndpoint,
 					},
-					ID: key.ClusterID(customObject),
+					ID: pod.GetNamespace(),
 				},
 				Node: corev1alpha1.NodeConfigSpecGuestNode{
-					Name: name,
+					Name: pod.GetName(),
 				},
 			},
 			VersionBundle: corev1alpha1.NodeConfigSpecVersionBundle{
@@ -191,23 +189,6 @@ func (r *Resource) createNodeConfig(ctx context.Context, customObject providerv1
 	r.logger.LogCtx(ctx, "level", "debug", "message", "created node config for guest cluster node")
 
 	return nil
-}
-
-func (r *Resource) getCustomObjectFromPod(ctx context.Context, pod *corev1.Pod) (providerv1alpha1.KVMConfig, error) {
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("looking for kvm config associated to pod '%s'", pod.GetName()))
-
-	n := corev1.NamespaceDefault
-	i := pod.GetNamespace()
-	o := metav1.GetOptions{}
-
-	m, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(n).Get(i, o)
-	if err != nil {
-		return providerv1alpha1.KVMConfig{}, microerror.Mask(err)
-	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found kvm config associated to pod '%s'", pod.GetName()))
-
-	return *m, nil
 }
 
 func (r *Resource) deleteNodeConfig(ctx context.Context, nodeConfig *corev1alpha1.NodeConfig) error {
@@ -227,4 +208,16 @@ func (r *Resource) deleteNodeConfig(ctx context.Context, nodeConfig *corev1alpha
 	}
 
 	return nil
+}
+
+func apiEndpointFromAnnotations(annotations map[string]string) (string, error) {
+	apiEndpoint, ok := annotations[key.APIEndpointAnnotation]
+	if !ok {
+		return "", microerror.Maskf(missingAnnotationError, key.APIEndpointAnnotation)
+	}
+	if apiEndpoint == "" {
+		return "", microerror.Maskf(missingAnnotationError, key.APIEndpointAnnotation)
+	}
+
+	return apiEndpoint, nil
 }
