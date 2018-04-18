@@ -160,7 +160,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 func (r *Resource) createNodeConfig(ctx context.Context, customObject providerv1alpha1.KVMConfig, name string) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "creating node config for guest cluster node")
 
-	n := customObject.GetNamespace()
+	n := key.ClusterID(customObject)
 	c := &corev1alpha1.NodeConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
