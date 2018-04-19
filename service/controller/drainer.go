@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
@@ -47,7 +48,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.ProjectName),
 			},
 			RateWait:     informer.DefaultRateWait,
-			ResyncPeriod: informer.DefaultResyncPeriod,
+			ResyncPeriod: 30 * time.Second,
 		}
 
 		newInformer, err = informer.New(c)
