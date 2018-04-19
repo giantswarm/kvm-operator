@@ -33,12 +33,12 @@ write_files:
   owner: root
   permissions: 644
   content: |
-    # Calico Version v3.0.2
-    # https://docs.projectcalico.org/v3.0/releases#v3.0.2
+    # Calico Version v3.0.5
+    # https://docs.projectcalico.org/v3.0/releases#v3.0.5
     # This manifest includes the following component versions:
-    #   calico/node:v3.0.2
-    #   calico/cni:v2.0.0
-    #   calico/kube-controllers:v2.0.0
+    #   calico/node:v3.0.5
+    #   calico/cni:v2.0.4
+    #   calico/kube-controllers:v2.0.3
 
     # This ConfigMap is used to configure a self-hosted Calico installation.
     kind: ConfigMap
@@ -136,7 +136,7 @@ write_files:
             # container programs network policy and routes on each
             # host.
             - name: calico-node
-              image: quay.io/calico/node:v3.0.2
+              image: quay.io/calico/node:v3.0.5
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -231,7 +231,7 @@ write_files:
             # This container installs the Calico CNI binaries
             # and CNI network config file on each node.
             - name: install-cni
-              image: quay.io/calico/cni:v2.0.0
+              image: quay.io/calico/cni:v2.0.4
               command: ["/install-cni.sh"]
               env:
                 # Name of the CNI config file to create.
@@ -312,7 +312,7 @@ write_files:
           serviceAccountName: calico-kube-controllers
           containers:
             - name: calico-kube-controllers
-              image: quay.io/calico/kube-controllers:v2.0.0
+              image: quay.io/calico/kube-controllers:v2.0.3
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -412,7 +412,8 @@ write_files:
             health
             kubernetes {{.Cluster.Kubernetes.Domain}} {{.Cluster.Kubernetes.API.ClusterIPRange}} {{.Cluster.Calico.Subnet}}/{{.Cluster.Calico.CIDR}} {
               pods insecure
-              upstream /etc/resolv.conf
+              upstream
+              fallthrough in-addr.arpa ip6.arpa
             }
             prometheus :9153
             proxy . /etc/resolv.conf
@@ -460,7 +461,7 @@ write_files:
                   topologyKey: kubernetes.io/hostname
           containers:
           - name: coredns
-            image: quay.io/giantswarm/coredns:1.0.6
+            image: quay.io/giantswarm/coredns:1.1.1
             imagePullPolicy: IfNotPresent
             args: [ "-conf", "/etc/coredns/Corefile" ]
             volumeMounts:
@@ -2204,7 +2205,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       LimitNOFILE=40000
-      Environment=IMAGE=quay.io/coreos/etcd:v3.3.1
+      Environment=IMAGE=quay.io/coreos/etcd:v3.3.3
       Environment=NAME=%p.service
       EnvironmentFile=/etc/network-environment
       ExecStartPre=-/usr/bin/docker stop  $NAME
@@ -2253,7 +2254,7 @@ coreos:
       [Service]
       Type=oneshot
       EnvironmentFile=/etc/network-environment
-      Environment=IMAGE=quay.io/coreos/etcd:v3.3.1
+      Environment=IMAGE=quay.io/coreos/etcd:v3.3.3
       Environment=NAME=%p.service
       ExecStartPre=-/usr/bin/docker stop  $NAME
       ExecStartPre=-/usr/bin/docker rm  $NAME
@@ -2328,6 +2329,7 @@ coreos:
       -v /etc/iscsi/:/etc/iscsi/ \
       -v /dev/disk/by-path/:/dev/disk/by-path/ \
       -v /dev/mapper/:/dev/mapper/ \
+      -v /lib/modules:/lib/modules \
       -v /usr/sbin/mkfs.xfs:/usr/sbin/mkfs.xfs \
       -v /usr/lib64/libxfs.so.0:/usr/lib/libxfs.so.0 \
       -v /usr/lib64/libxcmd.so.0:/usr/lib/libxcmd.so.0 \
