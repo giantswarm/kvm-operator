@@ -132,6 +132,10 @@ func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
 }
 
+func IsInDeletionState(customObject v1alpha1.KVMConfig) bool {
+	return customObject.GetDeletionTimestamp() != nil
+}
+
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
 	return int32(portBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }

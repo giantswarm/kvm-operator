@@ -5,9 +5,10 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext"
-	apiv1 "k8s.io/api/core/v1"
+	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
 )
@@ -18,12 +19,27 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
+	if key.IsInDeletionState(customObject) {
+		n := key.ClusterNamespace(customObject)
+		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		if len(list.Items) != 0 {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of namespace due to existing pods")
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
+
+			return nil, nil
+		}
+	}
+
 	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the namespace in the Kubernetes API")
 
 	// Lookup the current state of the namespace.
-	var namespace *apiv1.Namespace
+	var namespace *corev1.Namespace
 	{
-		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(key.ClusterNamespace(customObject), apismetav1.GetOptions{})
+		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(key.ClusterNamespace(customObject), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find the namespace in the Kubernetes API")
 			// fall through
