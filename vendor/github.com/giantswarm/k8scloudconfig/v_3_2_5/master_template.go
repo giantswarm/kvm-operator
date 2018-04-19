@@ -6,8 +6,10 @@ users:
     groups:
       - "sudo"
       - "docker"
+{{ if ne $user.PublicKey "" }}
     ssh-authorized-keys:
        - "{{ $user.PublicKey }}"
+{{ end }}
 {{end}}
 write_files:
 {{ if not .DisableCalico -}}
@@ -33,12 +35,12 @@ write_files:
   owner: root
   permissions: 644
   content: |
-    # Calico Version v3.0.2
-    # https://docs.projectcalico.org/v3.0/releases#v3.0.2
+    # Calico Version v3.0.5
+    # https://docs.projectcalico.org/v3.0/releases#v3.0.5
     # This manifest includes the following component versions:
-    #   calico/node:v3.0.2
-    #   calico/cni:v2.0.0
-    #   calico/kube-controllers:v2.0.0
+    #   calico/node:v3.0.5
+    #   calico/cni:v2.0.4
+    #   calico/kube-controllers:v2.0.3
 
     # This ConfigMap is used to configure a self-hosted Calico installation.
     kind: ConfigMap
@@ -136,7 +138,7 @@ write_files:
             # container programs network policy and routes on each
             # host.
             - name: calico-node
-              image: quay.io/calico/node:v3.0.2
+              image: quay.io/calico/node:v3.0.5
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -231,7 +233,7 @@ write_files:
             # This container installs the Calico CNI binaries
             # and CNI network config file on each node.
             - name: install-cni
-              image: quay.io/calico/cni:v2.0.0
+              image: quay.io/calico/cni:v2.0.4
               command: ["/install-cni.sh"]
               env:
                 # Name of the CNI config file to create.
@@ -312,7 +314,7 @@ write_files:
           serviceAccountName: calico-kube-controllers
           containers:
             - name: calico-kube-controllers
-              image: quay.io/calico/kube-controllers:v2.0.0
+              image: quay.io/calico/kube-controllers:v2.0.3
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -1863,7 +1865,7 @@ write_files:
         - --audit-policy-file=/etc/kubernetes/manifests/audit-policy.yml
         - --experimental-encryption-provider-config=/etc/kubernetes/encryption/k8s-encryption-config.yaml
         - --requestheader-client-ca-file=/etc/kubernetes/ssl/apiserver-ca.pem
-        - --requestheader-allowed-names=aggregator
+        - --requestheader-allowed-names=aggregator,{{.Cluster.Kubernetes.API.Domain}},{{.Cluster.Kubernetes.Kubelet.Domain}}
         - --requestheader-extra-headers-prefix=X-Remote-Extra-
         - --requestheader-group-headers=X-Remote-Group
         - --requestheader-username-headers=X-Remote-User
@@ -2205,7 +2207,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       LimitNOFILE=40000
-      Environment=IMAGE=quay.io/coreos/etcd:v3.3.1
+      Environment=IMAGE=quay.io/coreos/etcd:v3.3.3
       Environment=NAME=%p.service
       EnvironmentFile=/etc/network-environment
       ExecStartPre=-/usr/bin/docker stop  $NAME
@@ -2254,7 +2256,7 @@ coreos:
       [Service]
       Type=oneshot
       EnvironmentFile=/etc/network-environment
-      Environment=IMAGE=quay.io/coreos/etcd:v3.3.1
+      Environment=IMAGE=quay.io/coreos/etcd:v3.3.3
       Environment=NAME=%p.service
       ExecStartPre=-/usr/bin/docker stop  $NAME
       ExecStartPre=-/usr/bin/docker rm  $NAME
