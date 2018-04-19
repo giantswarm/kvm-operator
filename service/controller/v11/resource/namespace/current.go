@@ -19,21 +19,6 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	if key.IsInDeletionState(customObject) {
-		n := key.ClusterNamespace(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		if len(list.Items) != 0 {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of namespace due to existing pods")
-			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
-
-			return nil, nil
-		}
-	}
-
 	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the namespace in the Kubernetes API")
 
 	// Lookup the current state of the namespace.
@@ -60,6 +45,21 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for custom object")
 
 		return nil, nil
+	}
+
+	if key.IsInDeletionState(customObject) {
+		n := key.ClusterNamespace(customObject)
+		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		if len(list.Items) != 0 {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of namespace due to existing pods")
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
+
+			return nil, nil
+		}
 	}
 
 	return namespace, nil
