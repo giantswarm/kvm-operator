@@ -127,7 +127,7 @@ func New(config Config) (*Service, error) {
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
-			ProjectName: config.Name,
+			ProjectName: config.Name + "-drainer",
 		}
 
 		drainerController, err = controller.NewDrainer(c)
