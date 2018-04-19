@@ -78,49 +78,24 @@ func (f *Controller) addFinalizer(obj interface{}) (stopReconciliation bool, err
 }
 
 func (f *Controller) removeFinalizer(ctx context.Context, obj interface{}) error {
-	fmt.Printf("1\n")
 	patch, path, err := createRemoveFinalizerPatch(obj, f.name)
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	fmt.Printf("2\n")
 	if patch == nil {
-		f.logger.LogCtx(ctx, "function", "removeFinalizer", "level", "warning", "message", fmt.Sprintf("object is missing finalizer for controller %s", f.name))
 		return nil
 	}
-	fmt.Printf("3\n")
 	p, err := json.Marshal(patch)
 	if err != nil {
 		return microerror.Mask(err)
 	}
-	fmt.Printf("4\n")
 	operation := func() error {
-		fmt.Printf("5\n")
-
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-		fmt.Printf("removing finalizer\n")
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-
 		res := f.restClient.Patch(types.JSONPatchType).AbsPath(path).Body(p).Do()
 		if errors.IsNotFound(res.Error()) {
 			return nil // the object is already gone, nothing to do.
 		} else if res.Error() != nil {
 			return microerror.Mask(res.Error())
 		}
-
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-		fmt.Printf("removed finalizer\n")
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-		fmt.Printf("\n")
-
-		fmt.Printf("6\n")
 		return nil
 	}
 	err = backoff.Retry(operation, f.backOffFactory())
@@ -178,15 +153,14 @@ func createAddFinalizerPatch(obj interface{}, operatorName string) (patch []patc
 	return patch, true, nil
 }
 
-func createRemoveFinalizerPatch(obj interface{}, operatorName string) (patch []patchSpec, path string, err error) {
+func createRemoveFinalizerPatch(obj interface{}, operatorName string) ([]patchSpec, string, error) {
 	accessor, err := meta.Accessor(obj)
 	if err != nil {
 		return nil, "", microerror.Mask(err)
 	}
+
 	finalizerName := getFinalizerName(operatorName)
-	fmt.Printf("a\n")
 	if !containsFinalizer(accessor.GetFinalizers(), finalizerName) {
-		fmt.Printf("b\n")
 		// object has not finalizer set, this could have two reasons:
 		// 1. We are migrating and an old object never got reconciled before deletion.
 		// 2. The operator wasn't running and our first interaction with the object
@@ -194,14 +168,15 @@ func createRemoveFinalizerPatch(obj interface{}, operatorName string) (patch []p
 		// Both cases should not be harmful in general, so we ignore it.
 		return nil, "", nil
 	}
-	fmt.Printf("c\n")
-	patch = []patchSpec{}
-	deletePatch := patchSpec{
-		Op:    "replace",
-		Value: removeFinalizer(accessor.GetFinalizers(), finalizerName),
-		Path:  "/metadata/finalizers",
+
+	patch := []patchSpec{
+		{
+			Op:    "replace",
+			Value: removeFinalizer(accessor.GetFinalizers(), finalizerName),
+			Path:  "/metadata/finalizers",
+		},
 	}
-	patch = append(patch, deletePatch)
+
 	return patch, accessor.GetSelfLink(), nil
 }
 
@@ -216,5 +191,6 @@ func removeFinalizer(finalizers []string, finalizer string) []string {
 			break
 		}
 	}
+
 	return finalizers
 }

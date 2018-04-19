@@ -150,7 +150,7 @@
   revision = "ad4de16de22043f947fdf6c587cbc2736456d33d"
 
 [[projects]]
-  branch = "master"
+  branch = "cancel"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -165,7 +165,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "d0181ce3cd4ee6da338427e9ab5b98679165b8a7"
+  revision = "68580290dee86d423103a406305e453bfd4fc167"
 
 [[projects]]
   branch = "master"
@@ -523,7 +523,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "b126b21c05a91c856b027c16779c12e3bf236954"
+  revision = "3ccc7e5779793fd54564baf60c51bf017955e0ba"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -737,11 +737,11 @@
   branch = "master"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/common"]
-  revision = "f442ecb314a3679150c272e2b9713d8deed5955d"
+  revision = "0f2f0396e266ad24afbd02375ba74c0dda1e3611"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2023e725846be0a92c688f6c3cc1465487595d949b6198ae7073975fb1b5b672"
+  inputs-digest = "b9124d331ff82a69b65fbf24e5a41581fb42e8d43db3a968ab5f2d5d72f70a4a"
   solver-name = "gps-cdcl"
   solver-version = 1
