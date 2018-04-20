@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext"
+	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,6 +48,13 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, nil
 	}
 
+	// In case a cluster deletion happens, we want to delete the guest cluster
+	// namespace. We still need to use the namespace for resource creation in
+	// order to drain nodes on KVM though. So as long as pods are there we delay
+	// the deletion of the namespace here in order to still be able to create
+	// resources in it. As soon as the draining was done and the pods got removed
+	// we get an empty list here after the delete event got replayed. Then we just
+	// remove the namespace as usual.
 	if key.IsInDeletionState(customObject) {
 		n := key.ClusterNamespace(customObject)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
@@ -54,7 +63,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		}
 		if len(list.Items) != 0 {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of namespace due to existing pods")
-			reconciliationcanceledcontext.SetCanceled(ctx)
+			resourcecanceledcontext.SetCanceled(ctx)
+			finalizerskeptcontext.SetKept(ctx)
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
 
 			return nil, nil
