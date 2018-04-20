@@ -5,6 +5,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState interface{}) error {
@@ -17,7 +18,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState inter
 	}
 
 	_, err = r.k8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Create(k8sEndpoint)
-	if err != nil {
+	if errors.IsAlreadyExists(err) {
+		// fall through
+	} else if err != nil {
 		return microerror.Mask(err)
 	}
 
