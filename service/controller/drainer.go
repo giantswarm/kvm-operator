@@ -70,7 +70,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			ResourceRouter: resourceRouter,
 			RESTClient:     config.K8sClient.CoreV1().RESTClient(),
 
-			Name: config.ProjectName,
+			Name: config.ProjectName + "-drainer",
 		}
 
 		operatorkitController, err = controller.New(c)
