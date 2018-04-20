@@ -654,7 +654,6 @@ write_files:
             - /nginx-ingress-controller
             - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
             - --configmap=$(POD_NAMESPACE)/ingress-nginx
-            - --enable-ssl-passthrough
             - --annotations-prefix=nginx.ingress.kubernetes.io
             env:
               - name: POD_NAME
