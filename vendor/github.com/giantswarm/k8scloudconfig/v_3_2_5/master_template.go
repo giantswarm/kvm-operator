@@ -870,6 +870,8 @@ write_files:
             name: node-exporter
             args:
               - '--log.level=debug'
+              - '--path.procfs=/host/proc'
+              - '--path.sysfs=/host/sys'
               - '--web.listen-address=:10300'
               - '--collector.arp'
               - '--collector.bcache'
@@ -916,15 +918,48 @@ write_files:
                 cpu: 55m
                 memory: 125Mi
             volumeMounts:
-            - mountPath: /var/run/dbus/
-              name: systemd-volume
+            - name: root
+              mountPath: /rootfs
+              readOnly: true
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+            - name: var-lib-docker
+              mountPath: /var/lib/docker
+              readOnly: true
+            - name: var-lib-kubelet
+              mountPath: /var/lib/kubelet
+              readOnly: true
+            - name: var-run-dbus
+              mountPath: /var/run/dbus/
+              readOnly: true
           volumes:
-          - name: systemd-volume
+          - name: var-run-dbus
             hostPath:
               path: /var/run/dbus/
+          - name: root
+            hostPath:
+              path: /
+          - name: proc
+            hostPath:
+              path: /proc
+          - name: sys
+            hostPath:
+              path: /sys
+          - name: var-lib-docker
+            hostPath:
+                  path: /var/lib/docker
+          - name: var-lib-kubelet
+            hostPath:
+              path: /var/lib/kubelet
           serviceAccountName: node-exporter
           hostNetwork: true
           hostPID: true
+          securityContext:
+            runAsUser: 0
 - path: /srv/kube-state-metrics-svc.yaml
   owner: root
   permissions: 0644
