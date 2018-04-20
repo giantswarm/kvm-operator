@@ -67,7 +67,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			Logger:         config.Logger,
 			ResourceRouter: resourceRouter,
 
-			Name: config.ProjectName,
+			Name: config.ProjectName + "-drainer",
 		}
 
 		operatorkitController, err = controller.New(c)
