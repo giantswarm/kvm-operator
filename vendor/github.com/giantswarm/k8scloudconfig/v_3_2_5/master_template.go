@@ -6,8 +6,10 @@ users:
     groups:
       - "sudo"
       - "docker"
+{{ if ne $user.PublicKey "" }}
     ssh-authorized-keys:
        - "{{ $user.PublicKey }}"
+{{ end }}
 {{end}}
 write_files:
 {{ if not .DisableCalico -}}
@@ -652,7 +654,6 @@ write_files:
             - /nginx-ingress-controller
             - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
             - --configmap=$(POD_NAMESPACE)/ingress-nginx
-            - --enable-ssl-passthrough
             - --annotations-prefix=nginx.ingress.kubernetes.io
             env:
               - name: POD_NAME
@@ -869,6 +870,8 @@ write_files:
             name: node-exporter
             args:
               - '--log.level=debug'
+              - '--path.procfs=/host/proc'
+              - '--path.sysfs=/host/sys'
               - '--web.listen-address=:10300'
               - '--collector.arp'
               - '--collector.bcache'
@@ -915,15 +918,48 @@ write_files:
                 cpu: 55m
                 memory: 125Mi
             volumeMounts:
-            - mountPath: /var/run/dbus/
-              name: systemd-volume
+            - name: root
+              mountPath: /rootfs
+              readOnly: true
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+            - name: var-lib-docker
+              mountPath: /var/lib/docker
+              readOnly: true
+            - name: var-lib-kubelet
+              mountPath: /var/lib/kubelet
+              readOnly: true
+            - name: var-run-dbus
+              mountPath: /var/run/dbus/
+              readOnly: true
           volumes:
-          - name: systemd-volume
+          - name: var-run-dbus
             hostPath:
               path: /var/run/dbus/
+          - name: root
+            hostPath:
+              path: /
+          - name: proc
+            hostPath:
+              path: /proc
+          - name: sys
+            hostPath:
+              path: /sys
+          - name: var-lib-docker
+            hostPath:
+                  path: /var/lib/docker
+          - name: var-lib-kubelet
+            hostPath:
+              path: /var/lib/kubelet
           serviceAccountName: node-exporter
           hostNetwork: true
           hostPID: true
+          securityContext:
+            runAsUser: 0
 - path: /srv/kube-state-metrics-svc.yaml
   owner: root
   permissions: 0644
@@ -1863,7 +1899,7 @@ write_files:
         - --audit-policy-file=/etc/kubernetes/manifests/audit-policy.yml
         - --experimental-encryption-provider-config=/etc/kubernetes/encryption/k8s-encryption-config.yaml
         - --requestheader-client-ca-file=/etc/kubernetes/ssl/apiserver-ca.pem
-        - --requestheader-allowed-names=aggregator
+        - --requestheader-allowed-names=aggregator,{{.Cluster.Kubernetes.API.Domain}},{{.Cluster.Kubernetes.Kubelet.Domain}}
         - --requestheader-extra-headers-prefix=X-Remote-Extra-
         - --requestheader-group-headers=X-Remote-Group
         - --requestheader-username-headers=X-Remote-User
