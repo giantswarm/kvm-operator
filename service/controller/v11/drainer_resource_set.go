@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/endpoint"
 	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/pod"
 )
 
@@ -42,7 +43,26 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		}
 	}
 
+	var endpointResource controller.Resource
+	{
+		c := endpoint.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		ops, err := endpoint.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		endpointResource, err = toCRUDResource(config.Logger, ops)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resources := []controller.Resource{
+		endpointResource,
 		podResource,
 	}
 
