@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	g8sfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
@@ -123,17 +124,22 @@ func Test_Resource_Endpoint_ApplyDeleteChange(t *testing.T) {
 	var err error
 
 	for i, tc := range testCases {
+		fakeG8sClient := g8sfake.NewSimpleClientset()
 		fakeK8sClient := fake.NewSimpleClientset()
+
 		var newResource *Resource
 		{
-			resourceConfig := DefaultConfig()
-			resourceConfig.K8sClient = fakeK8sClient
-			resourceConfig.Logger = microloggertest.New()
-			newResource, err = New(resourceConfig)
+			c := Config{
+				G8sClient: fakeG8sClient,
+				K8sClient: fakeK8sClient,
+				Logger:    microloggertest.New(),
+			}
+			newResource, err = New(c)
 			if err != nil {
 				t.Fatal("expected", nil, "got", err)
 			}
 		}
+
 		for _, k8sEndpoint := range tc.SetupEndpoints {
 			if _, err := fakeK8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Create(k8sEndpoint); err != nil {
 				t.Fatalf("%d: error returned setting up k8s endpoints: %s\n", i, err)
@@ -345,12 +351,18 @@ func Test_Resource_Endpoint_newDeleteChangeForDeletePatch(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		var err error
+
+		fakeG8sClient := g8sfake.NewSimpleClientset()
+		fakeK8sClient := fake.NewSimpleClientset()
+
 		var newResource *Resource
 		{
-			resourceConfig := DefaultConfig()
-			resourceConfig.K8sClient = fake.NewSimpleClientset()
-			resourceConfig.Logger = microloggertest.New()
-			newResource, err = New(resourceConfig)
+			c := Config{
+				G8sClient: fakeG8sClient,
+				K8sClient: fakeK8sClient,
+				Logger:    microloggertest.New(),
+			}
+			newResource, err = New(c)
 			if err != nil {
 				t.Fatal("expected", nil, "got", err)
 			}
@@ -572,12 +584,18 @@ func Test_Resource_Endpoint_newDeleteChangeForUpdatePatch(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		var err error
+
+		fakeG8sClient := g8sfake.NewSimpleClientset()
+		fakeK8sClient := fake.NewSimpleClientset()
+
 		var newResource *Resource
 		{
-			resourceConfig := DefaultConfig()
-			resourceConfig.K8sClient = fake.NewSimpleClientset()
-			resourceConfig.Logger = microloggertest.New()
-			newResource, err = New(resourceConfig)
+			c := Config{
+				G8sClient: fakeG8sClient,
+				K8sClient: fakeK8sClient,
+				Logger:    microloggertest.New(),
+			}
+			newResource, err = New(c)
 			if err != nil {
 				t.Fatal("expected", nil, "got", err)
 			}

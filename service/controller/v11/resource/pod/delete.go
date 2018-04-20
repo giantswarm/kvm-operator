@@ -147,6 +147,24 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
+	{
+		r.logger.LogCtx(ctx, "debug", "updating pod status to drained")
+
+		p, err := r.k8sClient.CoreV1().Pods(currentPod.GetNamespace()).Get(currentPod.GetName(), metav1.GetOptions{})
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		a := p.GetAnnotations()
+		a[key.AnnotationPodDrained] = "True"
+		p.SetAnnotations(a)
+		_, err = r.k8sClient.CoreV1().Pods(p.GetNamespace()).Update(p)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		r.logger.LogCtx(ctx, "debug", "updated pod status to drained")
+	}
+
 	return nil
 }
 

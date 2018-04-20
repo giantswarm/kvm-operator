@@ -53,9 +53,9 @@ const (
 )
 
 const (
-	// kvm endpoint annotations
-	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService = "endpoint.kvm.giantswarm.io/service"
+	AnnotationIp         = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService    = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained = "endpoint.kvm.giantswarm.io/drained"
 
 	APIEndpointAnnotation          = "giantswarm.io/api-endpoint"
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
@@ -134,6 +134,10 @@ func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 
 func IsInDeletionState(customObject v1alpha1.KVMConfig) bool {
 	return customObject.GetDeletionTimestamp() != nil
+}
+
+func IsPodInDeletionState(pod *corev1.Pod) bool {
+	return pod.GetDeletionTimestamp() != nil
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {

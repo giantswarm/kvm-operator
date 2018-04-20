@@ -4,10 +4,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/giantswarm/micrologger"
+	g8sfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
+	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientgofake "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 func Test_Resource_Endpoint_cutIPs(t *testing.T) {
@@ -234,27 +235,34 @@ func Test_Resource_Endpoint_newK8sEndpoint(t *testing.T) {
 			errorMatcher: nil,
 		},
 	}
-	logger, err := micrologger.New(micrologger.Config{})
-	if err != nil {
-		t.Fatalf("micrologger.New() failed: %#v", err)
-	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			r, err := New(Config{
-				K8sClient: clientgofake.NewSimpleClientset(),
-				Logger:    logger,
-			})
-			if err != nil {
-				t.Fatalf("Resource construction failed: %#v", err)
+			var err error
+
+			fakeG8sClient := g8sfake.NewSimpleClientset()
+			fakeK8sClient := fake.NewSimpleClientset()
+
+			var newResource *Resource
+			{
+				c := Config{
+					G8sClient: fakeG8sClient,
+					K8sClient: fakeK8sClient,
+					Logger:    microloggertest.New(),
+				}
+				newResource, err = New(c)
+				if err != nil {
+					t.Fatal("expected", nil, "got", err)
+				}
 			}
+
 			if tc.setupService != nil {
-				if _, err := r.k8sClient.CoreV1().Services(tc.setupService.Namespace).Create(tc.setupService); err != nil {
+				if _, err := newResource.k8sClient.CoreV1().Services(tc.setupService.Namespace).Create(tc.setupService); err != nil {
 					t.Fatalf(" error returned setting up k8s service: %s\n", err)
 				}
 			}
 
-			k8sEndpoints, err := r.newK8sEndpoint(tc.endpoint)
+			k8sEndpoints, err := newResource.newK8sEndpoint(tc.endpoint)
 
 			switch {
 			case err == nil && tc.errorMatcher == nil: // correct; carry on

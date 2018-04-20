@@ -34,13 +34,13 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
-	newService := &Resource{
+	r := &Resource{
 		g8sClient: config.G8sClient,
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
 	}
 
-	return newService, nil
+	return r, nil
 }
 
 func (r *Resource) Name() string {

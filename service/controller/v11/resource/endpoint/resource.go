@@ -3,6 +3,7 @@ package endpoint
 import (
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
@@ -16,23 +17,21 @@ const (
 )
 
 type Config struct {
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 }
 
-func DefaultConfig() Config {
-	return Config{
-		K8sClient: nil,
-		Logger:    nil,
-	}
-}
-
 type Resource struct {
+	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 }
 
 func New(config Config) (*Resource, error) {
+	if config.G8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
+	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
@@ -41,6 +40,7 @@ func New(config Config) (*Resource, error) {
 	}
 
 	r := &Resource{
+		g8sClient: config.G8sClient,
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
 	}
