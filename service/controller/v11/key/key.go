@@ -40,7 +40,7 @@ const (
 	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker  = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:1a31839b84eabd7286f71e5dd7e1132967e9d686"
+	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:5bb60c92309d28483225320a64bb93eb8c15539a"
 	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:7146561e54142d4f986daee0206336ebee3ceb18"
 
@@ -136,7 +136,7 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 	return customObject.GetDeletionTimestamp() != nil
 }
 
-func IsPodInDeletionState(pod *corev1.Pod) bool {
+func IsPodDeleted(pod *corev1.Pod) bool {
 	return pod.GetDeletionTimestamp() != nil
 }
 

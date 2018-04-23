@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
@@ -23,16 +22,16 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	serviceNamespace := pod.GetNamespace()
 	_, serviceName, err := getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
 	if IsMissingAnnotationError(err) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "annotation is missing on pod")
 		resourcecanceledcontext.SetCanceled(ctx)
-		if resourcecanceledcontext.IsCanceled(ctx) {
-			r.logger.Log("pod", pod.GetName(), "debug", fmt.Sprintf("canceling reconciliation for pod,%#v", microerror.Mask(err)))
-			return nil, nil
-		}
+		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for pod")
+
+		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Maskf(err, "an error occurred while fetching the annotations of the pod")
 	}
 
-	if key.IsPodInDeletionState(pod) {
+	if key.IsPodDeleted(pod) {
 		a := pod.GetAnnotations()
 		if a == nil {
 			return nil, microerror.Mask(missingAnnotationError)

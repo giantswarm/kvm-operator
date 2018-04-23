@@ -2,6 +2,7 @@ package pod
 
 import (
 	"context"
+	"time"
 
 	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -67,7 +68,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "inspecting node config for the guest cluster")
 
-	if !nodeConfig.Status.HasFinalCondition() {
+	if !nodeConfig.Status.HasFinalCondition() && !forcePodCleanup(currentPod) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has no final state")
 		resourcecanceledcontext.SetCanceled(ctx)
 		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
@@ -238,4 +239,16 @@ func apiEndpointFromAnnotations(annotations map[string]string) (string, error) {
 	}
 
 	return apiEndpoint, nil
+}
+
+func forcePodCleanup(pod *corev1.Pod) bool {
+	if !key.IsPodDeleted(pod) {
+		return false
+	}
+
+	if pod.GetDeletionTimestamp().Add(30 * time.Minute).After(time.Now()) {
+		return false
+	}
+
+	return true
 }
