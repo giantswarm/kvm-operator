@@ -40,7 +40,7 @@ const (
 	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker  = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:a3e60fd1a50591c759ca01350fca2bb94d0e00b3"
+	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:1a31839b84eabd7286f71e5dd7e1132967e9d686"
 	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:7146561e54142d4f986daee0206336ebee3ceb18"
 
