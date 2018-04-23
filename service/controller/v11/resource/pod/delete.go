@@ -41,6 +41,24 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	}
 
+	{
+		a := currentPod.GetAnnotations()
+		if a == nil {
+			return microerror.Mask(missingAnnotationError)
+		}
+		v, ok := a[key.AnnotationPodDrained]
+		if !ok {
+			return microerror.Mask(missingAnnotationError)
+		}
+		if v == "True" {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is already drained")
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
+
+			return nil
+		}
+	}
+
 	if !forcePodCleanup(currentPod) {
 		r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
 
