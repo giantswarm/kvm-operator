@@ -6,6 +6,7 @@ import (
 
 	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -57,6 +58,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			}
 
 			resourcecanceledcontext.SetCanceled(ctx)
+			finalizerskeptcontext.SetKept(ctx)
 			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
 
 		} else if err != nil {
@@ -72,6 +74,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		if !nodeConfig.Status.HasFinalCondition() {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has no final state")
 			resourcecanceledcontext.SetCanceled(ctx)
+			finalizerskeptcontext.SetKept(ctx)
 			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
 
 			return nil
