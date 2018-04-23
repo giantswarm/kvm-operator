@@ -40,43 +40,50 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
+	if !forcePodCleanup(currentPod) {
+		r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
 
-	n := currentPod.GetNamespace()
-	p := currentPod.GetName()
-	o := metav1.GetOptions{}
+		n := currentPod.GetNamespace()
+		p := currentPod.GetName()
+		o := metav1.GetOptions{}
 
-	nodeConfig, err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Get(p, o)
-	if apierrors.IsNotFound(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "did not find node config for guest cluster node")
+		nodeConfig, err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Get(p, o)
+		if apierrors.IsNotFound(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find node config for guest cluster node")
 
-		err := r.createNodeConfig(ctx, currentPod)
+			err := r.createNodeConfig(ctx, currentPod)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+
+		} else if err != nil {
+			return microerror.Mask(err)
+		} else {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found node config for the guest cluster")
+
+			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for inspection of the reconciled pod")
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "inspecting node config for the guest cluster")
+
+		if !nodeConfig.Status.HasFinalCondition() {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has no final state")
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+
+			return nil
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has final state")
+
+		err = r.deleteNodeConfig(ctx, nodeConfig)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-
-		resourcecanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
-
-	} else if err != nil {
-		return microerror.Mask(err)
-	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "found node config for the guest cluster")
-
-		r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for inspection of the reconciled pod")
 	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", "inspecting node config for the guest cluster")
-
-	if !nodeConfig.Status.HasFinalCondition() && !forcePodCleanup(currentPod) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has no final state")
-		resourcecanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
-
-		return nil
-	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has final state")
 
 	// Here we remove the 'draining-nodes' finalizer from the reconciled pod, if
 	// any. This frees the garbage collection lock in the Kubernetes API and makes
@@ -98,6 +105,10 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		if changed {
 			podToDelete = currentPod
 			podToDelete.SetFinalizers(newFinalizers)
+
+			a := podToDelete.GetAnnotations()
+			a[key.AnnotationPodDrained] = "True"
+			podToDelete.SetAnnotations(a)
 		}
 	}
 
@@ -141,29 +152,6 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	} else {
 		r.logger.LogCtx(ctx, "debug", "the pod does not need to be updated nor to be deleted in the Kubernetes API")
-	}
-
-	err = r.deleteNodeConfig(ctx, nodeConfig)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	{
-		r.logger.LogCtx(ctx, "debug", "updating pod status to drained")
-
-		p, err := r.k8sClient.CoreV1().Pods(currentPod.GetNamespace()).Get(currentPod.GetName(), metav1.GetOptions{})
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		a := p.GetAnnotations()
-		a[key.AnnotationPodDrained] = "True"
-		p.SetAnnotations(a)
-		_, err = r.k8sClient.CoreV1().Pods(p.GetNamespace()).Update(p)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		r.logger.LogCtx(ctx, "debug", "updated pod status to drained")
 	}
 
 	return nil

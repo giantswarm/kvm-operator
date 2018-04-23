@@ -18,8 +18,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Log("pod", pod.GetName(), "debug", "looking for annotations on pod")
-	serviceNamespace := pod.GetNamespace()
+	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for annotations on pod")
+
 	_, serviceName, err := getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
 	if IsMissingAnnotationError(err) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "annotation is missing on pod")
@@ -28,7 +28,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 		return nil, nil
 	} else if err != nil {
-		return nil, microerror.Maskf(err, "an error occurred while fetching the annotations of the pod")
+		return nil, microerror.Mask(err)
 	}
 
 	if key.IsPodDeleted(pod) {
@@ -53,9 +53,9 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	currentEndpoint := Endpoint{
 		IPs:              []string{},
 		ServiceName:      serviceName,
-		ServiceNamespace: serviceNamespace,
+		ServiceNamespace: pod.GetNamespace(),
 	}
-	k8sEndpoints, err := r.k8sClient.CoreV1().Endpoints(serviceNamespace).Get(serviceName, metav1.GetOptions{})
+	k8sEndpoints, err := r.k8sClient.CoreV1().Endpoints(pod.GetNamespace()).Get(serviceName, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
 		return nil, nil
 	} else if err != nil {
