@@ -96,9 +96,6 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							key.AnnotationPodDrained:  "False",
 						},
 						GenerateName: key.MasterID,
-						Finalizers: []string{
-							key.DrainingNodesFinalizer,
-						},
 						Labels: map[string]string{
 							"app":               key.MasterID,
 							"cluster":           key.ClusterID(customObject),

@@ -65,9 +65,6 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 							key.AnnotationPodDrained:  "False",
 						},
 						Name: key.WorkerID,
-						Finalizers: []string{
-							key.DrainingNodesFinalizer,
-						},
 						Labels: map[string]string{
 							"cluster":           key.ClusterID(customObject),
 							"customer":          key.ClusterCustomer(customObject),

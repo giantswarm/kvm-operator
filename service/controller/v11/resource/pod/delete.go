@@ -88,73 +88,51 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	// Here we remove the 'draining-nodes' finalizer from the reconciled pod, if
-	// any. This frees the garbage collection lock in the Kubernetes API and makes
-	// the pod vanish.
 	var podToDelete *corev1.Pod
 	{
-		var changed bool
-		var newFinalizers []string
+		podToDelete = currentPod
 
-		for _, f := range currentPod.GetFinalizers() {
-			if f == key.DrainingNodesFinalizer {
-				changed = true
-				continue
-			}
-
-			newFinalizers = append(newFinalizers, f)
-		}
-
-		if changed {
-			podToDelete = currentPod
-			podToDelete.SetFinalizers(newFinalizers)
-
-			a := podToDelete.GetAnnotations()
-			a[key.AnnotationPodDrained] = "True"
-			podToDelete.SetAnnotations(a)
-		}
+		a := podToDelete.GetAnnotations()
+		a[key.AnnotationPodDrained] = "True"
+		podToDelete.SetAnnotations(a)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "looking if the pod has to be updated or to be deleted in the Kubernetes API")
+	{
+		r.logger.LogCtx(ctx, "debug", "updating the pod in the Kubernetes API")
 
-	if podToDelete != nil {
-		r.logger.LogCtx(ctx, "debug", "the pod has to be updated or to be deleted in the Kubernetes API")
+		_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
+		if apierrors.IsConflict(err) {
+			// The reconciled pod may be updated by other processes or even humans
+			// meanwhile. In case the resource version we currently know does not
+			// match the latest existing one, we give up here and wait for the
+			// delete event to be replayed. Then we try again later until we
+			// succeed.
+			r.logger.LogCtx(ctx, "debug", "cannot update the pod in the Kubernetes API due to outdated resource version")
+			resourcecanceledcontext.SetCanceled(ctx)
+			finalizerskeptcontext.SetKept(ctx)
+			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
 
-		{
-			r.logger.LogCtx(ctx, "debug", "updating the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer")
-
-			_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
-			if apierrors.IsConflict(err) {
-				// The reconciled pod may be updated by other processes or even humans
-				// meanwhile. In case the resource version we currently know does not
-				// match the latest existing one, we give up here and wait for the
-				// delete event to be replayed. Then we try again later until we
-				// succeed.
-				r.logger.LogCtx(ctx, "debug", "cannot update the pod in the Kubernetes API to remove the pod's 'draining-nodes' finalizer because of outdated resource version")
-				return nil
-			} else if err != nil {
-				return microerror.Mask(err)
-			}
-
-			r.logger.LogCtx(ctx, "debug", "updated the pod in the Kubernetes API to remove the pod's 'node-drainer' finalizer")
+			return nil
+		} else if err != nil {
+			return microerror.Mask(err)
 		}
 
-		{
-			r.logger.LogCtx(ctx, "debug", "deleting the pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "debug", "updated the pod in the Kubernetes API")
+	}
 
-			gracePeriodSeconds := int64(0)
-			options := &metav1.DeleteOptions{
-				GracePeriodSeconds: &gracePeriodSeconds,
-			}
-			err = r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Delete(podToDelete.Name, options)
-			if err != nil {
-				return microerror.Mask(err)
-			}
+	{
+		r.logger.LogCtx(ctx, "debug", "deleting the pod in the Kubernetes API")
 
-			r.logger.LogCtx(ctx, "debug", "deleted the pod in the Kubernetes API")
+		gracePeriodSeconds := int64(0)
+		options := &metav1.DeleteOptions{
+			GracePeriodSeconds: &gracePeriodSeconds,
 		}
-	} else {
-		r.logger.LogCtx(ctx, "debug", "the pod does not need to be updated nor to be deleted in the Kubernetes API")
+		err = r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Delete(podToDelete.Name, options)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		r.logger.LogCtx(ctx, "debug", "deleted the pod in the Kubernetes API")
 	}
 
 	return nil
