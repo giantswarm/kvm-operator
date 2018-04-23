@@ -52,7 +52,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// to the guest cluster API. As soon as the draining was done and the pods got
 	// removed we get an empty list here after the delete event got replayed. Then
 	// we just remove the ingresses as usual.
-	if key.IsInDeletionState(customObject) {
+	if key.IsDeleted(customObject) {
 		n := key.ClusterNamespace(customObject)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
 		if err != nil {
