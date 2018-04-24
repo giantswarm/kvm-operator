@@ -41,6 +41,15 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	}
 
+	// The pod status is partially reflected by its annotations. Here we check for
+	// the annotation that tells us if the pod was already drained or not. In case
+	// the pod does not have any annotations an unrecoverable error is returned.
+	// Such situations should actually never happen. If it happens, something
+	// really bad is going on. This is nothing we can just sort right away in our
+	// code.
+	//
+	// TODO(xh3b4sd) handle pod status via the runtime object status primitives
+	// and not via annotations.
 	{
 		a := currentPod.GetAnnotations()
 		if a == nil {
