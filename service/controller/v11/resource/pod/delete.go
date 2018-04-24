@@ -95,10 +95,22 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", "node config of guest cluster has final state")
+	}
 
-		err = r.deleteNodeConfig(ctx, nodeConfig)
-		if err != nil {
+	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting node config for guest cluster node")
+
+		n := currentPod.GetNamespace()
+		i := currentPod.GetName()
+		o := &metav1.DeleteOptions{}
+
+		err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Delete(i, o)
+		if apierrors.IsNotFound(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "node config for guest cluster node already deleted")
+		} else if err != nil {
 			return microerror.Mask(err)
+		} else {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "deleted node config for guest cluster node")
 		}
 	}
 
@@ -189,25 +201,6 @@ func (r *Resource) createNodeConfig(ctx context.Context, pod *corev1.Pod) error 
 	}
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "created node config for guest cluster node")
-
-	return nil
-}
-
-func (r *Resource) deleteNodeConfig(ctx context.Context, nodeConfig *corev1alpha1.NodeConfig) error {
-	r.logger.LogCtx(ctx, "level", "debug", "message", "deleting node config for guest cluster node")
-
-	n := nodeConfig.GetNamespace()
-	i := nodeConfig.GetName()
-	o := &metav1.DeleteOptions{}
-
-	err := r.g8sClient.CoreV1alpha1().NodeConfigs(n).Delete(i, o)
-	if apierrors.IsNotFound(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "node config for guest cluster node already deleted")
-	} else if err != nil {
-		return microerror.Mask(err)
-	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted node config for guest cluster node")
-	}
 
 	return nil
 }
