@@ -9,12 +9,6 @@ func IsInvalidConfig(err error) bool {
 	return microerror.Cause(err) == invalidConfigError
 }
 
-var missingAnnotationError = microerror.New("missing annotation")
-
-func IsMissingAnnotationError(err error) bool {
-	return microerror.Cause(err) == missingAnnotationError
-}
-
 var wrongTypeError = microerror.New("wrong type")
 
 // IsWrongTypeError asserts wrongTypeError.

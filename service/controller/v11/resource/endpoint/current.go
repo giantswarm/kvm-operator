@@ -32,15 +32,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	if key.IsPodDeleted(pod) {
-		a := pod.GetAnnotations()
-		if a == nil {
-			return nil, microerror.Mask(missingAnnotationError)
+		isDrained, err := key.IsPodDraind(pod)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
-		v, ok := a[key.AnnotationPodDrained]
-		if !ok {
-			return nil, microerror.Mask(missingAnnotationError)
-		}
-		if v == "False" {
+		if !isDrained {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of pod due to undrained status")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)

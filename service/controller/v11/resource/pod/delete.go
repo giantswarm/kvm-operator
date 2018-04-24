@@ -41,25 +41,12 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	// The pod status is partially reflected by its annotations. Here we check for
-	// the annotation that tells us if the pod was already drained or not. In case
-	// the pod does not have any annotations an unrecoverable error is returned.
-	// Such situations should actually never happen. If it happens, something
-	// really bad is going on. This is nothing we can just sort right away in our
-	// code.
-	//
-	// TODO(xh3b4sd) handle pod status via the runtime object status primitives
-	// and not via annotations.
 	{
-		a := currentPod.GetAnnotations()
-		if a == nil {
-			return microerror.Mask(missingAnnotationError)
+		isDrained, err := key.IsPodDraind(currentPod)
+		if err != nil {
+			return microerror.Mask(err)
 		}
-		v, ok := a[key.AnnotationPodDrained]
-		if !ok {
-			return microerror.Mask(missingAnnotationError)
-		}
-		if v == "True" {
+		if isDrained {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is already drained")
 			resourcecanceledcontext.SetCanceled(ctx)
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
@@ -168,7 +155,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 func (r *Resource) createNodeConfig(ctx context.Context, pod *corev1.Pod) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "creating node config for guest cluster node")
 
-	apiEndpoint, err := apiEndpointFromAnnotations(pod.GetAnnotations())
+	apiEndpoint, err := key.ClusterAPIEndpointFromPod(pod)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -223,18 +210,6 @@ func (r *Resource) deleteNodeConfig(ctx context.Context, nodeConfig *corev1alpha
 	}
 
 	return nil
-}
-
-func apiEndpointFromAnnotations(annotations map[string]string) (string, error) {
-	apiEndpoint, ok := annotations[key.AnnotationAPIEndpoint]
-	if !ok {
-		return "", microerror.Maskf(missingAnnotationError, key.AnnotationAPIEndpoint)
-	}
-	if apiEndpoint == "" {
-		return "", microerror.Maskf(missingAnnotationError, key.AnnotationAPIEndpoint)
-	}
-
-	return apiEndpoint, nil
 }
 
 func forcePodCleanup(pod *corev1.Pod) bool {
