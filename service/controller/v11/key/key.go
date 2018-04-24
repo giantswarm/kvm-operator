@@ -53,17 +53,18 @@ const (
 )
 
 const (
-	AnnotationIp         = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService    = "endpoint.kvm.giantswarm.io/service"
-	AnnotationPodDrained = "endpoint.kvm.giantswarm.io/drained"
+	AnnotationAPIEndpoint = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationIp          = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService     = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained  = "endpoint.kvm.giantswarm.io/drained"
+)
 
-	APIEndpointAnnotation          = "giantswarm.io/api-endpoint"
+const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
 const (
-	DrainingNodesFinalizer = "kvm-operator.giantswarm.io/node-drainer"
-	PodWatcherLabel        = "kvm-operator.giantswarm.io/pod-watcher"
+	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
 )
 
 const (

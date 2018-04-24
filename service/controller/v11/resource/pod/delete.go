@@ -217,12 +217,12 @@ func (r *Resource) deleteNodeConfig(ctx context.Context, nodeConfig *corev1alpha
 }
 
 func apiEndpointFromAnnotations(annotations map[string]string) (string, error) {
-	apiEndpoint, ok := annotations[key.APIEndpointAnnotation]
+	apiEndpoint, ok := annotations[key.AnnotationAPIEndpoint]
 	if !ok {
-		return "", microerror.Maskf(missingAnnotationError, key.APIEndpointAnnotation)
+		return "", microerror.Maskf(missingAnnotationError, key.AnnotationAPIEndpoint)
 	}
 	if apiEndpoint == "" {
-		return "", microerror.Maskf(missingAnnotationError, key.APIEndpointAnnotation)
+		return "", microerror.Maskf(missingAnnotationError, key.AnnotationAPIEndpoint)
 	}
 
 	return apiEndpoint, nil
