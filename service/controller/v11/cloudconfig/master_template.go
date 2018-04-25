@@ -88,7 +88,7 @@ func (e *masterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 			AssetContent: `[Unit]
 Description=Automount for etcd volume
 [Automount]
-Where=/etc/kubernetes/data/etcd
+Where=/var/lib/etcd
 [Install]
 WantedBy=multi-user.target
 `,
@@ -102,7 +102,7 @@ WantedBy=multi-user.target
 Description=Mount for etcd volume
 [Mount]
 What=etcdshare
-Where=/etc/kubernetes/data/etcd
+Where=/var/lib/etcd
 Options=trans=virtio,version=9p2000.L,cache=mmap
 Type=9p
 [Install]
