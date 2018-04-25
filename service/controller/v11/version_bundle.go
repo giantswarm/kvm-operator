@@ -41,12 +41,27 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "cloudconfig",
+				Description: "Fixed node-exporter running in container by adjusting host mounts.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
 				Description: "Updated Calico to 3.0.5.",
 				Kind:        versionbundle.KindChanged,
 			},
 			{
 				Component:   "cloudconfig",
 				Description: "Updated Etcd to 3.3.3.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Added trusted certificate CNs to aggregation API allowed names.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Disabled SSL passthrough in nginx-ingress-controller.",
 				Kind:        versionbundle.KindChanged,
 			},
 			{
@@ -58,6 +73,21 @@ func VersionBundle() versionbundle.Bundle {
 				Component:   "cloudconfig",
 				Description: "Removed calico-ipip-pinger.",
 				Kind:        versionbundle.KindRemoved,
+			},
+			{
+				Component:   "kvm-operator",
+				Description: "Added node draining support.",
+				Kind:        versionbundle.KindAdded,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Fixed etcd mount path.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Removed explicit hostname labeling for kubelet.",
+				Kind:        versionbundle.KindChanged,
 			},
 		},
 		Components: []versionbundle.Component{
@@ -93,8 +123,8 @@ func VersionBundle() versionbundle.Bundle {
 		Dependencies: []versionbundle.Dependency{},
 		Deprecated:   false,
 		Name:         "kvm-operator",
-		Time:         time.Date(2018, time.April, 04, 17, 32, 0, 0, time.UTC),
+		Time:         time.Date(2018, time.April, 25, 13, 00, 0, 0, time.UTC),
 		Version:      "2.2.0",
-		WIP:          true,
+		WIP:          false,
 	}
 }
