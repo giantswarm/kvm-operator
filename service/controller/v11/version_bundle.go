@@ -84,6 +84,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Fixed etcd mount path.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "cloudconfig",
+				Description: "Removed explicit hostname labeling for kubelet.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
