@@ -74,6 +74,16 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Removed calico-ipip-pinger.",
 				Kind:        versionbundle.KindRemoved,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Node draining support.",
+				Kind:        versionbundle.KindAdded,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Fixed etcd mount path.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
