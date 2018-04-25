@@ -41,12 +41,27 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "cloudconfig",
+				Description: "Fixed node-exporter running in container by adjusting host mounts.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
 				Description: "Updated Calico to 3.0.5.",
 				Kind:        versionbundle.KindChanged,
 			},
 			{
 				Component:   "cloudconfig",
 				Description: "Updated Etcd to 3.3.3.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Added trusted certificate CNs to aggregation API allowed names.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Disabled SSL passthrough in nginx-ingress-controller.",
 				Kind:        versionbundle.KindChanged,
 			},
 			{
@@ -93,8 +108,8 @@ func VersionBundle() versionbundle.Bundle {
 		Dependencies: []versionbundle.Dependency{},
 		Deprecated:   false,
 		Name:         "kvm-operator",
-		Time:         time.Date(2018, time.April, 04, 17, 32, 0, 0, time.UTC),
+		Time:         time.Date(2018, time.April, 25, 13, 00, 0, 0, time.UTC),
 		Version:      "2.2.0",
-		WIP:          true,
+		WIP:          false,
 	}
 }
