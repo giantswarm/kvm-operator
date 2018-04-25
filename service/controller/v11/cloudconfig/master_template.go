@@ -92,7 +92,7 @@ Where=/var/lib/etcd
 [Install]
 WantedBy=multi-user.target
 `,
-			Name:    "etc-kubernetes-data-etcd.automount",
+			Name:    "var-lib-etcd.automount",
 			Enable:  true,
 			Command: "start",
 		},
@@ -108,7 +108,7 @@ Type=9p
 [Install]
 WantedBy=multi-user.target
 `,
-			Name:   "etc-kubernetes-data-etcd.mount",
+			Name:   "var-lib-etcd.mount",
 			Enable: false,
 		},
 		{
