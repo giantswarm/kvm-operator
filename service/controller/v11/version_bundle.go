@@ -76,7 +76,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "kvm-operator",
-				Description: "Node draining support.",
+				Description: "Added node draining support.",
 				Kind:        versionbundle.KindAdded,
 			},
 			{
