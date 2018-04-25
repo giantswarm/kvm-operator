@@ -2,7 +2,9 @@ package controller
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -15,6 +17,7 @@ import (
 )
 
 type DrainerConfig struct {
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
@@ -45,7 +48,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.ProjectName),
 			},
 			RateWait:     informer.DefaultRateWait,
-			ResyncPeriod: informer.DefaultResyncPeriod,
+			ResyncPeriod: 30 * time.Second,
 		}
 
 		newInformer, err = informer.New(c)
@@ -63,9 +66,9 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	{
 		c := controller.Config{
 			Informer:       newInformer,
-			K8sClient:      config.K8sClient,
 			Logger:         config.Logger,
 			ResourceRouter: resourceRouter,
+			RESTClient:     config.K8sClient.CoreV1().RESTClient(),
 
 			Name: config.ProjectName + "-drainer",
 		}
@@ -89,6 +92,7 @@ func newDrainerResourceRouter(config DrainerConfig) (*controller.ResourceRouter,
 	var resourceSetV11 *controller.ResourceSet
 	{
 		c := v11.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 

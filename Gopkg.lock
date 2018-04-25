@@ -43,8 +43,8 @@
     ".",
     "log"
   ]
-  revision = "26b41036311f2da8242db402557a0dbd09dc83da"
-  version = "v2.6.0"
+  revision = "92cd0815dd1a028a6e69faee9757c7436238e252"
+  version = "v2.6.1"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -65,9 +65,12 @@
     "pkg/apis/core/v1alpha1",
     "pkg/apis/provider/v1alpha1",
     "pkg/clientset/versioned",
+    "pkg/clientset/versioned/fake",
     "pkg/clientset/versioned/scheme",
     "pkg/clientset/versioned/typed/core/v1alpha1",
-    "pkg/clientset/versioned/typed/provider/v1alpha1"
+    "pkg/clientset/versioned/typed/core/v1alpha1/fake",
+    "pkg/clientset/versioned/typed/provider/v1alpha1",
+    "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
   revision = "292a0157b9683e2593f1d65e2e52c5ff2859f124"
 
@@ -156,6 +159,7 @@
     "client/k8scrdclient",
     "client/k8srestconfig",
     "controller",
+    "controller/context/finalizerskeptcontext",
     "controller/context/reconciliationcanceledcontext",
     "controller/context/resourcecanceledcontext",
     "controller/context/updateallowedcontext",
@@ -165,7 +169,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "3e96a44c04a17fc0f5c626d10358cc388906833f"
+  revision = "20be1f8c80b4b638cfebd5e8fb001a003c27762b"
 
 [[projects]]
   branch = "master"
@@ -180,7 +184,7 @@
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
-  revision = "f1ba953de318d1c02fd88b21e2e9fa127b7beaba"
+  revision = "d9e6f0b682c63fc5a070aacaa48001ded44b16dc"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -425,7 +429,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "f1323f902ca878b3a87e1a76458be272fe1efe0d"
+  revision = "82f5ff156b29e276022b1a958f7d385870fb9814"
 
 [[projects]]
   branch = "master"
@@ -504,13 +508,14 @@
   name = "golang.org/x/net"
   packages = [
     "context",
+    "http/httpguts",
     "http2",
     "http2/hpack",
     "idna",
     "lex/httplex",
     "publicsuffix"
   ]
-  revision = "500e7a4f953ddaf55d316b4d3adc516aa0379622"
+  revision = "d41e8174641f662c5a2d1c7a5f9e828788eb8706"
 
 [[projects]]
   branch = "master"
@@ -522,7 +527,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "2f57af4873d00d535c5c9028850aa2152e6a5566"
+  revision = "79b0c6888797020a994db17c8510466c72fe75d9"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -736,11 +741,11 @@
   branch = "master"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/common"]
-  revision = "f442ecb314a3679150c272e2b9713d8deed5955d"
+  revision = "0f2f0396e266ad24afbd02375ba74c0dda1e3611"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "91a9e07a718a5628968f441f3a56967d7b548a6a0585c7c5fa92cc83f4a5301e"
+  inputs-digest = "68ecbd5386e91d3bdf77857595f95748dac26275b718dd0f5601f9020ff957d0"
   solver-name = "gps-cdcl"
   solver-version = 1

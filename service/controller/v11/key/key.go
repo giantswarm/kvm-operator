@@ -40,7 +40,7 @@ const (
 	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker  = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:4438d70d2181af66ea2b90c7f3bc74d1aa3c55a1"
+	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:16a61cf7fab82df299a1e921bb42e4f6402a8307"
 	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:7146561e54142d4f986daee0206336ebee3ceb18"
 
@@ -50,17 +50,21 @@ const (
 	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
 	workerIOOverhead             = "512M"
+)
 
-	// kvm endpoint annotations
-	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService = "endpoint.kvm.giantswarm.io/service"
+const (
+	AnnotationAPIEndpoint = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationIp          = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService     = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained  = "endpoint.kvm.giantswarm.io/drained"
+)
 
+const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
 const (
-	DrainingNodesFinalizer = "kvm-operator.giantswarm.io/node-drainer"
-	PodWatcherLabel        = "kvm-operator.giantswarm.io/pod-watcher"
+	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
 )
 
 const (
@@ -69,6 +73,18 @@ const (
 
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
+}
+
+func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {
+	apiEndpoint, ok := pod.GetAnnotations()[AnnotationAPIEndpoint]
+	if !ok {
+		return "", microerror.Maskf(missingAnnotationError, AnnotationAPIEndpoint)
+	}
+	if apiEndpoint == "" {
+		return "", microerror.Maskf(missingAnnotationError, AnnotationAPIEndpoint)
+	}
+
+	return apiEndpoint, nil
 }
 
 func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
@@ -127,6 +143,40 @@ func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
 
 func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
+}
+
+func IsDeleted(customObject v1alpha1.KVMConfig) bool {
+	return customObject.GetDeletionTimestamp() != nil
+}
+
+func IsPodDeleted(pod *corev1.Pod) bool {
+	return pod.GetDeletionTimestamp() != nil
+}
+
+// IsPodDraind checks whether the pod status indicates it got drained. The pod
+// status is partially reflected by its annotations. Here we check for the
+// annotation that tells us if the pod was already drained or not. In case the
+// pod does not have any annotations an unrecoverable error is returned. Such
+// situations should actually never happen. If it happens, something really bad
+// is going on. This is nothing we can just sort right away in our code.
+//
+// TODO(xh3b4sd) handle pod status via the runtime object status primitives
+// and not via annotations.
+func IsPodDraind(pod *corev1.Pod) (bool, error) {
+	a := pod.GetAnnotations()
+	if a == nil {
+		return false, microerror.Mask(missingAnnotationError)
+	}
+	v, ok := a[AnnotationPodDrained]
+	if !ok {
+		return false, microerror.Mask(missingAnnotationError)
+	}
+	b, err := strconv.ParseBool(v)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	return b, nil
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {

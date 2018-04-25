@@ -89,20 +89,19 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
-						GenerateName: key.MasterID,
-						Finalizers: []string{
-							key.DrainingNodesFinalizer,
+						Annotations: map[string]string{
+							key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(customObject),
+							key.AnnotationIp:          "",
+							key.AnnotationService:     key.MasterID,
+							key.AnnotationPodDrained:  "False",
 						},
+						GenerateName: key.MasterID,
 						Labels: map[string]string{
 							"app":               key.MasterID,
 							"cluster":           key.ClusterID(customObject),
 							"customer":          key.ClusterCustomer(customObject),
 							"node":              masterNode.ID,
 							key.PodWatcherLabel: "kvm-operator",
-						},
-						Annotations: map[string]string{
-							key.AnnotationIp:      "",
-							key.AnnotationService: key.MasterID,
 						},
 					},
 					Spec: apiv1.PodSpec{

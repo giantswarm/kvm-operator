@@ -14,9 +14,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
+	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
 	"github.com/giantswarm/operatorkit/informer"
@@ -43,7 +44,19 @@ type Config struct {
 	// and different resources can be executed depending on the runtime object
 	// being reconciled.
 	ResourceRouter *ResourceRouter
-	K8sClient      kubernetes.Interface
+	// RESTClient needs to be configured with a serializer capable of serializing
+	// and deserializing the object which is watched by the informer. Otherwise
+	// deserialization will fail when trying to add a finalizer.
+	//
+	// For standard k8s object this is going to be e.g.
+	//
+	// 		k8sClient.CoreV1().RESTClient()
+	//
+	// For CRs of giantswarm this is going to be e.g.
+	//
+	// 		g8sClient.CoreV1alpha1().RESTClient()
+	//
+	RESTClient rest.Interface
 
 	BackOffFactory func() backoff.BackOff
 	// Name is the name which the controller uses on finalizers for resources.
@@ -56,7 +69,7 @@ type Controller struct {
 	crd            *apiextensionsv1beta1.CustomResourceDefinition
 	crdClient      *k8scrdclient.CRDClient
 	informer       informer.Interface
-	k8sClient      kubernetes.Interface
+	restClient     rest.Interface
 	logger         micrologger.Logger
 	resourceRouter *ResourceRouter
 
@@ -75,7 +88,7 @@ func New(config Config) (*Controller, error) {
 	if config.Informer == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Informer must not be empty")
 	}
-	if config.K8sClient == nil {
+	if config.RESTClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
 	if config.Logger == nil {
@@ -96,7 +109,7 @@ func New(config Config) (*Controller, error) {
 		crd:            config.CRD,
 		crdClient:      config.CRDClient,
 		informer:       config.Informer,
-		k8sClient:      config.K8sClient,
+		restClient:     config.RESTClient,
 		logger:         config.Logger,
 		resourceRouter: config.ResourceRouter,
 
@@ -167,10 +180,12 @@ func (f *Controller) DeleteFunc(obj interface{}) {
 		return
 	}
 
-	err = f.removeFinalizer(ctx, obj)
-	if err != nil {
-		f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
-		return
+	if !finalizerskeptcontext.IsKept(ctx) {
+		err = f.removeFinalizer(ctx, obj)
+		if err != nil {
+			f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
+			return
+		}
 	}
 }
 

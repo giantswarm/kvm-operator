@@ -124,6 +124,7 @@ func New(config Config) (*Service, error) {
 	var drainerController *controller.Drainer
 	{
 		c := controller.DrainerConfig{
+			G8sClient: g8sClient,
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 

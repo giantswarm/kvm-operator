@@ -2,6 +2,7 @@ package v11
 
 import (
 	"github.com/cenkalti/backoff"
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -9,10 +10,12 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/endpoint"
 	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/pod"
 )
 
 type DrainerResourceSetConfig struct {
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
@@ -29,6 +32,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 	var podResource controller.Resource
 	{
 		c := pod.Config{
+			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 		}
@@ -39,7 +43,27 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		}
 	}
 
+	var endpointResource controller.Resource
+	{
+		c := endpoint.Config{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		ops, err := endpoint.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		endpointResource, err = toCRUDResource(config.Logger, ops)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resources := []controller.Resource{
+		endpointResource,
 		podResource,
 	}
 
