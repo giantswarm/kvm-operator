@@ -60,12 +60,13 @@ func (s *Searcher) SearchCluster(clusterID string) (Cluster, error) {
 	var cluster Cluster
 
 	certificates := []struct {
-		TLS  *TLS
-		Cert Cert
+		TLS      *TLS
+		Cert     Cert
+		optional bool
 	}{
 		{TLS: &cluster.APIServer, Cert: APICert},
 		{TLS: &cluster.CalicoClient, Cert: CalicoCert},
-		{TLS: &cluster.CalicoEtcdClient, Cert: CalicoEtcdClientCert},
+		{TLS: &cluster.CalicoEtcdClient, Cert: CalicoEtcdClientCert, optional: true},
 		{TLS: &cluster.EtcdServer, Cert: EtcdCert},
 		{TLS: &cluster.ServiceAccount, Cert: ServiceAccountCert},
 		{TLS: &cluster.Worker, Cert: WorkerCert},
@@ -74,7 +75,11 @@ func (s *Searcher) SearchCluster(clusterID string) (Cluster, error) {
 	for _, c := range certificates {
 		err := s.search(c.TLS, clusterID, c.Cert)
 		if err != nil {
-			return Cluster{}, microerror.Mask(err)
+			if c.optional {
+				s.logger.Log("level", "warning", "message", err.Error())
+			} else {
+				return Cluster{}, microerror.Mask(err)
+			}
 		}
 	}
 
