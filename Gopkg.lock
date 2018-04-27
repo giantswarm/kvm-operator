@@ -75,13 +75,13 @@
   revision = "292a0157b9683e2593f1d65e2e52c5ff2859f124"
 
 [[projects]]
-  branch = "make-calico-etcd-client-cert-optional-for-searcher"
+  branch = "master"
   name = "github.com/giantswarm/certs"
   packages = [
     ".",
     "certstest"
   ]
-  revision = "bcfbbb885eb7371ed64f1729e96c9b4bd1548ea1"
+  revision = "c087c8dd2a0a56cdebb4f41275de1ac448071a9c"
 
 [[projects]]
   branch = "master"
@@ -746,6 +746,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "52b560e47a369946318c81031d9fd00706483bbeefef673094321477241f58ab"
+  inputs-digest = "68ecbd5386e91d3bdf77857595f95748dac26275b718dd0f5601f9020ff957d0"
   solver-name = "gps-cdcl"
   solver-version = 1

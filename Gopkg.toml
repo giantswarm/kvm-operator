@@ -30,7 +30,7 @@
   name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]
-  branch = "make-calico-etcd-client-cert-optional-for-searcher"
+  branch = "master"
   name = "github.com/giantswarm/certs"
 
 [[constraint]]
