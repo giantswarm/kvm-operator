@@ -74,8 +74,12 @@ func (s *Searcher) SearchCluster(clusterID string) (Cluster, error) {
 
 	for _, c := range certificates {
 		err := s.search(c.TLS, clusterID, c.Cert)
-		if !c.optional && err != nil {
-			return Cluster{}, microerror.Mask(err)
+		if err != nil {
+			if c.optional {
+				s.logger.Log("level", "warning", "message", err.Error())
+			} else {
+				return Cluster{}, microerror.Mask(err)
+			}
 		}
 	}
 
