@@ -42,6 +42,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	var newInformer *informer.Informer
 	{
 		c := informer.Config{
+			Logger:  config.Logger,
 			Watcher: config.K8sClient.CoreV1().Pods(""),
 
 			ListOptions: apismetav1.ListOptions{

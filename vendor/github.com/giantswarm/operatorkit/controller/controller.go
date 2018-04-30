@@ -73,8 +73,9 @@ type Controller struct {
 	logger         micrologger.Logger
 	resourceRouter *ResourceRouter
 
-	bootOnce sync.Once
-	mutex    sync.Mutex
+	bootOnce       sync.Once
+	errorCollector chan error
+	mutex          sync.Mutex
 
 	backOffFactory func() backoff.BackOff
 	name           string
@@ -113,8 +114,9 @@ func New(config Config) (*Controller, error) {
 		logger:         config.Logger,
 		resourceRouter: config.ResourceRouter,
 
-		bootOnce: sync.Once{},
-		mutex:    sync.Mutex{},
+		bootOnce:       sync.Once{},
+		errorCollector: make(chan error, 1),
+		mutex:          sync.Mutex{},
 
 		backOffFactory: config.BackOffFactory,
 		name:           config.Name,
@@ -176,16 +178,23 @@ func (f *Controller) DeleteFunc(obj interface{}) {
 
 	err = ProcessDelete(ctx, obj, resourceSet.Resources())
 	if err != nil {
+		f.errorCollector <- err
 		f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
 		return
 	}
 
 	if !finalizerskeptcontext.IsKept(ctx) {
+		f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "debug", "message", "removing finalizer from runtime object")
+
 		err = f.removeFinalizer(ctx, obj)
 		if err != nil {
 			f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
 			return
 		}
+
+		f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "debug", "message", "removed finalizer from runtime object")
+	} else {
+		f.logger.LogCtx(ctx, "event", "delete", "function", "DeleteFunc", "level", "debug", "message", "not removing finalizer from runtime object due to request of keeping it")
 	}
 }
 
@@ -234,18 +243,6 @@ func (f *Controller) UpdateFunc(oldObj, newObj interface{}) {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
 
-	ok, err := f.addFinalizer(obj)
-	if err != nil {
-		f.logger.Log("event", "update", "function", "UpdateFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
-		return
-	}
-	if ok {
-		// A finalizer was added, this causes a new update event, so we stop
-		// reconciling here and will pick up the new event.
-		f.logger.Log("event", "update", "function", "UpdateFunc", "level", "debug", "message", "stop reconciliation due to finalizer added")
-		return
-	}
-
 	resourceSet, err := f.resourceRouter.ResourceSet(obj)
 	if IsNoResourceSet(err) {
 		// In case the resource router is not able to find any resource set to
@@ -258,12 +255,25 @@ func (f *Controller) UpdateFunc(oldObj, newObj interface{}) {
 
 	ctx, err := resourceSet.InitCtx(context.Background(), obj)
 	if err != nil {
+		f.logger.Log("event", "update", "function", "UpdateFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
+		return
+	}
+
+	ok, err := f.addFinalizer(obj)
+	if err != nil {
 		f.logger.LogCtx(ctx, "event", "update", "function", "UpdateFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
+		return
+	}
+	if ok {
+		// A finalizer was added, this causes a new update event, so we stop
+		// reconciling here and will pick up the new event.
+		f.logger.LogCtx(ctx, "event", "update", "function", "UpdateFunc", "level", "debug", "message", "stop reconciliation due to finalizer added")
 		return
 	}
 
 	err = ProcessUpdate(ctx, obj, resourceSet.Resources())
 	if err != nil {
+		f.errorCollector <- err
 		f.logger.LogCtx(ctx, "event", "update", "function", "UpdateFunc", "level", "error", "message", "stop reconciliation due to error", "stack", fmt.Sprintf("%#v", err))
 		return
 	}
@@ -279,9 +289,31 @@ func (f *Controller) bootWithError(ctx context.Context) error {
 		}
 
 		f.logger.LogCtx(ctx, "function", "bootWithError", "level", "debug", "message", "ensured custom resource definition exists")
-
-		// TODO collect metrics
 	}
+
+	{
+		f.logger.LogCtx(ctx, "function", "bootWithError", "level", "debug", "message", "booting informer")
+
+		err := f.informer.Boot(ctx)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		f.logger.LogCtx(ctx, "function", "bootWithError", "level", "debug", "message", "booted informer")
+	}
+
+	go func() {
+		resetWait := f.informer.ResyncPeriod() * 2
+
+		for {
+			select {
+			case <-f.errorCollector:
+				controllerErrorGauge.Inc()
+			case <-time.After(resetWait):
+				controllerErrorGauge.Set(0)
+			}
+		}
+	}()
 
 	f.logger.LogCtx(ctx, "function", "bootWithError", "level", "debug", "message", "starting list-watch")
 

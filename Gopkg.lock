@@ -169,7 +169,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "20be1f8c80b4b638cfebd5e8fb001a003c27762b"
+  revision = "fa5f9b848a8c9cb53e1face5f3af0e42a1e26b87"
 
 [[projects]]
   branch = "master"
