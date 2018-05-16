@@ -6,10 +6,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
@@ -36,10 +37,10 @@ const (
 
 	FlannelEnvPathPrefix = "/run/flannel"
 	CoreosImageDir       = "/var/lib/coreos-kvm-images"
-	CoreosVersion        = "1632.3.0"
+	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker  = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:4438d70d2181af66ea2b90c7f3bc74d1aa3c55a1"
+	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:16a61cf7fab82df299a1e921bb42e4f6402a8307"
 	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:7146561e54142d4f986daee0206336ebee3ceb18"
 
@@ -49,16 +50,41 @@ const (
 	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
 	workerIOOverhead             = "512M"
+)
 
-	// kvm endpoint annotations
-	AnnotationIp      = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService = "endpoint.kvm.giantswarm.io/service"
+const (
+	AnnotationAPIEndpoint = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationIp          = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService     = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained  = "endpoint.kvm.giantswarm.io/drained"
+)
 
+const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
+)
+
+const (
+	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
+)
+
+const (
+	PodDeletionGracePeriod = 5 * time.Minute
 )
 
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
+}
+
+func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {
+	apiEndpoint, ok := pod.GetAnnotations()[AnnotationAPIEndpoint]
+	if !ok {
+		return "", microerror.Maskf(missingAnnotationError, AnnotationAPIEndpoint)
+	}
+	if apiEndpoint == "" {
+		return "", microerror.Maskf(missingAnnotationError, AnnotationAPIEndpoint)
+	}
+
+	return apiEndpoint, nil
 }
 
 func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
@@ -69,7 +95,7 @@ func ClusterID(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.ID
 }
 
-func ClusterIDFromPod(pod *apiv1.Pod) string {
+func ClusterIDFromPod(pod *corev1.Pod) string {
 	l, ok := pod.Labels["cluster"]
 	if ok {
 		return l
@@ -117,6 +143,40 @@ func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
 
 func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
+}
+
+func IsDeleted(customObject v1alpha1.KVMConfig) bool {
+	return customObject.GetDeletionTimestamp() != nil
+}
+
+func IsPodDeleted(pod *corev1.Pod) bool {
+	return pod.GetDeletionTimestamp() != nil
+}
+
+// IsPodDraind checks whether the pod status indicates it got drained. The pod
+// status is partially reflected by its annotations. Here we check for the
+// annotation that tells us if the pod was already drained or not. In case the
+// pod does not have any annotations an unrecoverable error is returned. Such
+// situations should actually never happen. If it happens, something really bad
+// is going on. This is nothing we can just sort right away in our code.
+//
+// TODO(xh3b4sd) handle pod status via the runtime object status primitives
+// and not via annotations.
+func IsPodDraind(pod *corev1.Pod) (bool, error) {
+	a := pod.GetAnnotations()
+	if a == nil {
+		return false, microerror.Mask(missingAnnotationError)
+	}
+	v, ok := a[AnnotationPodDrained]
+	if !ok {
+		return false, microerror.Mask(missingAnnotationError)
+	}
+	b, err := strconv.ParseBool(v)
+	if err != nil {
+		return false, microerror.Mask(err)
+	}
+
+	return b, nil
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
@@ -236,6 +296,19 @@ func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	customObject := *customObjectPointer
 
 	return customObject, nil
+}
+
+func ToPod(v interface{}) (*corev1.Pod, error) {
+	if v == nil {
+		return nil, nil
+	}
+
+	pod, ok := v.(*corev1.Pod)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &corev1.Pod{}, v)
+	}
+
+	return pod, nil
 }
 
 func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {

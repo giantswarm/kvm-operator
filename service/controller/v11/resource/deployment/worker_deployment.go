@@ -11,7 +11,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v10/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
 )
 
 func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
@@ -19,6 +19,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 
 	privileged := true
 	replicas := int32(1)
+	podDeletionGracePeriod := int64(key.PodDeletionGracePeriod.Seconds())
 
 	for i, workerNode := range customObject.Spec.Cluster.Workers {
 		capabilities := customObject.Spec.KVM.Workers[i]
@@ -57,16 +58,19 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
+						Annotations: map[string]string{
+							key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(customObject),
+							key.AnnotationIp:          "",
+							key.AnnotationService:     key.WorkerID,
+							key.AnnotationPodDrained:  "False",
+						},
 						Name: key.WorkerID,
 						Labels: map[string]string{
-							"cluster":  key.ClusterID(customObject),
-							"customer": key.ClusterCustomer(customObject),
-							"app":      key.WorkerID,
-							"node":     workerNode.ID,
-						},
-						Annotations: map[string]string{
-							key.AnnotationIp:      "",
-							key.AnnotationService: key.WorkerID,
+							"cluster":           key.ClusterID(customObject),
+							"customer":          key.ClusterCustomer(customObject),
+							"app":               key.WorkerID,
+							"node":              workerNode.ID,
+							key.PodWatcherLabel: "kvm-operator",
 						},
 					},
 					Spec: apiv1.PodSpec{
@@ -75,7 +79,8 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 						NodeSelector: map[string]string{
 							"role": key.WorkerID,
 						},
-						ServiceAccountName: key.ServiceAccountName(customObject),
+						ServiceAccountName:            key.ServiceAccountName(customObject),
+						TerminationGracePeriodSeconds: &podDeletionGracePeriod,
 						Volumes: []apiv1.Volume{
 							{
 								Name: "cloud-config",
