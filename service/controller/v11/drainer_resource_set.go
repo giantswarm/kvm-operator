@@ -35,7 +35,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		// NOTE this is the hack we have to backport to ensure existing clusters
 		// work the way they do while paving the ground for v12 where we have to
 		// check more explictly against our desired version bundle version.
-		if v == "" {
+		if v == "" || v == VersionBundle().Version {
 			return true
 		}
 
