@@ -8,9 +8,9 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	"k8s.io/api/extensions/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v10/key"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
@@ -26,9 +26,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(deploymentsToDelete) != 0 {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the deployments in the Kubernetes API")
 
+		namespace := key.ClusterNamespace(customObject)
 		for _, deployment := range deploymentsToDelete {
-			n := key.ClusterNamespace(customObject)
-			err := r.k8sClient.Extensions().Deployments(n).Delete(deployment.Name, newDeleteOptions())
+			err := r.k8sClient.Extensions().Deployments(namespace).Delete(deployment.Name, newDeleteOptions())
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -110,10 +110,10 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 	return deploymentsToDelete, nil
 }
 
-func newDeleteOptions() *metav1.DeleteOptions {
-	propagation := metav1.DeletePropagationForeground
+func newDeleteOptions() *apismetav1.DeleteOptions {
+	propagation := apismetav1.DeletePropagationForeground
 
-	options := &metav1.DeleteOptions{
+	options := &apismetav1.DeleteOptions{
 		PropagationPolicy: &propagation,
 	}
 

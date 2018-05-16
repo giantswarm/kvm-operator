@@ -3,7 +3,7 @@ package cloudconfig
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_2_5"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_2_4"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/randomkeys"
 )
@@ -88,11 +88,11 @@ func (e *masterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 			AssetContent: `[Unit]
 Description=Automount for etcd volume
 [Automount]
-Where=/var/lib/etcd
+Where=/etc/kubernetes/data/etcd
 [Install]
 WantedBy=multi-user.target
 `,
-			Name:    "var-lib-etcd.automount",
+			Name:    "etc-kubernetes-data-etcd.automount",
 			Enable:  true,
 			Command: "start",
 		},
@@ -102,13 +102,13 @@ WantedBy=multi-user.target
 Description=Mount for etcd volume
 [Mount]
 What=etcdshare
-Where=/var/lib/etcd
+Where=/etc/kubernetes/data/etcd
 Options=trans=virtio,version=9p2000.L,cache=mmap
 Type=9p
 [Install]
 WantedBy=multi-user.target
 `,
-			Name:   "var-lib-etcd.mount",
+			Name:   "etc-kubernetes-data-etcd.mount",
 			Enable: false,
 		},
 		{
