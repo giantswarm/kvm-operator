@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
 	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/endpoint"
 	"github.com/giantswarm/kvm-operator/service/controller/v11/resource/pod"
 )
@@ -26,7 +27,20 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 	var err error
 
 	handlesFunc := func(obj interface{}) bool {
-		return true
+		p, err := key.ToPod(obj)
+		if err != nil {
+			return false
+		}
+		v, err := key.VersionBundleVersionFromPod(p)
+		if err != nil {
+			return false
+		}
+
+		if v == VersionBundle().Version {
+			return true
+		}
+
+		return false
 	}
 
 	var podResource controller.Resource

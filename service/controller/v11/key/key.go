@@ -53,10 +53,11 @@ const (
 )
 
 const (
-	AnnotationAPIEndpoint = "kvm-operator.giantswarm.io/api-endpoint"
-	AnnotationIp          = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService     = "endpoint.kvm.giantswarm.io/service"
-	AnnotationPodDrained  = "endpoint.kvm.giantswarm.io/drained"
+	AnnotationAPIEndpoint   = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationIp            = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService       = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained    = "endpoint.kvm.giantswarm.io/drained"
+	AnnotationVersionBundle = "kvm-operator.giantswarm.io/version-bundle"
 )
 
 const (
@@ -313,6 +314,19 @@ func ToPod(v interface{}) (*corev1.Pod, error) {
 
 func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.VersionBundle.Version
+}
+
+func VersionBundleVersionFromPod(pod *corev1.Pod) (string, error) {
+	a := pod.GetAnnotations()
+	if a == nil {
+		return "", microerror.Mask(missingAnnotationError)
+	}
+	v, ok := a[AnnotationVersionBundle]
+	if !ok {
+		return "", microerror.Mask(missingAnnotationError)
+	}
+
+	return v, nil
 }
 
 func VMNumber(ID int) string {

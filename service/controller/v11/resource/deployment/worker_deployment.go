@@ -59,10 +59,11 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Annotations: map[string]string{
-							key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(customObject),
-							key.AnnotationIp:          "",
-							key.AnnotationService:     key.WorkerID,
-							key.AnnotationPodDrained:  "False",
+							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customObject),
+							key.AnnotationIp:            "",
+							key.AnnotationService:       key.WorkerID,
+							key.AnnotationPodDrained:    "False",
+							key.AnnotationVersionBundle: key.VersionBundleVersion(customObject),
 						},
 						Name: key.WorkerID,
 						Labels: map[string]string{
