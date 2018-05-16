@@ -32,13 +32,22 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 			return false
 		}
 		v, err := key.VersionBundleVersionFromPod(p)
-		if err != nil {
-			return false
-		}
-
-		if v == VersionBundle().Version {
+		// NOTE this is the hack we have to backport to ensure existing clusters
+		// work the way they do while paving the ground for v12 where we have to
+		// check more explictly against our desired version bundle version.
+		if v == "" {
 			return true
 		}
+
+		// TODO this error handling has to be enabled when going from v11 to v12.
+		//if err != nil {
+		//	return false
+		//}
+
+		// TODO this check has to be enabled when going from v11 to v12.
+		//if v == VersionBundle().Version {
+		//	return true
+		//}
 
 		return false
 	}
