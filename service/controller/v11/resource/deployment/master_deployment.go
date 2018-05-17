@@ -90,10 +90,11 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Annotations: map[string]string{
-							key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(customObject),
-							key.AnnotationIp:          "",
-							key.AnnotationService:     key.MasterID,
-							key.AnnotationPodDrained:  "False",
+							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customObject),
+							key.AnnotationIp:            "",
+							key.AnnotationService:       key.MasterID,
+							key.AnnotationPodDrained:    "False",
+							key.AnnotationVersionBundle: key.VersionBundleVersion(customObject),
 						},
 						GenerateName: key.MasterID,
 						Labels: map[string]string{
