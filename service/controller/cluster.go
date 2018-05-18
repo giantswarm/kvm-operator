@@ -17,6 +17,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/v10"
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
+	"github.com/giantswarm/kvm-operator/service/controller/v12"
 	"github.com/giantswarm/kvm-operator/service/controller/v2"
 	"github.com/giantswarm/kvm-operator/service/controller/v3"
 	"github.com/giantswarm/kvm-operator/service/controller/v4"
@@ -287,6 +288,24 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
+	var resourceSetV12 *controller.ResourceSet
+	{
+		c := v12.ClusterResourceSetConfig{
+			CertsSearcher:      certsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			ProjectName:        config.ProjectName,
+		}
+
+		resourceSetV12, err = v12.NewClusterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceRouter *controller.ResourceRouter
 	{
 		c := controller.ResourceRouterConfig{
@@ -303,6 +322,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				resourceSetV9,
 				resourceSetV10,
 				resourceSetV11,
+				resourceSetV12,
 			},
 		}
 

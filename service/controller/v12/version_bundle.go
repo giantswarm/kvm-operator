@@ -1,4 +1,4 @@
-package v11
+package v12
 
 import (
 	"time"
@@ -10,83 +10,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "kubernetes",
-				Description: "Updated to 1.10.1.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Updated kube-state-metrics to version 1.3.1.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Changed kubelet bind mount mode from shared to rshared.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Disabled etcd3-defragmentation service in favor systemd timer.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Added /lib/modules mount for kubelet.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Updated CoreDNS to 1.1.1.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Fixed node-exporter running in container by adjusting host mounts.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Updated Calico to 3.0.5.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Updated Etcd to 3.3.3.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Added trusted certificate CNs to aggregation API allowed names.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Disabled SSL passthrough in nginx-ingress-controller.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Removed docker flag --disable-legacy-registry.",
-				Kind:        versionbundle.KindRemoved,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Removed calico-ipip-pinger.",
-				Kind:        versionbundle.KindRemoved,
-			},
-			{
-				Component:   "kvm-operator",
-				Description: "Added node draining support.",
-				Kind:        versionbundle.KindAdded,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Fixed etcd mount path.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Removed explicit hostname labeling for kubelet.",
+				Component:   "TODO",
+				Description: "TODO",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -123,8 +48,8 @@ func VersionBundle() versionbundle.Bundle {
 		Dependencies: []versionbundle.Dependency{},
 		Deprecated:   false,
 		Name:         "kvm-operator",
-		Time:         time.Date(2018, time.April, 25, 13, 00, 0, 0, time.UTC),
-		Version:      "2.2.0",
-		WIP:          false,
+		Time:         time.Date(2018, time.May, 18, 15, 00, 0, 0, time.UTC),
+		Version:      "2.2.1",
+		WIP:          true,
 	}
 }

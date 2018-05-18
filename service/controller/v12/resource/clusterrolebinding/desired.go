@@ -9,7 +9,7 @@ import (
 	apiv1 "k8s.io/api/rbac/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v12/key"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
