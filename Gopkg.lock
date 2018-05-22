@@ -101,7 +101,7 @@
     "v_3_2_4",
     "v_3_2_5"
   ]
-  revision = "a490795bbf0b7d2dc079185031115d4a3b698f81"
+  revision = "3bb30a7ce6831bdaeb65b6ae7bff2a839c100450"
 
 [[projects]]
   branch = "master"
@@ -127,7 +127,7 @@
   revision = "325932fa68e70dd4464598f11e2f710ac1aaec46"
 
 [[projects]]
-  branch = "graceful"
+  branch = "master"
   name = "github.com/giantswarm/microkit"
   packages = [
     "command",
@@ -143,7 +143,7 @@
     "server",
     "tls"
   ]
-  revision = "51c31cff6d72125b250009c3389a3ff18fa7d274"
+  revision = "a9dfb8b471d59689316c616503b53a558811dada"
 
 [[projects]]
   branch = "master"
@@ -523,7 +523,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
+  revision = "89da893103a6ed6c87fb4bb5c19fcf97812df621"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -742,6 +742,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c67864c0b62ceb2e0f408e8373b04b7c56770cea08609d6c612e2d972051eaab"
+  inputs-digest = "68ecbd5386e91d3bdf77857595f95748dac26275b718dd0f5601f9020ff957d0"
   solver-name = "gps-cdcl"
   solver-version = 1
