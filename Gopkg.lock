@@ -101,7 +101,7 @@
     "v_3_2_4",
     "v_3_2_5"
   ]
-  revision = "a490795bbf0b7d2dc079185031115d4a3b698f81"
+  revision = "3bb30a7ce6831bdaeb65b6ae7bff2a839c100450"
 
 [[projects]]
   branch = "master"
@@ -143,7 +143,7 @@
     "server",
     "tls"
   ]
-  revision = "e512bc900e56853249173da6028a45939ebe8e85"
+  revision = "a9dfb8b471d59689316c616503b53a558811dada"
 
 [[projects]]
   branch = "master"
@@ -187,7 +187,7 @@
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
-  revision = "36ba466124d6494c1772e6380756594ba996d081"
+  revision = "d3bebdd7a9efb503d3ce05d6feaf9f403ccbf927"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -501,12 +501,6 @@
   version = "v1.0.2"
 
 [[projects]]
-  name = "github.com/tylerb/graceful"
-  packages = ["."]
-  revision = "4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb"
-  version = "v1.2.15"
-
-[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = [
@@ -529,7 +523,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
+  revision = "89da893103a6ed6c87fb4bb5c19fcf97812df621"
 
 [[projects]]
   name = "golang.org/x/text"
