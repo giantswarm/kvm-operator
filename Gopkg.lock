@@ -127,7 +127,7 @@
   revision = "325932fa68e70dd4464598f11e2f710ac1aaec46"
 
 [[projects]]
-  branch = "master"
+  branch = "graceful"
   name = "github.com/giantswarm/microkit"
   packages = [
     "command",
@@ -143,7 +143,7 @@
     "server",
     "tls"
   ]
-  revision = "e512bc900e56853249173da6028a45939ebe8e85"
+  revision = "51c31cff6d72125b250009c3389a3ff18fa7d274"
 
 [[projects]]
   branch = "master"
@@ -187,7 +187,7 @@
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
-  revision = "36ba466124d6494c1772e6380756594ba996d081"
+  revision = "d3bebdd7a9efb503d3ce05d6feaf9f403ccbf927"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -501,12 +501,6 @@
   version = "v1.0.2"
 
 [[projects]]
-  name = "github.com/tylerb/graceful"
-  packages = ["."]
-  revision = "4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb"
-  version = "v1.2.15"
-
-[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = [
@@ -748,6 +742,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "68ecbd5386e91d3bdf77857595f95748dac26275b718dd0f5601f9020ff957d0"
+  inputs-digest = "c67864c0b62ceb2e0f408e8373b04b7c56770cea08609d6c612e2d972051eaab"
   solver-name = "gps-cdcl"
   solver-version = 1

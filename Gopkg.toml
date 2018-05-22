@@ -50,7 +50,7 @@
   name = "github.com/giantswarm/microerror"
 
 [[constraint]]
-  branch = "master"
+  branch = "graceful"
   name = "github.com/giantswarm/microkit"
 
 [[constraint]]
