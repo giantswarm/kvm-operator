@@ -1,8 +1,6 @@
 package v5
 
 import (
-	"time"
-
 	"github.com/giantswarm/versionbundle"
 )
 
@@ -85,11 +83,7 @@ func VersionBundle() versionbundle.Bundle {
 				Version: "0.10.2",
 			},
 		},
-		Dependencies: []versionbundle.Dependency{},
-		Deprecated:   true,
-		Name:         "kvm-operator",
-		Time:         time.Date(2018, time.February, 15, 2, 27, 0, 0, time.UTC),
-		Version:      "2.0.0",
-		WIP:          false,
+		Name:    "kvm-operator",
+		Version: "2.0.0",
 	}
 }
