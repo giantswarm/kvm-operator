@@ -38,13 +38,19 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
+  branch = "master"
   name = "github.com/docker/distribution"
   packages = [
-    "digest",
+    "digestset",
     "reference"
   ]
-  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
-  version = "v2.6.2"
+  revision = "f0cc927784781fa395c06317c58dea2841ece3a9"
 
 [[projects]]
   name = "github.com/emicklei/go-restful"
@@ -423,6 +429,12 @@
   version = "1.0.0"
 
 [[projects]]
+  name = "github.com/opencontainers/go-digest"
+  packages = ["."]
+  revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
+  version = "v1.0.0-rc1"
+
+[[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
   revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
@@ -517,15 +529,6 @@
 
 [[projects]]
   branch = "master"
-  name = "golang.org/x/crypto"
-  packages = [
-    "ed25519",
-    "ed25519/internal/edwards25519"
-  ]
-  revision = "ab813273cd59e1333f7ae7bff5d027d4aadf528c"
-
-[[projects]]
-  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -535,7 +538,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "4ef37e81ae7d4d477bda45ba9506a70004e1317b"
+  revision = "75944861c7512f64725d687546cfbc757626151f"
 
 [[projects]]
   branch = "master"
@@ -576,17 +579,6 @@
   packages = ["."]
   revision = "d2d2541c53f18d2a059457998ce2876cc8e67cbf"
   version = "v0.9.1"
-
-[[projects]]
-  name = "gopkg.in/square/go-jose.v2"
-  packages = [
-    ".",
-    "cipher",
-    "json",
-    "jwt"
-  ]
-  revision = "76dd09796242edb5b897103a75df2645c028c960"
-  version = "v2.1.6"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"
@@ -866,6 +858,7 @@
   revision = "98b5c3f6a62e3f879d7017752989c925732b6c7d"
 
 [[projects]]
+  branch = "release-1.9"
   name = "k8s.io/kubernetes"
   packages = [
     "pkg/api/legacyscheme",
@@ -887,8 +880,6 @@
     "pkg/features",
     "pkg/fieldpath",
     "pkg/kubelet/types",
-    "pkg/master/ports",
-    "pkg/scheduler/api",
     "pkg/security/apparmor",
     "pkg/serviceaccount",
     "pkg/util/file",
@@ -898,12 +889,11 @@
     "pkg/util/pointer",
     "pkg/util/taints"
   ]
-  revision = "2bba0127d85d5a46ab4b778548be28623b32d0b0"
-  version = "v1.10.3"
+  revision = "8fad583d0d79771723a2d5e30156334b461c2c6a"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cc701a7f19c9483ea404a219dc999beaa882448d79889d0106e9eb764a45f0c9"
+  inputs-digest = "35d0357761ef03dba339275fb26efe24db27da66c394f0239cf2263b08db349b"
   solver-name = "gps-cdcl"
   solver-version = 1
