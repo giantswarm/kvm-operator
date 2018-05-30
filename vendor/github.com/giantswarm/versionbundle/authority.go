@@ -2,6 +2,7 @@ package versionbundle
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/giantswarm/microerror"
 )
@@ -17,6 +18,13 @@ type Authority struct {
 // unmarshaling.
 type URL struct {
 	*url.URL
+}
+
+func (a Authority) BundleID() string {
+	n := strings.TrimSpace(a.Name)
+	p := strings.TrimSpace(a.Provider)
+	v := strings.TrimSpace(a.Version)
+	return n + ":" + p + ":" + v
 }
 
 func (u *URL) UnmarshalYAML(unmarshal func(interface{}) error) error {

@@ -1,8 +1,6 @@
 package v2
 
 import (
-	"time"
-
 	"github.com/giantswarm/versionbundle"
 )
 
@@ -67,12 +65,8 @@ func VersionBundles() []versionbundle.Bundle {
 					Version: "0.9.0",
 				},
 			},
-			Dependencies: []versionbundle.Dependency{},
-			Deprecated:   true,
-			Name:         "kvm-operator",
-			Time:         time.Date(2017, time.October, 26, 16, 38, 0, 0, time.UTC),
-			Version:      "0.1.0",
-			WIP:          false,
+			Name:    "kvm-operator",
+			Version: "0.1.0",
 		},
 		{
 			Changelogs: []versionbundle.Changelog{
@@ -108,12 +102,8 @@ func VersionBundles() []versionbundle.Bundle {
 					Version: "0.9.0",
 				},
 			},
-			Dependencies: []versionbundle.Dependency{},
-			Deprecated:   true,
-			Name:         "kvm-operator",
-			Time:         time.Date(2017, time.December, 12, 10, 00, 0, 0, time.UTC),
-			Version:      "1.0.0",
-			WIP:          false,
+			Name:    "kvm-operator",
+			Version: "1.0.0",
 		},
 	}
 }
