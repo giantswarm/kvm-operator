@@ -84,7 +84,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "496c70f095ab9a89b8413f099b3424cd3a6d9810"
+  revision = "461375f2ed17f7efd1c97917daa135c1f135ac1f"
 
 [[projects]]
   branch = "master"
@@ -535,7 +535,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "89e543239a64caf31d3a6865872ea120b41446df"
+  revision = "8d282c4e200f6234d5df69ac4ad1ecb709c3df2c"
 
 [[projects]]
   branch = "master"
@@ -904,6 +904,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "52e02f1f1ba9ff22e608d1e96d235815c1e7412e6aa12397a5aab745f54ddbf0"
+  inputs-digest = "cc701a7f19c9483ea404a219dc999beaa882448d79889d0106e9eb764a45f0c9"
   solver-name = "gps-cdcl"
   solver-version = 1
