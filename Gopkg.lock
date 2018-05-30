@@ -181,7 +181,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "178f1023df2fc4b7652ed03d77832c2370f45721"
+  revision = "4df9ae8a194ea96785e9ed8fdd284d79904726be"
 
 [[projects]]
   branch = "master"
@@ -535,7 +535,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "8d282c4e200f6234d5df69ac4ad1ecb709c3df2c"
+  revision = "4ef37e81ae7d4d477bda45ba9506a70004e1317b"
 
 [[projects]]
   branch = "master"
