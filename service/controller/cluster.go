@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"time"
-
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
@@ -29,10 +27,11 @@ import (
 )
 
 type ClusterConfig struct {
-	G8sClient    versioned.Interface
-	K8sClient    kubernetes.Interface
-	K8sExtClient apiextensionsclient.Interface
-	Logger       micrologger.Logger
+	CertsSearcher certs.Interface
+	G8sClient     versioned.Interface
+	K8sClient     kubernetes.Interface
+	K8sExtClient  apiextensionsclient.Interface
+	Logger        micrologger.Logger
 
 	GuestUpdateEnabled bool
 	ProjectName        string
@@ -57,21 +56,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 
 		crdClient, err = k8scrdclient.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var certsSearcher certs.Interface
-	{
-		c := certs.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			WatchTimeout: 5 * time.Second,
-		}
-
-		certsSearcher, err = certs.NewSearcher(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -107,7 +91,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV2 *controller.ResourceSet
 	{
 		c := v2.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -129,7 +113,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV3 *controller.ResourceSet
 	{
 		c := v3.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -147,7 +131,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV4 *controller.ResourceSet
 	{
 		c := v4.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -165,7 +149,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV5 *controller.ResourceSet
 	{
 		c := v5.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -183,7 +167,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV6 *controller.ResourceSet
 	{
 		c := v6.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -201,7 +185,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV7 *controller.ResourceSet
 	{
 		c := v7.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -219,7 +203,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV8 *controller.ResourceSet
 	{
 		c := v8.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -237,7 +221,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV9 *controller.ResourceSet
 	{
 		c := v9.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -255,7 +239,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV10 *controller.ResourceSet
 	{
 		c := v10.ResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -273,7 +257,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV11 *controller.ResourceSet
 	{
 		c := v11.ClusterResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -291,7 +275,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var resourceSetV12 *controller.ResourceSet
 	{
 		c := v12.ClusterResourceSetConfig{
-			CertsSearcher:      certsSearcher,
+			CertsSearcher:      config.CertsSearcher,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
