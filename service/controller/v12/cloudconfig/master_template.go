@@ -21,6 +21,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 			certs: certs,
 		}
 		params.Node = node
+		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
 	}
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
