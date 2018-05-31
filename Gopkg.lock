@@ -99,7 +99,8 @@
     "v_3_2_2",
     "v_3_2_3",
     "v_3_2_4",
-    "v_3_2_5"
+    "v_3_2_5",
+    "v_3_3_2"
   ]
   revision = "119402e11843b12ffcc2c5f88997f1ec3849e14b"
 
@@ -742,6 +743,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "68ecbd5386e91d3bdf77857595f95748dac26275b718dd0f5601f9020ff957d0"
+  inputs-digest = "ccd56fa0aeb2f324f6dad45f00d39c1594977003a0fb34fb4ba25a78bdf01044"
   solver-name = "gps-cdcl"
   solver-version = 1
