@@ -8,8 +8,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "cloudconfig",
-				Description: "Added OIDC integration for kubernetes API.",
+				Component:   "TODO",
+				Description: "TODO.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -44,6 +44,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "2.3.0",
+		Version: "2.4.0",
 	}
 }
