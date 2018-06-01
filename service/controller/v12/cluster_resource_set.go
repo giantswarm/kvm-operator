@@ -31,7 +31,6 @@ type ClusterResourceSetConfig struct {
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 
-	InstallationName   string
 	OIDC               cloudconfig.OIDCConfig
 	GuestUpdateEnabled bool
 	ProjectName        string

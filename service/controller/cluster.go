@@ -36,7 +36,6 @@ type ClusterConfig struct {
 	Logger       micrologger.Logger
 
 	GuestUpdateEnabled bool
-	InstallationName   string
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
 }
@@ -310,7 +309,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			ProjectName:        config.ProjectName,
-			InstallationName:   config.InstallationName,
 			OIDC: v12cloudconfig.OIDCConfig{
 				ClientID:      config.OIDC.ClientID,
 				IssuerURL:     config.OIDC.IssuerURL,
