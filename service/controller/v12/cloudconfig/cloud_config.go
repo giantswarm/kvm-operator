@@ -2,6 +2,7 @@ package cloudconfig
 
 import (
 	"fmt"
+
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 )
