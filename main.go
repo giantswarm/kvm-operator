@@ -99,6 +99,11 @@ func main() {
 
 	daemonCommand := newCommand.DaemonCommand().CobraCommand()
 
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.ClientID, "", "OIDC authorization provider ClientID.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.IssuerURL, "", "OIDC authorization provider IssuerURL.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim, "", "OIDC authorization provider UsernameClaim.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim, "", "OIDC authorization provider GroupsClaim.")
+
 	daemonCommand.PersistentFlags().Bool(f.Service.Guest.Update.Enabled, false, "Whether updates of guest cluster nodes are allowed to be processed upon reconciliation.")
 
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.Address, "http://127.0.0.1:6443", "Address used to connect to Kubernetes. When empty in-cluster config is created.")
