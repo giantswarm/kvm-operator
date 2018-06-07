@@ -149,9 +149,10 @@ func New(config Config) (*Service, error) {
 	var deleterController *controller.Deleter
 	{
 		c := controller.DeleterConfig{
-			G8sClient: g8sClient,
-			K8sClient: k8sClient,
-			Logger:    config.Logger,
+			CertsSearcher: certsSearcher,
+			G8sClient:     g8sClient,
+			K8sClient:     k8sClient,
+			Logger:        config.Logger,
 
 			ProjectName: config.Name,
 		}
