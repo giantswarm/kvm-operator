@@ -5,13 +5,14 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
-	"k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	"k8s.io/kubernetes/pkg/api/v1/node"
 	"k8s.io/kubernetes/pkg/cloudprovider"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v12/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v13/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
@@ -26,9 +27,9 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "creating K8s client for the guest cluster")
 
-		certs, err := r.certsSearcher.SearchDraining(key.ClusterID(customObject))
+		certs, err := r.certsSearcher.SearchCluster(key.ClusterID(customObject))
 		if err != nil {
-			return nil, microerror.Mask(err)
+			return microerror.Mask(err)
 		}
 
 		c := k8srestconfig.Config{
@@ -44,12 +45,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 		restConfig, err := k8srestconfig.New(c)
 		if err != nil {
-			return nil, microerror.Mask(err)
+			return microerror.Mask(err)
 		}
 
 		k8sClient, err = kubernetes.NewForConfig(restConfig)
 		if err != nil {
-			return nil, microerror.Mask(err)
+			return microerror.Mask(err)
 		}
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", "created K8s client for the guest cluster")
@@ -71,7 +72,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// We need to fetch the nodes being registered within the guest cluster's
 	// Kubernetes API. The list of nodes is used below to sort out which ones have
 	// to be deleted if there does no associated host cluster node exist.
-	var nodes []v1.Node
+	var nodes []corev1.Node
 	{
 		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
 		if err != nil {
@@ -90,7 +91,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			continue
 		}
 
-		exists, err := doesNodeExistAsInstance(instances, node)
+		exists, err := doesNodeExistAsInstance(instances, n)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -111,12 +112,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	return nil
 }
 
-func (r *Resource) newRestConfig(ctx context.Context, clusterID, apiDomain string) (*rest.Config, error) {
-
-	return restConfig, nil
-}
-
-func doesNodeExistAsInstance(instances cloudprovider.Instances, n *v1.Node) (bool, error) {
+func doesNodeExistAsInstance(instances cloudprovider.Instances, n corev1.Node) (bool, error) {
 	_, err := instances.ExternalID(types.NodeName(n.Name))
 	if IsInstanceNotFound(err) {
 		return false, nil
