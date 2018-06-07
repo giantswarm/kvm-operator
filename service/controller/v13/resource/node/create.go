@@ -2,6 +2,7 @@ package node
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
@@ -88,6 +89,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// Kubernetes API.
 	for _, n := range nodes {
 		if node.IsNodeReady(&n) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because it is in state 'Ready'", n.GetName()))
 			continue
 		}
 
@@ -96,6 +98,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 		if exists {
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because it exists in the cloud provider", n.GetName()))
 			continue
 		}
 
