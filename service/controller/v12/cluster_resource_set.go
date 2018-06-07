@@ -31,6 +31,7 @@ type ClusterResourceSetConfig struct {
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 
+	OIDC               cloudconfig.OIDCConfig
 	GuestUpdateEnabled bool
 	ProjectName        string
 }
@@ -40,9 +41,11 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var cloudConfig *cloudconfig.CloudConfig
 	{
-		c := cloudconfig.DefaultConfig()
+		c := cloudconfig.Config{
+			Logger: config.Logger,
 
-		c.Logger = config.Logger
+			OIDC: config.OIDC,
+		}
 
 		cloudConfig, err = cloudconfig.New(c)
 		if err != nil {

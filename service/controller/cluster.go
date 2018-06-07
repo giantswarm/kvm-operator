@@ -16,6 +16,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v10"
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
 	"github.com/giantswarm/kvm-operator/service/controller/v12"
+	v12cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v12/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v2"
 	"github.com/giantswarm/kvm-operator/service/controller/v3"
 	"github.com/giantswarm/kvm-operator/service/controller/v4"
@@ -34,7 +35,17 @@ type ClusterConfig struct {
 	Logger        micrologger.Logger
 
 	GuestUpdateEnabled bool
+	OIDC               ClusterConfigOIDC
 	ProjectName        string
+}
+
+// ClusterConfigOIDC represents the configuration of the OIDC authorization
+// provider.
+type ClusterConfigOIDC struct {
+	ClientID      string
+	IssuerURL     string
+	UsernameClaim string
+	GroupsClaim   string
 }
 
 type Cluster struct {
@@ -282,6 +293,12 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			ProjectName:        config.ProjectName,
+			OIDC: v12cloudconfig.OIDCConfig{
+				ClientID:      config.OIDC.ClientID,
+				IssuerURL:     config.OIDC.IssuerURL,
+				UsernameClaim: config.OIDC.UsernameClaim,
+				GroupsClaim:   config.OIDC.GroupsClaim,
+			},
 		}
 
 		resourceSetV12, err = v12.NewClusterResourceSet(c)
