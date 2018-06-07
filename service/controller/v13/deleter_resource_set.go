@@ -1,7 +1,6 @@
-package v12
+package v13
 
 import (
-	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -11,8 +10,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/kubernetes/pkg/cloudprovider"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v12/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v12/resource/node"
+	"github.com/giantswarm/kvm-operator/service/controller/v13/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v13/resource/node"
 )
 
 type DeleterResourceSetConfig struct {
@@ -65,8 +64,7 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 
 	{
 		c := retryresource.WrapConfig{
-			BackOffFactory: func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), uint64(3)) },
-			Logger:         config.Logger,
+			Logger: config.Logger,
 		}
 
 		resources, err = retryresource.Wrap(resources, c)
