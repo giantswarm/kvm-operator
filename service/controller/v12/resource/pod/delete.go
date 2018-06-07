@@ -28,9 +28,9 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		currentPod, err = r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(reconciledPod.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			// In case we reconcile a pod we cannot find anymore this means the
-			// informer's watch event is outdated and the pod got already deleted in
-			// the Kubernetes API. This is a normal transition behaviour, so we just
-			// ignore it and assume we are done.
+			// informer's watch event is outdated and the pod got already deleted in the
+			// Kubernetes API. This is a normal transition behaviour, so we just ignore
+			// it and assume we are done.
 			r.logger.LogCtx(ctx, "debug", "cannot find the current version of the reconciled pod in the Kubernetes API")
 			resourcecanceledcontext.SetCanceled(ctx)
 			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
