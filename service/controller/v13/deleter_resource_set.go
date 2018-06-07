@@ -23,8 +23,6 @@ type DeleterResourceSetConfig struct {
 }
 
 func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.ResourceSet, error) {
-	var err error
-
 	handlesFunc := func(obj interface{}) bool {
 		kvmConfig, err := key.ToCustomObject(obj)
 		if err != nil {
