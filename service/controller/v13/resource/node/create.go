@@ -55,6 +55,23 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "created K8s client for the guest cluster")
 	}
 
+	// We need to fetch the nodes being registered within the guest cluster's
+	// Kubernetes API. The list of nodes is used below to sort out which ones have
+	// to be deleted if there does no associated host cluster pod exist.
+	var nodes []corev1.Node
+	{
+		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
+		if IsGuestAPINotAvailable(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "guest cluster is not available")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
+
+			return nil
+		} else if err != nil {
+			return microerror.Mask(err)
+		}
+		nodes = list.Items
+	}
+
 	// Fetch the list of pods running on the host cluster. These pods serve VMs
 	// which in turn run the guest cluster nodes. We use the pods to compare them
 	// against the guest cluster nodes below.
@@ -66,18 +83,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 		pods = list.Items
-	}
-
-	// We need to fetch the nodes being registered within the guest cluster's
-	// Kubernetes API. The list of nodes is used below to sort out which ones have
-	// to be deleted if there does no associated host cluster pod exist.
-	var nodes []corev1.Node
-	{
-		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		nodes = list.Items
 	}
 
 	// Iterate through all nodes and compare them against the pods of the host
