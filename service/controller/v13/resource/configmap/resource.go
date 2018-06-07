@@ -22,7 +22,7 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	CertSearcher certs.Interface
+	CertsSearcher certs.Interface
 	CloudConfig  *cloudconfig.CloudConfig
 	K8sClient    kubernetes.Interface
 	KeyWatcher   randomkeys.Interface
@@ -42,8 +42,8 @@ type Resource struct {
 // New creates a new configured config map resource.
 func New(config Config) (*Resource, error) {
 	// Dependencies.
-	if config.CertSearcher == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.CertSearcher must not be empty")
+	if config.CertsSearcher == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.CertsSearcher must not be empty")
 	}
 	if config.CloudConfig == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.CloudConfig must not be empty")
@@ -60,7 +60,7 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		// Dependencies.
-		certSearcher: config.CertSearcher,
+		certSearcher: config.CertsSearcher,
 		cloudConfig:  config.CloudConfig,
 		k8sClient:    config.K8sClient,
 		keyWatcher:   config.KeyWatcher,

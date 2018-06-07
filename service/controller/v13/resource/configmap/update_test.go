@@ -143,7 +143,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{}
-		resourceConfig.CertSearcher = certstest.NewSearcher()
+		resourceConfig.CertsSearcher = certstest.NewSearcher()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
