@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
@@ -13,8 +14,6 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 
 	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/service/controller"
@@ -38,7 +37,7 @@ type Service struct {
 
 	bootOnce          sync.Once
 	clusterController *controller.Cluster
-	deleterController *controller.Cluster
+	deleterController *controller.Deleter
 	drainerController *controller.Drainer
 }
 
@@ -96,7 +95,7 @@ func New(config Config) (*Service, error) {
 	var certsSearcher certs.Interface
 	{
 		c := certs.Config{
-			K8sClient: config.K8sClient,
+			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
 			WatchTimeout: 5 * time.Second,

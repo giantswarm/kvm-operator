@@ -23,20 +23,20 @@ const (
 type Config struct {
 	// Dependencies.
 	CertsSearcher certs.Interface
-	CloudConfig  *cloudconfig.CloudConfig
-	K8sClient    kubernetes.Interface
-	KeyWatcher   randomkeys.Interface
-	Logger       micrologger.Logger
+	CloudConfig   *cloudconfig.CloudConfig
+	K8sClient     kubernetes.Interface
+	KeyWatcher    randomkeys.Interface
+	Logger        micrologger.Logger
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	certSearcher certs.Interface
-	cloudConfig  *cloudconfig.CloudConfig
-	k8sClient    kubernetes.Interface
-	keyWatcher   randomkeys.Interface
-	logger       micrologger.Logger
+	certsSearcher certs.Interface
+	cloudConfig   *cloudconfig.CloudConfig
+	k8sClient     kubernetes.Interface
+	keyWatcher    randomkeys.Interface
+	logger        micrologger.Logger
 }
 
 // New creates a new configured config map resource.
@@ -60,11 +60,11 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		// Dependencies.
-		certSearcher: config.CertsSearcher,
-		cloudConfig:  config.CloudConfig,
-		k8sClient:    config.K8sClient,
-		keyWatcher:   config.KeyWatcher,
-		logger:       config.Logger,
+		certsSearcher: config.CertsSearcher,
+		cloudConfig:   config.CloudConfig,
+		k8sClient:     config.K8sClient,
+		keyWatcher:    config.KeyWatcher,
+		logger:        config.Logger,
 	}
 
 	return newService, nil

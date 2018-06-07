@@ -109,13 +109,13 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var configMapResource controller.Resource
 	{
-		c := configmap.DefaultConfig()
-
-		c.CertsSearcher = config.CertsSearcher
-		c.CloudConfig = cloudConfig
-		c.K8sClient = config.K8sClient
-		c.KeyWatcher = config.RandomkeysSearcher
-		c.Logger = config.Logger
+		c := configmap.Config{
+			CertsSearcher: config.CertsSearcher,
+			CloudConfig:   cloudConfig,
+			K8sClient:     config.K8sClient,
+			KeyWatcher:    config.RandomkeysSearcher,
+			Logger:        config.Logger,
+		}
 
 		ops, err := configmap.New(c)
 		if err != nil {
