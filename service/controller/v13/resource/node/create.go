@@ -97,18 +97,18 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		if doesNodeExistAsPod(pods, n) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because it exists in the cloud provider", n.GetName()))
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because its host cluster pod does exist", n.GetName()))
 			continue
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the node in the guest cluster's Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting node '%s' in the guest cluster's Kubernetes API", n.GetName()))
 
 		err = k8sClient.CoreV1().Nodes().Delete(n.GetName(), nil)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the node in the guest cluster's Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted node '%s' in the guest cluster's Kubernetes API", n.GetName()))
 	}
 
 	return nil
