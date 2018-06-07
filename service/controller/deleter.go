@@ -65,7 +65,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 			Informer:       newInformer,
 			Logger:         config.Logger,
 			ResourceRouter: resourceRouter,
-			RESTClient:     config.K8sClient.CoreV1().RESTClient(),
+			RESTClient:     config.G8sClient.ProviderV1alpha1().RESTClient(),
 
 			Name: config.ProjectName + "-deleter",
 		}
