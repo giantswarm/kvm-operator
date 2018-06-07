@@ -58,8 +58,8 @@
     ".",
     "log"
   ]
-  revision = "2810ccc68e0ca445fa81ebfa03fbf70aca5c41ae"
-  version = "v2.7.0"
+  revision = "3658237ded108b4134956c1b3050349d93e7b895"
+  version = "v2.7.1"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -90,7 +90,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "461375f2ed17f7efd1c97917daa135c1f135ac1f"
+  revision = "8599d0312c41dcf2bd3122b77935b87a74b5918f"
 
 [[projects]]
   branch = "master"
@@ -116,7 +116,7 @@
     "v_3_2_4",
     "v_3_2_5"
   ]
-  revision = "119402e11843b12ffcc2c5f88997f1ec3849e14b"
+  revision = "570aa461fd8c9fc1d56f45cfc5b8afffc4af7109"
 
 [[projects]]
   branch = "master"
@@ -158,7 +158,7 @@
     "server",
     "tls"
   ]
-  revision = "77c2b7f4339670c6095d67d02d89fab885516575"
+  revision = "6578efbcb390bb4be316637e0de492241bea52a3"
 
 [[projects]]
   branch = "master"
@@ -202,7 +202,7 @@
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
-  revision = "da2469c864842ff01892ad70b1f99b247b0a2aef"
+  revision = "5a861dc7cd1cc6c24816af3aadadb85ea1b372ff"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -402,7 +402,7 @@
     "jlexer",
     "jwriter"
   ]
-  revision = "8b799c424f57fa123fc63a99d6383bc6e4c02578"
+  revision = "3fdea8d05856a0c8df22ed4bc71b3219245e4485"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -437,8 +437,8 @@
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
-  version = "v1.1.0"
+  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -459,7 +459,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "42bc0a18c2207d46ac4039bbb6b4cf1507872837"
+  revision = "faf4ec335fe01ae5a6a0eaa34a5a9333bfbd1a30"
 
 [[projects]]
   branch = "master"
@@ -486,7 +486,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "fe93d378a6b03758a2c1b65e86cf630bf78681c0"
+  revision = "94663424ae5ae9856b40a9f170762b4197024661"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -538,7 +538,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "75944861c7512f64725d687546cfbc757626151f"
+  revision = "1e491301e022f8f977054da4c2d852decd59571f"
 
 [[projects]]
   branch = "master"
@@ -550,7 +550,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "c11f84a56e43e20a78cee75a7c034031ecf57d1f"
+  revision = "9527bec2660bd847c050fda93a0f0c6dee0800bb"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -698,7 +698,7 @@
     "pkg/features",
     "pkg/util/feature"
   ]
-  revision = "26d8520c41c195deccdd8632a350c1cdaff01c0c"
+  revision = "0553b9748924ffb5737340cb0afa6f0de2b12c42"
 
 [[projects]]
   name = "k8s.io/client-go"
@@ -855,7 +855,7 @@
     "pkg/common",
     "pkg/util/proto"
   ]
-  revision = "98b5c3f6a62e3f879d7017752989c925732b6c7d"
+  revision = "8a9b82f00b3a86eac24681da3f9fe6c34c01cea2"
 
 [[projects]]
   branch = "release-1.9"
@@ -863,6 +863,7 @@
   packages = [
     "pkg/api/legacyscheme",
     "pkg/api/service",
+    "pkg/api/v1/node",
     "pkg/api/v1/pod",
     "pkg/apis/autoscaling",
     "pkg/apis/core",
@@ -889,11 +890,11 @@
     "pkg/util/pointer",
     "pkg/util/taints"
   ]
-  revision = "8fad583d0d79771723a2d5e30156334b461c2c6a"
+  revision = "72b99d1a8667a42b8506822227258adb7f9705c7"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "35d0357761ef03dba339275fb26efe24db27da66c394f0239cf2263b08db349b"
+  inputs-digest = "2175ee7aa02a20311fe4ad779f297b7a5eb75e7f09f19f991caab767951e26f2"
   solver-name = "gps-cdcl"
   solver-version = 1
