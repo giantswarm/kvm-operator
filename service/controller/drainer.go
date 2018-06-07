@@ -13,8 +13,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
-	"github.com/giantswarm/kvm-operator/service/controller/v11/key"
 	"github.com/giantswarm/kvm-operator/service/controller/v12"
+	"github.com/giantswarm/kvm-operator/service/controller/v13"
+	"github.com/giantswarm/kvm-operator/service/controller/v13/key"
 )
 
 type DrainerConfig struct {
@@ -123,6 +124,22 @@ func newDrainerResourceRouter(config DrainerConfig) (*controller.ResourceRouter,
 		}
 	}
 
+	var resourceSetV13 *controller.ResourceSet
+	{
+		c := v13.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV13, err = v13.NewDrainerResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceRouter *controller.ResourceRouter
 	{
 		c := controller.ResourceRouterConfig{
@@ -131,6 +148,7 @@ func newDrainerResourceRouter(config DrainerConfig) (*controller.ResourceRouter,
 			ResourceSets: []*controller.ResourceSet{
 				resourceSetV11,
 				resourceSetV12,
+				resourceSetV13,
 			},
 		}
 

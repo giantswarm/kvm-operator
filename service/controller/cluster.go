@@ -17,6 +17,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
 	"github.com/giantswarm/kvm-operator/service/controller/v12"
 	v12cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v12/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v13"
+	v13cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v13/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v2"
 	"github.com/giantswarm/kvm-operator/service/controller/v3"
 	"github.com/giantswarm/kvm-operator/service/controller/v4"
@@ -307,6 +309,30 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
+	var resourceSetV13 *controller.ResourceSet
+	{
+		c := v13.ClusterResourceSetConfig{
+			CertsSearcher:      config.CertsSearcher,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			ProjectName:        config.ProjectName,
+			OIDC: v13cloudconfig.OIDCConfig{
+				ClientID:      config.OIDC.ClientID,
+				IssuerURL:     config.OIDC.IssuerURL,
+				UsernameClaim: config.OIDC.UsernameClaim,
+				GroupsClaim:   config.OIDC.GroupsClaim,
+			},
+		}
+
+		resourceSetV13, err = v13.NewClusterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceRouter *controller.ResourceRouter
 	{
 		c := controller.ResourceRouterConfig{
@@ -324,6 +350,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				resourceSetV10,
 				resourceSetV11,
 				resourceSetV12,
+				resourceSetV13,
 			},
 		}
 
