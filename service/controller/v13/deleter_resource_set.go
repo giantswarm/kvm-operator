@@ -8,7 +8,6 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/kubernetes/pkg/cloudprovider"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v13/key"
 	"github.com/giantswarm/kvm-operator/service/controller/v13/resource/node"
@@ -23,6 +22,8 @@ type DeleterResourceSetConfig struct {
 }
 
 func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.ResourceSet, error) {
+	var err error
+
 	handlesFunc := func(obj interface{}) bool {
 		kvmConfig, err := key.ToCustomObject(obj)
 		if err != nil {
@@ -36,16 +37,10 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 		return false
 	}
 
-	cloudProvider, err := cloudprovider.InitCloudProvider("kubernetes", "")
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
 	var nodeResource controller.Resource
 	{
 		c := node.Config{
 			CertsSearcher: config.CertsSearcher,
-			CloudProvider: cloudProvider,
 			K8sClient:     config.K8sClient,
 			Logger:        config.Logger,
 		}

@@ -8,10 +8,8 @@ import (
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/kubernetes/pkg/api/v1/node"
-	"k8s.io/kubernetes/pkg/cloudprovider"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v13/key"
 )
@@ -57,22 +55,22 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "created K8s client for the guest cluster")
 	}
 
-	// Fetch the list of instances from the cloud provider. This is a list of host
-	// cluster nodes which we use to compare against the guest cluster nodes
-	// below.
-	var instances cloudprovider.Instances
+	// Fetch the list of pods running on the host cluster. These pods serve VMs
+	// which in turn run the guest cluster nodes. We use the pods to compare them
+	// against the guest cluster nodes below.
+	var pods []corev1.Pod
 	{
-		var ok bool
-
-		instances, ok = r.cloudProvider.Instances()
-		if !ok {
-			return microerror.Mask(instanceNotFoundError)
+		n := key.ClusterID(customObject)
+		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
+		if err != nil {
+			return microerror.Mask(err)
 		}
+		pods = list.Items
 	}
 
 	// We need to fetch the nodes being registered within the guest cluster's
 	// Kubernetes API. The list of nodes is used below to sort out which ones have
-	// to be deleted if there does no associated host cluster node exist.
+	// to be deleted if there does no associated host cluster pod exist.
 	var nodes []corev1.Node
 	{
 		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
@@ -82,10 +80,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		nodes = list.Items
 	}
 
-	// Iterate through all nodes and compare them against the instances of the
-	// cloud provider API. Nodes being in a Ready state are fine. Nodes that
-	// belong to host cluster nodes are also ok. If a guest cluster node does not
-	// have an associated host cluster node we delete it from the guest cluster's
+	// Iterate through all nodes and compare them against the pods of the host
+	// cluster. Nodes being in a Ready state are fine. Nodes that belong to host
+	// cluster pods are also ok. If a guest cluster node does not have an
+	// associated host cluster pod, we delete it from the guest cluster's
 	// Kubernetes API.
 	for _, n := range nodes {
 		if node.IsNodeReady(&n) {
@@ -93,11 +91,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			continue
 		}
 
-		exists, err := doesNodeExistAsInstance(instances, n)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		if exists {
+		if doesNodeExistAsPod(pods, n) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because it exists in the cloud provider", n.GetName()))
 			continue
 		}
@@ -115,13 +109,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	return nil
 }
 
-func doesNodeExistAsInstance(instances cloudprovider.Instances, n corev1.Node) (bool, error) {
-	_, err := instances.ExternalID(types.NodeName(n.Name))
-	if IsInstanceNotFound(err) {
-		return false, nil
-	} else if err != nil {
-		return false, microerror.Mask(err)
+func doesNodeExistAsPod(pods []corev1.Pod, n corev1.Node) bool {
+	for _, p := range pods {
+		if p.GetName() == n.GetName() {
+			return true
+		}
 	}
 
-	return true, nil
+	return false
 }
