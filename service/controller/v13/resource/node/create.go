@@ -101,6 +101,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			continue
 		}
 
+		if isPodOfNodeRunning(pods, n) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because its host cluster pod is running", n.GetName()))
+			continue
+		}
+
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting node '%s' in the guest cluster's Kubernetes API", n.GetName()))
 
 		err = k8sClient.CoreV1().Nodes().Delete(n.GetName(), nil)
@@ -118,6 +123,18 @@ func doesNodeExistAsPod(pods []corev1.Pod, n corev1.Node) bool {
 	for _, p := range pods {
 		if p.GetName() == n.GetName() {
 			return true
+		}
+	}
+
+	return false
+}
+
+func isPodOfNodeRunning(pods []corev1.Pod, n corev1.Node) bool {
+	for _, p := range pods {
+		if p.GetName() == n.GetName() {
+			if p.Status.Phase == corev1.PodRunning {
+				return true
+			}
 		}
 	}
 
