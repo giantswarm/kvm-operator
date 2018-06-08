@@ -33,7 +33,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.ConfigMap, error) {
 	var configMaps []*apiv1.ConfigMap
 
-	certs, err := r.certSearcher.SearchCluster(key.ClusterID(customObject))
+	certs, err := r.certsSearcher.SearchCluster(key.ClusterID(customObject))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

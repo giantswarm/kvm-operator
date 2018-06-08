@@ -17,7 +17,6 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	testCases := []struct {
 		Obj                      interface{}
 		ExpectedMasterCount      int
-		ExpectedNodeCtrlCount    int
 		ExpectedWorkerCount      int
 		ExpectedMastersResources []apiv1.ResourceRequirements
 		ExpectedWorkersResources []apiv1.ResourceRequirements
@@ -49,9 +48,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedMasterCount:   1,
-			ExpectedNodeCtrlCount: 1,
-			ExpectedWorkerCount:   1,
+			ExpectedMasterCount: 1,
+			ExpectedWorkerCount: 1,
 			ExpectedMastersResources: []apiv1.ResourceRequirements{
 				{
 					Requests: apiv1.ResourceList{
@@ -109,9 +107,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedMasterCount:   1,
-			ExpectedNodeCtrlCount: 1,
-			ExpectedWorkerCount:   3,
+			ExpectedMasterCount: 1,
+			ExpectedWorkerCount: 3,
 			ExpectedMastersResources: []apiv1.ResourceRequirements{
 				{
 					Requests: apiv1.ResourceList{
@@ -193,9 +190,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedMasterCount:   3,
-			ExpectedNodeCtrlCount: 1,
-			ExpectedWorkerCount:   3,
+			ExpectedMasterCount: 3,
+			ExpectedWorkerCount: 3,
 			ExpectedMastersResources: []apiv1.ResourceRequirements{
 				{
 					Requests: apiv1.ResourceList{
@@ -294,8 +290,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %d worker nodes got %d", i, tc.ExpectedWorkerCount, testGetWorkerCount(deployments))
 		}
 
-		if len(deployments) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount {
-			t.Fatalf("case %d expected %d nodes got %d", i, tc.ExpectedMasterCount+tc.ExpectedWorkerCount+tc.ExpectedNodeCtrlCount, len(deployments))
+		if len(deployments) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount {
+			t.Fatalf("case %d expected %d nodes got %d", i, tc.ExpectedMasterCount+tc.ExpectedWorkerCount, len(deployments))
 		}
 
 		for j, r := range testGetK8sMasterKVMResources(deployments) {

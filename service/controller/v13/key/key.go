@@ -15,9 +15,8 @@ import (
 )
 
 const (
-	MasterID         = "master"
-	NodeControllerID = "node-controller"
-	WorkerID         = "worker"
+	MasterID = "master"
+	WorkerID = "worker"
 	// portBase is a baseline for computing the port for liveness probes.
 	portBase = 23000
 	// HealthEndpoint is http path for liveness probe.
@@ -39,10 +38,9 @@ const (
 	CoreosImageDir       = "/var/lib/coreos-kvm-images"
 	CoreosVersion        = "1688.5.3"
 
-	K8SEndpointUpdaterDocker  = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage         = "quay.io/giantswarm/k8s-kvm:16a61cf7fab82df299a1e921bb42e4f6402a8307"
-	K8SKVMHealthDocker        = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
-	NodeControllerDockerImage = "quay.io/giantswarm/kvm-operator-node-controller:7146561e54142d4f986daee0206336ebee3ceb18"
+	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:16a61cf7fab82df299a1e921bb42e4f6402a8307"
+	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1G"

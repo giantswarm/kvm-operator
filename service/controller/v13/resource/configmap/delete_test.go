@@ -266,8 +266,8 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 	var err error
 	var newResource *Resource
 	{
-		resourceConfig := DefaultConfig()
-		resourceConfig.CertSearcher = certstest.NewSearcher()
+		resourceConfig := Config{}
+		resourceConfig.CertsSearcher = certstest.NewSearcher()
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()

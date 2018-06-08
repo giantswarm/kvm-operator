@@ -29,19 +29,6 @@ type Config struct {
 	Logger       micrologger.Logger
 }
 
-// DefaultConfig provides a default configuration to create a new config map
-// resource by best effort.
-func DefaultConfig() Config {
-	return Config{
-		// Dependencies.
-		CertSearcher: nil,
-		CloudConfig:  nil,
-		K8sClient:    nil,
-		KeyWatcher:   nil,
-		Logger:       nil,
-	}
-}
-
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
