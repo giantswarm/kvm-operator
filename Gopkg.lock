@@ -63,7 +63,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "18c1aa070409bfa5ebdf91660837370dfb4071b1"
+  revision = "7bd5a0ce29400731deed05bccaf559cedc6f2221"
 
 [[projects]]
   branch = "master"
@@ -73,6 +73,12 @@
     "certstest"
   ]
   revision = "04529861e1d707d6edb01808e1d9870e1b48c711"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/errors"
+  packages = ["guest"]
+  revision = "e829655ed78351b795407d7ec2b9b27d9a40dcf7"
 
 [[projects]]
   branch = "master"
@@ -131,7 +137,7 @@
     "server",
     "tls"
   ]
-  revision = "6578efbcb390bb4be316637e0de492241bea52a3"
+  revision = "19f5fe4a59000232718a4e563090d8346bd06ad9"
 
 [[projects]]
   branch = "master"
@@ -682,11 +688,11 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "2e433e8166b4314bc4debca9bcf15946614308eb"
+  revision = "af0d35700e68ac73b2bf044e8140a406c37f2d1a"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ebe919cd50f646f26a2cfbd662ae28c143192c3ab63963fe805a43cf379c2e63"
+  inputs-digest = "30dfe92e173be80f61600882af86f4422970f92e59de9ef0df85e7fece9c6fa7"
   solver-name = "gps-cdcl"
   solver-version = 1
