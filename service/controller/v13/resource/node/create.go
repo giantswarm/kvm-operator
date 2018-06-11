@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/giantswarm/errors/guest"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	corev1 "k8s.io/api/core/v1"
@@ -61,7 +62,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var nodes []corev1.Node
 	{
 		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
-		if IsGuestAPINotAvailable(err) {
+		if guest.IsAPINotAvailable(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "guest cluster is not available")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
 
