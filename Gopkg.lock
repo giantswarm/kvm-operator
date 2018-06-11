@@ -47,7 +47,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "k8s-1.10.4"
+  branch = "master"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -63,16 +63,16 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "6432d5e9d211094d511f17b560819dd757c97bb6"
+  revision = "18c1aa070409bfa5ebdf91660837370dfb4071b1"
 
 [[projects]]
-  branch = "k8s-1.10.4"
+  branch = "master"
   name = "github.com/giantswarm/certs"
   packages = [
     ".",
     "certstest"
   ]
-  revision = "257d07274c96c906f40e3214f5bd0c6e0cc52d6d"
+  revision = "04529861e1d707d6edb01808e1d9870e1b48c711"
 
 [[projects]]
   branch = "master"
@@ -144,7 +144,7 @@
   revision = "39f8cfb7c2583edb28552d9e4b12193e5bddaf60"
 
 [[projects]]
-  branch = "k8s-1.10.4"
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -160,16 +160,16 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "f744e97ecf7ce924044c3b387bcd2bf841af1d35"
+  revision = "d80fdea79511051e5f7fbd585a98b5919671ea45"
 
 [[projects]]
-  branch = "k8s-1.10.4"
+  branch = "master"
   name = "github.com/giantswarm/randomkeys"
   packages = [
     ".",
     "randomkeystest"
   ]
-  revision = "6235d97583aaf71ad18502dcbbf49f168b56b1fa"
+  revision = "b2516ed0f070900eddc2b2654ce4f3d356ddf24a"
 
 [[projects]]
   branch = "master"
@@ -687,6 +687,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "545750f1d65000d05783b4b65dd7c6ebbcc6eb2057adf7a1fb65a020f861549e"
+  inputs-digest = "ebe919cd50f646f26a2cfbd662ae28c143192c3ab63963fe805a43cf379c2e63"
   solver-name = "gps-cdcl"
   solver-version = 1
