@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command"
 	microserver "github.com/giantswarm/microkit/server"
 	"github.com/giantswarm/micrologger"
@@ -22,14 +23,23 @@ var (
 )
 
 func main() {
+	err := mainError()
+	if err != nil {
+		panic(fmt.Sprintf("%#v\n", err))
+	}
+}
+
+func mainError() error {
 	var err error
 
 	// Create a new logger which is used by all packages.
 	var newLogger micrologger.Logger
 	{
-		newLogger, err = micrologger.New(micrologger.Config{})
+		c := micrologger.Config{}
+
+		newLogger, err = micrologger.New(c)
 		if err != nil {
-			panic(fmt.Sprintf("%#v", err))
+			return microerror.Mask(err)
 		}
 	}
 
@@ -93,7 +103,7 @@ func main() {
 
 		newCommand, err = command.New(c)
 		if err != nil {
-			panic(fmt.Sprintf("%#v", err))
+			return microerror.Mask(err)
 		}
 	}
 
@@ -113,4 +123,6 @@ func main() {
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.TLS.KeyFile, "", "Key file path to use to authenticate with Kubernetes.")
 
 	newCommand.CobraCommand().Execute()
+
+	return nil
 }
