@@ -32,7 +32,7 @@
     "digestset",
     "reference"
   ]
-  revision = "f0cc927784781fa395c06317c58dea2841ece3a9"
+  revision = "749f6afb4572201e3c37325d0ffedb6f32be8950"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -78,7 +78,7 @@
   branch = "master"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
-  revision = "e829655ed78351b795407d7ec2b9b27d9a40dcf7"
+  revision = "1aa8d2252e47796136320c0cf768b79fb3d969d6"
 
 [[projects]]
   branch = "master"
@@ -96,7 +96,7 @@
     "v_3_2_5",
     "v_3_3_3"
   ]
-  revision = "e95830a9949c10a21b2975ac509fbe664e2332c3"
+  revision = "669cfba70d5fc7362dd0a30d74d62b2c1a2b8cbd"
 
 [[projects]]
   branch = "master"
@@ -393,7 +393,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "94663424ae5ae9856b40a9f170762b4197024661"
+  revision = "7d6f385de8bea29190f15ba9931442a0eaef9af7"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -438,7 +438,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "8ac0e0d97ce45cd83d1d7243c060cb8461dda5e9"
+  revision = "027cca12c2d63e3d62b670d901e8a2c95854feec"
 
 [[projects]]
   branch = "master"
@@ -451,7 +451,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "1e491301e022f8f977054da4c2d852decd59571f"
+  revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
 
 [[projects]]
   branch = "master"
@@ -466,7 +466,7 @@
     "unix",
     "windows"
   ]
-  revision = "bff228c7b664c5fce602223a05fb708fd8654986"
+  revision = "fc8bd948cf46f9c7af0f07d34151ce25fe90e477"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -543,7 +543,6 @@
   revision = "8b7507fac302640dd5f1efbf9643199952cc58db"
 
 [[projects]]
-  branch = "release-1.10"
   name = "k8s.io/apiextensions-apiserver"
   packages = [
     "pkg/apis/apiextensions",
@@ -553,9 +552,9 @@
     "pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
   ]
   revision = "8e7f43002fec5394a8d96ebca781aa9d4b37aaef"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
-  branch = "release-1.10"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/errors",
@@ -598,6 +597,7 @@
     "third_party/forked/golang/reflect"
   ]
   revision = "17529ec7eadb8de8e7dc835201455f53571f655a"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
   branch = "release-7.0"
@@ -689,7 +689,7 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "af0d35700e68ac73b2bf044e8140a406c37f2d1a"
+  revision = "a21d351a96330c1307f9c22e457439cb1cc706f0"
 
 [solve-meta]
   analyzer-name = "dep"
