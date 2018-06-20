@@ -10,6 +10,8 @@ data:
         address: 'http://0.0.0.0:8000'
     service:
       guest:
+        ssh:
+          ssoPublicKey: '{{ .Values.Installation.V1.Guest.SSH.SSOPublicKey }}'
         update:
           enabled: {{ .Values.Installation.V1.Guest.Update.Enabled }}
       kubernetes:
