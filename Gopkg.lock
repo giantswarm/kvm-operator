@@ -66,12 +66,6 @@
   revision = "7bd5a0ce29400731deed05bccaf559cedc6f2221"
 
 [[projects]]
-  branch = "sshd_config"
-  name = "github.com/giantswarm/aws-operator"
-  packages = ["flag/service/guest/ssh"]
-  revision = "ac5345ad4ec65cc36315e27f0087b56fd12d7d02"
-
-[[projects]]
   branch = "master"
   name = "github.com/giantswarm/certs"
   packages = [
@@ -700,6 +694,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "10ccb028c1895f42699952c2b8d3d17ff837819f1125f4e81a22098c8c7124a3"
+  inputs-digest = "232de006b9d0ed30e38d10bedf9296784e683f657eb7f956355a6029df70b7bd"
   solver-name = "gps-cdcl"
   solver-version = 1
