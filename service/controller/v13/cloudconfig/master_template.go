@@ -3,7 +3,7 @@ package cloudconfig
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_3_3"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_4_0"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/randomkeys"
 )
@@ -22,6 +22,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 		}
 		params.Node = node
 		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
+		params.SSOPublicKey = c.ssoPublicKey
 	}
 
 	var newCloudConfig *k8scloudconfig.CloudConfig

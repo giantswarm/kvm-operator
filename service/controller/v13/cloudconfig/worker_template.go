@@ -3,7 +3,7 @@ package cloudconfig
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_3_3"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_4_0"
 	"github.com/giantswarm/microerror"
 )
 
@@ -19,6 +19,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 			certs: certs,
 		}
 		params.Node = node
+		params.SSOPublicKey = c.ssoPublicKey
 	}
 
 	var newCloudConfig *k8scloudconfig.CloudConfig

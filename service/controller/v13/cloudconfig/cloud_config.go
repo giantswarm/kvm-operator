@@ -17,7 +17,8 @@ type Config struct {
 	// Dependencies.
 	Logger micrologger.Logger
 
-	OIDC OIDCConfig
+	OIDC         OIDCConfig
+	SSOPublicKey string
 }
 
 // DefaultConfig provides a default configuration to create a new cloud config
@@ -35,6 +36,7 @@ type CloudConfig struct {
 	logger micrologger.Logger
 
 	k8sAPIExtraArgs []string
+	ssoPublicKey    string
 }
 
 // OIDCConfig represents the configuration of the OIDC authorization provider
@@ -73,6 +75,7 @@ func New(config Config) (*CloudConfig, error) {
 		logger: config.Logger,
 
 		k8sAPIExtraArgs: k8sAPIExtraArgs,
+		ssoPublicKey:    config.SSOPublicKey,
 	}
 
 	return newCloudConfig, nil
