@@ -1,4 +1,4 @@
-package v_3_3_3
+package v_3_4_0
 
 const MasterTemplate = `#cloud-config
 users:
@@ -12,6 +12,11 @@ users:
 {{ end }}
 {{end}}
 write_files:
+- path: /etc/ssh/trusted-user-ca-keys.pem
+  owner: root
+  permissions: 644
+  content: |
+    {{ .SSOPublicKey }}
 {{ if not .DisableCalico -}}
 - path: /srv/calico-kube-controllers-sa.yaml
   owner: root
@@ -531,6 +536,7 @@ write_files:
         }
       ]
     }
+{{ if not .DisableIngressController -}}    
 - path: /srv/default-backend-dep.yml
   owner: root
   permissions: 0644
@@ -718,6 +724,7 @@ write_files:
         targetPort: 443
       selector:
         k8s-app: nginx-ingress-controller
+{{ end -}}
 - path: /srv/kube-proxy-sa.yaml
   owner: root
   permissions: 0644
@@ -909,6 +916,7 @@ write_files:
       kind: ClusterRole
       name: calico-node
       apiGroup: rbac.authorization.k8s.io
+{{- if not .DisableIngressController }}
     ---
     ## IC
     kind: ClusterRoleBinding
@@ -937,6 +945,7 @@ write_files:
       kind: Role
       name: nginx-ingress-role
       apiGroup: rbac.authorization.k8s.io
+{{ end -}}
 - path: /srv/rbac_roles.yaml
   owner: root
   permissions: 0644
@@ -972,6 +981,7 @@ write_files:
           - nodes
         verbs:
           - get
+{{- if not .DisableIngressController }}
     ---
     ## IC
     apiVersion: v1
@@ -1075,6 +1085,7 @@ write_files:
           - get
           - create
           - update
+{{ end -}}
 - path: /srv/psp_policies.yaml
   owner: root
   permissions: 0644
@@ -1283,7 +1294,7 @@ write_files:
               /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/$manifest
               [ "$?" -ne "0" ]
           do
-              echo "failed to apply /src/$manifest, retrying in 5 sec"
+              echo "failed to apply /srv/$manifest, retrying in 5 sec"
               sleep 5s
           done
       done
@@ -1292,7 +1303,7 @@ write_files:
           /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/priority_classes.yaml
           [ "$?" -ne "0" ]
       do
-          echo "failed to apply /src/priority_classes.yaml, retrying in 5 sec"
+          echo "failed to apply /srv/priority_classes.yaml, retrying in 5 sec"
           sleep 5s
       done
 
@@ -1312,7 +1323,7 @@ write_files:
               /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/$manifest
               [ "$?" -ne "0" ]
           do
-              echo "failed to apply /src/$manifest, retrying in 5 sec"
+              echo "failed to apply /srv/$manifest, retrying in 5 sec"
               sleep 5s
           done
       done
@@ -1353,11 +1364,13 @@ write_files:
       MANIFESTS="${MANIFESTS} kube-proxy-sa.yaml"
       MANIFESTS="${MANIFESTS} kube-proxy-ds.yaml"
       MANIFESTS="${MANIFESTS} coredns.yaml"
+      {{ if not .DisableIngressController -}}
       MANIFESTS="${MANIFESTS} default-backend-dep.yml"
       MANIFESTS="${MANIFESTS} default-backend-svc.yml"
       MANIFESTS="${MANIFESTS} ingress-controller-cm.yml"
       MANIFESTS="${MANIFESTS} ingress-controller-dep.yml"
       MANIFESTS="${MANIFESTS} ingress-controller-svc.yml"
+      {{ end -}}
 
       for manifest in $MANIFESTS
       do
@@ -1774,6 +1787,7 @@ write_files:
     # Non defaults (#100)
     ClientAliveCountMax 2
     PasswordAuthentication no
+    TrustedUserCAKeys /etc/ssh/trusted-user-ca-keys.pem
 - path: /etc/sysctl.d/hardening.conf
   owner: root
   permissions: 0600
@@ -2004,10 +2018,13 @@ coreos:
     command: start
     content: |
       [Unit]
+      Wants=k8s-setup-network-env.service
+      After=k8s-setup-network-env.service
       Description=k8s-kubelet
       StartLimitIntervalSec=0
 
       [Service]
+      TimeoutStartSec=300
       Restart=always
       RestartSec=0
       TimeoutStopSec=10
