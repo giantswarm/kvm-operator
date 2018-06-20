@@ -17,6 +17,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Removed kube-state-metrics and node-exporter related components (will be managed by chart-operator).",
 				Kind:        versionbundle.KindRemoved,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Added CA public key into trusted user keys for SSO ssh.",
+				Kind:        versionbundle.KindAdded,
+			},
 		},
 		Components: []versionbundle.Component{
 			{

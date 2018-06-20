@@ -138,6 +138,7 @@ func New(config Config) (*Service, error) {
 				UsernameClaim: config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
 				GroupsClaim:   config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
 			},
+			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Guest.SSH.SSOPublicKey),
 		}
 
 		clusterController, err = controller.NewCluster(c)

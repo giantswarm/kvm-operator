@@ -39,6 +39,7 @@ type ClusterConfig struct {
 	GuestUpdateEnabled bool
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
+	SSOPublicKey       string
 }
 
 // ClusterConfigOIDC represents the configuration of the OIDC authorization
@@ -325,6 +326,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				UsernameClaim: config.OIDC.UsernameClaim,
 				GroupsClaim:   config.OIDC.GroupsClaim,
 			},
+			SSOPublicKey: config.SSOPublicKey,
 		}
 
 		resourceSetV13, err = v13.NewClusterResourceSet(c)

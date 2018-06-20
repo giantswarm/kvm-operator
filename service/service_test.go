@@ -39,6 +39,7 @@ func Test_Service_New(t *testing.T) {
 
 				config.Viper.Set(config.Flag.Service.Kubernetes.Address, "http://127.0.0.1:6443")
 				config.Viper.Set(config.Flag.Service.Kubernetes.InCluster, "false")
+				config.Viper.Set(confg.Flag.Service.Guest.SSH.SSOPublicKey, "test")
 
 				return config
 			},

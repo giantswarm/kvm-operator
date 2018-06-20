@@ -34,17 +34,23 @@ type ClusterResourceSetConfig struct {
 	OIDC               cloudconfig.OIDCConfig
 	GuestUpdateEnabled bool
 	ProjectName        string
+	SSOPublicKey       string
 }
 
 func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
+
+	if config.SSOPublicKey == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.SSOPublicKey must not be empty", config)
+	}
 
 	var cloudConfig *cloudconfig.CloudConfig
 	{
 		c := cloudconfig.Config{
 			Logger: config.Logger,
 
-			OIDC: config.OIDC,
+			OIDC:         config.OIDC,
+			SSOPublicKey: config.SSOPublicKey,
 		}
 
 		cloudConfig, err = cloudconfig.New(c)
