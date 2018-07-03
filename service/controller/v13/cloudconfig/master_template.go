@@ -126,7 +126,7 @@ WantedBy=multi-user.target
 		{
 			AssetContent: `[Unit]
 Description=Temporary fix for issues with calico-node and kube-proxy after master restart
-Require=k8s-kubelet.service
+Requires=k8s-kubelet.service
 After=k8s-kubelet.service
 
 [Service]
@@ -139,7 +139,7 @@ ExecStart=/bin/sh -c "\
 	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy; \
 	sleep 1m; \
 	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-kube-controllers; \
-	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-dns"
+	/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=coredns"
 
 [Install]
 WantedBy=multi-user.target`,

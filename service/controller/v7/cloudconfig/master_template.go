@@ -109,7 +109,7 @@ WantedBy=multi-user.target
 		{
 			AssetContent: `[Unit]
 Description=Temporary fix for issues with calico-node and kube-proxy after master restart
-Require=k8s-kubelet.service
+Requires=k8s-kubelet.service
 After=k8s-kubelet.service
 
 [Service]
