@@ -10,13 +10,13 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v13/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v14/cloudconfig"
 )
 
 const (
 	KeyUserData = "user_data"
 	// Name is the identifier of the resource.
-	Name = "configmapv13"
+	Name = "configmapv14"
 )
 
 // Config represents the configuration used to create a new config map resource.
