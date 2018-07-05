@@ -22,6 +22,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Added CA public key into trusted user keys for SSO ssh.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "k8s-kvm",
+				Description: "Added virtio RNG device for better entropy generation.",
+				Kind:        versionbundle.KindAdded,
+			},
 		},
 		Components: []versionbundle.Component{
 			{

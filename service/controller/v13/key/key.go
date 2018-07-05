@@ -39,7 +39,7 @@ const (
 	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:16a61cf7fab82df299a1e921bb42e4f6402a8307"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:d808ee530c434ee1d084b1e2000f184caf5cd283"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 
 	// constants for calculation qemu memory overhead.
