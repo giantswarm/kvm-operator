@@ -1,4 +1,4 @@
-package v13
+package v14
 
 import (
 	"github.com/giantswarm/certs"
@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v13/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v13/resource/node"
+	"github.com/giantswarm/kvm-operator/service/controller/v14/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v14/resource/node"
 )
 
 type DeleterResourceSetConfig struct {
