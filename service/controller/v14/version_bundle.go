@@ -1,4 +1,4 @@
-package v13
+package v14
 
 import (
 	"github.com/giantswarm/versionbundle"
@@ -8,24 +8,9 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "kubernetes",
-				Description: "Updated to 1.10.4.",
+				Component:   "TODO",
+				Description: "TODO",
 				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Removed kube-state-metrics and node-exporter related components (will be managed by chart-operator).",
-				Kind:        versionbundle.KindRemoved,
-			},
-			{
-				Component:   "kvm-operator",
-				Description: "Added CA public key into trusted user keys for SSO ssh.",
-				Kind:        versionbundle.KindAdded,
-			},
-			{
-				Component:   "k8s-kvm",
-				Description: "Added virtio RNG device for better entropy generation.",
-				Kind:        versionbundle.KindAdded,
 			},
 		},
 		Components: []versionbundle.Component{
@@ -59,6 +44,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "2.4.0",
+		Version: "2.5.0",
 	}
 }
