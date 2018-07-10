@@ -22,7 +22,6 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 				key.LabelCustomer:      key.ClusterCustomer(customObject),
 				key.LabelApp:           key.MasterID,
 				key.LabelCluster:       key.ClusterID(customObject),
-				key.LabelEtcdDomain:    key.ClusterEtcdDomain(customObject),
 				key.LabelOrganization:  key.ClusterCustomer(customObject),
 				key.LabelVersionBundle: key.VersionBundleVersion(customObject),
 			},
