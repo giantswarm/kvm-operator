@@ -90,6 +90,10 @@ func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Customer.ID
 }
 
+func ClusterEtcdDomain(customObject v1alpha1.KVMConfig) string {
+	return customObject.Spec.Cluster.Etcd.Domain
+}
+
 func ClusterID(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.ID
 }
@@ -101,10 +105,6 @@ func ClusterIDFromPod(pod *corev1.Pod) string {
 	}
 
 	return "n/a"
-}
-
-func ClusterEtcdDomain(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.Cluster.Etcd.Domain
 }
 
 func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
