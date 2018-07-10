@@ -143,7 +143,7 @@ write_files:
             # container programs network policy and routes on each
             # host.
             - name: calico-node
-              image: quay.io/giantswarm/node:v3.0.5
+              image: {{ .RegistryDomain }}/giantswarm/node:v3.0.5
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -238,7 +238,7 @@ write_files:
             # This container installs the Calico CNI binaries
             # and CNI network config file on each node.
             - name: install-cni
-              image: quay.io/giantswarm/cni:v2.0.4
+              image: {{ .RegistryDomain }}/giantswarm/cni:v2.0.4
               command: ["/install-cni.sh"]
               env:
                 # Name of the CNI config file to create.
@@ -319,7 +319,7 @@ write_files:
           serviceAccountName: calico-kube-controllers
           containers:
             - name: calico-kube-controllers
-              image: quay.io/giantswarm/kube-controllers:v2.0.3
+              image: {{ .RegistryDomain }}/giantswarm/kube-controllers:v2.0.3
               env:
                 # The location of the Calico etcd cluster.
                 - name: ETCD_ENDPOINTS
@@ -468,7 +468,7 @@ write_files:
                   topologyKey: kubernetes.io/hostname
           containers:
           - name: coredns
-            image: quay.io/giantswarm/coredns:1.1.1
+            image: {{ .RegistryDomain }}/giantswarm/coredns:1.1.1
             imagePullPolicy: IfNotPresent
             args: [ "-conf", "/etc/coredns/Corefile" ]
             volumeMounts:
@@ -557,7 +557,7 @@ write_files:
         spec:
           containers:
           - name: default-http-backend
-            image: quay.io/giantswarm/defaultbackend:1.0
+            image: {{ .RegistryDomain }}/giantswarm/defaultbackend:1.0
             livenessProbe:
               httpGet:
                 path: /healthz
@@ -605,6 +605,7 @@ write_files:
       server-name-hash-bucket-size: "1024"
       server-name-hash-max-size: "1024"
       server-tokens: "false"
+      worker-processes: "4"
 - path: /srv/ingress-controller-dep.yml
   owner: root
   permissions: 0644
@@ -650,14 +651,14 @@ write_files:
             - sh
             - -c
             - sysctl -w net.core.somaxconn=32768; sysctl -w net.ipv4.ip_local_port_range="1024 65535"
-            image: quay.io/giantswarm/alpine:3.7
+            image: {{ .RegistryDomain }}/giantswarm/alpine:3.7
             imagePullPolicy: IfNotPresent
             name: sysctl
             securityContext:
               privileged: true
           containers:
           - name: nginx-ingress-controller
-            image: quay.io/giantswarm/nginx-ingress-controller:0.12.0
+            image: {{ .RegistryDomain }}/giantswarm/nginx-ingress-controller:0.12.0
             args:
             - /nginx-ingress-controller
             - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
@@ -775,7 +776,7 @@ write_files:
           serviceAccountName: kube-proxy
           containers:
             - name: kube-proxy
-              image: quay.io/giantswarm/hyperkube:v1.10.4
+              image: {{ .RegistryDomain }}/giantswarm/hyperkube:v1.10.4
               command:
               - /hyperkube
               - proxy
@@ -908,6 +909,20 @@ write_files:
       name: node-operator
       apiGroup: rbac.authorization.k8s.io
     ---
+    ## prometheus-external is prometheus from host cluster
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: prometheus-external
+    subjects:
+    - kind: User
+      name: prometheus.{{.BaseDomain}}
+      apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: prometheus-external
+      apiGroup: rbac.authorization.k8s.io
+    ---
     ## Calico
     kind: ClusterRoleBinding
     apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -980,6 +995,28 @@ write_files:
     - apiGroups: [""]
       resources: ["pods"]
       verbs: ["list", "delete"]
+    ---
+    ## prometheus-external
+    kind: ClusterRole
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: prometheus-external
+    rules:
+    - apiGroups: [""]
+      resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+      verbs: ["get", "list", "watch"]
+    - apiGroups:
+      - extensions
+      resources:
+      - ingresses
+      verbs: ["get", "list", "watch"]
+    - nonResourceURLs: ["/metrics"]
+      verbs: ["get"]
     ---
     ## Calico
     kind: ClusterRole
@@ -1304,7 +1341,7 @@ write_files:
 
       export KUBECONFIG=/etc/kubernetes/config/addons-kubeconfig.yml
       # kubectl 1.8.4
-      KUBECTL=quay.io/giantswarm/docker-kubectl:8cabd75bacbcdad7ac5d85efc3ca90c2fabf023b
+      KUBECTL={{ .RegistryDomain }}/giantswarm/docker-kubectl:8cabd75bacbcdad7ac5d85efc3ca90c2fabf023b
 
       /usr/bin/docker pull $KUBECTL
 
@@ -1573,7 +1610,7 @@ write_files:
       priorityClassName: core-pods
       containers:
       - name: k8s-api-server
-        image: quay.io/giantswarm/hyperkube:v1.10.4
+        image: {{ .RegistryDomain }}/giantswarm/hyperkube:v1.10.4
         env:
         - name: HOST_IP
           valueFrom:
@@ -1598,7 +1635,7 @@ write_files:
         - --repair-malformed-updates=false
         - --service-account-lookup=true
         - --authorization-mode=RBAC
-        - --feature-gates=ExpandPersistentVolumes=true,PodPriority=true
+        - --feature-gates=ExpandPersistentVolumes=true,PodPriority=true,CustomResourceSubresources=true
         - --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,PersistentVolumeClaimResize,PodSecurityPolicy,Priority
         - --cloud-provider={{.Cluster.Kubernetes.CloudProvider}}
         - --service-cluster-ip-range={{.Cluster.Kubernetes.API.ClusterIPRange}}
@@ -1695,7 +1732,7 @@ write_files:
       priorityClassName: core-pods
       containers:
       - name: k8s-controller-manager
-        image: quay.io/giantswarm/hyperkube:v1.10.4
+        image: {{ .RegistryDomain }}/giantswarm/hyperkube:v1.10.4
         command:
         - /hyperkube
         - controller-manager
@@ -1709,7 +1746,7 @@ write_files:
         - --terminated-pod-gc-threshold=10
         - --use-service-account-credentials=true
         - --kubeconfig=/etc/kubernetes/config/controller-manager-kubeconfig.yml
-        - --feature-gates=ExpandPersistentVolumes=true,PodPriority=true
+        - --feature-gates=ExpandPersistentVolumes=true,PodPriority=true,CustomResourceSubresources=true
         - --root-ca-file=/etc/kubernetes/ssl/apiserver-ca.pem
         - --service-account-private-key-file=/etc/kubernetes/ssl/service-account-key.pem
         resources:
@@ -1768,14 +1805,14 @@ write_files:
       priorityClassName: core-pods
       containers:
       - name: k8s-scheduler
-        image: quay.io/giantswarm/hyperkube:v1.10.4
+        image: {{ .RegistryDomain }}/giantswarm/hyperkube:v1.10.4
         command:
         - /hyperkube
         - scheduler
         - --logtostderr=true
         - --v=2
         - --profiling=false
-        - --feature-gates=ExpandPersistentVolumes=true,PodPriority=true
+        - --feature-gates=ExpandPersistentVolumes=true,PodPriority=true,CustomResourceSubresources=true
         - --kubeconfig=/etc/kubernetes/config/scheduler-kubeconfig.yml
         resources:
           requests:
@@ -1963,7 +2000,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       LimitNOFILE=40000
-      Environment=IMAGE=quay.io/coreos/etcd:v3.3.3
+      Environment=IMAGE={{ .RegistryDomain }}/giantswarm/etcd:v3.3.8
       Environment=NAME=%p.service
       EnvironmentFile=/etc/network-environment
       ExecStartPre=-/usr/bin/docker stop  $NAME
@@ -2012,7 +2049,7 @@ coreos:
       [Service]
       Type=oneshot
       EnvironmentFile=/etc/network-environment
-      Environment=IMAGE=quay.io/coreos/etcd:v3.3.3
+      Environment=IMAGE={{ .RegistryDomain }}/giantswarm/etcd:v3.3.3
       Environment=NAME=%p.service
       ExecStartPre=-/usr/bin/docker stop  $NAME
       ExecStartPre=-/usr/bin/docker rm  $NAME
@@ -2060,7 +2097,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE=quay.io/giantswarm/hyperkube:v1.10.4"
+      Environment="IMAGE={{ .RegistryDomain }}/giantswarm/hyperkube:v1.10.4"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/docker pull $IMAGE
@@ -2121,7 +2158,7 @@ coreos:
       --register-node=true \
       --register-with-taints=node-role.kubernetes.io/master=:NoSchedule \
       --allow-privileged=true \
-      --feature-gates=ExpandPersistentVolumes=true,PodPriority=true \
+      --feature-gates=ExpandPersistentVolumes=true,PodPriority=true,CustomResourceSubresources=true \
       --pod-manifest-path=/etc/kubernetes/manifests \
       --kubeconfig=/etc/kubernetes/config/kubelet-kubeconfig.yml \
       --node-labels="node-role.kubernetes.io/master,role=master,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
