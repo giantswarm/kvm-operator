@@ -51,11 +51,21 @@ const (
 )
 
 const (
-	AnnotationAPIEndpoint   = "kvm-operator.giantswarm.io/api-endpoint"
-	AnnotationIp            = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService       = "endpoint.kvm.giantswarm.io/service"
-	AnnotationPodDrained    = "endpoint.kvm.giantswarm.io/drained"
-	AnnotationVersionBundle = "kvm-operator.giantswarm.io/version-bundle"
+	AnnotationAPIEndpoint       = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationEtcdDomain        = "giantswarm.io/etcd-domain"
+	AnnotationIp                = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService           = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained        = "endpoint.kvm.giantswarm.io/drained"
+	AnnotationPrometheusCluster = "giantswarm.io/prometheus-cluster"
+	AnnotationVersionBundle     = "kvm-operator.giantswarm.io/version-bundle"
+
+	LabelApp           = "app"
+	LabelCluster       = "giantswarm.io/cluster"
+	LabelCustomer      = "customer"
+	LabelOrganization  = "giantswarm.io/organization"
+	LabelVersionBundle = "giantswarm.io/version-bundle"
+
+	LegacyLabelCluster = "cluster"
 )
 
 const (
@@ -88,6 +98,10 @@ func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {
 
 func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Customer.ID
+}
+
+func ClusterEtcdDomain(customObject v1alpha1.KVMConfig) string {
+	return customObject.Spec.Cluster.Etcd.Domain
 }
 
 func ClusterID(customObject v1alpha1.KVMConfig) string {
