@@ -12,6 +12,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Added support for etcd monitoring.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Changed service types.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
