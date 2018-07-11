@@ -15,7 +15,8 @@ func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name: key.MasterID,
+			Name:      key.MasterID,
+			Namespace: key.ClusterID(customObject),
 			Labels: map[string]string{
 				key.LegacyLabelCluster: key.ClusterID(customObject),
 				key.LabelCustomer:      key.ClusterCustomer(customObject),

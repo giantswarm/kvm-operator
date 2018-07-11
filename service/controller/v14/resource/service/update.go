@@ -19,7 +19,6 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 		r.logger.LogCtx(ctx, "level", "debug", "message", "updating services")
 
 		for _, serviceToUpdate := range servicesToUpdate {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "updating service %#v", serviceToUpdate)
 			_, err := r.k8sClient.CoreV1().Services(serviceToUpdate.Namespace).Update(serviceToUpdate)
 			if err != nil {
 				return microerror.Mask(err)
