@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v13"
+	"github.com/giantswarm/kvm-operator/service/controller/v14"
 )
 
 type DeleterConfig struct {
@@ -102,6 +103,22 @@ func newDeleterResourceRouter(config DeleterConfig) (*controller.ResourceRouter,
 		}
 	}
 
+	var resourceSetV14 *controller.ResourceSet
+	{
+		c := v14.DeleterResourceSetConfig{
+			CertsSearcher: config.CertsSearcher,
+			K8sClient:     config.K8sClient,
+			Logger:        config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV14, err = v14.NewDeleterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceRouter *controller.ResourceRouter
 	{
 		c := controller.ResourceRouterConfig{
@@ -109,6 +126,7 @@ func newDeleterResourceRouter(config DeleterConfig) (*controller.ResourceRouter,
 
 			ResourceSets: []*controller.ResourceSet{
 				resourceSetV13,
+				resourceSetV14,
 			},
 		}
 
