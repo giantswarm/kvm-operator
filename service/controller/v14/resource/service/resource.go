@@ -5,6 +5,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
+	"reflect"
 )
 
 const (
@@ -64,6 +65,32 @@ func containsService(list []*apiv1.Service, item *apiv1.Service) bool {
 		if l.Name == item.Name {
 			return true
 		}
+	}
+
+	return false
+}
+
+func getServiceByName(list []*apiv1.Service, name string) (*apiv1.Service, error) {
+	for _, l := range list {
+		if l.Name == name {
+			return l, nil
+		}
+	}
+
+	return nil, microerror.Mask(notFoundError)
+}
+
+func isServiceModified(a, b *apiv1.Service) bool {
+	if !reflect.DeepEqual(a.Spec, b.Spec) {
+		return true
+	}
+
+	if !reflect.DeepEqual(a.Labels, b.Labels) {
+		return true
+	}
+
+	if !reflect.DeepEqual(a.Annotations, b.Annotations) {
+		return true
 	}
 
 	return false
