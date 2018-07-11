@@ -17,16 +17,20 @@ func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: key.MasterID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(customObject),
-				"customer": key.ClusterCustomer(customObject),
-				"app":      key.MasterID,
+				key.LegacyLabelCluster: key.ClusterID(customObject),
+				key.LabelCustomer:      key.ClusterCustomer(customObject),
+				key.LabelApp:           key.MasterID,
+				key.LabelCluster:       key.ClusterID(customObject),
+				key.LabelOrganization:  key.ClusterCustomer(customObject),
+				key.LabelVersionBundle: key.VersionBundleVersion(customObject),
 			},
 			Annotations: map[string]string{
-				"giantswarm.io/prometheus-cluster": key.ClusterID(customObject),
-				"prometheus.io/path":               "/healthz",
-				"prometheus.io/port":               "30010",
-				"prometheus.io/scheme":             "http",
-				"prometheus.io/scrape":             "true",
+				key.AnnotationEtcdDomain:        key.ClusterEtcdDomain(customObject),
+				key.AnnotationPrometheusCluster: key.ClusterID(customObject),
+				"prometheus.io/path":            "/healthz",
+				"prometheus.io/port":            "30010",
+				"prometheus.io/scheme":          "http",
+				"prometheus.io/scrape":          "true",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
