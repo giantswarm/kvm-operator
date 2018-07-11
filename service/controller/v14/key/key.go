@@ -101,7 +101,7 @@ func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
 }
 
 func ClusterEtcdDomain(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s:%d,", customObject.Spec.Cluster.Etcd.Domain, customObject.Spec.Cluster.Etcd.Port)
+	return fmt.Sprintf("%s:%d", customObject.Spec.Cluster.Etcd.Domain, customObject.Spec.Cluster.Etcd.Port)
 }
 
 func ClusterID(customObject v1alpha1.KVMConfig) string {
