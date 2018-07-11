@@ -13,7 +13,6 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v10"
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
 	"github.com/giantswarm/kvm-operator/service/controller/v12"
 	v12cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v12/cloudconfig"
@@ -22,13 +21,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v14"
 	v14cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v2"
-	"github.com/giantswarm/kvm-operator/service/controller/v3"
 	"github.com/giantswarm/kvm-operator/service/controller/v4"
-	"github.com/giantswarm/kvm-operator/service/controller/v5"
-	"github.com/giantswarm/kvm-operator/service/controller/v6"
-	"github.com/giantswarm/kvm-operator/service/controller/v7"
-	"github.com/giantswarm/kvm-operator/service/controller/v8"
-	"github.com/giantswarm/kvm-operator/service/controller/v9"
 )
 
 type ClusterConfig struct {
@@ -126,24 +119,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV3 *controller.ResourceSet
-	{
-		c := v3.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			Name:               config.ProjectName,
-		}
-
-		resourceSetV3, err = v3.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var resourceSetV4 *controller.ResourceSet
 	{
 		c := v4.ResourceSetConfig{
@@ -157,114 +132,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 
 		resourceSetV4, err = v4.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV5 *controller.ResourceSet
-	{
-		c := v5.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-		}
-
-		resourceSetV5, err = v5.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV6 *controller.ResourceSet
-	{
-		c := v6.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-		}
-
-		resourceSetV6, err = v6.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV7 *controller.ResourceSet
-	{
-		c := v7.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-		}
-
-		resourceSetV7, err = v7.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV8 *controller.ResourceSet
-	{
-		c := v8.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-		}
-
-		resourceSetV8, err = v8.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV9 *controller.ResourceSet
-	{
-		c := v9.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-		}
-
-		resourceSetV9, err = v9.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV10 *controller.ResourceSet
-	{
-		c := v10.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-		}
-
-		resourceSetV10, err = v10.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -369,14 +236,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 
 			ResourceSets: []*controller.ResourceSet{
 				resourceSetV2,
-				resourceSetV3,
 				resourceSetV4,
-				resourceSetV5,
-				resourceSetV6,
-				resourceSetV7,
-				resourceSetV8,
-				resourceSetV9,
-				resourceSetV10,
 				resourceSetV11,
 				resourceSetV12,
 				resourceSetV13,
