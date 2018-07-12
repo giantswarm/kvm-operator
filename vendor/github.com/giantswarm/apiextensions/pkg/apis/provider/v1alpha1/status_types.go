@@ -2,6 +2,21 @@ package v1alpha1
 
 import "time"
 
+const (
+	StatusClusterStatusFalse = "False"
+	StatusClusterStatusTrue  = "True"
+)
+
+const (
+	StatusClusterTypeCreated  = "Created"
+	StatusClusterTypeCreating = "Creating"
+)
+
+const (
+	StatusClusterTypeUpdated  = "Updated"
+	StatusClusterTypeUpdating = "Updating"
+)
+
 type StatusCluster struct {
 	Conditions []StatusClusterCondition `json:"conditions" yaml:"conditions"`
 	Versions   []StatusClusterVersion   `json:"versions" yaml:"versions"`

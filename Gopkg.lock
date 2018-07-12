@@ -63,7 +63,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "eb901a8e7d95ce8b1017d54c655f90a2ddd786ea"
+  revision = "52949fbd1f95f7ed0da3edf56061bc0d2571537f"
 
 [[projects]]
   branch = "master"
@@ -72,7 +72,7 @@
     ".",
     "certstest"
   ]
-  revision = "04529861e1d707d6edb01808e1d9870e1b48c711"
+  revision = "fa0af96de35e5a2d7c51f5ba9e49a4f346496c00"
 
 [[projects]]
   branch = "master"
@@ -96,7 +96,7 @@
     "v_3_2_5",
     "v_3_4_0"
   ]
-  revision = "0da0819ebebd37520330bb4cb6ee5a8f15b92418"
+  revision = "39cb58590d0ff3307f404d407ac9b90bc4052937"
 
 [[projects]]
   branch = "master"
@@ -167,7 +167,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "d80fdea79511051e5f7fbd585a98b5919671ea45"
+  revision = "070ef8e414feb53402e4107057e89ced6f6e2a3e"
 
 [[projects]]
   branch = "master"
@@ -182,7 +182,7 @@
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
-  revision = "5a861dc7cd1cc6c24816af3aadadb85ea1b372ff"
+  revision = "57f08180f2122ea89e07d16e841f83020ef07577"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -203,8 +203,8 @@
 [[projects]]
   name = "github.com/go-resty/resty"
   packages = ["."]
-  revision = "fc3ad735b5565cada42d34bc298573fd3fe5adc6"
-  version = "v1.6"
+  revision = "fccc498aed22c31ff3768bcac00795f94149a21d"
+  version = "v1.7.0"
 
 [[projects]]
   name = "github.com/go-stack/stack"
@@ -366,7 +366,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "d6a9817c4afc94d51115e4a30d449056a3fbf547"
+  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
 
 [[projects]]
   branch = "master"
@@ -393,7 +393,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "40f013a808ec4fa79def444a1a56de4d1727efcb"
+  revision = "ae68e2d4c00fed4943b5f6698d504a5fe083da8a"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -451,7 +451,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9"
+  revision = "292b43bbf7cb8d35ddf40f8d5100ef3837cced3f"
 
 [[projects]]
   branch = "master"
@@ -466,7 +466,7 @@
     "unix",
     "windows"
   ]
-  revision = "7138fd3d9dc8335c567ca206f4333fb75eb05d56"
+  revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -689,7 +689,7 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "a66be7c67235b2cf6f9212f1ab0f272cf4034fcb"
+  revision = "f7ef7a267727c2b32df51dab2f7d32773595e00e"
 
 [solve-meta]
   analyzer-name = "dep"
