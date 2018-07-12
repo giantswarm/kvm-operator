@@ -15,12 +15,12 @@ func Test_toService(t *testing.T) {
 	testCases := []struct {
 		name          string
 		input         interface{}
-		expectedState *[]corev1.Service
+		expectedState []*corev1.Service
 		errorMatcher  func(error) bool
 	}{
 		{
 			name: "case 0: basic match",
-			input: &[]corev1.Service{
+			input: []*corev1.Service{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name:      "master",
@@ -49,7 +49,7 @@ func Test_toService(t *testing.T) {
 					},
 				},
 			},
-			expectedState: &[]corev1.Service{
+			expectedState: []*corev1.Service{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name:      "master",
