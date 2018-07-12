@@ -85,6 +85,10 @@ func isServiceModified(a, b *apiv1.Service) bool {
 		return true
 	}
 
+	if !reflect.DeepEqual(a.Spec.Type, b.Spec.Type) {
+		return true
+	}
+
 	if !reflect.DeepEqual(a.Labels, b.Labels) {
 		return true
 	}
