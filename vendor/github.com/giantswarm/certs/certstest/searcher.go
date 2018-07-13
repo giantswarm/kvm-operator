@@ -26,3 +26,7 @@ func (s *Searcher) SearchClusterOperator(clusterID string) (certs.ClusterOperato
 func (s *Searcher) SearchMonitoring(clusterID string) (certs.Monitoring, error) {
 	return certs.Monitoring{}, nil
 }
+
+func (s *Searcher) SearchTLS(clusterID string, cert certs.Cert) (certs.TLS, error) {
+	return certs.TLS{}, nil
+}
