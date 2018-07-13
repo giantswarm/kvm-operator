@@ -2,7 +2,6 @@ package pod
 
 import (
 	"context"
-	"time"
 
 	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -55,7 +54,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	if !forcePodCleanup(currentPod) {
+	{
 		r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
 
 		n := currentPod.GetNamespace()
@@ -64,16 +63,16 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 		drainerConfig, err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Get(p, o)
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for guest cluster node")
-
 			err := r.createDrainerConfig(ctx, currentPod)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for guest cluster node")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
 			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+			return nil
 
 		} else if err != nil {
 			return microerror.Mask(err)
@@ -83,19 +82,76 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for inspection of the reconciled pod")
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "inspecting drainer config for the guest cluster")
+		if drainerConfig.Status.HasDrainedCondition() {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has drained condition")
 
-		if !drainerConfig.Status.HasFinalCondition() {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has no final state")
-			resourcecanceledcontext.SetCanceled(ctx)
-			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
-
-			return nil
+			err := r.finishDraining(ctx, currentPod, drainerConfig)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has final state")
+		if drainerConfig.Status.HasTimeoutCondition() {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has timeout condition")
+
+			err := r.finishDraining(ctx, currentPod, drainerConfig)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
 	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has no drained condition")
+	resourcecanceledcontext.SetCanceled(ctx)
+	finalizerskeptcontext.SetKept(ctx)
+	r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+
+	return nil
+}
+
+func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) error {
+	r.logger.LogCtx(ctx, "level", "debug", "message", "creating drainer config for guest cluster node")
+
+	apiEndpoint, err := key.ClusterAPIEndpointFromPod(pod)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	n := pod.GetNamespace()
+	c := &corev1alpha1.DrainerConfig{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: pod.GetName(),
+		},
+		Spec: corev1alpha1.DrainerConfigSpec{
+			Guest: corev1alpha1.DrainerConfigSpecGuest{
+				Cluster: corev1alpha1.DrainerConfigSpecGuestCluster{
+					API: corev1alpha1.DrainerConfigSpecGuestClusterAPI{
+						Endpoint: apiEndpoint,
+					},
+					ID: pod.GetNamespace(),
+				},
+				Node: corev1alpha1.DrainerConfigSpecGuestNode{
+					Name: pod.GetName(),
+				},
+			},
+			VersionBundle: corev1alpha1.DrainerConfigSpecVersionBundle{
+				Version: "0.1.0",
+			},
+		},
+	}
+
+	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(c)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for guest cluster node")
+
+	return nil
+}
+
+func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, drainerConfig *corev1alpha1.DrainerConfig) error {
+	var err error
 
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting drainer config for guest cluster node")
@@ -162,57 +218,4 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	return nil
-}
-
-func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) error {
-	r.logger.LogCtx(ctx, "level", "debug", "message", "creating drainer config for guest cluster node")
-
-	apiEndpoint, err := key.ClusterAPIEndpointFromPod(pod)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	n := pod.GetNamespace()
-	c := &corev1alpha1.DrainerConfig{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: pod.GetName(),
-		},
-		Spec: corev1alpha1.DrainerConfigSpec{
-			Guest: corev1alpha1.DrainerConfigSpecGuest{
-				Cluster: corev1alpha1.DrainerConfigSpecGuestCluster{
-					API: corev1alpha1.DrainerConfigSpecGuestClusterAPI{
-						Endpoint: apiEndpoint,
-					},
-					ID: pod.GetNamespace(),
-				},
-				Node: corev1alpha1.DrainerConfigSpecGuestNode{
-					Name: pod.GetName(),
-				},
-			},
-			VersionBundle: corev1alpha1.DrainerConfigSpecVersionBundle{
-				Version: "0.1.0",
-			},
-		},
-	}
-
-	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(c)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for guest cluster node")
-
-	return nil
-}
-
-func forcePodCleanup(pod *corev1.Pod) bool {
-	if !key.IsPodDeleted(pod) {
-		return false
-	}
-
-	if pod.GetDeletionTimestamp().Add(30 * time.Minute).After(time.Now()) {
-		return false
-	}
-
-	return true
 }
