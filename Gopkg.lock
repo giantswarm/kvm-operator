@@ -63,7 +63,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "52949fbd1f95f7ed0da3edf56061bc0d2571537f"
+  revision = "343bac0517a0df7b1ddf604b3049c6dd589ad235"
 
 [[projects]]
   branch = "master"
@@ -78,21 +78,14 @@
   branch = "master"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
-  revision = "1aa8d2252e47796136320c0cf768b79fb3d969d6"
+  revision = "55d763df908376a858290cf4009e8bd1c768ccef"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
-    "v_2_0_0",
     "v_2_0_1",
-    "v_3_1_0",
-    "v_3_1_1",
-    "v_3_2_1",
-    "v_3_2_2",
-    "v_3_2_3",
-    "v_3_2_4",
     "v_3_2_5",
     "v_3_4_0"
   ]
@@ -167,7 +160,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "070ef8e414feb53402e4107057e89ced6f6e2a3e"
+  revision = "09dd03341dd8ade7ad177c5cce4a412a7a9a4d3b"
 
 [[projects]]
   branch = "master"
@@ -366,13 +359,13 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+  revision = "ee1c9d7e23df7f011bdf6f12a5c9e7f0ae10a1fe"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
-  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
+  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
 
 [[projects]]
   branch = "master"
@@ -451,7 +444,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "292b43bbf7cb8d35ddf40f8d5100ef3837cced3f"
+  revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
 
 [[projects]]
   branch = "master"
@@ -689,11 +682,11 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "f7ef7a267727c2b32df51dab2f7d32773595e00e"
+  revision = "93a2e8a4bd6f7915893dcf34783912e118eca531"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "232de006b9d0ed30e38d10bedf9296784e683f657eb7f956355a6029df70b7bd"
+  inputs-digest = "355d5cd23e0eb0fdeba3993189361ffbdbc31123ae9f3eee543c6b05aec0e600"
   solver-name = "gps-cdcl"
   solver-version = 1
