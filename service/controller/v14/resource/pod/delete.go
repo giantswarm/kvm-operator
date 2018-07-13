@@ -20,24 +20,25 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "debug", "looking for the current version of the reconciled pod in the Kubernetes API")
-
 	var currentPod *corev1.Pod
 	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the current version of the reconciled pod in the Kubernetes API")
+
 		currentPod, err = r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(reconciledPod.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			// In case we reconcile a pod we cannot find anymore this means the
 			// informer's watch event is outdated and the pod got already deleted in
 			// the Kubernetes API. This is a normal transition behaviour, so we just
 			// ignore it and assume we are done.
-			r.logger.LogCtx(ctx, "debug", "cannot find the current version of the reconciled pod in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot find the current version of the reconciled pod in the Kubernetes API")
 			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
 
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
+		r.logger.LogCtx(ctx, "level", "debug", "message", "found the current version of the reconciled pod in the Kubernetes API")
 	}
 
 	{
@@ -55,7 +56,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		r.logger.LogCtx(ctx, "debug", "found the current version of the reconciled pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the drainer config for the guest cluster")
 
 		n := currentPod.GetNamespace()
 		p := currentPod.GetName()
@@ -63,15 +64,16 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 		drainerConfig, err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Get(p, o)
 		if apierrors.IsNotFound(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for guest cluster node")
+
 			err := r.createDrainerConfig(ctx, currentPod)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for guest cluster node")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
 			return nil
 
 		} else if err != nil {
@@ -104,7 +106,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has no drained condition")
 	resourcecanceledcontext.SetCanceled(ctx)
 	finalizerskeptcontext.SetKept(ctx)
-	r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
 
 	return nil
 }
@@ -180,7 +182,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 	}
 
 	{
-		r.logger.LogCtx(ctx, "debug", "updating the pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updating the pod in the Kubernetes API")
 
 		_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
 		if apierrors.IsConflict(err) {
@@ -189,21 +191,21 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 			// match the latest existing one, we give up here and wait for the
 			// delete event to be replayed. Then we try again later until we
 			// succeed.
-			r.logger.LogCtx(ctx, "debug", "cannot update the pod in the Kubernetes API due to outdated resource version")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot update the pod in the Kubernetes API due to outdated resource version")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "debug", "canceling reconciliation for pod")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
 
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "debug", "updated the pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updated the pod in the Kubernetes API")
 	}
 
 	{
-		r.logger.LogCtx(ctx, "debug", "deleting the pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the pod in the Kubernetes API")
 
 		gracePeriodSeconds := int64(0)
 		options := &metav1.DeleteOptions{
@@ -214,7 +216,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "debug", "deleted the pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the pod in the Kubernetes API")
 	}
 
 	return nil
