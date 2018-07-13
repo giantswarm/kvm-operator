@@ -34,7 +34,7 @@ func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 			},
 		},
 		Spec: apiv1.ServiceSpec{
-			Type: apiv1.ServiceTypeLoadBalancer,
+			Type: apiv1.ServiceTypeClusterIP,
 			Ports: []apiv1.ServicePort{
 				{
 					Name:     "etcd",
