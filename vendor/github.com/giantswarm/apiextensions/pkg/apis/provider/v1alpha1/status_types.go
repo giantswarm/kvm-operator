@@ -19,6 +19,7 @@ const (
 
 type StatusCluster struct {
 	Conditions []StatusClusterCondition `json:"conditions" yaml:"conditions"`
+	Network    StatusClusterNetwork     `json:"network" yaml:"network"`
 	Versions   []StatusClusterVersion   `json:"versions" yaml:"versions"`
 }
 
@@ -30,6 +31,12 @@ type StatusClusterCondition struct {
 	// Type may be Creating, Created, Scaling, Scaled, Draining, Drained,
 	// Deleting, Deleted.
 	Type string `json:"type" yaml:"type"`
+}
+
+// StatusClusterNetwork expresses the network segment that is allocated for a
+// guest cluster.
+type StatusClusterNetwork struct {
+	CIDR string `json:"cidr" yaml:"cidr"`
 }
 
 // StatusClusterVersion expresses the versions in which a guest cluster was and
