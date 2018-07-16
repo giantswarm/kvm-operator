@@ -129,6 +129,9 @@ func portsEqual(a, b *apiv1.Service) bool {
 		if !reflect.DeepEqual(portA.Port, portB.Port) {
 			return false
 		}
+		if !reflect.DeepEqual(portA.TargetPort, portB.TargetPort) {
+			return false
+		}
 		if !reflect.DeepEqual(portA.Protocol, portB.Protocol) {
 			return false
 		}
