@@ -13,4 +13,8 @@ type Interface interface {
 	// SearchMonitoring searches for secrets containing TLS certs for
 	// monitoring guest clusters.
 	SearchMonitoring(clusterID string) (Monitoring, error)
+	// SearchTLS provides a dedicated way to lookup a single TLS asset for one
+	// specific purpose. This might be used for e.g. granting guest cluster
+	// access within operators.
+	SearchTLS(clusterID string, cert Cert) (TLS, error)
 }

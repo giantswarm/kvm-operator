@@ -146,11 +146,15 @@ func (s *Searcher) SearchMonitoring(clusterID string) (Monitoring, error) {
 	return monitoring, nil
 }
 
-func (s *Searcher) searchError(tls *TLS, clusterID string, cert Cert, err error) error {
+func (s *Searcher) SearchTLS(clusterID string, cert Cert) (TLS, error) {
+	tls := &TLS{}
+
+	err := s.search(tls, clusterID, cert)
 	if err != nil {
-		return err
+		return TLS{}, microerror.Mask(err)
 	}
-	return s.search(tls, clusterID, cert)
+
+	return *tls, nil
 }
 
 func (s *Searcher) search(tls *TLS, clusterID string, cert Cert) error {
