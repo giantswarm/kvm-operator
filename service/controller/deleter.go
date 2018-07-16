@@ -55,7 +55,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 		}
 	}
 
-	resourceRouter, err := newDeleterResourceRouter(config)
+	resourceSets, err := newDeleterResourceSets(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -63,10 +63,10 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			Informer:       newInformer,
-			Logger:         config.Logger,
-			ResourceRouter: resourceRouter,
-			RESTClient:     config.G8sClient.ProviderV1alpha1().RESTClient(),
+			Informer:     newInformer,
+			Logger:       config.Logger,
+			ResourceSets: resourceSets,
+			RESTClient:   config.G8sClient.ProviderV1alpha1().RESTClient(),
 
 			Name: config.ProjectName + "-deleter",
 		}
@@ -84,7 +84,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 	return d, nil
 }
 
-func newDeleterResourceRouter(config DeleterConfig) (*controller.ResourceRouter, error) {
+func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, error) {
 	var err error
 
 	var resourceSetV13 *controller.ResourceSet
@@ -119,22 +119,10 @@ func newDeleterResourceRouter(config DeleterConfig) (*controller.ResourceRouter,
 		}
 	}
 
-	var resourceRouter *controller.ResourceRouter
-	{
-		c := controller.ResourceRouterConfig{
-			Logger: config.Logger,
-
-			ResourceSets: []*controller.ResourceSet{
-				resourceSetV13,
-				resourceSetV14,
-			},
-		}
-
-		resourceRouter, err = controller.NewResourceRouter(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
+	resourceSets := []*controller.ResourceSet{
+		resourceSetV13,
+		resourceSetV14,
 	}
 
-	return resourceRouter, nil
+	return resourceSets, nil
 }
