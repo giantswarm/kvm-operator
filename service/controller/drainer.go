@@ -61,7 +61,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 		}
 	}
 
-	resourceRouter, err := newDrainerResourceRouter(config)
+	resourceSets, err := newDrainerResourceSets(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -69,10 +69,10 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			Informer:       newInformer,
-			Logger:         config.Logger,
-			ResourceRouter: resourceRouter,
-			RESTClient:     config.K8sClient.CoreV1().RESTClient(),
+			Informer:     newInformer,
+			Logger:       config.Logger,
+			ResourceSets: resourceSets,
+			RESTClient:   config.K8sClient.CoreV1().RESTClient(),
 
 			Name: config.ProjectName + "-drainer",
 		}
@@ -90,7 +90,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	return d, nil
 }
 
-func newDrainerResourceRouter(config DrainerConfig) (*controller.ResourceRouter, error) {
+func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, error) {
 	var err error
 
 	var resourceSetV11 *controller.ResourceSet
@@ -157,24 +157,12 @@ func newDrainerResourceRouter(config DrainerConfig) (*controller.ResourceRouter,
 		}
 	}
 
-	var resourceRouter *controller.ResourceRouter
-	{
-		c := controller.ResourceRouterConfig{
-			Logger: config.Logger,
-
-			ResourceSets: []*controller.ResourceSet{
-				resourceSetV11,
-				resourceSetV12,
-				resourceSetV13,
-				resourceSetV14,
-			},
-		}
-
-		resourceRouter, err = controller.NewResourceRouter(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
+	resourceSets := []*controller.ResourceSet{
+		resourceSetV11,
+		resourceSetV12,
+		resourceSetV13,
+		resourceSetV14,
 	}
 
-	return resourceRouter, nil
+	return resourceSets, nil
 }
