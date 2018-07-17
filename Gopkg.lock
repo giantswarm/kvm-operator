@@ -63,7 +63,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "52949fbd1f95f7ed0da3edf56061bc0d2571537f"
+  revision = "6cb2b75722069008d2a01e29be897236224c9f9f"
 
 [[projects]]
   branch = "master"
@@ -78,21 +78,14 @@
   branch = "master"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
-  revision = "1aa8d2252e47796136320c0cf768b79fb3d969d6"
+  revision = "823a4ad2876212aba33bcf7ad831f93baffcbdbb"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
-    "v_2_0_0",
     "v_2_0_1",
-    "v_3_1_0",
-    "v_3_1_1",
-    "v_3_2_1",
-    "v_3_2_2",
-    "v_3_2_3",
-    "v_3_2_4",
     "v_3_2_5",
     "v_3_4_0"
   ]
@@ -167,7 +160,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "070ef8e414feb53402e4107057e89ced6f6e2a3e"
+  revision = "e299b3f2585f09f50ce40debe7aab42345deb7e0"
 
 [[projects]]
   branch = "master"
@@ -218,8 +211,8 @@
     "proto",
     "sortkeys"
   ]
-  revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
-  version = "v1.0.0"
+  revision = "7d68e886eac4f7e34d0d82241a6273d6c304c5cf"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -333,7 +326,7 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "bb74f1db0675b241733089d5a1faa5dd8b0ef57b"
+  revision = "f15292f7a699fcc1a38a80977f80a046874ba8ac"
 
 [[projects]]
   name = "github.com/modern-go/concurrent"
@@ -366,13 +359,13 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "ae27198cdd90bf12cd134ad79d1366a6cf49f632"
+  revision = "bcbbc08eb2ddff3af83bbf11e7ec13b4fd730b6e"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
-  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
+  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
 
 [[projects]]
   branch = "master"
@@ -451,7 +444,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "292b43bbf7cb8d35ddf40f8d5100ef3837cced3f"
+  revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
 
 [[projects]]
   branch = "master"
@@ -466,7 +459,7 @@
     "unix",
     "windows"
   ]
-  revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
+  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -508,7 +501,6 @@
   version = "v2.2.1"
 
 [[projects]]
-  branch = "release-1.10"
   name = "k8s.io/api"
   packages = [
     "admissionregistration/v1alpha1",
@@ -541,6 +533,7 @@
     "storage/v1beta1"
   ]
   revision = "8b7507fac302640dd5f1efbf9643199952cc58db"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
   name = "k8s.io/apiextensions-apiserver"
@@ -689,11 +682,11 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "f7ef7a267727c2b32df51dab2f7d32773595e00e"
+  revision = "69ed60f047cbe21a89272c2b019b98ee756e6e83"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "232de006b9d0ed30e38d10bedf9296784e683f657eb7f956355a6029df70b7bd"
+  inputs-digest = "355d5cd23e0eb0fdeba3993189361ffbdbc31123ae9f3eee543c6b05aec0e600"
   solver-name = "gps-cdcl"
   solver-version = 1
