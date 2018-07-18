@@ -17,6 +17,7 @@ import (
 const (
 	MasterID = "master"
 	WorkerID = "worker"
+	EtcdPort = 443
 	// portBase is a baseline for computing the port for liveness probes.
 	portBase = 23000
 	// HealthEndpoint is http path for liveness probe.
@@ -101,7 +102,7 @@ func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
 }
 
 func ClusterEtcdDomain(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.Cluster.Etcd.Domain
+	return fmt.Sprintf("%s:%d", customObject.Spec.Cluster.Etcd.Domain, EtcdPort)
 }
 
 func ClusterID(customObject v1alpha1.KVMConfig) string {
