@@ -140,7 +140,7 @@
   branch = "master"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
-  revision = "823a4ad2876212aba33bcf7ad831f93baffcbdbb"
+  revision = "856ccc5369b1336eea4861803efdbfd8243ee7e6"
 
 [[projects]]
   branch = "master"
@@ -255,7 +255,7 @@
   branch = "versions"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
-  revision = "98985fb2013239e3e5c9fe3c15523009d9690966"
+  revision = "b9fcdaa7351e83a64400d2623d73d7ee3eb9a9a5"
 
 [[projects]]
   branch = "master"
@@ -1144,7 +1144,7 @@
     "pkg/volume/util/recyclerclient",
     "pkg/volume/util/types"
   ]
-  revision = "49109522c0af1719bcd4dae82f29065afab4041e"
+  revision = "cd6a03fe20fab94bed3b74f98a1ff5377bdf7d06"
 
 [[projects]]
   branch = "master"
