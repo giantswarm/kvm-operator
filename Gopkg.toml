@@ -23,6 +23,7 @@
 
 required = [
   "github.com/docker/distribution/reference",
+  "k8s.io/apiserver/pkg/endpoints/request"
 ]
 
 
@@ -76,6 +77,10 @@ required = [
   name = "github.com/giantswarm/randomkeys"
 
 [[constraint]]
+  branch = "versions"
+  name = "github.com/giantswarm/statusresource"
+
+[[constraint]]
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
 
@@ -97,6 +102,10 @@ required = [
 
 [[constraint]]
   name = "k8s.io/apimachinery"
+  version = "kubernetes-1.10.4"
+
+[[constraint]]
+  name = "k8s.io/apiserver"
   version = "kubernetes-1.10.4"
 
 [[constraint]]
