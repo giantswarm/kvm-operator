@@ -76,8 +76,11 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/randomkeys"
 
+[[override]]
+  branch = "extend"
+  name = "github.com/giantswarm/errors"
 [[constraint]]
-  branch = "master"
+  branch = "cancel"
   name = "github.com/giantswarm/statusresource"
 
 [[constraint]]
