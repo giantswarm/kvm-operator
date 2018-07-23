@@ -44,7 +44,7 @@
     "digestset",
     "reference"
   ]
-  revision = "749f6afb4572201e3c37325d0ffedb6f32be8950"
+  revision = "0dae0957e5fe3156c265d22bef4cba9efbf388e2"
 
 [[projects]]
   name = "github.com/docker/docker"
@@ -125,7 +125,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "4dd4ba547409a0be555dc933432897f94b5acb2b"
+  revision = "dbe7aa4771048f64040c9e6148a708c21226a1b2"
 
 [[projects]]
   branch = "master"
@@ -140,7 +140,7 @@
   branch = "master"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
-  revision = "856ccc5369b1336eea4861803efdbfd8243ee7e6"
+  revision = "57bc941af0be633160a3d35d8d36912d3bd627ed"
 
 [[projects]]
   branch = "master"
@@ -255,7 +255,7 @@
   branch = "versions"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
-  revision = "b9fcdaa7351e83a64400d2623d73d7ee3eb9a9a5"
+  revision = "d70608b76180eee1cad3a7a6b9fe5eac72b2a18f"
 
 [[projects]]
   branch = "master"
@@ -617,7 +617,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "fedd2861243fd1a8152376292b921b394c7bef7e"
+  revision = "02b4e95473316948020af0b7a4f0f22c73929b0e"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -1144,7 +1144,7 @@
     "pkg/volume/util/recyclerclient",
     "pkg/volume/util/types"
   ]
-  revision = "cd6a03fe20fab94bed3b74f98a1ff5377bdf7d06"
+  revision = "1de34f08718b3677cef39234ca6a821762cb9de8"
 
 [[projects]]
   branch = "master"

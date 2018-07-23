@@ -41,7 +41,7 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/apiextensions"
 
-[[constraint]]
+[[override]]
   branch = "master"
   name = "github.com/giantswarm/errors"
 
