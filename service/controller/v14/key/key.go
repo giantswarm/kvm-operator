@@ -302,6 +302,33 @@ func StorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }
 
+func ToClusterEndpoint(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return customObject.Spec.Cluster.Kubernetes.API.Domain, nil
+}
+
+func ToClusterID(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return ClusterID(customObject), nil
+}
+
+func ToClusterStatus(v interface{}) (v1alpha1.StatusCluster, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return v1alpha1.StatusCluster{}, microerror.Mask(err)
+	}
+
+	return customObject.Status.Cluster, nil
+}
+
 func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	customObjectPointer, ok := v.(*v1alpha1.KVMConfig)
 	if !ok {
@@ -310,6 +337,17 @@ func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	customObject := *customObjectPointer
 
 	return customObject, nil
+}
+
+func ToNodeCount(v interface{}) (int, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return 0, microerror.Mask(err)
+	}
+
+	nodeCount := len(customObject.Spec.Cluster.Masters) + len(customObject.Spec.Cluster.Workers)
+
+	return nodeCount, nil
 }
 
 func ToPod(v interface{}) (*corev1.Pod, error) {
@@ -323,6 +361,15 @@ func ToPod(v interface{}) (*corev1.Pod, error) {
 	}
 
 	return pod, nil
+}
+
+func ToVersionBundleVersion(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return VersionBundleVersion(customObject), nil
 }
 
 func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
