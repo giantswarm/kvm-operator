@@ -10,47 +10,45 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteState interface{}) error {
-	k8sEndpoint, err := toK8sEndpoint(deleteState)
+func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
+	endpointToDelete, err := toK8sEndpoint(deleteChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if k8sEndpoint == nil {
-		return nil // Nothing to do.
+	// The endpoint resource is reconciled by watching pods. Pods get deleted at
+	// times. We do not want to delete the whole endpoint only because one pod is
+	// gone. We only delete the whole endpoint when it does not contain any IP
+	// anymore. Removing IPs is done on update events.
+	if endpointToDelete != nil && isEmptyEndpoint(*endpointToDelete) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting endpoint '%s'", endpointToDelete.GetName()))
+
+		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(endpointToDelete.Name, &metav1.DeleteOptions{})
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted endpoint '%s'", endpointToDelete.GetName()))
+	} else {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting endpoint '%s'", endpointToDelete.GetName()))
 	}
-
-	// TODO this looks very wrong. When the endpoint is not empty on a delete
-	// event, we want to delete it usually. The code below says we don't.
-	if !isEmptyEndpoint(*k8sEndpoint) {
-		return nil
-	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting endpoint '%s'", k8sEndpoint.GetName()))
-
-	err = r.k8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Delete(k8sEndpoint.Name, &metav1.DeleteOptions{})
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted endpoint '%s'", k8sEndpoint.GetName()))
 
 	return nil
 }
 
 func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*controller.Patch, error) {
-	deleteState, err := r.newDeleteChangeForDeletePatch(ctx, obj, currentState, desiredState)
+	deleteChange, err := r.newDeleteChangeForDeletePatch(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	updateState, err := r.newDeleteChangeForUpdatePatch(ctx, obj, currentState, desiredState)
+	updateChange, err := r.newDeleteChangeForUpdatePatch(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	patch := controller.NewPatch()
-	patch.SetDeleteChange(deleteState)
-	patch.SetUpdateChange(updateState)
+	patch.SetDeleteChange(deleteChange)
+	patch.SetUpdateChange(updateChange)
 
 	return patch, nil
 }
@@ -81,12 +79,12 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		ServiceNamespace: currentEndpoint.ServiceNamespace,
 		IPs:              ips,
 	}
-	deleteState, err := r.newK8sEndpoint(endpoint)
+	deleteChange, err := r.newK8sEndpoint(endpoint)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	return deleteState, nil
+	return deleteChange, nil
 }
 
 func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*corev1.Endpoints, error) {
@@ -115,10 +113,10 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		ServiceNamespace: currentEndpoint.ServiceNamespace,
 		IPs:              ips,
 	}
-	updateState, err := r.newK8sEndpoint(endpoint)
+	updateChange, err := r.newK8sEndpoint(endpoint)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	return updateState, nil
+	return updateChange, nil
 }
