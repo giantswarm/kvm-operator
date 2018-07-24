@@ -1,3 +1,20 @@
+e2eTest: &e2eTest
+  machine: true
+  working_directory: /home/circleci/.go_workspace/src/github.com/giantswarm/kvm-operator
+  steps:
+  - checkout
+  - run: |
+      wget -q $(curl -sS https://api.github.com/repos/giantswarm/e2e-harness/releases/latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+      chmod +x ./e2e-harness
+  - run: ./e2e-harness localkube
+  - run: ./e2e-harness setup --remote=false
+  - run:
+      command: ./e2e-harness test --test-dir=${TEST_DIR}
+      no_output_timeout: 30m
+  - run:
+      command: ./e2e-harness teardown
+      when: always
+
 version: 2
 jobs:
   build:
@@ -15,3 +32,37 @@ jobs:
           if [ "${CIRCLE_BRANCH}" == "master" ]; then
             ./architect deploy
           fi
+
+  e2eTestCurPRReady:
+    environment:
+      TESTED_VERSION: "current"
+      TEST_DIR: "integration/test/ready"
+    <<: *e2eTest
+  e2eTestCurMasterReady:
+    environment:
+      TESTED_VERSION: "current"
+      TEST_DIR: "integration/test/ready"
+    <<: *e2eTest
+
+workflows:
+  version: 2
+  build_and_e2eTest:
+    jobs:
+      - build
+      - hold:
+          type: approval
+          filters:
+            branches:
+              ignore: master
+          requires:
+          - build
+
+      - e2eTestCurPRReady:
+          requires:
+          - hold
+      - e2eTestCurMasterReady:
+          filters:
+            branches:
+              only: master
+          requires:
+          - build
