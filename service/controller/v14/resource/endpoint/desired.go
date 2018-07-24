@@ -16,7 +16,6 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-
 	desiredEndpoint := &Endpoint{
 		IPs: []string{
 			endpointIP,
@@ -24,5 +23,6 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		ServiceName:      serviceName,
 		ServiceNamespace: pod.GetNamespace(),
 	}
+
 	return desiredEndpoint, nil
 }
