@@ -12,12 +12,6 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func Test_Resource_Endpoint_ApplyUpdateChange(t *testing.T) {
-}
-
-func Test_Resource_Endpoint_NewUpdatePatch(t *testing.T) {
-}
-
 func Test_Resource_Endpoint_newUpdateChange(t *testing.T) {
 	testCases := []struct {
 		CurrentState        *Endpoint

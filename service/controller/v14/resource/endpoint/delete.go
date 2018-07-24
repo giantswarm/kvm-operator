@@ -20,6 +20,8 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteState inter
 		return nil // Nothing to do.
 	}
 
+	// TODO this looks very wrong. When the endpoint is not empty on a delete
+	// event, we want to delete it usually. The code below says we don't.
 	if !isEmptyEndpoint(*k8sEndpoint) {
 		return nil
 	}
@@ -54,31 +56,31 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*corev1.Endpoints, error) {
-	desiredEndpoint, err := toEndpoint(desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	if desiredEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-
 	currentEndpoint, err := toEndpoint(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
+	desiredEndpoint, err := toEndpoint(desiredState)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
+
 	if currentEndpoint == nil {
 		return nil, nil // Nothing to do.
+	}
+	if desiredEndpoint == nil {
+		return nil, nil // Nothing to do.
+	}
+	if len(ips) > 0 {
+		return nil, nil
 	}
 
 	endpoint := &Endpoint{
 		ServiceName:      currentEndpoint.ServiceName,
 		ServiceNamespace: currentEndpoint.ServiceNamespace,
-		IPs:              cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs),
+		IPs:              ips,
 	}
-	if len(endpoint.IPs) > 0 {
-		return nil, nil
-	}
-
 	deleteState, err := r.newK8sEndpoint(endpoint)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -92,28 +94,27 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	if currentEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-
 	desiredEndpoint, err := toEndpoint(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
+	ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
+
+	if currentEndpoint == nil {
+		return nil, nil // Nothing to do.
+	}
 	if desiredEndpoint == nil {
 		return nil, nil // Nothing to do.
+	}
+	if len(ips) == 0 {
+		return nil, nil
 	}
 
 	endpoint := &Endpoint{
 		ServiceName:      currentEndpoint.ServiceName,
 		ServiceNamespace: currentEndpoint.ServiceNamespace,
-		IPs:              cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs),
+		IPs:              ips,
 	}
-
-	if len(endpoint.IPs) == 0 {
-		return nil, nil
-	}
-
 	updateState, err := r.newK8sEndpoint(endpoint)
 	if err != nil {
 		return nil, microerror.Mask(err)
