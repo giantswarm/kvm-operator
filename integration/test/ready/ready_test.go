@@ -15,5 +15,8 @@ import (
 // 4. wait until guest cluster is ready
 // 5. hand over execution to this test
 func TestGuestReady(t *testing.T) {
-	t.Log("Guest cluster is ready")
+	// TODO: Uncomment proper log message below.
+	// Test is still WIP at the moment so no guest cluster is installed.
+	//t.Log("Guest cluster is ready")
+	t.Log("Test validated that kvm-operator and prerequisites were successfully installed.")
 }
