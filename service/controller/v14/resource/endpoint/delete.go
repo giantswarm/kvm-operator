@@ -63,14 +63,10 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 	var deleteChange *corev1.Endpoints
 	{
-		ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
-		if len(ips) > 0 {
-			ips = []string{}
-		}
 		endpoint := &Endpoint{
 			ServiceName:      currentEndpoint.ServiceName,
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
-			IPs:              ips,
+			IPs:              cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs),
 		}
 		deleteChange, err = r.newK8sEndpoint(endpoint)
 		if err != nil {

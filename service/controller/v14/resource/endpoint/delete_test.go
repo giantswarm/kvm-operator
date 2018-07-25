@@ -257,7 +257,11 @@ func Test_Resource_Endpoint_newDeleteChange(t *testing.T) {
 								Port: 1234,
 							},
 						},
-						Addresses: []corev1.EndpointAddress{},
+						Addresses: []corev1.EndpointAddress{
+							{
+								IP: "1.2.3.4",
+							},
+						},
 					},
 				},
 			},
@@ -306,7 +310,14 @@ func Test_Resource_Endpoint_newDeleteChange(t *testing.T) {
 								Port: 1234,
 							},
 						},
-						Addresses: []corev1.EndpointAddress{},
+						Addresses: []corev1.EndpointAddress{
+							{
+								IP: "5.5.5.5",
+							},
+							{
+								IP: "1.2.3.4",
+							},
+						},
 					},
 				},
 			},
