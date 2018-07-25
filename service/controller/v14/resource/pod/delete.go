@@ -49,7 +49,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		if isDrained {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is already drained")
 			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
 			return nil
 		}
@@ -106,7 +106,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has no drained condition")
 	resourcecanceledcontext.SetCanceled(ctx)
 	finalizerskeptcontext.SetKept(ctx)
-	r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
 
 	return nil
 }
@@ -194,7 +194,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot update the pod in the Kubernetes API due to outdated resource version")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
 
 			return nil
 		} else if err != nil {
