@@ -30,7 +30,11 @@ func Test_Resource_Endpoint_GetCurrentState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedEndpoints: nil,
+			ExpectedEndpoints: &Endpoint{
+				IPs:              []string{},
+				ServiceName:      "TestService",
+				ServiceNamespace: "TestNamespace",
+			},
 		},
 		{
 			Obj: &corev1.Pod{
@@ -216,10 +220,10 @@ func Test_Resource_Endpoint_GetCurrentState(t *testing.T) {
 		}
 		result, err := newResource.GetCurrentState(resourcecanceledcontext.NewContext(context.TODO(), make(chan struct{})), tc.Obj)
 		if err != nil {
-			t.Fatal("case", i+1, "expected", nil, "got", err)
+			t.Fatal("case", i, "expected", nil, "got", err)
 		}
 		if !reflect.DeepEqual(tc.ExpectedEndpoints, result) {
-			t.Fatalf("case %d expected %#v got %#v", i+1, tc.ExpectedEndpoints, result)
+			t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedEndpoints, result)
 		}
 	}
 }

@@ -57,26 +57,22 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
 
-	if currentEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-	if desiredEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-	if len(ips) > 0 {
-		ips = []string{}
-	}
-
-	endpoint := &Endpoint{
-		ServiceName:      currentEndpoint.ServiceName,
-		ServiceNamespace: currentEndpoint.ServiceNamespace,
-		IPs:              ips,
-	}
-	deleteChange, err := r.newK8sEndpoint(endpoint)
-	if err != nil {
-		return nil, microerror.Mask(err)
+	var deleteChange *corev1.Endpoints
+	{
+		ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
+		if len(ips) > 0 {
+			ips = []string{}
+		}
+		endpoint := &Endpoint{
+			ServiceName:      currentEndpoint.ServiceName,
+			ServiceNamespace: currentEndpoint.ServiceNamespace,
+			IPs:              ips,
+		}
+		deleteChange, err = r.newK8sEndpoint(endpoint)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	return deleteChange, nil
