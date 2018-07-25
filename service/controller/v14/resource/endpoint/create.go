@@ -41,23 +41,20 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	var ips []string
-	for _, desiredIP := range desiredEndpoint.IPs {
-		if !containsIP(ips, desiredIP) {
-			ips = append(ips, desiredIP)
-		}
-	}
 
 	var createChange *corev1.Endpoints
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the endpoint has to be computed")
+		var ips []string
+		for _, desiredIP := range desiredEndpoint.IPs {
+			if !containsIP(ips, desiredIP) {
+				ips = append(ips, desiredIP)
+			}
+		}
 
 		endpointExists := currentEndpoint != nil
 		ipsEmpty := len(ips) == 0
 
 		if !endpointExists && !ipsEmpty {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "the endpoint has to be computed")
-
 			endpoint := &Endpoint{
 				ServiceName:      desiredEndpoint.ServiceName,
 				ServiceNamespace: desiredEndpoint.ServiceNamespace,
@@ -67,8 +64,6 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
-		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "the endpoint does not have to be computed")
 		}
 	}
 

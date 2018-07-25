@@ -47,6 +47,7 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 
 	patch := controller.NewPatch()
 	patch.SetDeleteChange(deleteChange)
+	patch.SetUpdateChange(deleteChange)
 
 	return patch, nil
 }
