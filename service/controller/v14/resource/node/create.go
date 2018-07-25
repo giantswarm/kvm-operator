@@ -64,7 +64,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
 		if guest.IsAPINotAvailable(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "guest cluster is not available")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for custom object")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
 			return nil
 		} else if err != nil {

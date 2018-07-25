@@ -24,7 +24,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	if IsMissingAnnotationError(err) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "annotation is missing on pod")
 		resourcecanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for pod")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
 		return nil, nil
 	} else if err != nil {
@@ -40,7 +40,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of pod due to undrained status")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource for pod")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
 			return nil, nil
 		}

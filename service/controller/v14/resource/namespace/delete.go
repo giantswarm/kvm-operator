@@ -29,7 +29,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the namespace in the Kubernetes API")
 		reconciliationcanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for custom object")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
 	} else {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "the namespace does not need to be deleted from the Kubernetes API")
 	}
