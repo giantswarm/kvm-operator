@@ -163,10 +163,6 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 	return customObject.GetDeletionTimestamp() != nil
 }
 
-func IsPodDeleted(pod *corev1.Pod) bool {
-	return pod.GetDeletionTimestamp() != nil
-}
-
 // IsPodDraind checks whether the pod status indicates it got drained. The pod
 // status is partially reflected by its annotations. Here we check for the
 // annotation that tells us if the pod was already drained or not. In case the
