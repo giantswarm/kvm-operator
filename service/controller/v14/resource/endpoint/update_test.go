@@ -227,19 +227,10 @@ func Test_Resource_Endpoint_newUpdateChange(t *testing.T) {
 								Port: 1234,
 							},
 						},
-						Addresses: []corev1.EndpointAddress{
-							{
-								IP: "1.1.1.1",
-							},
-						},
+						Addresses: []corev1.EndpointAddress{},
 					},
 				},
 			},
-		},
-		{
-			CurrentState:        nil,
-			DesiredState:        nil,
-			ExpectedCreateState: (*corev1.Endpoints)(nil),
 		},
 	}
 	for i, tc := range testCases {

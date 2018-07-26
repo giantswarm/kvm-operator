@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -20,11 +21,13 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	// times. We do not want to delete the whole endpoint only because one pod is
 	// gone. We only delete the whole endpoint when it does not contain any IP
 	// anymore. Removing IPs is done on update events.
-	if endpointToDelete != nil && isEmptyEndpoint(*endpointToDelete) {
+	if isEmptyEndpoint(*endpointToDelete) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting endpoint '%s'", endpointToDelete.GetName()))
 
 		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(endpointToDelete.Name, &metav1.DeleteOptions{})
-		if err != nil {
+		if errors.IsNotFound(err) {
+			// fall through
+		} else if err != nil {
 			return microerror.Mask(err)
 		}
 
@@ -37,23 +40,19 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 }
 
 func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*controller.Patch, error) {
-	deleteChange, err := r.newDeleteChangeForDeletePatch(ctx, obj, currentState, desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	updateChange, err := r.newDeleteChangeForUpdatePatch(ctx, obj, currentState, desiredState)
+	deleteChange, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	patch := controller.NewPatch()
 	patch.SetDeleteChange(deleteChange)
-	patch.SetUpdateChange(updateChange)
+	patch.SetUpdateChange(deleteChange)
 
 	return patch, nil
 }
 
-func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*corev1.Endpoints, error) {
+func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (*corev1.Endpoints, error) {
 	currentEndpoint, err := toEndpoint(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -62,61 +61,19 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
 
-	if currentEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-	if desiredEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-	if len(ips) > 0 {
-		return nil, nil
-	}
-
-	endpoint := &Endpoint{
-		ServiceName:      currentEndpoint.ServiceName,
-		ServiceNamespace: currentEndpoint.ServiceNamespace,
-		IPs:              ips,
-	}
-	deleteChange, err := r.newK8sEndpoint(endpoint)
-	if err != nil {
-		return nil, microerror.Mask(err)
+	var deleteChange *corev1.Endpoints
+	{
+		endpoint := &Endpoint{
+			ServiceName:      currentEndpoint.ServiceName,
+			ServiceNamespace: currentEndpoint.ServiceNamespace,
+			IPs:              cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs),
+		}
+		deleteChange, err = r.newK8sEndpoint(endpoint)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	return deleteChange, nil
-}
-
-func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*corev1.Endpoints, error) {
-	currentEndpoint, err := toEndpoint(currentState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	desiredEndpoint, err := toEndpoint(desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
-
-	if currentEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-	if desiredEndpoint == nil {
-		return nil, nil // Nothing to do.
-	}
-	if len(ips) == 0 {
-		return nil, nil
-	}
-
-	endpoint := &Endpoint{
-		ServiceName:      currentEndpoint.ServiceName,
-		ServiceNamespace: currentEndpoint.ServiceNamespace,
-		IPs:              ips,
-	}
-	updateChange, err := r.newK8sEndpoint(endpoint)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	return updateChange, nil
 }

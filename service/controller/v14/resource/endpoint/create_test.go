@@ -137,30 +137,6 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedCreateState: nil,
-		},
-		{
-			CurrentState: nil,
-			DesiredState: &Endpoint{
-				IPs: []string{
-					"1.1.1.1",
-				},
-				ServiceName:      "TestService",
-				ServiceNamespace: "TestNamespace",
-			},
-			SetupService: &corev1.Service{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "TestService",
-					Namespace: "TestNamespace",
-				},
-				Spec: corev1.ServiceSpec{
-					Ports: []corev1.ServicePort{
-						{
-							Port: 1234,
-						},
-					},
-				},
-			},
 			ExpectedCreateState: &corev1.Endpoints{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: "v1",
@@ -176,67 +152,17 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 								Port: 1234,
 							},
 						},
-						Addresses: []corev1.EndpointAddress{
-							{
-								IP: "1.1.1.1",
-							},
-						},
+						Addresses: []corev1.EndpointAddress{},
 					},
 				},
 			},
 		},
 		{
-			CurrentState: nil,
-			DesiredState: &Endpoint{
-				IPs: []string{
-					"5.5.5.5",
-					"1.2.3.4",
-				},
+			CurrentState: &Endpoint{
+				IPs:              []string{},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
 			},
-			SetupService: &corev1.Service{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "TestService",
-					Namespace: "TestNamespace",
-				},
-				Spec: corev1.ServiceSpec{
-					Ports: []corev1.ServicePort{
-						{
-							Port: 1234,
-						},
-					},
-				},
-			},
-			ExpectedCreateState: &corev1.Endpoints{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: "v1",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "TestService",
-					Namespace: "TestNamespace",
-				},
-				Subsets: []corev1.EndpointSubset{
-					{
-						Ports: []corev1.EndpointPort{
-							{
-								Port: 1234,
-							},
-						},
-						Addresses: []corev1.EndpointAddress{
-							{
-								IP: "5.5.5.5",
-							},
-							{
-								IP: "1.2.3.4",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			CurrentState: nil,
 			DesiredState: &Endpoint{
 				IPs: []string{
 					"1.1.1.1",

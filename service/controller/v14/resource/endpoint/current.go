@@ -18,17 +18,20 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for annotations on pod")
+	var serviceName string
+	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for annotations on pod")
 
-	_, serviceName, err := getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
-	if IsMissingAnnotationError(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "annotation is missing on pod")
-		resourcecanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+		_, serviceName, err = getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
+		if IsMissingAnnotationError(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "annotation is missing on pod")
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
-		return nil, nil
-	} else if err != nil {
-		return nil, microerror.Mask(err)
+			return nil, nil
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	if key.IsPodDeleted(pod) {
@@ -46,27 +49,39 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
-	currentEndpoint := Endpoint{
-		IPs:              []string{},
-		ServiceName:      serviceName,
-		ServiceNamespace: pod.GetNamespace(),
-	}
-	k8sEndpoints, err := r.k8sClient.CoreV1().Endpoints(pod.GetNamespace()).Get(serviceName, metav1.GetOptions{})
-	if errors.IsNotFound(err) {
-		return nil, nil
-	} else if err != nil {
-		return nil, microerror.Mask(err)
-	}
+	var endpoint *Endpoint
+	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "finding endpoint")
 
-	for _, endpointSubset := range k8sEndpoints.Subsets {
-		for _, endpointAddress := range endpointSubset.Addresses {
-			foundIP := endpointAddress.IP
+		endpoint = &Endpoint{
+			IPs:              []string{},
+			ServiceName:      serviceName,
+			ServiceNamespace: pod.GetNamespace(),
+		}
 
-			if !containsIP(currentEndpoint.IPs, foundIP) {
-				currentEndpoint.IPs = append(currentEndpoint.IPs, foundIP)
+		k8sEndpoints, err := r.k8sClient.CoreV1().Endpoints(pod.GetNamespace()).Get(serviceName, metav1.GetOptions{})
+		if errors.IsNotFound(err) {
+			// In case the endpoint manifest cannot be found in the Kubernetes API we
+			// return the endpoint structure we dispatch without filling any IP.
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find endpoint")
+
+			return endpoint, nil
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		for _, endpointSubset := range k8sEndpoints.Subsets {
+			for _, endpointAddress := range endpointSubset.Addresses {
+				foundIP := endpointAddress.IP
+
+				if !containsIP(endpoint.IPs, foundIP) {
+					endpoint.IPs = append(endpoint.IPs, foundIP)
+				}
 			}
 		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "found endpoint")
 	}
 
-	return &currentEndpoint, nil
+	return endpoint, nil
 }

@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
@@ -9,21 +10,22 @@ import (
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState interface{}) error {
-	k8sEndpoint, err := toK8sEndpoint(updateState)
+	endpointToUpdate, err := toK8sEndpoint(updateState)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if k8sEndpoint == nil {
-		return nil // Nothing to do.
-	}
-	if isEmptyEndpoint(*k8sEndpoint) {
-		return nil
-	}
+	if !isEmptyEndpoint(*endpointToUpdate) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating endpoint '%s'", endpointToUpdate.GetName()))
 
-	_, err = r.k8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Update(k8sEndpoint)
-	if err != nil {
-		return microerror.Mask(err)
+		_, err = r.k8sClient.CoreV1().Endpoints(endpointToUpdate.Namespace).Update(endpointToUpdate)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updated endpoint '%s'", endpointToUpdate.GetName()))
+	} else {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not updating endpoint '%s'", endpointToUpdate.GetName()))
 	}
 
 	return nil
@@ -34,7 +36,6 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-
 	updateState, err := r.newUpdateChange(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -58,40 +59,31 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	if currentEndpoint == nil {
-		return nil, nil // The endpoint does not exist, we should create it instead.
-	}
-
 	var updateChange *corev1.Endpoints
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the endpoint has to be computed")
-
 		var ips []string
-		for _, currentIP := range currentEndpoint.IPs {
-			if !containsIP(ips, currentIP) {
-				ips = append(ips, currentIP)
-			}
+		for _, ip := range currentEndpoint.IPs {
+			ips = append(ips, ip)
 		}
-		for _, desiredIP := range desiredEndpoint.IPs {
-			if !containsIP(ips, desiredIP) {
-				ips = append(ips, desiredIP)
+		for _, ip := range desiredEndpoint.IPs {
+			if !containsIP(ips, ip) {
+				ips = append(ips, ip)
 			}
 		}
 
-		if len(ips) != 0 {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "the endpoint has to be computed")
+		endpoint := &Endpoint{
+			IPs:              []string{},
+			ServiceName:      desiredEndpoint.ServiceName,
+			ServiceNamespace: desiredEndpoint.ServiceNamespace,
+		}
 
-			endpoint := &Endpoint{
-				ServiceName:      desiredEndpoint.ServiceName,
-				ServiceNamespace: desiredEndpoint.ServiceNamespace,
-				IPs:              ips,
-			}
-			updateChange, err = r.newK8sEndpoint(endpoint)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "the endpoint does not have to be computed")
+		if len(currentEndpoint.IPs) > 0 {
+			endpoint.IPs = ips
+		}
+
+		updateChange, err = r.newK8sEndpoint(endpoint)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
 	}
 

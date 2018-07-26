@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
@@ -9,24 +10,24 @@ import (
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState interface{}) error {
-	k8sEndpoint, err := toK8sEndpoint(createState)
+	endpointToCreate, err := toK8sEndpoint(createState)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if k8sEndpoint != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the endpoint in the Kubernetes API")
+	if !isEmptyEndpoint(*endpointToCreate) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating endpoint '%s'", endpointToCreate.GetName()))
 
-		_, err = r.k8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Create(k8sEndpoint)
+		_, err = r.k8sClient.CoreV1().Endpoints(endpointToCreate.Namespace).Create(endpointToCreate)
 		if errors.IsAlreadyExists(err) {
 			// fall through
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created the endpoint in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created endpoint '%s'", endpointToCreate.GetName()))
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the endpoint does not need to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not creating endpoint '%s'", endpointToCreate.GetName()))
 	}
 
 	return nil
@@ -41,34 +42,29 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	var ips []string
-	for _, desiredIP := range desiredEndpoint.IPs {
-		if !containsIP(ips, desiredIP) {
-			ips = append(ips, desiredIP)
-		}
-	}
 
 	var createChange *corev1.Endpoints
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the endpoint has to be computed")
-
-		endpointExists := currentEndpoint != nil
-		ipsEmpty := len(ips) == 0
-
-		if !endpointExists && !ipsEmpty {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "the endpoint has to be computed")
-
-			endpoint := &Endpoint{
-				ServiceName:      desiredEndpoint.ServiceName,
-				ServiceNamespace: desiredEndpoint.ServiceNamespace,
-				IPs:              ips,
+		var ips []string
+		for _, ip := range desiredEndpoint.IPs {
+			if !containsIP(ips, ip) {
+				ips = append(ips, ip)
 			}
-			createChange, err = r.newK8sEndpoint(endpoint)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
-		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "the endpoint does not have to be computed")
+		}
+
+		endpoint := &Endpoint{
+			IPs:              []string{},
+			ServiceName:      desiredEndpoint.ServiceName,
+			ServiceNamespace: desiredEndpoint.ServiceNamespace,
+		}
+
+		if len(currentEndpoint.IPs) == 0 {
+			endpoint.IPs = ips
+		}
+
+		createChange, err = r.newK8sEndpoint(endpoint)
+		if err != nil {
+			return nil, microerror.Mask(err)
 		}
 	}
 
