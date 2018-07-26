@@ -14,6 +14,7 @@ import (
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/teardown"
 	"github.com/giantswarm/kvm-operator/integration/template"
+	"github.com/giantswarm/e2e-harness/pkg/harness"
 )
 
 const (
@@ -42,6 +43,16 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
 // Setup e2e testing environment.
 func Setup(g *framework.Guest, h *framework.Host) error {
 	var err error
+
+	baseDir, err := harness.BaseDir()
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	err = createKubeconfig(kubeconfigFilePath(baseDir))
+	if err != nil {
+		return microerror.Mask(err)
+	}
 
 	err = h.Setup()
 	if err != nil {
