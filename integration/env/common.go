@@ -23,18 +23,6 @@ const (
 	// TODO rename to CLUSTER_ID. Note this also had to be changed in the
 	// framework package of e2e-harness.
 	EnvVarClusterID = "CLUSTER_NAME"
-	// EnvVarK8sApiUrl is the process environment variable representing the
-	// k8s api url for testing cluster.
-	EnvVarK8sApiUrl = "K8S_API_URL"
-	// EnvVarK8sCert is the process environment variable representing the
-	// k8s kubeconfig cert value for testing cluster.
-	EnvVarK8sCert = "K8S_CERT_ENCODED"
-	// EnvVarK8sCert is the process environment variable representing the
-	// k8s kubeconfig ca cert value for testing cluster.
-	EnvVarK8sCertCA = "K8S_CERT_CA_ENCODED"
-	// EnvVarK8sCert is the process environment variable representing the
-	// k8s kubeconfig private key value for testing cluster.
-	EnvVarK8sCertPrivate = "K8S_CERT_PRIVATE_ENCODED"
 	// EnvVarCommonDomain is the process environment variable representing the
 	// COMMON_DOMAIN env var.
 	EnvVarCommonDomain = "COMMON_DOMAIN"
@@ -63,10 +51,6 @@ var (
 	circleSHA            string
 	clusterID            string
 	commonDomain         string
-	k8sApiUrl            string
-	k8sCert              string
-	k8sCertPrivate       string
-	k8sCertCA            string
 	testDir              string
 	testedVersion        string
 	keepResources        string
@@ -91,23 +75,6 @@ func init() {
 	}
 
 	testDir = os.Getenv(EnvVarTestDir)
-
-	k8sApiUrl = os.Getenv(EnvVarK8sApiUrl)
-	if k8sApiUrl == "" {
-		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sApiUrl))
-	}
-	k8sCert = os.Getenv(EnvVarK8sCertCA)
-	if k8sCert == "" {
-		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sCertCA))
-	}
-	k8sCertCA = os.Getenv(EnvVarK8sCert)
-	if k8sCertCA == "" {
-		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sCert))
-	}
-	k8sCertPrivate = os.Getenv(EnvVarK8sCertPrivate)
-	if k8sCertPrivate == "" {
-		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sCertPrivate))
-	}
 
 	// NOTE that implications of changing the order of initialization here means
 	// breaking the initialization behaviour.
@@ -180,22 +147,6 @@ func ClusterID() string {
 
 func CommonDomain() string {
 	return commonDomain
-}
-
-func K8sApiUrl() string {
-	return k8sApiUrl
-}
-
-func K8sCert() string {
-	return k8sCert
-}
-
-func K8sCertCa() string {
-	return k8sCertCA
-}
-
-func K8sCertPrivate() string {
-	return k8sCertPrivate
 }
 
 func KeepResources() string {
