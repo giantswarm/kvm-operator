@@ -11,10 +11,10 @@ import (
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
 	"github.com/giantswarm/microerror"
 
+	"github.com/giantswarm/e2e-harness/pkg/harness"
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/teardown"
 	"github.com/giantswarm/kvm-operator/integration/template"
-	"github.com/giantswarm/e2e-harness/pkg/harness"
 )
 
 const (
