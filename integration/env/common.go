@@ -97,15 +97,15 @@ func init() {
 		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sApiUrl))
 	}
 	k8sCert = os.Getenv(EnvVarK8sCertCA)
-	if k8sApiUrl == "" {
+	if k8sCert == "" {
 		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sCertCA))
 	}
 	k8sCertCA = os.Getenv(EnvVarK8sCert)
-	if k8sApiUrl == "" {
+	if k8sCertCA == "" {
 		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sCert))
 	}
 	k8sCertPrivate = os.Getenv(EnvVarK8sCertPrivate)
-	if k8sApiUrl == "" {
+	if k8sCertPrivate == "" {
 		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarK8sCertPrivate))
 	}
 
@@ -189,12 +189,15 @@ func K8sApiUrl() string {
 func K8sCert() string {
 	return k8sCert
 }
+
 func K8sCertCa() string {
 	return k8sCertCA
 }
+
 func K8sCertPrivate() string {
 	return k8sCertPrivate
 }
+
 func KeepResources() string {
 	return keepResources
 }
