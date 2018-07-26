@@ -4,12 +4,9 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v14/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -20,11 +17,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var serviceName string
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for annotations on pod")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "finding annotations")
 
 		_, serviceName, err = getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
 		if IsMissingAnnotationError(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "annotation is missing on pod")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find annotations")
 			resourcecanceledcontext.SetCanceled(ctx)
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
@@ -32,21 +29,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		}
-	}
 
-	if key.IsPodDeleted(pod) {
-		isDrained, err := key.IsPodDraind(pod)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		if !isDrained {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of pod due to undrained status")
-			resourcecanceledcontext.SetCanceled(ctx)
-			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-
-			return nil, nil
-		}
+		r.logger.LogCtx(ctx, "level", "debug", "message", "found annotations")
 	}
 
 	var endpoint *Endpoint
