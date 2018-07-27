@@ -32,7 +32,7 @@
     "digestset",
     "reference"
   ]
-  revision = "749f6afb4572201e3c37325d0ffedb6f32be8950"
+  revision = "0dae0957e5fe3156c265d22bef4cba9efbf388e2"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -63,7 +63,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "6cb2b75722069008d2a01e29be897236224c9f9f"
+  revision = "dbe7aa4771048f64040c9e6148a708c21226a1b2"
 
 [[projects]]
   branch = "master"
@@ -72,7 +72,7 @@
     ".",
     "certstest"
   ]
-  revision = "fa0af96de35e5a2d7c51f5ba9e49a4f346496c00"
+  revision = "e91f12dea59971a68d08a48479014e33d1b90540"
 
 [[projects]]
   branch = "master"
@@ -81,7 +81,7 @@
     "pkg/framework",
     "pkg/harness"
   ]
-  revision = "280a83f10efb0ccd3a7546d7300641719448870b"
+  revision = "f4a0289c65b6e1f859fc0c960c2904b4e6dff5a8"
 
 [[projects]]
   branch = "master"
@@ -93,7 +93,7 @@
   branch = "master"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
-  revision = "823a4ad2876212aba33bcf7ad831f93baffcbdbb"
+  revision = "9e78ca0e32a019481beb21ae3e158d1bb150730d"
 
 [[projects]]
   branch = "master"
@@ -127,7 +127,7 @@
   branch = "master"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
-  revision = "325932fa68e70dd4464598f11e2f710ac1aaec46"
+  revision = "923901297a5c5013f1499f11708afe567a3fe7a2"
 
 [[projects]]
   branch = "master"
@@ -175,7 +175,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "e299b3f2585f09f50ce40debe7aab42345deb7e0"
+  revision = "b549537227f0b5de6525ed65361a4bc660ba90c4"
 
 [[projects]]
   branch = "master"
@@ -184,7 +184,7 @@
     ".",
     "randomkeystest"
   ]
-  revision = "b2516ed0f070900eddc2b2654ce4f3d356ddf24a"
+  revision = "32106653e4aa60bef71a2b6d62154b923660412e"
 
 [[projects]]
   branch = "master"
@@ -226,8 +226,8 @@
     "proto",
     "sortkeys"
   ]
-  revision = "7d68e886eac4f7e34d0d82241a6273d6c304c5cf"
-  version = "v1.1.0"
+  revision = "636bf0302bc95575d69441b25a2603156ffdddf1"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -251,7 +251,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "8a103ad706081e816a4e3bc678a45a0758491289"
+  revision = "b47a3f75fc03ed477be4f04813180deb31407570"
 
 [[projects]]
   branch = "master"
@@ -425,7 +425,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "ae68e2d4c00fed4943b5f6698d504a5fe083da8a"
+  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -470,7 +470,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
+  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
 
 [[projects]]
   branch = "master"
@@ -484,7 +484,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
+  revision = "3673e40ba22529d22c3fd7c93e97b0ce50fa7bdd"
 
 [[projects]]
   branch = "master"
@@ -493,7 +493,7 @@
     ".",
     "internal"
   ]
-  revision = "ef147856a6ddbb60760db74283d2424e98c87bff"
+  revision = "3d292e4d0cdc3a0113e6d207bb137145ef1de42f"
 
 [[projects]]
   branch = "master"
@@ -508,7 +508,7 @@
     "unix",
     "windows"
   ]
-  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
+  revision = "e072cadbbdc8dd3d3ffa82b8b4b9304c261d9311"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -750,7 +750,7 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "69ed60f047cbe21a89272c2b019b98ee756e6e83"
+  revision = "7b222aaa9c68494c2e49a63e3fde2671ab7dc990"
 
 [solve-meta]
   analyzer-name = "dep"
