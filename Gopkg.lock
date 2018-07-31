@@ -75,13 +75,13 @@
   revision = "e91f12dea59971a68d08a48479014e33d1b90540"
 
 [[projects]]
-  branch = "master"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
     "pkg/harness"
   ]
-  revision = "f4a0289c65b6e1f859fc0c960c2904b4e6dff5a8"
+  revision = "0195240d6f11565e602721d796bd0ced9a972605"
+  version = "0195240"
 
 [[projects]]
   branch = "master"
@@ -104,7 +104,7 @@
     "v_3_2_5",
     "v_3_4_0"
   ]
-  revision = "39cb58590d0ff3307f404d407ac9b90bc4052937"
+  revision = "fa0193c7d6833775c652d3e0267e6603e472484f"
 
 [[projects]]
   branch = "master"
@@ -127,7 +127,7 @@
   branch = "master"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
-  revision = "923901297a5c5013f1499f11708afe567a3fe7a2"
+  revision = "a8d5d4f526c526b4b773062958847fe7e0b7f449"
 
 [[projects]]
   branch = "master"
@@ -251,7 +251,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "b47a3f75fc03ed477be4f04813180deb31407570"
+  revision = "32c30013be0212dd7246d50d79172453d1fd2472"
 
 [[projects]]
   branch = "master"
@@ -484,7 +484,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "3673e40ba22529d22c3fd7c93e97b0ce50fa7bdd"
+  revision = "c4299a1a0d8524c11563db160fbf9bddbceadb21"
 
 [[projects]]
   branch = "master"
@@ -508,7 +508,7 @@
     "unix",
     "windows"
   ]
-  revision = "e072cadbbdc8dd3d3ffa82b8b4b9304c261d9311"
+  revision = "bd9dbc187b6e1dacfdd2722a87e83093c2d7bd6e"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -750,7 +750,7 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "7b222aaa9c68494c2e49a63e3fde2671ab7dc990"
+  revision = "08ba9db03ae263233adfd55f3b9484e623f6d9c2"
 
 [solve-meta]
   analyzer-name = "dep"
