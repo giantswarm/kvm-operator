@@ -3,7 +3,6 @@ package v11
 import (
 	"context"
 
-	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -211,8 +210,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	{
 		c := retryresource.WrapConfig{
-			BackOffFactory: func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), uint64(3)) },
-			Logger:         config.Logger,
+			Logger: config.Logger,
 		}
 
 		resources, err = retryresource.Wrap(resources, c)
