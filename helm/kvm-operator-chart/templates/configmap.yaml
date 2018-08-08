@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kvm-operator-configmap
-  namespace: giantswarm
+  namespace: {{ .Values.namespace }}
 data:
   config.yml: |
     server:
