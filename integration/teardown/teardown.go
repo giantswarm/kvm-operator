@@ -13,7 +13,7 @@ import (
 // Teardown e2e testing environment.
 func Teardown(g *framework.Guest, h *framework.Host) error {
 	var err error
-	targetNamespace = env.ClusterID()
+	targetNamespace := env.ClusterID()
 
 	{
 		err = framework.HelmCmd(fmt.Sprintf("delete kvm-operator --namespace %s --purge", targetNamespace))
