@@ -17,6 +17,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Changed service types.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Expose guest ingress via nodePort.",
+				Kind:        versionbundle.KindAdded,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
