@@ -9,17 +9,7 @@ func VersionBundle() versionbundle.Bundle {
 		Changelogs: []versionbundle.Changelog{
 			{
 				Component:   "kvm-operator",
-				Description: "Added support for etcd monitoring.",
-				Kind:        versionbundle.KindAdded,
-			},
-			{
-				Component:   "kvm-operator",
-				Description: "Changed service types.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "kvm-operator",
-				Description: "Expose guest ingress via nodePort.",
+				Description: "your change here",
 				Kind:        versionbundle.KindAdded,
 			},
 		},
@@ -54,6 +44,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "2.5.0",
+		Version: "2.6.0",
 	}
 }
