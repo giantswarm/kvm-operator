@@ -12,6 +12,7 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
@@ -278,6 +279,39 @@ func NetworkNTPBlock(servers []net.IP) string {
 	ntpBlock := strings.Join(ntpBlockParts, "\n")
 
 	return ntpBlock
+}
+
+func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
+	var ports []corev1.ServicePort
+
+	// Compatibility mode, if no port mappings specified.
+	if len(customObject.Spec.KVM.PortMappings) == 0 {
+		ports := []corev1.ServicePort{
+			{
+				Name:       "http",
+				Port:       int32(30010),
+				TargetPort: intstr.FromInt(30010),
+			},
+			{
+				Name:       "https",
+				Port:       int32(30011),
+				TargetPort: intstr.FromInt(30011),
+			},
+		}
+		return ports
+	}
+
+	for _, p := range customObject.Spec.KVM.PortMappings {
+		port := corev1.ServicePort{
+			Name:       p.Name,
+			NodePort:   int32(p.NodePort),
+			Port:       int32(p.TargetPort),
+			TargetPort: intstr.FromInt(p.TargetPort),
+		}
+		ports = append(ports, port)
+	}
+
+	return ports
 }
 
 func PVCNames(customObject v1alpha1.KVMConfig) []string {

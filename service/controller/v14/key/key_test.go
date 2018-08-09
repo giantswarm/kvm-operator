@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func Test_ClusterID(t *testing.T) {
@@ -56,5 +58,80 @@ DNS=8.8.4.4`
 
 	if dnsServers != expected {
 		t.Fatal("expected", expected, "got", dnsServers)
+	}
+}
+
+func Test_PortMappings(t *testing.T) {
+	customObject := v1alpha1.KVMConfig{
+		Spec: v1alpha1.KVMConfigSpec{
+			KVM: v1alpha1.KVMConfigSpecKVM{
+				PortMappings: []v1alpha1.KVMConfigSpecKVMPortMappings{
+					{
+						Name:       "ingress-http",
+						NodePort:   31010,
+						TargetPort: 30010,
+					},
+					{
+						Name:       "ingress-https",
+						NodePort:   31011,
+						TargetPort: 30011,
+					},
+				},
+			},
+		},
+	}
+
+	expected := []corev1.ServicePort{
+		{
+			Name:       "ingress-http",
+			NodePort:   int32(31010),
+			Port:       int32(30010),
+			TargetPort: intstr.FromInt(30010),
+		},
+		{
+			Name:       "ingress-https",
+			NodePort:   int32(31011),
+			Port:       int32(30011),
+			TargetPort: intstr.FromInt(30011),
+		},
+	}
+
+	actual := PortMappings(customObject)
+
+	for i := range actual {
+		if actual[i] != expected[i] {
+			t.Fatalf("Expected port mapping %+v but was %+v", expected[i], actual[i])
+		}
+	}
+}
+
+func Test_PortMappings_CompatibilityMode(t *testing.T) {
+	customObject := v1alpha1.KVMConfig{
+		Spec: v1alpha1.KVMConfigSpec{
+			KVM: v1alpha1.KVMConfigSpecKVM{
+				PortMappings: []v1alpha1.KVMConfigSpecKVMPortMappings{},
+			},
+		},
+	}
+
+	expected := []corev1.ServicePort{
+		{
+			Name:       "http",
+			Port:       int32(30010),
+			TargetPort: intstr.FromInt(30010),
+		},
+		{
+			Name:       "https",
+			Port:       int32(30011),
+			TargetPort: intstr.FromInt(30011),
+		},
+	}
+
+	actual := PortMappings(customObject)
+
+	for i := range actual {
+		if actual[i] != expected[i] {
+			t.Fatalf("Expected port mapping %+v but was %+v", expected[i], actual[i])
+		}
 	}
 }
