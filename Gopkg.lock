@@ -87,13 +87,13 @@
     "pkg/framework",
     "pkg/harness"
   ]
-  revision = "aed53bfc34ca056fc52001f3e52d3d87acb7f350"
+  revision = "7cc3f26ba2196a4ddbbb3fb995f28c2dca678364"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/e2etemplates"
   packages = ["pkg/e2etemplates"]
-  revision = "fa85e487f49b50f99921c80ce508d110827b2f9d"
+  revision = "cb44aefe3ea5b72262e2342cc6172297a5856c0c"
 
 [[projects]]
   branch = "master"
@@ -257,7 +257,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "fbd7fb9c7f3d27aa691e8421690e00be916f8d8d"
+  revision = "8c40ff417df53f2b031ca687be1b2e0bd7aa8fe9"
 
 [[projects]]
   branch = "master"
@@ -476,7 +476,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "f027049dab0ad238e394a753dba2d14753473a04"
+  revision = "de0752318171da717af4ce24d0a2e8626afaeb11"
 
 [[projects]]
   branch = "master"
@@ -514,7 +514,7 @@
     "unix",
     "windows"
   ]
-  revision = "acbc56fc7007d2a01796d5bde54f39e3b3e95945"
+  revision = "904bdc257025c7b3f43c19360ad3ab85783fad78"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -756,11 +756,11 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "e98e71aa83cab383690deea081cf3d5013e46416"
+  revision = "8619d2218cd390359b3f22163ae3319b4974930a"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "91dd8520e0a32b9978c9bd334011b00cb2c32a6431393515bb2ee56c3c47c984"
+  inputs-digest = "dc94f896f5ec4b619c830d064f200e7bab4283b351d7364c99d7db6959b9ab03"
   solver-name = "gps-cdcl"
   solver-version = 1
