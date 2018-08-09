@@ -6,6 +6,7 @@ import (
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/microerror"
 
+	"fmt"
 	"github.com/giantswarm/kvm-operator/integration/env"
 )
 
@@ -14,25 +15,18 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	var err error
 
 	{
-		// only do full teardown when not on CI
-		if env.CircleCI() == "true" {
-			return nil
-		}
-	}
-
-	{
-		err = framework.HelmCmd("delete kvm-operator --purge")
+		err = framework.HelmCmd(fmt.Sprintf("delete kvm-operator --namespace %s --purge", env.ClusterID()))
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		err = framework.HelmCmd("delete cert-operator --purge")
+		err = framework.HelmCmd(fmt.Sprintf("delete cert-operator --namespace %s --purge", env.ClusterID()))
 		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
 
 	{
-		err = framework.HelmCmd("delete cert-config-e2e --purge")
+		err = framework.HelmCmd(fmt.Sprintf("delete cert-config-e2e --namespace %s --purge", env.ClusterID()))
 		if err != nil {
 			return microerror.Mask(err)
 		}
