@@ -9,7 +9,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "serviceaccountv14"
+	Name = "serviceaccountv15"
 )
 
 // Config represents the configuration used to create a new cloud config resource.
