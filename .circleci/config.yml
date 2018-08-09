@@ -6,8 +6,7 @@ e2eTest: &e2eTest
   - run: |
       wget -q $(curl -sS https://api.github.com/repos/giantswarm/e2e-harness/releases/latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
       chmod +x ./e2e-harness
-  - run: ./e2e-harness localkube
-  - run: ./e2e-harness setup --remote=false
+  - run: ./e2e-harness setup --remote=true --existing=true --k8s-context=giantswarm-e2e --k8s-api-url=${K8S_API_URL} --k8s-cert=${K8S_CERT_ENCODED} --k8s-cert-ca=${K8S_CERT_CA_ENCODED} --k8s-cert-key=${K8S_CERT_KEY_ENCODED}
   - run:
       command: ./e2e-harness test --test-dir=${TEST_DIR}
       no_output_timeout: 30m

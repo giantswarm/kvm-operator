@@ -48,9 +48,10 @@ func TestMain(m *testing.M) {
 
 	{
 		c := framework.HostConfig{
-			Logger:     logger,
-			ClusterID:  env.ClusterID(),
-			VaultToken: env.VaultToken(),
+			Logger:          logger,
+			ClusterID:       env.ClusterID(),
+			TargetNamespace: env.ClusterID(),
+			VaultToken:      env.VaultToken(),
 		}
 		h, err = framework.NewHost(c)
 		if err != nil {
