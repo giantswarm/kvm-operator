@@ -3,10 +3,12 @@
 package teardown
 
 import (
+	"fmt"
+
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/microerror"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"fmt"
 	"github.com/giantswarm/kvm-operator/integration/env"
 )
 
