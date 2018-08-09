@@ -14,7 +14,6 @@ import (
 func Teardown(g *framework.Guest, h *framework.Host) error {
 	var err error
 	targetNamespace := env.ClusterID()
-
 	{
 		err = h.K8sClient().CoreV1().Namespaces().Delete(targetNamespace, &metav1.DeleteOptions{})
 		if err != nil {

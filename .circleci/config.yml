@@ -37,6 +37,11 @@ jobs:
       TESTED_VERSION: "current"
       TEST_DIR: "integration/test/ready"
     <<: *e2eTest
+  e2eTestCurPRReady2:
+    environment:
+      TESTED_VERSION: "current"
+      TEST_DIR: "integration/test/ready2"
+    <<: *e2eTest
   e2eTestCurMasterReady:
     environment:
       TESTED_VERSION: "current"
@@ -57,6 +62,9 @@ workflows:
           - build
 
       - e2eTestCurPRReady:
+          requires:
+          - hold
+      - e2eTestCurPRReady2:
           requires:
           - hold
       - e2eTestCurMasterReady:
