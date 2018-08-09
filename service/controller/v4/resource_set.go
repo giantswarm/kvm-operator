@@ -3,7 +3,6 @@ package v4
 import (
 	"context"
 
-	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -24,10 +23,6 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v4/resource/pvc"
 	"github.com/giantswarm/kvm-operator/service/controller/v4/resource/service"
 	"github.com/giantswarm/kvm-operator/service/controller/v4/resource/serviceaccount"
-)
-
-const (
-	ResourceRetries uint64 = 3
 )
 
 type ResourceSetConfig struct {
@@ -234,7 +229,6 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	{
 		retryWrapConfig := retryresource.WrapConfig{}
 
-		retryWrapConfig.BackOffFactory = func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) }
 		retryWrapConfig.Logger = config.Logger
 
 		resources, err = retryresource.Wrap(resources, retryWrapConfig)
