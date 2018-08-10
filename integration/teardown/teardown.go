@@ -3,6 +3,7 @@
 package teardown
 
 import (
+	"context"
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,13 +41,13 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	// wait until both crds are deleted by operators
 	o := func() error {
 		kvmDeleted, certDeleted := false, false
-		_, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).Get(h.TargetNamespace())
+		_, err = h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).Get(h.TargetNamespace(), v1.GetOptions{})
 		if err != nil {
 			// resource doesnt exist we are good to continue
 			kvmDeleted = true
 		}
 
-		_, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).Get(h.TargetNamespace())
+		_, err = h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).Get(h.TargetNamespace(), v1.GetOptions{})
 		if err != nil {
 			// resource doesnt exist we are good to continue
 			certDeleted = true
@@ -63,7 +64,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	err = backoff.RetryNotify(o, b, n)
 
 	{
-		err = h.K8sClient().CoreV1().Namespaces().Delete(h.TargetNamespace(), &metav1.DeleteOptions{})
+		err = h.K8sClient().CoreV1().Namespaces().Delete(h.TargetNamespace(), &v1.DeleteOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
