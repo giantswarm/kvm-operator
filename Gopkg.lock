@@ -32,7 +32,7 @@
     "digestset",
     "reference"
   ]
-  revision = "4a75b72fd3621c1892143614474ff2b05d30e4b3"
+  revision = "b7446e89bfcec2a0b33d2bdf4a50309e19c40e14"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -81,19 +81,19 @@
   revision = "f7b6ff2ca78dc4ec5b7cf87f357d603a353d0ffb"
 
 [[projects]]
-  branch = "master"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
     "pkg/harness"
   ]
-  revision = "aed53bfc34ca056fc52001f3e52d3d87acb7f350"
+  revision = "9218541e7e6b23dbac5bca8478a34043173196f6"
+  version = "9218541"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/e2etemplates"
   packages = ["pkg/e2etemplates"]
-  revision = "fa85e487f49b50f99921c80ce508d110827b2f9d"
+  revision = "cb44aefe3ea5b72262e2342cc6172297a5856c0c"
 
 [[projects]]
   branch = "master"
@@ -257,7 +257,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "fbd7fb9c7f3d27aa691e8421690e00be916f8d8d"
+  revision = "4430a04b2018f2e2dbee0f3ee44d9ed18c543b16"
 
 [[projects]]
   branch = "master"
@@ -463,8 +463,8 @@
 [[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
-  version = "v1.0.1"
+  revision = "9a97c102cda95a86cec2345a6f09f55a939babf5"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/spf13/viper"
@@ -476,7 +476,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "f027049dab0ad238e394a753dba2d14753473a04"
+  revision = "de0752318171da717af4ce24d0a2e8626afaeb11"
 
 [[projects]]
   branch = "master"
@@ -514,7 +514,7 @@
     "unix",
     "windows"
   ]
-  revision = "acbc56fc7007d2a01796d5bde54f39e3b3e95945"
+  revision = "f0d5e33068cb57c22a181f5df0ffda885309eb5a"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -756,11 +756,11 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "e98e71aa83cab383690deea081cf3d5013e46416"
+  revision = "8619d2218cd390359b3f22163ae3319b4974930a"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "91dd8520e0a32b9978c9bd334011b00cb2c32a6431393515bb2ee56c3c47c984"
+  inputs-digest = "dc94f896f5ec4b619c830d064f200e7bab4283b351d7364c99d7db6959b9ab03"
   solver-name = "gps-cdcl"
   solver-version = 1
