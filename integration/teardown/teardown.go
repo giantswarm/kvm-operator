@@ -4,9 +4,13 @@ package teardown
 
 import (
 	"fmt"
+
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/microerror"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/giantswarm/micrologger"
 )
 
 // Teardown e2e testing environment.
