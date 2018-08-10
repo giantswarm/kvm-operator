@@ -5,17 +5,17 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v14/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v15/key"
 )
 
-func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
+func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 	service := &apiv1.Service{
 		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
 		ObjectMeta: apismetav1.ObjectMeta{
-			Name:      key.WorkerID,
+			Name:      key.MasterID,
 			Namespace: key.ClusterID(customObject),
 			Labels: map[string]string{
 				key.LegacyLabelCluster: key.ClusterID(customObject),
@@ -26,15 +26,28 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 				key.LabelVersionBundle: key.VersionBundleVersion(customObject),
 			},
 			Annotations: map[string]string{
-				"prometheus.io/path":   "/healthz",
-				"prometheus.io/port":   "30010",
-				"prometheus.io/scheme": "http",
-				"prometheus.io/scrape": "true",
+				key.AnnotationEtcdDomain:        key.ClusterEtcdDomain(customObject),
+				key.AnnotationPrometheusCluster: key.ClusterID(customObject),
+				"prometheus.io/path":            "/healthz",
+				"prometheus.io/port":            "30010",
+				"prometheus.io/scheme":          "http",
+				"prometheus.io/scrape":          "true",
 			},
 		},
 		Spec: apiv1.ServiceSpec{
-			Type:  apiv1.ServiceTypeNodePort,
-			Ports: key.PortMappings(customObject),
+			Type: apiv1.ServiceTypeClusterIP,
+			Ports: []apiv1.ServicePort{
+				{
+					Name:     "etcd",
+					Port:     int32(2379),
+					Protocol: "TCP",
+				},
+				{
+					Name:     "api",
+					Port:     int32(customObject.Spec.Cluster.Kubernetes.API.SecurePort),
+					Protocol: "TCP",
+				},
+			},
 			// Note that we do not use a selector definition on purpose to be able to
 			// manually set the IP address of the actual VM.
 		},
