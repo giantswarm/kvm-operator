@@ -43,11 +43,6 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
 func Setup(g *framework.Guest, h *framework.Host) error {
 	var err error
 
-	err = h.Setup()
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
 	err = Resources(g, h)
 	if err != nil {
 		return microerror.Mask(err)
