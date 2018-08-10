@@ -32,10 +32,11 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
-		if err != nil {
-			return microerror.Mask(err)
-		}
+		/*
+			err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
+			if err != nil {
+				return microerror.Mask(err)
+			}*/
 	}
 
 	// wait until both crds are deleted by operators
