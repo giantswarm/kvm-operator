@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/backoff"
@@ -47,25 +46,25 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			LabelSelector: crdLabelSelector(h.TargetNamespace()),
 		})
 		if err != nil {
-			l.Log("level", "debug", "kvm list error", err)
 			return microerror.Mask(err)
 		}
 
-		if len(kvmList.Items) == 0 && apierrors.IsNotFound(err) {
+		if len(kvmList.Items) == 0 {
 			// resource doesnt exist we are good to continue
 			kvmDeleted = true
+			l.Log("level", "info", "kvm crd was deleted")
 		}
 
 		certList, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{
 			LabelSelector: crdLabelSelector(h.TargetNamespace()),
 		})
 		if err != nil {
-			l.Log("level", "debug", "cert list error", err)
 			return microerror.Mask(err)
 		}
-		if len(certList.Items) == 0 && apierrors.IsNotFound(err) {
+		if len(certList.Items) == 0 {
 			// resource doesnt exist we are good to continue
 			certDeleted = true
+			l.Log("level", "info", "cert crd was deleted")
 		}
 
 		if kvmDeleted && certDeleted {
@@ -75,7 +74,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return resourceNotDeleted
 		}
 	}
-	b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+	b := backoff.NewExponential(framework.LongMaxWait, framework.LongMaxInterval)
 	n := backoff.NewNotifier(l, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 
