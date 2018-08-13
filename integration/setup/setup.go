@@ -49,10 +49,10 @@ func Setup(g *framework.Guest, h *framework.Host) error {
 	}
 
 	// TODO(r7vme): Enable, when real kvm host cluster will be used.
-	//err = g.Setup()
-	//if err != nil {
-	//	return microerror.Mask(err)
-	//}
+	err = g.Setup()
+	if err != nil {
+		return microerror.Mask(err)
+	}
 
 	return nil
 }
