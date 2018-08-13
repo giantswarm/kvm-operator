@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/backoff"
@@ -42,7 +43,9 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	// wait until both crds are deleted by operators
 	o := func() error {
 		kvmDeleted, certDeleted := false, false
-		kvmList, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{LabelSelector: "clusterID=" + h.TargetNamespace()})
+		kvmList, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{
+			LabelSelector: crdLabelSelector(h.TargetNamespace()),
+		})
 		if err != nil {
 			l.Log("level", "debug", "kvm list error", err)
 			return microerror.Mask(err)
@@ -53,8 +56,11 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			kvmDeleted = true
 		}
 
-		certList, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{LabelSelector: "clusterID=" + h.TargetNamespace()})
+		certList, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{
+			LabelSelector: crdLabelSelector(h.TargetNamespace()),
+		})
 		if err != nil {
+			l.Log("level", "debug", "cert list error", err)
 			return microerror.Mask(err)
 		}
 		if len(certList.Items) == 0 && apierrors.IsNotFound(err) {
@@ -63,9 +69,10 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 
 		if kvmDeleted && certDeleted {
+			// crd resources are gone, we can exit
 			return nil
 		} else {
-			return microerror.New("resource still exist")
+			return resourceNotDeleted
 		}
 	}
 	b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
