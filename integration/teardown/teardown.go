@@ -52,7 +52,9 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		if len(kvmList.Items) == 0 {
 			// resource doesnt exist we are good to continue
 			kvmDeleted = true
-			l.Log("level", "info", "kvm crd was deleted")
+			l.Log("level", "info", "message", "kvm crd was deleted")
+		} else {
+			l.Log("level", "info", "message", "kvm crd has not been deleted")
 		}
 
 		certList, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{
@@ -64,7 +66,9 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		if len(certList.Items) == 0 {
 			// resource doesnt exist we are good to continue
 			certDeleted = true
-			l.Log("level", "info", "cert crd was deleted")
+			l.Log("level", "info", "message", "cert crd was deleted")
+		} else {
+			l.Log("level", "info", "message", "cert crd has not been deleted")
 		}
 
 		if kvmDeleted && certDeleted {
