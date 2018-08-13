@@ -44,6 +44,9 @@ const (
 	// EnvVarVersionBundleVersion is the process environment variable representing
 	// the VERSION_BUNDLE_VERSION env var.
 	EnvVarVersionBundleVersion = "VERSION_BUNDLE_VERSION"
+
+	// operator namespace suffix
+	operatorNamespaceSuffix = "op"
 )
 
 var (
@@ -151,6 +154,10 @@ func CommonDomain() string {
 
 func KeepResources() string {
 	return keepResources
+}
+
+func TargetNamespace() string {
+	return fmt.Sprintf("%s-%s", ClusterID(), operatorNamespaceSuffix)
 }
 
 func TestedVersion() string {
