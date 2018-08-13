@@ -44,9 +44,11 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		kvmDeleted, certDeleted := false, false
 		kvmList, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{LabelSelector: "clusterID=" + h.TargetNamespace()})
 		if err != nil {
+			l.Log("level", "debug", "kvm list error", err)
 			return microerror.Mask(err)
 		}
-		if len(kvmList.Items) == 0 {
+
+		if len(kvmList.Items) == 0 && apierrors.IsNotFound(err) {
 			// resource doesnt exist we are good to continue
 			kvmDeleted = true
 		}
@@ -55,7 +57,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		if len(certList.Items) == 0 {
+		if len(certList.Items) == 0 && apierrors.IsNotFound(err) {
 			// resource doesnt exist we are good to continue
 			certDeleted = true
 		}
