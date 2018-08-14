@@ -192,6 +192,7 @@ func initRangePool(h *framework.Host, l micrologger.Logger) (*rangepool.Service,
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
+
 		var k8sCrdClient *k8scrdclient.CRDClient
 		{
 			var k8sCrdClientConfig k8scrdclient.Config
