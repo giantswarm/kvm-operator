@@ -144,6 +144,8 @@ func installKVMResource(h *framework.Host) error {
 			kvmResourceChartValues.HttpNodePort = httpPort
 			kvmResourceChartValues.HttpsNodePort = httpsPort
 		}
+
+		kvmResourceChartValues.VersionBundleVersion = env.VersionBundleVersion()
 	}
 
 	o := func() error {
