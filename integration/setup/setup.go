@@ -159,7 +159,7 @@ func installKVMResource(h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		err := tmpl.Execute(buffer, kvmResourceChartValues)
+		err = tmpl.Execute(buffer, kvmResourceChartValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
