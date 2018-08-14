@@ -186,8 +186,6 @@ func initRangePool(h *framework.Host, l micrologger.Logger) (*rangepool.Service,
 	var err error
 	var storage microstorage.Storage
 	{
-		var c crdstorage.Config
-
 		k8sExtClient, err := apiextensionsclient.NewForConfig(h.RestConfig())
 		if err != nil {
 			return nil, microerror.Mask(err)
@@ -205,6 +203,7 @@ func initRangePool(h *framework.Host, l micrologger.Logger) (*rangepool.Service,
 			}
 		}
 
+		c := crdstorage.DefaultConfig()
 		c.CRDClient = k8sCrdClient
 		c.G8sClient = h.G8sClient()
 		c.K8sClient = h.K8sClient()
