@@ -81,6 +81,12 @@
   revision = "f7b6ff2ca78dc4ec5b7cf87f357d603a353d0ffb"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/crdstorage"
+  packages = ["."]
+  revision = "33442669272cd036d1b9e0d71b623f049b2b6441"
+
+[[projects]]
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
@@ -166,6 +172,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/microstorage"
+  packages = ["."]
+  revision = "4411a6307c6b844b7f9e68aaba37407b41b1c4d7"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -191,6 +203,12 @@
     "randomkeystest"
   ]
   revision = "8c249db3ebb52660916c620688b96ff0b345da13"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/rangepool"
+  packages = ["."]
+  revision = "5e1f0ed497cf04625fccc565bf13449e4493da29"
 
 [[projects]]
   branch = "master"
@@ -761,6 +779,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "dc94f896f5ec4b619c830d064f200e7bab4283b351d7364c99d7db6959b9ab03"
+  inputs-digest = "753b3c5f8276fbefbb356ecab7d773c4f0cc275eea0a51bb5a33dca59634b5d5"
   solver-name = "gps-cdcl"
   solver-version = 1

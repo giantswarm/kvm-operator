@@ -7,7 +7,7 @@ var resourceNotDeleted = &microerror.Error{
 	Desc: "Resource has not been deleted, but its required to be deleted.",
 }
 
-// IsInvalidConfig asserts invalidConfigError.
+// IsResourceNotDeleted asserts resourceNotDeleted.
 func IsResourceNotDeleted(err error) bool {
 	return microerror.Cause(err) == resourceNotDeleted
 }
