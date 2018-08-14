@@ -152,14 +152,15 @@ func installKVMResource(h *framework.Host) error {
 		// the helm client lib. Then error handling will be better.
 		framework.HelmCmd(fmt.Sprintf("delete --purge %s-kvm-config-e2e", h.TargetNamespace()))
 
-		var buffer *bytes.Buffer
+		var buffer bytes.Buffer
 
 		tmpl, err := gotemplate.New("kvm-e2e-values").Parse(template.ApiextensionsKVMConfigE2EChartValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		err = tmpl.Execute(buffer, kvmResourceChartValues)
+		err = tmpl.Execute(&buffer, kvmResourceChartValues)
+
 		if err != nil {
 			return microerror.Mask(err)
 		}
