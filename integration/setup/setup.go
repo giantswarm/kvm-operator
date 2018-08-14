@@ -154,7 +154,7 @@ func installKVMResource(h *framework.Host) error {
 
 		var buffer *bytes.Buffer
 
-		tmpl := gotemplate.New("kvm-e2e-values")
+		tmpl := gotemplate.New("kvm-e2e-values").Parse(template.ApiextensionsKVMConfigE2EChartValues)
 		err := tmpl.Execute(buffer, kvmResourceChartValues)
 		if err != nil {
 			return microerror.Mask(err)
