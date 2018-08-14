@@ -250,7 +250,7 @@ func generateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 	items, err := rangePool.Create(
 		context.Background(),
 		clusterID,
-		clusterID,
+		rangePoolVNIID(clusterID),
 		1, // num
 		vniMin,
 		vniMax,
@@ -270,7 +270,7 @@ func generateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (i
 	items, err := rangePool.Create(
 		context.Background(),
 		clusterID,
-		clusterID,
+		rangePoolIngressID(clusterID),
 		2, // num
 		nodePortMin,
 		nodePortMax,
@@ -284,4 +284,11 @@ func generateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (i
 	}
 
 	return items[0], items[1], nil
+}
+
+func rangePoolVNIID(clusterID string) string {
+	return fmt.Sprintf("%s-vni", clusterID)
+}
+func rangePoolIngressID(clusterID string) string {
+	return fmt.Sprintf("%s-ingress", clusterID)
 }
