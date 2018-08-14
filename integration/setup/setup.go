@@ -19,8 +19,10 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/microstorage"
+	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/rangepool"
 	"k8s.io/api/core/v1"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
@@ -184,8 +186,25 @@ func initRangePool(h *framework.Host, l micrologger.Logger) (*rangepool.Service,
 	var err error
 	var storage microstorage.Storage
 	{
-		c := crdstorage.DefaultConfig()
+		var c crdstorage.Config
 
+		k8sExtClient, err := apiextensionsclient.NewForConfig(h.RestConfig())
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		var k8sCrdClient *k8scrdclient.CRDClient
+		{
+			var k8sCrdClientConfig k8scrdclient.Config
+			k8sCrdClientConfig.Logger = l
+			k8sCrdClientConfig.K8sExtClient = k8sExtClient
+
+			k8sCrdClient, err = k8scrdclient.New(k8sCrdClientConfig)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+		}
+
+		c.CRDClient = k8sCrdClient
 		c.G8sClient = h.G8sClient()
 		c.K8sClient = h.K8sClient()
 		c.Logger = l
