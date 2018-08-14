@@ -154,7 +154,11 @@ func installKVMResource(h *framework.Host) error {
 
 		var buffer *bytes.Buffer
 
-		tmpl := gotemplate.New("kvm-e2e-values").Parse(template.ApiextensionsKVMConfigE2EChartValues)
+		tmpl, err := gotemplate.New("kvm-e2e-values").Parse(template.ApiextensionsKVMConfigE2EChartValues)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
 		err := tmpl.Execute(buffer, kvmResourceChartValues)
 		if err != nil {
 			return microerror.Mask(err)
@@ -255,6 +259,7 @@ func generateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 		vniMin,
 		vniMax,
 	)
+
 	if err != nil {
 		return 0, microerror.Mask(err)
 	}
