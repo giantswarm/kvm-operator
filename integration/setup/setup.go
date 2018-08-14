@@ -29,8 +29,10 @@ import (
 const (
 	kvmResourceValuesFile = "/tmp/kvm-operator-values.yaml"
 
-	vniMin = 1
-	vniMax = 1000
+	vniMin      = 1
+	vniMax      = 1000
+	nodePortMin = 30100
+	nodePortMax = 31500
 )
 
 // WrapTestMain setup and teardown e2e testing environment.
@@ -249,8 +251,8 @@ func generateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (i
 		clusterID,
 		clusterID,
 		2, // num
-		vniMin,
-		vniMax,
+		nodePortMin,
+		nodePortMax,
 	)
 	if err != nil {
 		return 0, 0, microerror.Mask(err)
