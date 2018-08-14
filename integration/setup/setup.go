@@ -249,7 +249,7 @@ func initRangePool(h *framework.Host, l micrologger.Logger) (*rangepool.Service,
 func generateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 	items, err := rangePool.Create(
 		context.Background(),
-		clusterID,
+		rangePoolVNIID(clusterID),
 		rangePoolVNIID(clusterID),
 		1, // num
 		vniMin,
@@ -269,7 +269,7 @@ func generateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 func generateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (int, int, error) {
 	items, err := rangePool.Create(
 		context.Background(),
-		clusterID,
+		rangePoolIngressID(clusterID),
 		rangePoolIngressID(clusterID),
 		2, // num
 		nodePortMin,
