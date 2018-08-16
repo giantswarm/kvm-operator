@@ -140,10 +140,19 @@ func ClusterID() string {
 
 	parts = append(parts, "ci")
 	parts = append(parts, TestedVersion()[0:3])
-	parts = append(parts, CircleSHA()[0:5])
-	if TestHash() != "" {
-		parts = append(parts, TestHash())
-	}
+	shaPart := CircleSHA()[0:4]
+	testPart := TestHash()
+
+	h := sha1.New()
+	h.Write([]byte(shaPart + testPart))
+	s := fmt.Sprintf("%x", h.Sum(nil))[0:5]
+
+	parts = append(parts, s)
+	/*
+		parts = append(parts, CircleSHA()[0:5])
+		if TestHash() != "" {
+			parts = append(parts, TestHash())
+		}*/
 
 	return strings.Join(parts, "-")
 }
