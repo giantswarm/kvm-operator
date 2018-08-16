@@ -129,7 +129,7 @@ func installKVMResource(h *framework.Host) error {
 		}
 	}
 
-	var crdStorage *microstorage.Storage
+	var crdStorage microstorage.Storage
 	{
 		crdStorage, err = initCRDStorage(h, l)
 		if err != nil {
