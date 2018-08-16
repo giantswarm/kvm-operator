@@ -202,7 +202,7 @@ func installKVMResource(h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-flannel-config-e2e-chart:stable -- -n %s-flannel-config-e2e --values %s", h.TargetNamespace(), flannelResourceChartValues))
+		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-flannel-config-e2e-chart:stable -- -n %s-flannel-config-e2e --values %s", h.TargetNamespace(), flannelResourceValuesFile))
 		if err != nil {
 			return microerror.Mask(err)
 		}
