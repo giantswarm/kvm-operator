@@ -87,13 +87,13 @@
   revision = "33442669272cd036d1b9e0d71b623f049b2b6441"
 
 [[projects]]
+  branch = "master"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
     "pkg/harness"
   ]
-  revision = "9218541e7e6b23dbac5bca8478a34043173196f6"
-  version = "9218541"
+  revision = "e4b3a2c22571076a898e46873b392382507bd223"
 
 [[projects]]
   branch = "master"
@@ -106,6 +106,12 @@
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
   revision = "51a7ca6b403dc133497da26a0a30684a5df56752"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/ipam"
+  packages = ["."]
+  revision = "9f5e82f904b3f54b19ac8cb58cbbadb59d50eb89"
 
 [[projects]]
   branch = "master"
@@ -779,6 +785,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "753b3c5f8276fbefbb356ecab7d773c4f0cc275eea0a51bb5a33dca59634b5d5"
+  inputs-digest = "c23b09b37755b112854d0e90ebff48ba69c3d27cd02101297ca938a722791911"
   solver-name = "gps-cdcl"
   solver-version = 1

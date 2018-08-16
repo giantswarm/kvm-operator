@@ -33,29 +33,20 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
+		err = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", h.TargetNamespace()))
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
 		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
 		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
 
-	// wait until both crds are deleted by operators
+	// wait until crds are deleted by operators
 	o := func() error {
-		kvmDeleted, certDeleted := false, false
-		kvmList, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{
-			LabelSelector: crdLabelSelector(h.TargetNamespace()),
-		})
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		if len(kvmList.Items) == 0 {
-			// resource doesnt exist we are good to continue
-			kvmDeleted = true
-			l.Log("level", "info", "message", "kvm crd was deleted")
-		} else {
-			l.Log("level", "info", "message", "kvm crd has not been deleted")
-		}
+		kvmDeleted, flannelDeleted, certDeleted := false, false, false
 
 		certList, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{
 			LabelSelector: crdLabelSelector(h.TargetNamespace()),
@@ -64,14 +55,44 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 		if len(certList.Items) == 0 {
-			// resource doesnt exist we are good to continue
+			// resource doesnt exist, we are good to continue
 			certDeleted = true
 			l.Log("level", "info", "message", "cert crd was deleted")
 		} else {
 			l.Log("level", "info", "message", "cert crd has not been deleted")
 		}
 
-		if kvmDeleted && certDeleted {
+		flannelList, err := h.G8sClient().CoreV1alpha1().FlannelConfigs(v1.NamespaceDefault).List(v1.ListOptions{
+			LabelSelector: crdLabelSelector(h.TargetNamespace()),
+		})
+		fmt.Sprintf("%#v", v1.ListOptions{LabelSelector: crdLabelSelector(h.TargetNamespace())})
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		if len(flannelList.Items) == 0 {
+			// resource doesnt exist, we are good to continue
+			certDeleted = true
+			l.Log("level", "info", "message", "flannel crd was deleted")
+		} else {
+			l.Log("level", "info", "message", "flannel crd has not been deleted")
+		}
+
+		kvmList, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{
+			LabelSelector: crdLabelSelector(h.TargetNamespace()),
+		})
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		if len(kvmList.Items) == 0 {
+			// resource doesnt exist, we are good to continue
+			kvmDeleted = true
+			l.Log("level", "info", "message", "kvm crd was deleted")
+		} else {
+			l.Log("level", "info", "message", "kvm crd has not been deleted")
+		}
+
+		if certDeleted && flannelDeleted && kvmDeleted {
 			// crd resources are gone, we can exit
 			return nil
 		} else {
