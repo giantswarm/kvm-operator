@@ -257,7 +257,7 @@ func installKVMResource(h *framework.Host) error {
 	return nil
 }
 
-func initCRDStorage(h *framework.Host, l micrologger.Logger) (*microstorage.Storage, error) {
+func initCRDStorage(h *framework.Host, l micrologger.Logger) (microstorage.Storage, error) {
 	var err error
 
 	k8sExtClient, err := apiextensionsclient.NewForConfig(h.RestConfig())
@@ -305,7 +305,7 @@ func initCRDStorage(h *framework.Host, l micrologger.Logger) (*microstorage.Stor
 	return crdStorage, nil
 }
 
-func initRangePool(crdStorage *microstorage.Storage, l micrologger.Logger) (*rangepool.Service, error) {
+func initRangePool(crdStorage microstorage.Storage, l micrologger.Logger) (*rangepool.Service, error) {
 
 	rangePoolConfig := rangepool.DefaultConfig()
 	rangePoolConfig.Logger = l
@@ -361,7 +361,7 @@ func generateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (i
 	return items[0], items[1], nil
 }
 
-func generateFlannelNetwork(clusterID string, crdStorage *microstorage.Storage, l micrologger.Logger) (string, error) {
+func generateFlannelNetwork(clusterID string, crdStorage microstorage.Storage, l micrologger.Logger) (string, error) {
 	var err error
 	var ipamConfig ipam.Config
 	{
