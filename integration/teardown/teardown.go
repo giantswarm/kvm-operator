@@ -71,7 +71,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 		if len(flannelList.Items) == 0 {
 			// resource doesnt exist, we are good to continue
-			certDeleted = true
+			flannelDeleted = true
 			l.Log("level", "info", "message", "flannel crd was deleted")
 		} else {
 			l.Log("level", "info", "message", "flannel crd has not been deleted")
