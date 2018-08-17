@@ -8,9 +8,9 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "kvm-operator",
-				Description: "your change here",
-				Kind:        versionbundle.KindAdded,
+				Component:   "cloudconfig",
+				Description: "Kubernetes (hyperkube) updated with version 1.11.1.",
+				Kind:        versionbundle.KindChanged,
 			},
 		},
 		Components: []versionbundle.Component{
@@ -36,7 +36,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.10.4",
+				Version: "1.11.1",
 			},
 			{
 				Name:    "nginx-ingress-controller",
