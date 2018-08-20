@@ -5,11 +5,13 @@ package teardown
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
+	"github.com/giantswarm/kvm-operator/integration/utils"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 )
@@ -26,22 +28,22 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 	}
+	clusterID := strings.TrimRight(h.TargetNamespace(), "-op")
+
+	// get flannel info so we can delete it from rangepool
+	var flannelNetwork string
+	{
+		flannelConfig, err := h.G8sClient().CoreV1alpha1().FlannelConfigs(v1.NamespaceDefault).Get(clusterID, v1.GetOptions{})
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		flannelNetwork = flannelConfig.Spec.Flannel.Spec.Network
+	}
 
 	{
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", h.TargetNamespace()))
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", h.TargetNamespace()))
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
-		if err != nil {
-			return microerror.Mask(err)
-		}
+		_ = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", h.TargetNamespace()))
+		_ = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", h.TargetNamespace()))
+		_ = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
 	}
 
 	// wait until crds are deleted by operators
@@ -49,7 +51,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		kvmDeleted, flannelDeleted, certDeleted := false, false, false
 
 		certList, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{
-			LabelSelector: crdLabelSelector(h.TargetNamespace()),
+			LabelSelector: crdLabelSelector(clusterID),
 		})
 		if err != nil {
 			return microerror.Mask(err)
@@ -63,9 +65,9 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 
 		flannelList, err := h.G8sClient().CoreV1alpha1().FlannelConfigs(v1.NamespaceDefault).List(v1.ListOptions{
-			LabelSelector: crdLabelSelector(h.TargetNamespace()),
+			LabelSelector: crdLabelSelector(clusterID),
 		})
-		fmt.Sprintf("%#v", v1.ListOptions{LabelSelector: crdLabelSelector(h.TargetNamespace())})
+
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -78,7 +80,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 
 		kvmList, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{
-			LabelSelector: crdLabelSelector(h.TargetNamespace()),
+			LabelSelector: crdLabelSelector(clusterID),
 		})
 		if err != nil {
 			return microerror.Mask(err)
@@ -108,6 +110,34 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
+	}
+
+	// clear rangepool values
+	{
+		crdStorage, err := utils.InitCRDStorage(h, l)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		rangePool, err := utils.InitRangePool(crdStorage, l)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		err = utils.DeleteVNI(rangePool, clusterID)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		l.Log("level", "info", "message", "Deleted VNI reservation in rangepool.")
+		err = utils.DeleteIngressNodePorts(rangePool, clusterID)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		l.Log("level", "info", "message", "Deleted Ingress node port reservation in rangepool.")
+		err = utils.DeleteFlannelNetwork(flannelNetwork, crdStorage, l)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
 	}
 
 	return nil
