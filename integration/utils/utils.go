@@ -97,7 +97,7 @@ func InitRangePool(crdStorage microstorage.Storage, l micrologger.Logger) (*rang
 func GenerateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 	items, err := rangePool.Create(
 		context.Background(),
-		rangePoolVNIID(clusterID),
+		gsNamespace,
 		rangePoolVNIID(clusterID),
 		1, // num
 		vniMin,
