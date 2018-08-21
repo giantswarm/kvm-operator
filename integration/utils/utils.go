@@ -28,7 +28,10 @@ const (
 	flannelCidrSize        = 26
 	flannelE2eNetworkRange = "10.1.0.0/16"
 
-	gsNamespace = "giantswarm"
+	vniRangepoolNamespace     = "vni"
+	ingressRangepoolNamespace = "ingress"
+
+	giantswarmNamespace = "giantswarm"
 )
 
 func InitCRDStorage(h *framework.Host, l micrologger.Logger) (microstorage.Storage, error) {
@@ -60,7 +63,7 @@ func InitCRDStorage(h *framework.Host, l micrologger.Logger) (microstorage.Stora
 	c.Name = "kvm-e2e"
 	c.Namespace = &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: gsNamespace,
+			Name: giantswarmNamespace,
 		},
 	}
 
@@ -97,7 +100,7 @@ func InitRangePool(crdStorage microstorage.Storage, l micrologger.Logger) (*rang
 func GenerateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 	items, err := rangePool.Create(
 		context.Background(),
-		gsNamespace,
+		vniRangepoolNamespace,
 		rangePoolVNIID(clusterID),
 		1, // num
 		vniMin,
@@ -116,13 +119,13 @@ func GenerateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 }
 
 func DeleteVNI(rangePool *rangepool.Service, clusterID string) error {
-	return rangePool.Delete(context.Background(), gsNamespace, rangePoolVNIID(clusterID))
+	return rangePool.Delete(context.Background(), vniRangepoolNamespace, rangePoolVNIID(clusterID))
 }
 
 func GenerateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (int, int, error) {
 	items, err := rangePool.Create(
 		context.Background(),
-		gsNamespace,
+		ingressRangepoolNamespace,
 		rangePoolIngressID(clusterID),
 		2, // num
 		nodePortMin,
@@ -140,7 +143,7 @@ func GenerateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (i
 }
 
 func DeleteIngressNodePorts(rangePool *rangepool.Service, clusterID string) error {
-	return rangePool.Delete(context.Background(), gsNamespace, rangePoolIngressID(clusterID))
+	return rangePool.Delete(context.Background(), ingressRangepoolNamespace, rangePoolIngressID(clusterID))
 }
 
 func GenerateFlannelNetwork(clusterID string, crdStorage microstorage.Storage, l micrologger.Logger) (string, error) {
