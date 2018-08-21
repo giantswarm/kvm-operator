@@ -5,7 +5,6 @@ package teardown
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -28,7 +27,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 	}
-	clusterID := strings.TrimRight(h.TargetNamespace(), "-op")
+	clusterID := getClusterID(h.TargetNamespace())
 
 	// get flannel info so we can delete it from rangepool
 	var flannelNetwork string
@@ -41,9 +40,18 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	}
 
 	{
-		_ = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", h.TargetNamespace()))
-		_ = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", h.TargetNamespace()))
-		_ = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
+		err = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", h.TargetNamespace()))
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		err = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", h.TargetNamespace()))
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
 	// wait until crds are deleted by operators

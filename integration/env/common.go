@@ -152,7 +152,7 @@ func ClusterID() string {
 		parts = append(parts, CircleSHA()[0:5])
 		if TestHash() != "" {
 			parts = append(parts, TestHash())
-		}*/
+	}*/
 
 	return strings.Join(parts, "-")
 }
