@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
@@ -24,7 +25,6 @@ import (
 	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v2"
 	"github.com/giantswarm/kvm-operator/service/controller/v4"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type ClusterConfig struct {
