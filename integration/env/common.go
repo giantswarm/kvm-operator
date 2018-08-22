@@ -148,11 +148,6 @@ func ClusterID() string {
 	s := fmt.Sprintf("%x", h.Sum(nil))[0:5]
 
 	parts = append(parts, s)
-	/*
-		parts = append(parts, CircleSHA()[0:5])
-		if TestHash() != "" {
-			parts = append(parts, TestHash())
-	}*/
 
 	return strings.Join(parts, "-")
 }
