@@ -5,10 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	"k8s.io/api/core/v1"
-	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/giantswarm/crdstorage"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/ipam"
@@ -17,6 +13,9 @@ import (
 	"github.com/giantswarm/microstorage"
 	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/rangepool"
+	"k8s.io/api/core/v1"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -34,7 +33,7 @@ const (
 	giantswarmNamespace = "giantswarm"
 )
 
-func InitCRDStorage(h *framework.Host, l micrologger.Logger) (microstorage.Storage, error) {
+func InitCRDStorage(ctx context.Context, h *framework.Host, l micrologger.Logger) (microstorage.Storage, error) {
 	var err error
 
 	k8sExtClient, err := apiextensionsclient.NewForConfig(h.RestConfig())
@@ -74,7 +73,7 @@ func InitCRDStorage(h *framework.Host, l micrologger.Logger) (microstorage.Stora
 	}
 
 	l.Log("info", "booting crdstorage")
-	err = crdStorage.Boot(context.Background())
+	err = crdStorage.Boot(ctx)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -97,9 +96,9 @@ func InitRangePool(crdStorage microstorage.Storage, l micrologger.Logger) (*rang
 	return rangePool, nil
 }
 
-func GenerateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
+func GenerateVNI(ctx context.Context, rangePool *rangepool.Service, clusterID string) (int, error) {
 	items, err := rangePool.Create(
-		context.Background(),
+		ctx,
 		vniRangepoolNamespace,
 		rangePoolVNIID(clusterID),
 		1, // num
@@ -118,13 +117,17 @@ func GenerateVNI(rangePool *rangepool.Service, clusterID string) (int, error) {
 	return items[0], nil
 }
 
-func DeleteVNI(rangePool *rangepool.Service, clusterID string) error {
-	return rangePool.Delete(context.Background(), vniRangepoolNamespace, rangePoolVNIID(clusterID))
+func DeleteVNI(ctx context.Context, rangePool *rangepool.Service, clusterID string) error {
+	err := rangePool.Delete(ctx, vniRangepoolNamespace, rangePoolVNIID(clusterID))
+	if err != nil {
+		return microerror.Mask(err)
+	}
+	return nil
 }
 
-func GenerateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (int, int, error) {
+func GenerateIngressNodePorts(ctx context.Context, rangePool *rangepool.Service, clusterID string) (int, int, error) {
 	items, err := rangePool.Create(
-		context.Background(),
+		ctx,
 		ingressRangepoolNamespace,
 		rangePoolIngressID(clusterID),
 		2, // num
@@ -142,11 +145,15 @@ func GenerateIngressNodePorts(rangePool *rangepool.Service, clusterID string) (i
 	return items[0], items[1], nil
 }
 
-func DeleteIngressNodePorts(rangePool *rangepool.Service, clusterID string) error {
-	return rangePool.Delete(context.Background(), ingressRangepoolNamespace, rangePoolIngressID(clusterID))
+func DeleteIngressNodePorts(ctx context.Context, rangePool *rangepool.Service, clusterID string) error {
+	err := rangePool.Delete(ctx, ingressRangepoolNamespace, rangePoolIngressID(clusterID))
+	if err != nil {
+		return microerror.Mask(err)
+	}
+	return nil
 }
 
-func GenerateFlannelNetwork(clusterID string, crdStorage microstorage.Storage, l micrologger.Logger) (string, error) {
+func GenerateFlannelNetwork(ctx context.Context, clusterID string, crdStorage microstorage.Storage, l micrologger.Logger) (string, error) {
 	var err error
 	var ipamConfig ipam.Config
 	{
@@ -167,7 +174,7 @@ func GenerateFlannelNetwork(clusterID string, crdStorage microstorage.Storage, l
 
 	cidrMask := net.CIDRMask(flannelCidrSize, 32)
 
-	cidr, err := ipamService.CreateSubnet(context.Background(), cidrMask, flannelNetworkAnnotation(clusterID))
+	cidr, err := ipamService.CreateSubnet(ctx, cidrMask, flannelNetworkAnnotation(clusterID))
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
@@ -175,7 +182,7 @@ func GenerateFlannelNetwork(clusterID string, crdStorage microstorage.Storage, l
 	return cidr.String(), nil
 }
 
-func DeleteFlannelNetwork(network string, crdStorage microstorage.Storage, l micrologger.Logger) error {
+func DeleteFlannelNetwork(ctx context.Context, network string, crdStorage microstorage.Storage, l micrologger.Logger) error {
 	var err error
 	var ipamConfig ipam.Config
 	{
@@ -198,7 +205,7 @@ func DeleteFlannelNetwork(network string, crdStorage microstorage.Storage, l mic
 		return microerror.Mask(err)
 	}
 
-	err = ipamService.DeleteSubnet(context.Background(), *subnet)
+	err = ipamService.DeleteSubnet(ctx, *subnet)
 	if err != nil {
 		return microerror.Mask(err)
 	}

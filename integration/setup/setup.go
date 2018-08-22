@@ -79,7 +79,7 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		err = h.InstallStableOperator("node-operator", "drainerconfig", template.NodeOperatorChartValues)
+		err = h.InstallStableOperator("node-operator", "drainerconfig", e2etemplates.NodeOperatorChartValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -107,6 +107,7 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 
 func installKVMResource(h *framework.Host) error {
 	var err error
+	ctx := context.Background()
 
 	var l micrologger.Logger
 	{
@@ -120,7 +121,7 @@ func installKVMResource(h *framework.Host) error {
 
 	var crdStorage microstorage.Storage
 	{
-		crdStorage, err = utils.InitCRDStorage(h, l)
+		crdStorage, err = utils.InitCRDStorage(ctx, h, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -136,7 +137,7 @@ func installKVMResource(h *framework.Host) error {
 		}
 
 		{
-			vni, err := utils.GenerateVNI(rangePool, env.ClusterID())
+			vni, err := utils.GenerateVNI(ctx, rangePool, env.ClusterID())
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -144,7 +145,7 @@ func installKVMResource(h *framework.Host) error {
 		}
 
 		{
-			httpPort, httpsPort, err := utils.GenerateIngressNodePorts(rangePool, env.ClusterID())
+			httpPort, httpsPort, err := utils.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -160,7 +161,7 @@ func installKVMResource(h *framework.Host) error {
 		flannelResourceChartValues.ClusterID = env.ClusterID()
 		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
 
-		network, err := utils.GenerateFlannelNetwork(env.ClusterID(), crdStorage, l)
+		network, err := utils.GenerateFlannelNetwork(ctx, env.ClusterID(), crdStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
