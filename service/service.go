@@ -129,6 +129,7 @@ func New(config Config) (*Service, error) {
 			K8sExtClient:  k8sExtClient,
 			Logger:        config.Logger,
 
+			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled),
 			ProjectName:        config.Name,
 

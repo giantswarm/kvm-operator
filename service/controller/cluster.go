@@ -24,6 +24,7 @@ import (
 	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v2"
 	"github.com/giantswarm/kvm-operator/service/controller/v4"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type ClusterConfig struct {
@@ -33,6 +34,7 @@ type ClusterConfig struct {
 	K8sExtClient  apiextensionsclient.Interface
 	Logger        micrologger.Logger
 
+	CRDLabelSelector   string
 	GuestUpdateEnabled bool
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
@@ -91,6 +93,11 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,
+		}
+		if config.CRDLabelSelector != "" {
+			c.ListOptions = v1.ListOptions{
+				LabelSelector: config.CRDLabelSelector,
+			}
 		}
 
 		newInformer, err = informer.New(c)
