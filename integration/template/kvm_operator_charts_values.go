@@ -23,4 +23,5 @@ var KVMOperatorChartValues = `Installation:
       Registry:
         PullSecret:
           DockerConfigJSON: "{\"auths\":{\"quay.io\":{\"auth\":\"${REGISTRY_PULL_SECRET}\"}}}"
+labelSelector: 'clusterID=${CLUSTER_NAME}'
 `
