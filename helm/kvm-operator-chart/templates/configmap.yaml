@@ -9,6 +9,8 @@ data:
       listen:
         address: 'http://0.0.0.0:8000'
     service:
+      crd:
+        labelSelector: '{{ .Values.labelSelector }}'
       guest:
         ssh:
           ssoPublicKey: '{{ .Values.Installation.V1.Guest.SSH.SSOPublicKey }}'

@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
@@ -33,6 +34,7 @@ type ClusterConfig struct {
 	K8sExtClient  apiextensionsclient.Interface
 	Logger        micrologger.Logger
 
+	CRDLabelSelector   string
 	GuestUpdateEnabled bool
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
@@ -91,6 +93,11 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,
+		}
+		if config.CRDLabelSelector != "" {
+			c.ListOptions = v1.ListOptions{
+				LabelSelector: config.CRDLabelSelector,
+			}
 		}
 
 		newInformer, err = informer.New(c)
