@@ -20,6 +20,7 @@ import (
 // Teardown e2e testing environment.
 func Teardown(g *framework.Guest, h *framework.Host) error {
 	var err error
+	var errors []error
 	var l micrologger.Logger
 	{
 		c := micrologger.Config{}
@@ -45,15 +46,15 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	{
 		err = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", h.TargetNamespace()))
 		if err != nil {
-			return microerror.Mask(err)
+			errors = append(errors, microerror.Mask(err))
 		}
 		err = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", h.TargetNamespace()))
 		if err != nil {
-			return microerror.Mask(err)
+			errors = append(errors, microerror.Mask(err))
 		}
 		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
 		if err != nil {
-			return microerror.Mask(err)
+			errors = append(errors, microerror.Mask(err))
 		}
 	}
 
@@ -140,6 +141,10 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
+	}
+
+	if len(errors) > 0 {
+		return microerror.Mask(errors[0])
 	}
 
 	return nil
