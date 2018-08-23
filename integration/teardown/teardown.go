@@ -1,5 +1,3 @@
-// +build k8srequired
-
 package teardown
 
 import (
@@ -12,7 +10,9 @@ import (
 	"github.com/giantswarm/micrologger"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/integration/utils"
+	"github.com/giantswarm/kvm-operator/integration/ipam"
+	"github.com/giantswarm/kvm-operator/integration/rangepool"
+	"github.com/giantswarm/kvm-operator/integration/storage"
 )
 
 // Teardown e2e testing environment.
@@ -113,32 +113,31 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 	}
 
-	// clear rangepool values
+	// clear rangepool and ipam values
 	{
-		crdStorage, err := utils.InitCRDStorage(ctx, h, l)
+		crdStorage, err := storage.InitCRDStorage(ctx, h, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		rangePool, err := utils.InitRangePool(crdStorage, l)
+		rangePool, err := rangepool.InitRangePool(crdStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		err = utils.DeleteVNI(ctx, rangePool, clusterID)
+		err = rangepool.DeleteVNI(ctx, rangePool, clusterID)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 		l.LogCtx(ctx, "level", "info", "message", "Deleted VNI reservation in rangepool.")
-		err = utils.DeleteIngressNodePorts(ctx, rangePool, clusterID)
+		err = rangepool.DeleteIngressNodePorts(ctx, rangePool, clusterID)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 		l.LogCtx(ctx, "level", "info", "message", "Deleted Ingress node port reservation in rangepool.")
-		err = utils.DeleteFlannelNetwork(ctx, flannelNetwork, crdStorage, l)
+		err = ipam.DeleteFlannelNetwork(ctx, flannelNetwork, crdStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-
 	}
 
 	return nil

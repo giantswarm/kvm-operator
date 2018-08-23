@@ -1,4 +1,4 @@
-package utils
+package rangepool
 
 import "github.com/giantswarm/microerror"
 

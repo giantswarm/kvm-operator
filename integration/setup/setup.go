@@ -20,9 +20,11 @@ import (
 	"github.com/giantswarm/microstorage"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
+	"github.com/giantswarm/kvm-operator/integration/ipam"
+	"github.com/giantswarm/kvm-operator/integration/rangepool"
+	"github.com/giantswarm/kvm-operator/integration/storage"
 	"github.com/giantswarm/kvm-operator/integration/teardown"
 	"github.com/giantswarm/kvm-operator/integration/template"
-	"github.com/giantswarm/kvm-operator/integration/utils"
 )
 
 const (
@@ -121,7 +123,7 @@ func installKVMResource(h *framework.Host) error {
 
 	var crdStorage microstorage.Storage
 	{
-		crdStorage, err = utils.InitCRDStorage(ctx, h, l)
+		crdStorage, err = storage.InitCRDStorage(ctx, h, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -131,13 +133,13 @@ func installKVMResource(h *framework.Host) error {
 	{
 		kvmResourceChartValues.ClusterID = env.ClusterID()
 
-		rangePool, err := utils.InitRangePool(crdStorage, l)
+		rangePool, err := rangepool.InitRangePool(crdStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
 		{
-			vni, err := utils.GenerateVNI(ctx, rangePool, env.ClusterID())
+			vni, err := rangepool.GenerateVNI(ctx, rangePool, env.ClusterID())
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -145,7 +147,7 @@ func installKVMResource(h *framework.Host) error {
 		}
 
 		{
-			httpPort, httpsPort, err := utils.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
+			httpPort, httpsPort, err := rangepool.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -161,7 +163,7 @@ func installKVMResource(h *framework.Host) error {
 		flannelResourceChartValues.ClusterID = env.ClusterID()
 		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
 
-		network, err := utils.GenerateFlannelNetwork(ctx, env.ClusterID(), crdStorage, l)
+		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), crdStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
