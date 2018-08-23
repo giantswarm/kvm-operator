@@ -65,9 +65,9 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 		if len(certList.Items) == 0 {
 			// resource doesnt exist, we are good to continue
-			l.Log("level", "info", "message", "cert crd was deleted")
+			l.LogCtx(ctx, "level", "info", "message", "cert crd was deleted")
 		} else {
-			l.Log("level", "info", "message", "cert crd has not been deleted")
+			l.LogCtx(ctx, "level", "info", "message", "cert crd has not been deleted")
 			return microerror.Mask(resourceNotDeleted)
 		}
 
@@ -80,9 +80,9 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 		if len(flannelList.Items) == 0 {
 			// resource doesnt exist, we are good to continue
-			l.Log("level", "info", "message", "flannel crd was deleted")
+			l.LogCtx(ctx, "level", "info", "message", "flannel crd was deleted")
 		} else {
-			l.Log("level", "info", "message", "flannel crd has not been deleted")
+			l.LogCtx(ctx, "level", "info", "message", "flannel crd has not been deleted")
 			return microerror.Mask(resourceNotDeleted)
 		}
 
@@ -95,9 +95,9 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 
 		if len(kvmList.Items) == 0 {
 			// resource doesnt exist, we are good to continue
-			l.Log("level", "info", "message", "kvm crd was deleted")
+			l.LogCtx(ctx, "level", "info", "message", "kvm crd was deleted")
 		} else {
-			l.Log("level", "info", "message", "kvm crd has not been deleted")
+			l.LogCtx(ctx, "level", "info", "message", "kvm crd has not been deleted")
 			return microerror.Mask(resourceNotDeleted)
 		}
 		return nil
@@ -128,12 +128,12 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		l.Log("level", "info", "message", "Deleted VNI reservation in rangepool.")
+		l.LogCtx(ctx, "level", "info", "message", "Deleted VNI reservation in rangepool.")
 		err = utils.DeleteIngressNodePorts(ctx, rangePool, clusterID)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		l.Log("level", "info", "message", "Deleted Ingress node port reservation in rangepool.")
+		l.LogCtx(ctx, "level", "info", "message", "Deleted Ingress node port reservation in rangepool.")
 		err = utils.DeleteFlannelNetwork(ctx, flannelNetwork, crdStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
