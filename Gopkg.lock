@@ -32,7 +32,7 @@
     "digestset",
     "reference"
   ]
-  revision = "4a75b72fd3621c1892143614474ff2b05d30e4b3"
+  revision = "b7446e89bfcec2a0b33d2bdf4a50309e19c40e14"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -82,12 +82,18 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/crdstorage"
+  packages = ["."]
+  revision = "33442669272cd036d1b9e0d71b623f049b2b6441"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
     "pkg/harness"
   ]
-  revision = "7cc3f26ba2196a4ddbbb3fb995f28c2dca678364"
+  revision = "e4b3a2c22571076a898e46873b392382507bd223"
 
 [[projects]]
   branch = "master"
@@ -100,6 +106,12 @@
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
   revision = "51a7ca6b403dc133497da26a0a30684a5df56752"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/ipam"
+  packages = ["."]
+  revision = "9f5e82f904b3f54b19ac8cb58cbbadb59d50eb89"
 
 [[projects]]
   branch = "master"
@@ -167,6 +179,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/microstorage"
+  packages = ["."]
+  revision = "4411a6307c6b844b7f9e68aaba37407b41b1c4d7"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -192,6 +210,12 @@
     "randomkeystest"
   ]
   revision = "8c249db3ebb52660916c620688b96ff0b345da13"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/rangepool"
+  packages = ["."]
+  revision = "5e1f0ed497cf04625fccc565bf13449e4493da29"
 
 [[projects]]
   branch = "master"
@@ -258,7 +282,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "8c40ff417df53f2b031ca687be1b2e0bd7aa8fe9"
+  revision = "4430a04b2018f2e2dbee0f3ee44d9ed18c543b16"
 
 [[projects]]
   branch = "master"
@@ -464,8 +488,8 @@
 [[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
-  version = "v1.0.1"
+  revision = "9a97c102cda95a86cec2345a6f09f55a939babf5"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/spf13/viper"
@@ -515,7 +539,7 @@
     "unix",
     "windows"
   ]
-  revision = "904bdc257025c7b3f43c19360ad3ab85783fad78"
+  revision = "f0d5e33068cb57c22a181f5df0ffda885309eb5a"
 
 [[projects]]
   name = "golang.org/x/text"
