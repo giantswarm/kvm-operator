@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Name = "podv14"
+	Name = "podv14patch1"
 )
 
 type Config struct {
