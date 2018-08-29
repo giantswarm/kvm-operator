@@ -8,19 +8,9 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "kvm-operator",
-				Description: "Added support for etcd monitoring.",
-				Kind:        versionbundle.KindAdded,
-			},
-			{
-				Component:   "kvm-operator",
-				Description: "Changed service types.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "kvm-operator",
-				Description: "Expose guest ingress via nodePort.",
-				Kind:        versionbundle.KindAdded,
+				Component:   "cloudconfig",
+				Description: "Removed nginx-ingress-controller related components (will be managed by chart-operator).",
+				Kind:        versionbundle.KindRemoved,
 			},
 		},
 		Components: []versionbundle.Component{
@@ -48,12 +38,8 @@ func VersionBundle() versionbundle.Bundle {
 				Name:    "kubernetes",
 				Version: "1.10.4",
 			},
-			{
-				Name:    "nginx-ingress-controller",
-				Version: "0.12.0",
-			},
 		},
 		Name:    "kvm-operator",
-		Version: "2.5.0",
+		Version: "2.5.1",
 	}
 }
