@@ -17,6 +17,10 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 	{
 		params.APIServerEncryptionKey = string(randomKeys.APIServerEncryptionKey)
 		params.Cluster = customObject.Spec.Cluster
+		params.DisableIngressController = true
+		// Ingress controller service remains in k8scloudconfig and will be
+		// removed in a later migration.
+		params.DisableIngressControllerService = false
 		params.Extension = &masterExtension{
 			certs: certs,
 		}
