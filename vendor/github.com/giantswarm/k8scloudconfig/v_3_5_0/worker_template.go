@@ -1,4 +1,4 @@
-package v_3_6_0
+package v_3_5_0
 
 const WorkerTemplate = `#cloud-config
 users:
@@ -17,16 +17,6 @@ write_files:
   permissions: 644
   content: |
     {{ .SSOPublicKey }}
-- path: /etc/kubernetes/config/proxy-config.yml
-  owner: root
-  permissions: 0644
-  content: |
-    apiVersion: kubeproxy.config.k8s.io/v1alpha1
-    clientConnection:
-      kubeconfig: /etc/kubernetes/config/proxy-kubeconfig.yml
-    kind: KubeProxyConfiguration
-    mode: iptables
-    resourceContainer: /kube-proxy
 - path: /etc/kubernetes/config/proxy-kubeconfig.yml
   owner: root
   permissions: 0644
@@ -49,35 +39,6 @@ write_files:
         user: proxy
       name: service-account-context
     current-context: service-account-context
-- path: /etc/kubernetes/config/kubelet-config.yaml.tmpl
-  owner: root
-  permissions: 0644
-  content: |
-    kind: KubeletConfiguration
-    apiVersion: kubelet.config.k8s.io/v1beta1
-    address: ${DEFAULT_IPV4}
-    port: 10250
-    healthzBindAddress: ${DEFAULT_IPV4}
-    healthzPort: 10248
-    clusterDNS:
-      - {{.Cluster.Kubernetes.DNS.IP}}
-    clusterDomain: {{.Cluster.Kubernetes.Domain}}
-    staticPodPath: /etc/kubernetes/manifests
-    evictionSoft:
-      memory.available: "500Mi"
-    evictionHard:
-      memory.available: "200Mi"
-    evictionSoftGracePeriod:
-      memory.available: "5s"
-    evictionMaxPodGracePeriod: 60
-    authentication:
-      anonymous:
-        enabled: true # Defaults to false as of 1.10
-      webhook:
-        enabled: false # Deafults to true as of 1.10
-    authorization:
-      mode: AlwaysAllow # Deafults to webhook as of 1.10
-    readOnlyPort: 10255 # Used by heapster. Defaults to 0 (disabled) as of 1.10. Needed for metrics.
 - path: /etc/kubernetes/config/kubelet-kubeconfig.yml
   owner: root
   permissions: 0644
@@ -248,21 +209,6 @@ coreos:
     mask: true
   - name: systemd-networkd-wait-online.service
     mask: true
-  - name: k8s-setup-kubelet-config.service
-    enable: true
-    command: start
-    content: |
-      [Unit]
-      Description=k8s-setup-kubelet-config Service
-      After=k8s-setup-network-env.service docker.service
-      Requires=k8s-setup-network-env.service docker.service
-
-      [Service]
-      EnvironmentFile=/etc/network-environment
-      ExecStart=/bin/bash -c '/usr/bin/envsubst </etc/kubernetes/config/kubelet-config.yaml.tmpl >/etc/kubernetes/config/kubelet-config.yaml'
-
-      [Install]
-      WantedBy=multi-user.target
   - name: docker.service
     enable: true
     command: start
@@ -300,8 +246,8 @@ coreos:
     command: start
     content: |
       [Unit]
-      Wants=k8s-setup-network-env.service k8s-setup-kubelet-config.service
-      After=k8s-setup-network-env.service k8s-setup-kubelet-config.service
+      Wants=k8s-setup-network-env.service
+      After=k8s-setup-network-env.service
       Description=k8s-kubelet
       StartLimitIntervalSec=0
 
@@ -311,7 +257,7 @@ coreos:
       RestartSec=0
       TimeoutStopSec=10
       EnvironmentFile=/etc/network-environment
-      Environment="IMAGE={{ .RegistryDomain }}/giantswarm/hyperkube:v1.11.1"
+      Environment="IMAGE={{ .RegistryDomain }}/giantswarm/hyperkube:v1.10.4"
       Environment="NAME=%p.service"
       Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/docker pull $IMAGE
@@ -330,7 +276,6 @@ coreos:
       -v /run/docker.sock:/run/docker.sock:rw \
       -v /usr/lib/os-release:/etc/os-release \
       -v /usr/share/ca-certificates/:/etc/ssl/certs \
-      -v /var/lib/calico/:/var/lib/calico \
       -v /var/lib/docker/:/var/lib/docker:rw,rshared \
       -v /var/lib/kubelet/:/var/lib/kubelet:rw,rshared \
       -v /etc/kubernetes/ssl/:/etc/kubernetes/ssl/ \
@@ -355,17 +300,32 @@ coreos:
       {{ range .Hyperkube.Kubelet.Docker.CommandExtraArgs -}}
       {{ . }} \
       {{ end -}}
+      --address=${DEFAULT_IPV4} \
+      --port={{.Cluster.Kubernetes.Kubelet.Port}} \
       --node-ip=${DEFAULT_IPV4} \
-      --config=/etc/kubernetes/config/kubelet-config.yaml \
       --containerized \
       --enable-server \
       --logtostderr=true \
+      --machine-id-file=/rootfs/etc/machine-id \
       --cadvisor-port=4194 \
       --cloud-provider={{.Cluster.Kubernetes.CloudProvider}} \
+      --healthz-bind-address=${DEFAULT_IPV4} \
+      --healthz-port=10248 \
+      --cluster-dns={{.Cluster.Kubernetes.DNS.IP}} \
+      --cluster-domain={{.Cluster.Kubernetes.Domain}} \
       --network-plugin=cni \
       --register-node=true \
+      --allow-privileged=true \
+      --feature-gates=ExpandPersistentVolumes=true,PodPriority=true,CustomResourceSubresources=true \
       --kubeconfig=/etc/kubernetes/config/kubelet-kubeconfig.yml \
       --node-labels="ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
+      --kube-reserved="cpu=200m,memory=250Mi" \
+      --system-reserved="cpu=150m,memory=250Mi" \
+      --eviction-soft='memory.available<500Mi' \
+      --eviction-hard='memory.available<350Mi' \
+      --eviction-soft-grace-period='memory.available=5s' \
+      --eviction-max-pod-grace-period=60 \
+      --enforce-node-allocatable=pods \
       --v=2"
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
       ExecStopPost=-/usr/bin/docker rm -f $NAME
