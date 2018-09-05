@@ -119,6 +119,7 @@ WantedBy=multi-user.target
 		},
 		{
 			AssetContent: `[Unit]
+Before=docker.service
 Description=Automount for docker volume
 [Automount]
 Where=/var/lib/docker

@@ -82,6 +82,7 @@ func (e *workerExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 	unitsMeta := []k8scloudconfig.UnitMetadata{
 		{
 			AssetContent: `[Unit]
+Before=docker.service
 Description=Automount for docker volume
 [Automount]
 Where=/var/lib/docker
