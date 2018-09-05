@@ -81,6 +81,33 @@ func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 func (e *workerExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
 	unitsMeta := []k8scloudconfig.UnitMetadata{
 		{
+			AssetContent: `[Unit]
+Description=Automount for docker volume
+[Automount]
+Where=/var/lib/docker
+[Install]
+WantedBy=multi-user.target
+`,
+			Name:    "var-lib-docker.automount",
+			Enable:  true,
+			Command: "start",
+		},
+		{
+			AssetContent: `[Unit]
+Description=Mount for docker volume
+[Mount]
+What=/dev/disk/by-id/virtio-dockerfs
+Where=/var/lib/docker
+Options=trans=virtio,version=9p2000.L,cache=mmap
+Type=9p
+[Install]
+WantedBy=multi-user.target
+`,
+			Name:   "var-lib-docker.mount",
+			Enable: false,
+
+		},
+		{
 			Name:    "iscsid.service",
 			Enable:  true,
 			Command: "start",
