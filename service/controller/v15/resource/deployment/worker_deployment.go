@@ -165,8 +165,12 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 										Value: key.CoreosVersion,
 									},
 									{
-										Name:  "DISK",
-										Value: fmt.Sprintf("%.0fG", capabilities.Disk),
+										Name:  "DISK_DOCKER",
+										Value: key.DockerVolumeSizeFromNode(capabilities),
+									},
+									{
+										Name:  "DISK_OS",
+										Value: key.DefaultOSDiskSize,
 									},
 									{
 										Name: "HOSTNAME",
