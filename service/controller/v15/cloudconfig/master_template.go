@@ -120,29 +120,17 @@ WantedBy=multi-user.target
 		{
 			AssetContent: `[Unit]
 Before=docker.service
-Description=Automount for docker volume
-[Automount]
-Where=/var/lib/docker
-[Install]
-WantedBy=multi-user.target
-`,
-			Name:    "var-lib-docker.automount",
-			Enable:  true,
-			Command: "start",
-		},
-		{
-			AssetContent: `[Unit]
 Description=Mount for docker volume
 [Mount]
 What=/dev/disk/by-id/virtio-dockerfs
 Where=/var/lib/docker
-Options=trans=virtio,version=9p2000.L,cache=mmap
-Type=9p
+Type=xfs
 [Install]
 WantedBy=multi-user.target
 `,
-			Name:   "var-lib-docker.mount",
-			Enable: false,
+			Name:    "var-lib-docker.mount",
+			Enable:  true,
+			Command: "start",
 		},
 		{
 			Name:    "iscsid.service",
