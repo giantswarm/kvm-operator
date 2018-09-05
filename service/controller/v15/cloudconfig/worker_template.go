@@ -105,7 +105,6 @@ WantedBy=multi-user.target
 `,
 			Name:   "var-lib-docker.mount",
 			Enable: false,
-
 		},
 		{
 			Name:    "iscsid.service",
