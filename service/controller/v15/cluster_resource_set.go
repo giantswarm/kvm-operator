@@ -206,7 +206,27 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
+	var statusResource controller.Resource
+	{
+		c := statusresource.ResourceConfig{
+			ClusterEndpointFunc:      key.ToClusterEndpoint,
+			ClusterIDFunc:            key.ToClusterID,
+			ClusterStatusFunc:        key.ToClusterStatus,
+			GuestCluster:             guestCluster,
+			NodeCountFunc:            key.ToNodeCount,
+			Logger:                   config.Logger,
+			RESTClient:               config.G8sClient.ProviderV1alpha1().RESTClient(),
+			VersionBundleVersionFunc: key.ToVersionBundleVersion,
+		}
+
+		statusResource, err = statusresource.NewResource(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resources := []controller.Resource{
+		statusResource,
 		clusterRoleBindingResource,
 		namespaceResource,
 		serviceAccountResource,
