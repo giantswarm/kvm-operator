@@ -95,21 +95,6 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var guestCluster guestcluster.Interface
-	{
-		c := guestcluster.Config{
-			CertsSearcher: config.CertsSearcher,
-			Logger:        config.Logger,
-
-			CertID: certs.APICert,
-		}
-
-		guestCluster, err = guestcluster.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var serviceAccountResource controller.Resource
 	{
 		c := serviceaccount.DefaultConfig()
@@ -216,6 +201,21 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 
 		serviceResource, err = toCRUDResource(config.Logger, ops)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var guestCluster guestcluster.Interface
+	{
+		c := guestcluster.Config{
+			CertsSearcher: config.CertsSearcher,
+			Logger:        config.Logger,
+
+			CertID: certs.APICert,
+		}
+
+		guestCluster, err = guestcluster.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

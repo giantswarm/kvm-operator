@@ -219,6 +219,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v14.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.G8sClient,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -244,6 +245,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v14patch1.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.G8sClient,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
