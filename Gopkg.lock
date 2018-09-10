@@ -1032,7 +1032,7 @@
   version = "kubernetes-1.10.4"
 
 [[projects]]
-  digest = "1:5ab3e7599d1755b8266b1265de5382523e8a262f11d45369559b297747ec0669"
+  digest = "1:b080da28a0d963770a8272ca3dc649cd29be6189fc578ef11a0fd5907cf5e340"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/equality",
@@ -1040,7 +1040,6 @@
     "pkg/api/meta",
     "pkg/api/resource",
     "pkg/api/validation",
-    "pkg/api/validation/path",
     "pkg/apimachinery",
     "pkg/apimachinery/announced",
     "pkg/apimachinery/registered",
@@ -1095,8 +1094,7 @@
   version = "kubernetes-1.10.4"
 
 [[projects]]
-  branch = "master"
-  digest = "1:e38fd46b96594c848ae465219e948e3ca1d3b595fc136d63b5022e625d8436bb"
+  digest = "1:dde6031988d993fc4f0a4d13eded2b665d6c1dbfbea27e700a078a388d4a2593"
   name = "k8s.io/apiserver"
   packages = [
     "pkg/apis/audit",
@@ -1108,7 +1106,8 @@
     "pkg/util/feature",
   ]
   pruneopts = "UT"
-  revision = "e73ba2ce12ce3e93585fee9cb7c5233aa7c5eb56"
+  revision = "8378ef881d4fa7d3ca5c5e7e5309592ec69b11e4"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
   digest = "1:7c9dd34244ac5f25357515873619fe8c76872485153ee75c8e5440c2b6ae8e9c"
@@ -1551,6 +1550,7 @@
     "k8s.io/apimachinery/pkg/api/resource",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/util/intstr",
+    "k8s.io/apiserver/pkg/endpoints/request",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/fake",
     "k8s.io/client-go/rest",

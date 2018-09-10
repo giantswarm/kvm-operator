@@ -3,7 +3,9 @@ package v15
 import (
 	"context"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/guestcluster"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -28,6 +30,7 @@ import (
 
 type ClusterResourceSetConfig struct {
 	CertsSearcher      certs.Interface
+	G8sClient          versioned.Interface
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
@@ -40,10 +43,6 @@ type ClusterResourceSetConfig struct {
 
 func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
-
-	if config.SSOPublicKey == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.SSOPublicKey must not be empty", config)
-	}
 
 	var cloudConfig *cloudconfig.CloudConfig
 	{
@@ -91,6 +90,21 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 
 		namespaceResource, err = toCRUDResource(config.Logger, ops)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var guestCluster guestcluster.Interface
+	{
+		c := guestcluster.Config{
+			CertsSearcher: config.CertsSearcher,
+			Logger:        config.Logger,
+
+			CertID: certs.APICert,
+		}
+
+		guestCluster, err = guestcluster.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
