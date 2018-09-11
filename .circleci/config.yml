@@ -37,6 +37,8 @@ jobs:
             ./architect deploy
           fi
 
+
+
   e2eTestCurPRReady:
     environment:
       TESTED_VERSION: "current"
@@ -47,6 +49,24 @@ jobs:
       TESTED_VERSION: "current"
       TEST_DIR: "integration/test/ready"
     <<: *e2eTest
+
+
+
+  # Note we only have update tests for the current version because it anyway
+  # tests one version transition. Having the same tests for WIP only runs the
+  # same test twice and we can simply save resources by not doing so.
+  e2eTestCurMasterUpdate:
+    environment:
+      TESTED_VERSION: "current"
+      TEST_DIR: "integration/test/update"
+    <<: *e2eTest
+  e2eTestCurPRUpdate:
+    environment:
+      TESTED_VERSION: "current"
+      TEST_DIR: "integration/test/update"
+    <<: *e2eTest
+
+
 
 workflows:
   version: 2
@@ -61,6 +81,8 @@ workflows:
           requires:
           - build
 
+
+
       - e2eTestCurPRReady:
           requires:
           - hold
@@ -70,3 +92,15 @@ workflows:
               only: master
           requires:
           - build
+
+
+
+      - e2eTestCurMasterUpdate:
+          filters:
+            branches:
+              only: master
+          requires:
+          - build
+      - e2eTestCurPRUpdate:
+          requires:
+          - hold

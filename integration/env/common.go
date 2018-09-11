@@ -54,6 +54,7 @@ var (
 	circleSHA            string
 	clusterID            string
 	commonDomain         string
+	githubToken          string
 	testDir              string
 	testedVersion        string
 	keepResources        string
@@ -96,11 +97,15 @@ func init() {
 		panic(fmt.Sprintf("env var %q must not be empty", EnvVaultToken))
 	}
 
-	token := os.Getenv(EnvVarGithubBotToken)
+	githubToken = os.Getenv(EnvVarGithubBotToken)
+	if githubToken == "" {
+		panic(fmt.Sprintf("env var %q must not be empty", EnvVarGithubBotToken))
+	}
+
 	params := &framework.VBVParams{
 		Component: "kvm-operator",
 		Provider:  "kvm",
-		Token:     token,
+		Token:     githubToken,
 		VType:     TestedVersion(),
 	}
 	versionBundleVersion, err = framework.GetVersionBundleVersion(params)
@@ -154,6 +159,10 @@ func ClusterID() string {
 
 func CommonDomain() string {
 	return commonDomain
+}
+
+func GithubToken() string {
+	return githubToken
 }
 
 func KeepResources() string {
