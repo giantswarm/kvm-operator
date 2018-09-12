@@ -17,6 +17,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Removed nginx-ingress-controller related components (will be managed by chart-operator).",
 				Kind:        versionbundle.KindRemoved,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Made worker node docker volume size to be configurable.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
