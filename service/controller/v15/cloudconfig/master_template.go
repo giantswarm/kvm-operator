@@ -118,6 +118,21 @@ WantedBy=multi-user.target
 			Enable: false,
 		},
 		{
+			AssetContent: `[Unit]
+Before=docker.service
+Description=Mount for docker volume
+[Mount]
+What=/dev/disk/by-id/virtio-dockerfs
+Where=/var/lib/docker
+Type=xfs
+[Install]
+WantedBy=multi-user.target
+`,
+			Name:    "var-lib-docker.mount",
+			Enable:  true,
+			Command: "start",
+		},
+		{
 			Name:    "iscsid.service",
 			Enable:  true,
 			Command: "start",

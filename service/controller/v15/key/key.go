@@ -41,7 +41,7 @@ const (
 	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:d808ee530c434ee1d084b1e2000f184caf5cd283"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:db5f9c0ad08fd99a7e775e31fba99e5c7f87ab59"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 
 	// constants for calculation qemu memory overhead.
@@ -50,6 +50,14 @@ const (
 	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
 	workerIOOverhead             = "512M"
+
+	// DefaultDockerDiskSize defines the space used to partition the docker FS
+	// within k8s-kvm. Note we use this only for masters, since the value for the
+	// workers can be configured at runtime by the user.
+	DefaultDockerDiskSize = "50G"
+	// DefaultOSDiskSize defines the space used to partition the root FS within
+	// k8s-kvm.
+	DefaultOSDiskSize = "5G"
 )
 
 const (
@@ -146,6 +154,18 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 
 func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
+}
+
+func DockerVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
+	if node.DockerVolumeSizeGB != 0 {
+		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
+	}
+
+	if node.Disk != 0 {
+		return fmt.Sprintf("%sG", strconv.FormatFloat(node.Disk, 'f', 0, 64))
+	}
+
+	return DefaultDockerDiskSize
 }
 
 func EtcdPVCName(clusterID string, vmNumber string) string {

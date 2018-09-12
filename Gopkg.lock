@@ -58,7 +58,7 @@
     "reference",
   ]
   pruneopts = "UT"
-  revision = "642075f42c027b8a05b7d06f4f132939eb9ed902"
+  revision = "a5c2fdc5b87bb6a142cf89f7406ffe25374affb5"
 
 [[projects]]
   digest = "1:67bf6da2a62f206f3387976fcd8f4df00371719a6e9517e0e2b54c32edf342d9"
@@ -157,7 +157,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "5785fd3981f760016ad07a194bf28beb37ee97d6"
+  revision = "e52bb804d8aced1aa7ca1aa9173cb8839edd979a"
 
 [[projects]]
   branch = "master"
@@ -496,11 +496,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2f2487c2dd2cd5937f478ab184e815bc8bbff0d0d7d6c4bcdf720015a3f47595"
+  digest = "1:70088cd4a61c745fd77686978c41d868a85e12bb85d83692b4c15512f493c2ca"
   name = "github.com/google/go-github"
   packages = ["github"]
   pruneopts = "UT"
-  revision = "e37ada65812f271e271664307d93b14a222034e3"
+  revision = "c3e9de61cf0678e682ea2b98cf1301ae3a814bc8"
 
 [[projects]]
   branch = "master"
@@ -614,7 +614,7 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "1624edc4454b8682399def8740d46db5e4362ba4"
-  version = "1.1.5"
+  version = "v1.1.5"
 
 [[projects]]
   branch = "master"
@@ -803,7 +803,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "0709b304e793a5edb4a2c0145f281ecdc20838a4"
+  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
   branch = "master"
@@ -821,7 +821,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "161cd47e91fd58ac17490ef4d742dc98bb4cf60e"
+  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
 
 [[projects]]
   branch = "master"
@@ -912,10 +912,10 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "11092d34479b07829b72e10713b159248caf5dad"
+  revision = "36d5787dc5356b711fe8f3040271aaf51c35955b"
 
 [[projects]]
-  digest = "1:7ccedf0aab474a6aef9d7222cd2429a34fddb996bbd1f60ec0f9fe69d80b36ae"
+  digest = "1:c52f29435ecb5b76c37e7f0098b6a50dbe60f8624d820827d0fede75c40199a1"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -947,8 +947,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "32fb0ac620c32ba40a4626ddf94d90d12cce3455"
-  version = "v1.14.0"
+  revision = "8dea3dc473e90c8179e519d91302d0597c0ca1d1"
+  version = "v1.15.0"
 
 [[projects]]
   digest = "1:2d1fbdc6777e5408cabeb02bf336305e724b925ff4546ded0fa8715a7267922a"
@@ -1470,7 +1470,7 @@
     "pkg/volume/util/types",
   ]
   pruneopts = "UT"
-  revision = "a963fce72fed31bdcf65502884f25ee2cdfaf9e1"
+  revision = "defbddd8359e1ae711713f4a205da70aabbb072d"
 
 [[projects]]
   branch = "master"
@@ -1506,6 +1506,7 @@
     "github.com/giantswarm/e2etests/update",
     "github.com/giantswarm/e2etests/update/provider",
     "github.com/giantswarm/errors/guest",
+    "github.com/giantswarm/guestcluster",
     "github.com/giantswarm/ipam",
     "github.com/giantswarm/k8scloudconfig/v_1_1_0",
     "github.com/giantswarm/k8scloudconfig/v_2_0_1",
