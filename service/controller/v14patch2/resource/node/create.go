@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/kubernetes/pkg/api/v1/node"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch1/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v14patch2/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
