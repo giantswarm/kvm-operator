@@ -3,7 +3,9 @@ package v15
 import (
 	"context"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/guestcluster"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -11,6 +13,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"github.com/giantswarm/randomkeys"
+	"github.com/giantswarm/statusresource"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
@@ -27,6 +30,7 @@ import (
 
 type ClusterResourceSetConfig struct {
 	CertsSearcher      certs.Interface
+	G8sClient          versioned.Interface
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
@@ -39,10 +43,6 @@ type ClusterResourceSetConfig struct {
 
 func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
-
-	if config.SSOPublicKey == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.SSOPublicKey must not be empty", config)
-	}
 
 	var cloudConfig *cloudconfig.CloudConfig
 	{
@@ -206,7 +206,42 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
+	var guestCluster guestcluster.Interface
+	{
+		c := guestcluster.Config{
+			CertsSearcher: config.CertsSearcher,
+			Logger:        config.Logger,
+
+			CertID: certs.APICert,
+		}
+
+		guestCluster, err = guestcluster.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var statusResource controller.Resource
+	{
+		c := statusresource.ResourceConfig{
+			ClusterEndpointFunc:      key.ToClusterEndpoint,
+			ClusterIDFunc:            key.ToClusterID,
+			ClusterStatusFunc:        key.ToClusterStatus,
+			GuestCluster:             guestCluster,
+			NodeCountFunc:            key.ToNodeCount,
+			Logger:                   config.Logger,
+			RESTClient:               config.G8sClient.ProviderV1alpha1().RESTClient(),
+			VersionBundleVersionFunc: key.ToVersionBundleVersion,
+		}
+
+		statusResource, err = statusresource.NewResource(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resources := []controller.Resource{
+		statusResource,
 		clusterRoleBindingResource,
 		namespaceResource,
 		serviceAccountResource,

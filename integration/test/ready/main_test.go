@@ -3,7 +3,6 @@
 package ready
 
 import (
-	"os"
 	"testing"
 
 	"github.com/giantswarm/e2e-harness/pkg/framework"
@@ -25,9 +24,8 @@ func TestMain(m *testing.M) {
 
 	var logger micrologger.Logger
 	{
-		c := micrologger.Config{
-			IOWriter: os.Stdout,
-		}
+		c := micrologger.Config{}
+
 		logger, err = micrologger.New(c)
 		if err != nil {
 			panic(err.Error())
@@ -36,7 +34,8 @@ func TestMain(m *testing.M) {
 
 	{
 		c := framework.GuestConfig{
-			Logger:       logger,
+			Logger: logger,
+
 			ClusterID:    env.ClusterID(),
 			CommonDomain: env.CommonDomain(),
 		}
@@ -48,7 +47,8 @@ func TestMain(m *testing.M) {
 
 	{
 		c := framework.HostConfig{
-			Logger:          logger,
+			Logger: logger,
+
 			ClusterID:       env.ClusterID(),
 			TargetNamespace: env.TargetNamespace(),
 			VaultToken:      env.VaultToken(),

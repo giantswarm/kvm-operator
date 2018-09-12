@@ -214,6 +214,10 @@ func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
 	return int32(portBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
 
+func MasterCount(customObject v1alpha1.KVMConfig) int {
+	return len(customObject.Spec.KVM.Masters)
+}
+
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 	return filepath.Join("/home/core/volumes", clusterID, "k8s-master-vm"+vmNumber)
 }
@@ -352,6 +356,33 @@ func StorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }
 
+func ToClusterEndpoint(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return ClusterAPIEndpoint(customObject), nil
+}
+
+func ToClusterID(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return ClusterID(customObject), nil
+}
+
+func ToClusterStatus(v interface{}) (v1alpha1.StatusCluster, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return v1alpha1.StatusCluster{}, microerror.Mask(err)
+	}
+
+	return customObject.Status.Cluster, nil
+}
+
 func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	customObjectPointer, ok := v.(*v1alpha1.KVMConfig)
 	if !ok {
@@ -360,6 +391,17 @@ func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	customObject := *customObjectPointer
 
 	return customObject, nil
+}
+
+func ToNodeCount(v interface{}) (int, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return 0, microerror.Mask(err)
+	}
+
+	nodeCount := MasterCount(customObject) + WorkerCount(customObject)
+
+	return nodeCount, nil
 }
 
 func ToPod(v interface{}) (*corev1.Pod, error) {
@@ -373,6 +415,15 @@ func ToPod(v interface{}) (*corev1.Pod, error) {
 	}
 
 	return pod, nil
+}
+
+func ToVersionBundleVersion(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return VersionBundleVersion(customObject), nil
 }
 
 func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
@@ -394,4 +445,8 @@ func VersionBundleVersionFromPod(pod *corev1.Pod) (string, error) {
 
 func VMNumber(ID int) string {
 	return fmt.Sprintf("%d", ID)
+}
+
+func WorkerCount(customObject v1alpha1.KVMConfig) int {
+	return len(customObject.Spec.KVM.Workers)
 }
