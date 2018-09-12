@@ -3,7 +3,7 @@ package cloudconfigtest
 import (
 	"github.com/giantswarm/micrologger/microloggertest"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch1/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v14patch2/cloudconfig"
 )
 
 func New() *cloudconfig.CloudConfig {
