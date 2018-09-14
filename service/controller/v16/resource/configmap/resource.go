@@ -16,7 +16,7 @@ import (
 const (
 	KeyUserData = "user_data"
 	// Name is the identifier of the resource.
-	Name = "configmapv15"
+	Name = "configmapv16"
 )
 
 // Config represents the configuration used to create a new config map resource.

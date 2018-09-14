@@ -11,7 +11,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "deploymentv15"
+	Name = "deploymentv16"
 )
 
 // Config represents the configuration used to create a new deployment resource.
