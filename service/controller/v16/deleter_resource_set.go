@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v15/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v15/resource/node"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/resource/node"
 )
 
 type DeleterResourceSetConfig struct {
