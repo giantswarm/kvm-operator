@@ -5,6 +5,9 @@ package template
 // variables will be expanded before writing the contents to a file.
 var KVMOperatorChartValues = `Installation:
   V1:
+    GiantSwarm:
+      KVMOperator:
+        LabelSelector: 'giantswarm.io/cluster=${CLUSTER_NAME}'
     Guest:
       SSH:
         SSOPublicKey: 'test'
@@ -23,5 +26,4 @@ var KVMOperatorChartValues = `Installation:
       Registry:
         PullSecret:
           DockerConfigJSON: "{\"auths\":{\"quay.io\":{\"auth\":\"${REGISTRY_PULL_SECRET}\"}}}"
-labelSelector: 'clusterID=${CLUSTER_NAME}'
 `
