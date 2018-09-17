@@ -18,7 +18,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v14"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch1"
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
-	"github.com/giantswarm/kvm-operator/service/controller/v15/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v16"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
 )
 
 type DrainerConfig struct {
@@ -191,6 +192,22 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV16 *controller.ResourceSet
+	{
+		c := v16.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV16, err = v16.NewDrainerResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV11,
 		resourceSetV12,
@@ -198,6 +215,7 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		resourceSetV14,
 		resourceSetV14Patch1,
 		resourceSetV15,
+		resourceSetV16,
 	}
 
 	return resourceSets, nil
