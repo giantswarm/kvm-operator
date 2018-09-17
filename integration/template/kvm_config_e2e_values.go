@@ -12,6 +12,7 @@ const ApiextensionsKVMConfigE2EChartValues = `
 baseDomain: "k8s.gastropod.gridscale.kvm.gigantic.io"
 cluster:
   id: "{{.ClusterID}}"
+encryptionKey: "QitRZGlWeW5WOFo2YmdvMVRwQUQ2UWoxRHZSVEF4MmovajlFb05sT1AzOD0="
 kvm:
   vni: {{.VNI}}
   ingress:
