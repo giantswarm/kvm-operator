@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
@@ -55,11 +56,7 @@ type ClusterConfigOIDC struct {
 
 func (c ClusterConfig) newInformerListOptions() metav1.ListOptions {
 	listOptions := metav1.ListOptions{
-		LabelSelector: "",
-	}
-
-	if c.CRDLabelSelector != "" {
-		listOptions.LabelSelector = c.CRDLabelSelector
+		LabelSelector: c.CRDLabelSelector,
 	}
 
 	return listOptions

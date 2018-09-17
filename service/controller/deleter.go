@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v13"
@@ -30,11 +31,7 @@ type DeleterConfig struct {
 
 func (c DeleterConfig) newInformerListOptions() metav1.ListOptions {
 	listOptions := metav1.ListOptions{
-		LabelSelector: "",
-	}
-
-	if c.CRDLabelSelector != "" {
-		listOptions.LabelSelector = c.CRDLabelSelector
+		LabelSelector: c.CRDLabelSelector,
 	}
 
 	return listOptions
