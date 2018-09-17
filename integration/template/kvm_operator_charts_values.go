@@ -7,7 +7,8 @@ var KVMOperatorChartValues = `Installation:
   V1:
     GiantSwarm:
       KVMOperator:
-        LabelSelector: 'giantswarm.io/cluster=${CLUSTER_NAME}'
+        CRD:
+          LabelSelector: 'giantswarm.io/cluster=${CLUSTER_NAME}'
     Guest:
       SSH:
         SSOPublicKey: 'test'
