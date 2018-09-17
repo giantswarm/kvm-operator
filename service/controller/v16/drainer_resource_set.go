@@ -1,4 +1,4 @@
-package v15
+package v16
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
@@ -9,9 +9,9 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v15/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v15/resource/endpoint"
-	"github.com/giantswarm/kvm-operator/service/controller/v15/resource/pod"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/resource/endpoint"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/resource/pod"
 )
 
 type DrainerResourceSetConfig struct {
