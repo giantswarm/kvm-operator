@@ -33,7 +33,19 @@ rules:
     resources:
       - kvmconfigs
     verbs:
-      - "*"
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - provider.giantswarm.io
+    resources:
+      - kvmconfigs/status
+    verbs:
+      - create
+      - patch
+      - update
   - apiGroups:
       - ""
     resources:
@@ -57,7 +69,7 @@ rules:
       - endpoints
       - services
     verbs:
-      - get 
+      - get
       - list
       - watch
       - create
