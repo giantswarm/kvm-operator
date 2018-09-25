@@ -22,6 +22,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Made worker node docker volume size to be configurable.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "cloudconfig",
+				Description: "Removed CoreDNS related components (now managed by chart-operator).",
+				Kind:        versionbundle.KindRemoved,
+			},
 		},
 		Components: []versionbundle.Component{
 			{

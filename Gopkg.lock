@@ -208,7 +208,7 @@
     "v_3_5_0",
     "v_3_6_0"
   ]
-  revision = "d85d5b5eb3de40653cbbd4bc2385298800216811"
+  revision = "54ae1d87febe98a8ef9fa66d98f05f9e6b200f2e"
 
 [[projects]]
   branch = "master"
@@ -399,10 +399,10 @@
   version = "v1.2.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "c3e9de61cf0678e682ea2b98cf1301ae3a814bc8"
-  version = "v18.1.0"
+  revision = "429a78b65d747db5654a1eb8422d20f046ee5d81"
 
 [[projects]]
   branch = "master"
