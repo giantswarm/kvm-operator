@@ -116,6 +116,11 @@ required = [
   name = "k8s.io/kubernetes"
 
 
+[[prune.project]]
+  name = "github.com/giantswarm/k8scloudconfig"
+  unused-packages = false
+  non-go = false
+
 
 [prune]
   go-tests = true
