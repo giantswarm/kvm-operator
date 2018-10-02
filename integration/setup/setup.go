@@ -32,17 +32,8 @@ const (
 )
 
 // WrapTestMain setup and teardown e2e testing environment.
-func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
+func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M, l micrologger.Logger) {
 	var r int
-	var l micrologger.Logger
-	{
-		c := micrologger.Config{}
-
-		l, err = micrologger.New(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
 
 	err := Setup(g, h)
 	if err != nil {
