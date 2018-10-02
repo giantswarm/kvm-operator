@@ -45,7 +45,10 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
 	}
 
 	if env.KeepResources() != "true" {
+		fmt.Printf("\n Removing all resources.\n")
 		teardown.Teardown(g, h)
+	} else {
+		fmt.Printf("\nNot removing resources becasue  env 'KEEP_RESOURCES' is set to true.\n")
 	}
 
 	os.Exit(r)
