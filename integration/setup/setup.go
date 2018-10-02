@@ -52,7 +52,11 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
 
 	if env.KeepResources() != "true" {
 		log.Printf("\nRemoving all resources.\n\n")
-		teardown.Teardown(g, h)
+		err = teardown.Teardown(g, h)
+		if err != nil {
+			log.Printf("\nTeardown stage failed.")
+			log.Printf("teardown stage error: %#v\n", err)
+		}
 	} else {
 		log.Printf("\nNot removing resources becasue  env 'KEEP_RESOURCES' is set to true.\n")
 	}
