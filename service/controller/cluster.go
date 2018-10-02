@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
@@ -52,6 +52,14 @@ type ClusterConfigOIDC struct {
 	IssuerURL     string
 	UsernameClaim string
 	GroupsClaim   string
+}
+
+func (c ClusterConfig) newInformerListOptions() metav1.ListOptions {
+	listOptions := metav1.ListOptions{
+		LabelSelector: c.CRDLabelSelector,
+	}
+
+	return listOptions
 }
 
 type Cluster struct {
@@ -95,13 +103,9 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Logger:  config.Logger,
 			Watcher: config.G8sClient.ProviderV1alpha1().KVMConfigs(""),
 
+			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,
-		}
-		if config.CRDLabelSelector != "" {
-			c.ListOptions = v1.ListOptions{
-				LabelSelector: config.CRDLabelSelector,
-			}
 		}
 
 		newInformer, err = informer.New(c)
