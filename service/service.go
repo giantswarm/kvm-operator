@@ -156,7 +156,8 @@ func New(config Config) (*Service, error) {
 			K8sClient:     k8sClient,
 			Logger:        config.Logger,
 
-			ProjectName: config.Name,
+			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
+			ProjectName:      config.Name,
 		}
 
 		deleterController, err = controller.NewDeleter(c)
@@ -172,7 +173,8 @@ func New(config Config) (*Service, error) {
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
-			ProjectName: config.Name,
+			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
+			ProjectName:      config.Name,
 		}
 
 		drainerController, err = controller.NewDrainer(c)
