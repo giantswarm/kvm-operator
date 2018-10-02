@@ -143,11 +143,13 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 	}
 
 	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(c)
-	if err != nil {
+	if apierrors.IsAlreadyExists(err) {
+		r.logger.LogCtx(ctx, "level", "warning", "message", "drainer config for guest cluster node already exists")
+	} else if err != nil {
 		return microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for guest cluster node")
 	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for guest cluster node")
 
 	return nil
 }
