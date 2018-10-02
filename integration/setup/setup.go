@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"testing"
 	gotemplate "text/template"
@@ -35,30 +34,37 @@ const (
 // WrapTestMain setup and teardown e2e testing environment.
 func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
 	var r int
+	var l micrologger.Logger
+	{
+		c := micrologger.Config{}
+
+		l, err = micrologger.New(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
 
 	err := Setup(g, h)
 	if err != nil {
-		log.Printf("\nSetup stage failed,")
-		log.Printf("setup stage error: %#v\n", err)
+		l.Log("level", "error", "message", "setup stage failed", "error", err)
 		r = 1
 	} else {
-		// add output to separate setup stage and test stage outputs
-		log.Printf("\nFinished setup stage.\n")
+		l.Log("level", "info", "message", "finished setup stage")
 		r = m.Run()
 		if r != 0 {
-			log.Printf("\n Test stage failed.")
+			l.Log("level", "error", "message", "test stage failed")
 		}
 	}
 
 	if env.KeepResources() != "true" {
-		log.Printf("\nRemoving all resources.\n\n")
+		l.Log("level", "info", "message", "removing all resources")
 		err = teardown.Teardown(g, h)
 		if err != nil {
-			log.Printf("\nTeardown stage failed.")
-			log.Printf("teardown stage error: %#v\n", err)
+			l.Log("level", "error", "message", "teardown stage failed", "error", err)
+
 		}
 	} else {
-		log.Printf("\nNot removing resources becasue  env 'KEEP_RESOURCES' is set to true.\n")
+		l.Log("level", "info", "message", "not removing resources becasue  env 'KEEP_RESOURCES' is set to true")
 	}
 
 	os.Exit(r)
