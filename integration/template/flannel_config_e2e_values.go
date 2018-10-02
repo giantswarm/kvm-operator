@@ -22,4 +22,7 @@ Installation:
       Registry:
         PullSecret:
           DockerConfigJSON: "{\"auths\":{\"quay.io\":{\"auth\":\"$REGISTRY_PULL_SECRET\"}}}"
+service:
+  crd:
+    labelSelector: ${CLUSTER_NAME}
 `
