@@ -38,17 +38,23 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
 
 	err := Setup(g, h)
 	if err != nil {
-		log.Printf("%#v\n", err)
+		log.Printf("\nSetup stage failed,")
+		log.Printf("setup stage error: %#v\n", err)
 		r = 1
 	} else {
+		// add output to separate setup stage and test stage outputs
+		log.Printf("\nFinished setup stage.\n")
 		r = m.Run()
+		if r != 0 {
+			log.Printf("\n Test stage failed.")
+		}
 	}
 
 	if env.KeepResources() != "true" {
-		fmt.Printf("\n Removing all resources.\n")
+		log.Printf("\nRemoving all resources.\n\n")
 		teardown.Teardown(g, h)
 	} else {
-		fmt.Printf("\nNot removing resources becasue  env 'KEEP_RESOURCES' is set to true.\n")
+		log.Printf("\nNot removing resources becasue  env 'KEEP_RESOURCES' is set to true.\n")
 	}
 
 	os.Exit(r)
