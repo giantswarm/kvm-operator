@@ -149,20 +149,42 @@ func installKVMResource(h *framework.Host) error {
 		}
 
 		{
-			vni, err := rangepool.GenerateVNI(ctx, rangePool, env.ClusterID())
+			o := func() error {
+				vni, err := rangepool.GenerateVNI(ctx, rangePool, env.ClusterID())
+				if err != nil {
+					return microerror.Mask(err)
+				}
+
+				kvmResourceChartValues.VNI = vni
+				return nil
+			}
+
+			b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+			n := backoff.NewNotifier(l, context.Background())
+			err = backoff.RetryNotify(o, b, n)
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			kvmResourceChartValues.VNI = vni
 		}
 
 		{
-			httpPort, httpsPort, err := rangepool.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
+			o := func() error {
+				httpPort, httpsPort, err := rangepool.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
+				if err != nil {
+					return microerror.Mask(err)
+				}
+
+				kvmResourceChartValues.HttpNodePort = httpPort
+				kvmResourceChartValues.HttpsNodePort = httpsPort
+				return nil
+			}
+
+			b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+			n := backoff.NewNotifier(l, context.Background())
+			err = backoff.RetryNotify(o, b, n)
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			kvmResourceChartValues.HttpNodePort = httpPort
-			kvmResourceChartValues.HttpsNodePort = httpsPort
 		}
 
 		kvmResourceChartValues.VersionBundleVersion = env.VersionBundleVersion()
