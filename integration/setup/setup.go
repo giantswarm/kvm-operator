@@ -37,7 +37,7 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M, l microlo
 
 	err := Setup(g, h)
 	if err != nil {
-		l.Log("level", "error", "message", "setup stage failed", "error", err)
+		l.Log("level", "error", "message", "setup stage failed", "stack", fmt.Sprintf("%#v", err))
 		r = 1
 	} else {
 		l.Log("level", "info", "message", "finished setup stage")
@@ -51,11 +51,11 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M, l microlo
 		l.Log("level", "info", "message", "removing all resources")
 		err = teardown.Teardown(g, h)
 		if err != nil {
-			l.Log("level", "error", "message", "teardown stage failed", "error", err)
+			l.Log("level", "error", "message", "teardown stage failed", "stack", fmt.Sprintf("%#v", err))
 
 		}
 	} else {
-		l.Log("level", "info", "message", "not removing resources becasue  env 'KEEP_RESOURCES' is set to true")
+		l.Log("level", "info", "message", "not removing resources because  env 'KEEP_RESOURCES' is set to true")
 	}
 
 	os.Exit(r)
