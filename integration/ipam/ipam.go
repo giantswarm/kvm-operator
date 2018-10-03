@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/giantswarm/backoff"
+	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/ipam"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -37,7 +39,20 @@ func GenerateFlannelNetwork(ctx context.Context, clusterID string, crdStorage mi
 
 	cidrMask := net.CIDRMask(flannelCidrSize, 32)
 
-	cidr, err := ipamService.CreateSubnet(ctx, cidrMask, flannelNetworkAnnotation(clusterID))
+	var cidr net.IPNet
+	o := func() error {
+		var err error
+		cidr, err = ipamService.CreateSubnet(ctx, cidrMask, flannelNetworkAnnotation(clusterID))
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		return nil
+	}
+
+	b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+	n := backoff.NewNotifier(l, context.Background())
+	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
@@ -68,7 +83,18 @@ func DeleteFlannelNetwork(ctx context.Context, network string, crdStorage micros
 		return microerror.Mask(err)
 	}
 
-	err = ipamService.DeleteSubnet(ctx, *subnet)
+	o := func() error {
+		err = ipamService.DeleteSubnet(ctx, *subnet)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		return nil
+	}
+
+	b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+	n := backoff.NewNotifier(l, context.Background())
+	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
 		return microerror.Mask(err)
 	}

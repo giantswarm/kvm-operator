@@ -44,10 +44,15 @@ func InitCRDStorage(ctx context.Context, h *framework.Host, l micrologger.Logger
 	c.K8sClient = h.K8sClient()
 	c.Logger = l
 
+	targetNamespace := h.TargetNamespace()
+	if targetNamespace == "" {
+		targetNamespace = giantswarmNamespace
+	}
+
 	c.Name = "kvm-e2e"
 	c.Namespace = &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: giantswarmNamespace,
+			Name: targetNamespace,
 		},
 	}
 

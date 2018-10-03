@@ -127,19 +127,58 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		err = rangepool.DeleteVNI(ctx, rangePool, clusterID)
-		if err != nil {
-			return microerror.Mask(err)
+		{
+			o := func() error {
+				err = rangepool.DeleteVNI(ctx, rangePool, clusterID)
+				if err != nil {
+					return microerror.Mask(err)
+				}
+				l.LogCtx(ctx, "level", "info", "message", "Deleted VNI reservation in rangepool.")
+				return nil
+			}
+
+			b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+			n := backoff.NewNotifier(l, context.Background())
+			err = backoff.RetryNotify(o, b, n)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
-		l.LogCtx(ctx, "level", "info", "message", "Deleted VNI reservation in rangepool.")
-		err = rangepool.DeleteIngressNodePorts(ctx, rangePool, clusterID)
-		if err != nil {
-			return microerror.Mask(err)
+
+		{
+			o := func() error {
+				err = rangepool.DeleteIngressNodePorts(ctx, rangePool, clusterID)
+				if err != nil {
+					return microerror.Mask(err)
+				}
+				l.LogCtx(ctx, "level", "info", "message", "Deleted Ingress node port reservation in rangepool.")
+				return nil
+			}
+
+			b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+			n := backoff.NewNotifier(l, context.Background())
+			err = backoff.RetryNotify(o, b, n)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
-		l.LogCtx(ctx, "level", "info", "message", "Deleted Ingress node port reservation in rangepool.")
-		err = ipam.DeleteFlannelNetwork(ctx, flannelNetwork, crdStorage, l)
-		if err != nil {
-			return microerror.Mask(err)
+
+		{
+			o := func() error {
+				err = ipam.DeleteFlannelNetwork(ctx, flannelNetwork, crdStorage, l)
+				if err != nil {
+					return microerror.Mask(err)
+				}
+				l.LogCtx(ctx, "level", "info", "message", "Deallocated Flannel network reservation.")
+				return nil
+			}
+
+			b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+			n := backoff.NewNotifier(l, context.Background())
+			err = backoff.RetryNotify(o, b, n)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 	}
 
