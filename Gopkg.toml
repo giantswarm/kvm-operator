@@ -125,7 +125,3 @@ required = [
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  branch = "ensure-default-patches"
-  name = "github.com/giantswarm/statusresource"

@@ -385,12 +385,12 @@
   revision = "5e1f0ed497cf04625fccc565bf13449e4493da29"
 
 [[projects]]
-  branch = "ensure-default-patches"
+  branch = "master"
   digest = "1:7e6e1b2104f98d3d9422d3d5a55c4eb6f7867e514ef88fafb7a3057f9555c7a6"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
   pruneopts = "UT"
-  revision = "fdee68f3eeb6f9102544e0aee3b8b64d329d6ccd"
+  revision = "f4a1a0068353f19876ed0c4f8adee74b1a33dd00"
 
 [[projects]]
   branch = "master"
