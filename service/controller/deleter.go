@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v13"
@@ -24,7 +25,16 @@ type DeleterConfig struct {
 	K8sClient     kubernetes.Interface
 	Logger        micrologger.Logger
 
-	ProjectName string
+	CRDLabelSelector string
+	ProjectName      string
+}
+
+func (c DeleterConfig) newInformerListOptions() metav1.ListOptions {
+	listOptions := metav1.ListOptions{
+		LabelSelector: c.CRDLabelSelector,
+	}
+
+	return listOptions
 }
 
 type Deleter struct {
@@ -48,6 +58,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 			Logger:  config.Logger,
 			Watcher: config.G8sClient.ProviderV1alpha1().KVMConfigs(""),
 
+			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: 30 * time.Second,
 		}

@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
@@ -27,7 +27,20 @@ type DrainerConfig struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
-	ProjectName string
+	CRDLabelSelector string
+	ProjectName      string
+}
+
+func (c DrainerConfig) newInformerListOptions() metav1.ListOptions {
+	listOptions := metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, c.ProjectName),
+	}
+
+	if c.CRDLabelSelector != "" {
+		listOptions.LabelSelector = listOptions.LabelSelector + "," + c.CRDLabelSelector
+	}
+
+	return listOptions
 }
 
 type Drainer struct {
@@ -51,9 +64,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			Logger:  config.Logger,
 			Watcher: config.K8sClient.CoreV1().Pods(""),
 
-			ListOptions: apismetav1.ListOptions{
-				LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, config.ProjectName),
-			},
+			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: 30 * time.Second,
 		}
