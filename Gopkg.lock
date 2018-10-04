@@ -338,11 +338,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ddd43139c09097ebf88f8748425ae83d37770763aae32f6a855782847161e587"
+  digest = "1:dcce0e2a37e13265ab8ae53d5403ad511dbad131adefc7b5452d41b1687428f6"
   name = "github.com/giantswarm/microstorage"
-  packages = ["."]
+  packages = [
+    ".",
+    "retrystorage",
+  ]
   pruneopts = "UT"
-  revision = "4411a6307c6b844b7f9e68aaba37407b41b1c4d7"
+  revision = "e7d619b8ec166cd68eb4d026b68b9193bb645d8f"
 
 [[projects]]
   branch = "master"
@@ -1526,6 +1529,7 @@
     "github.com/giantswarm/micrologger",
     "github.com/giantswarm/micrologger/microloggertest",
     "github.com/giantswarm/microstorage",
+    "github.com/giantswarm/microstorage/retrystorage",
     "github.com/giantswarm/operatorkit/client/k8scrdclient",
     "github.com/giantswarm/operatorkit/client/k8srestconfig",
     "github.com/giantswarm/operatorkit/controller",
