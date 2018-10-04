@@ -11,6 +11,7 @@ import (
 	"testing"
 	gotemplate "text/template"
 
+	cenkalti "github.com/cenkalti/backoff"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
@@ -139,11 +140,14 @@ func installKVMResource(h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+		b := func() cenkalti.BackOff {
+			return backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+		}
+
 		c := retrystorage.Config{
 			Logger:         l,
-			Underlying:     crdstorage,
-			NewBackoffFunc: b,
+			Underlying:     crdStorage,
+			NewBackOffFunc: b,
 		}
 
 		retryingCRDStorage, err = retrystorage.New(c)
@@ -186,7 +190,7 @@ func installKVMResource(h *framework.Host) error {
 		flannelResourceChartValues.ClusterID = env.ClusterID()
 		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
 
-		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), crdStorage, l)
+		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), retryingCRDStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
