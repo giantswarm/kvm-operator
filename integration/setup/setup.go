@@ -141,7 +141,7 @@ func installKVMResource(h *framework.Host) error {
 		}
 
 		b := func() cenkalti.BackOff {
-			return backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+			return backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 		}
 
 		c := retrystorage.Config{
@@ -228,7 +228,7 @@ func installKVMResource(h *framework.Host) error {
 
 		return nil
 	}
-	b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+	b := backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 	n := backoff.NewNotifier(l, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
@@ -266,7 +266,7 @@ func installKVMResource(h *framework.Host) error {
 
 		return nil
 	}
-	b = backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+	b = backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 	n = backoff.NewNotifier(l, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
