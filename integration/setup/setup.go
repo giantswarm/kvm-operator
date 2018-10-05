@@ -11,12 +11,14 @@ import (
 	"testing"
 	gotemplate "text/template"
 
+	cenkalti "github.com/cenkalti/backoff"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/microstorage"
+	"github.com/giantswarm/microstorage/retrystorage"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/ipam"
@@ -131,9 +133,24 @@ func installKVMResource(h *framework.Host) error {
 		}
 	}
 
-	var crdStorage microstorage.Storage
+	var retryingCRDStorage microstorage.Storage
 	{
-		crdStorage, err = storage.InitCRDStorage(ctx, h, l)
+		crdStorage, err := storage.InitCRDStorage(ctx, h, l)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		b := func() cenkalti.BackOff {
+			return backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+		}
+
+		c := retrystorage.Config{
+			Logger:         l,
+			Underlying:     crdStorage,
+			NewBackOffFunc: b,
+		}
+
+		retryingCRDStorage, err = retrystorage.New(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -143,7 +160,7 @@ func installKVMResource(h *framework.Host) error {
 	{
 		kvmResourceChartValues.ClusterID = env.ClusterID()
 
-		rangePool, err := rangepool.InitRangePool(crdStorage, l)
+		rangePool, err := rangepool.InitRangePool(retryingCRDStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -173,7 +190,7 @@ func installKVMResource(h *framework.Host) error {
 		flannelResourceChartValues.ClusterID = env.ClusterID()
 		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
 
-		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), crdStorage, l)
+		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), retryingCRDStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
