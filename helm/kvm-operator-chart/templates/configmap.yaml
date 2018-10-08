@@ -13,7 +13,7 @@ data:
         address: 'http://0.0.0.0:8000'
     service:
       crd:
-        labelSelector: '{{ .Values.labelSelector }}'
+        labelSelector: '{{ .Values.Installation.V1.GiantSwarm.KVMOperator.CRD.LabelSelector }}'
       guest:
         ssh:
           ssoPublicKey: '{{ .Values.Installation.V1.Guest.SSH.SSOPublicKey }}'

@@ -59,5 +59,5 @@ func TestMain(m *testing.M) {
 		}
 	}
 
-	setup.WrapTestMain(g, h, m)
+	setup.WrapTestMain(g, h, m, logger)
 }

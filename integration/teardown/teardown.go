@@ -105,7 +105,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 		}
 		return nil
 	}
-	b := backoff.NewExponential(framework.LongMaxWait, framework.LongMaxInterval)
+	b := backoff.NewExponential(backoff.LongMaxWait, backoff.LongMaxInterval)
 	n := backoff.NewNotifier(l, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 

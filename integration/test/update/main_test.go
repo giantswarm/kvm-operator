@@ -18,13 +18,13 @@ import (
 var (
 	g *framework.Guest
 	h *framework.Host
+	l micrologger.Logger
 	u *update.Update
 )
 
 func init() {
 	var err error
 
-	var l micrologger.Logger
 	{
 		c := micrologger.Config{}
 
@@ -97,5 +97,5 @@ func init() {
 // TestMain allows us to have common setup and teardown steps that are run
 // once for all the tests https://golang.org/pkg/testing/#hdr-Main.
 func TestMain(m *testing.M) {
-	setup.WrapTestMain(g, h, m)
+	setup.WrapTestMain(g, h, m, l)
 }
