@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kvm-operator
+  name: {{ .Values.clusterRoleName }}
 rules:
   - apiGroups:
       - apiextensions.k8s.io
@@ -57,7 +57,7 @@ rules:
       - endpoints
       - services
     verbs:
-      - get 
+      - get
       - list
       - watch
       - create
@@ -90,20 +90,20 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kvm-operator
+  name: {{ .Values.clusterRoleBindingName }}
 subjects:
   - kind: ServiceAccount
     name: kvm-operator
     namespace: {{ .Values.namespace }}
 roleRef:
   kind: ClusterRole
-  name: kvm-operator
+  name: {{ .Values.clusterRoleName }}
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kvm-operator-psp
+  name: {{ .Values.clusterRoleNamePSP }}
 rules:
   - apiGroups:
       - extensions
@@ -117,12 +117,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kvm-operator-psp
+  name: {{ .Values.clusterRoleBindingNamePSP }}
 subjects:
   - kind: ServiceAccount
     name: kvm-operator
     namespace: {{ .Values.namespace }}
 roleRef:
   kind: ClusterRole
-  name: kvm-operator-psp
+  name: {{ .Values.clusterRoleNamePSP }}
   apiGroup: rbac.authorization.k8s.io
