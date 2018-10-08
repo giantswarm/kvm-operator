@@ -166,7 +166,7 @@
     "pkg/chartvalues",
     "pkg/e2etemplates"
   ]
-  revision = "38f8d00a9526a772158c13bb40d454fa32e64ab5"
+  revision = "1e4569c89a56aeb02b9ac57847b7cd8aaa9cc603"
 
 [[projects]]
   branch = "master"
