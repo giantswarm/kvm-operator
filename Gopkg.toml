@@ -44,7 +44,7 @@ required = [
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
-  branch = "master"
+  branch = "add-kvm-operator"
   name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]

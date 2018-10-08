@@ -159,14 +159,14 @@
   revision = "05bd411c3155f53d3a73c8c4653cb9daa894c982"
 
 [[projects]]
-  branch = "master"
+  branch = "add-kvm-operator"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
     "pkg/chartvalues",
     "pkg/e2etemplates"
   ]
-  revision = "1e4569c89a56aeb02b9ac57847b7cd8aaa9cc603"
+  revision = "903d5f02c015b872921f2f565e9bb561366096b7"
 
 [[projects]]
   branch = "master"
@@ -1304,6 +1304,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e5c5383d17e895b06e92e62bee379cf1a8f5b60cc954201248430e2bfd5046b0"
+  inputs-digest = "731704dd405f2e8ef383155b6138c8f5edfc38d378f5f5cd24922b873d04aa8d"
   solver-name = "gps-cdcl"
   solver-version = 1
