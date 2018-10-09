@@ -5564,6 +5564,14 @@ func (o *Organization) GetDefaultRepoPermission() string {
 	return *o.DefaultRepoPermission
 }
 
+// GetDefaultRepoSettings returns the DefaultRepoSettings field if it's non-nil, zero value otherwise.
+func (o *Organization) GetDefaultRepoSettings() string {
+	if o == nil || o.DefaultRepoSettings == nil {
+		return ""
+	}
+	return *o.DefaultRepoSettings
+}
+
 // GetDescription returns the Description field if it's non-nil, zero value otherwise.
 func (o *Organization) GetDescription() string {
 	if o == nil || o.Description == nil {
@@ -9954,6 +9962,14 @@ func (r *RepositoryTag) GetZipballURL() string {
 		return ""
 	}
 	return *r.ZipballURL
+}
+
+// GetAction returns the Action field if it's non-nil, zero value otherwise.
+func (r *RepositoryVulnerabilityAlertEvent) GetAction() string {
+	if r == nil || r.Action == nil {
+		return ""
+	}
+	return *r.Action
 }
 
 // GetForkRepos returns the ForkRepos field if it's non-nil, zero value otherwise.
