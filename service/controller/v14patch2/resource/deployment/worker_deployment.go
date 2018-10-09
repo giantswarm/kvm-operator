@@ -55,6 +55,13 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{
+				Selector: apismetav1.LabelSelector{
+					MatchLabels: map[string]string{
+						key.LabelApp: key.WorkerID,
+						"cluster":    key.ClusterID(customObject),
+						"node":       workerNode.ID,
+					},
+				},
 				Strategy: extensionsv1.DeploymentStrategy{
 					Type: extensionsv1.RecreateDeploymentStrategyType,
 				},
