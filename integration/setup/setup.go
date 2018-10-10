@@ -12,9 +12,12 @@ import (
 	gotemplate "text/template"
 
 	cenkalti "github.com/cenkalti/backoff"
+	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
+	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
+	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/microstorage"
@@ -34,17 +37,17 @@ const (
 )
 
 // WrapTestMain setup and teardown e2e testing environment.
-func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M, l micrologger.Logger) {
-	var r int
+func WrapTestMain(g *framework.Guest, h *framework.Host, helmClient *helmclient.Client, m *testing.M, r *release.Release, l micrologger.Logger) {
+	var exitCode int
 
-	err := Setup(g, h)
+	err := Setup(g, helmClient, h, r)
 	if err != nil {
 		l.Log("level", "error", "message", "setup stage failed", "stack", fmt.Sprintf("%#v", err))
-		r = 1
+		exitCode = 1
 	} else {
 		l.Log("level", "info", "message", "finished setup stage")
-		r = m.Run()
-		if r != 0 {
+		exitCode = m.Run()
+		if exitCode != 0 {
 			l.Log("level", "error", "message", "test stage failed")
 		}
 	}
@@ -60,14 +63,14 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M, l microlo
 		l.Log("level", "info", "message", "not removing resources because  env 'KEEP_RESOURCES' is set to true")
 	}
 
-	os.Exit(r)
+	os.Exit(exitCode)
 }
 
 // Setup e2e testing environment.
-func Setup(g *framework.Guest, h *framework.Host) error {
+func Setup(g *framework.Guest, helmClient *helmclient.Client, h *framework.Host, r *release.Release) error {
 	var err error
 
-	err = Resources(g, h)
+	err = Resources(g, helmClient, h, r)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -81,11 +84,17 @@ func Setup(g *framework.Guest, h *framework.Host) error {
 }
 
 // Resources install required charts.
-func Resources(g *framework.Guest, h *framework.Host) error {
+func Resources(g *framework.Guest, helmClient *helmclient.Client, h *framework.Host, r *release.Release) error {
+	ctx := context.Background()
 	var err error
 
 	{
-		err = h.InstallStableOperator("cert-operator", "certconfig", e2etemplates.CertOperatorChartValues)
+		err = helmClient.EnsureTillerInstalled()
+		if err != nil {
+			microerror.Mask(err)
+		}
+
+		err = r.InstallOperator(ctx, "cert-operator", release.NewStableVersion(), e2etemplates.CertOperatorChartValues, v1alpha1.NewCertConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
