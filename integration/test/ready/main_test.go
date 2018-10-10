@@ -8,11 +8,9 @@ import (
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2e-harness/pkg/framework/filelogger"
-	"github.com/giantswarm/e2e-harness/pkg/harness"
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/setup"
@@ -64,11 +62,6 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			panic(err.Error())
 		}
-	}
-
-	restConfig, err := clientcmd.BuildConfigFromFlags("", harness.DefaultKubeConfig)
-	if err != nil {
-		panic(err.Error())
 	}
 
 	var fileLogger *filelogger.FileLogger
