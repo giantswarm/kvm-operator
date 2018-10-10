@@ -5,8 +5,15 @@ package ready
 import (
 	"testing"
 
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
+	"github.com/giantswarm/e2e-harness/pkg/framework/filelogger"
+	"github.com/giantswarm/e2e-harness/pkg/harness"
+	"github.com/giantswarm/e2e-harness/pkg/release"
+	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/micrologger"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/setup"
@@ -15,6 +22,7 @@ import (
 var (
 	g *framework.Guest
 	h *framework.Host
+	r *release.Release
 )
 
 // TestMain allows us to have common setup and teardown steps that are run
@@ -54,6 +62,62 @@ func TestMain(m *testing.M) {
 			VaultToken:      env.VaultToken(),
 		}
 		h, err = framework.NewHost(c)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+
+	restConfig, err := clientcmd.BuildConfigFromFlags("", harness.DefaultKubeConfig)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var extClient *apiextensionsclient.Clientset
+	{
+		extClient, err = apiextensionsclient.NewForConfig(restConfig)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+
+	var fileLogger *filelogger.FileLogger
+	{
+		fc := filelogger.Config{
+			Backoff:   backoff.NewExponential(backoff.ShortMaxWait, backoff.LongMaxInterval),
+			K8sClient: h.K8sClient(),
+			Logger:    logger,
+		}
+		fileLogger, err = filelogger.New(fc)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+	var helmClient *helmclient.Client
+	{
+		c := helmclient.Config{
+			Logger:          logger,
+			K8sClient:       h.K8sClient(),
+			RestConfig:      h.RestConfig(),
+			TillerNamespace: h.TargetNamespace(),
+		}
+		helmClient, err = helmclient.New(c)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+
+	{
+		c := release.Config{
+			ExtClient:  extClient,
+			FileLogger: fileLogger,
+			G8sClient:  h.G8sClient(),
+			HelmClient: helmClient,
+			K8sClient:  h.K8sClient(),
+			Logger:     logger,
+
+			Namespace: h.TargetNamespace(),
+		}
+		r, err = release.New(c)
 		if err != nil {
 			panic(err.Error())
 		}
