@@ -12,7 +12,6 @@ import (
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/micrologger"
-	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
@@ -72,14 +71,6 @@ func TestMain(m *testing.M) {
 		panic(err.Error())
 	}
 
-	var extClient *apiextensionsclient.Clientset
-	{
-		extClient, err = apiextensionsclient.NewForConfig(restConfig)
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-
 	var fileLogger *filelogger.FileLogger
 	{
 		fc := filelogger.Config{
@@ -108,7 +99,7 @@ func TestMain(m *testing.M) {
 
 	{
 		c := release.Config{
-			ExtClient:  extClient,
+			ExtClient:  h.ExtClient(),
 			FileLogger: fileLogger,
 			G8sClient:  h.G8sClient(),
 			HelmClient: helmClient,
