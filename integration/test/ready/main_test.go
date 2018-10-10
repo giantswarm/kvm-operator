@@ -114,5 +114,5 @@ func TestMain(m *testing.M) {
 		}
 	}
 
-	setup.WrapTestMain(g, h, m, logger)
+	setup.WrapTestMain(g, h, m, r, logger)
 }
