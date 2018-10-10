@@ -8,18 +8,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "kubernetes",
-				Description: "Updated to 1.11.1.",
-				Kind:        versionbundle.KindChanged,
-			},
-			{
-				Component:   "cloudconfig",
-				Description: "Removed nginx-ingress-controller related components (will be managed by chart-operator).",
-				Kind:        versionbundle.KindRemoved,
-			},
-			{
-				Component:   "kvm-operator",
-				Description: "Made worker node docker volume size to be configurable.",
+				Component:   "TODO",
+				Description: "TODO",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -50,6 +40,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.0.0",
+		Version: "3.0.1",
 	}
 }
