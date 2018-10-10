@@ -82,7 +82,7 @@ func TestMain(m *testing.M) {
 			Logger:          logger,
 			K8sClient:       h.K8sClient(),
 			RestConfig:      h.RestConfig(),
-			TillerNamespace: h.TargetNamespace(),
+			TillerNamespace: "kube-system",
 		}
 		helmClient, err = helmclient.New(c)
 		if err != nil {
