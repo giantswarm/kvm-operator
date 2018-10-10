@@ -107,5 +107,5 @@ func TestMain(m *testing.M) {
 		}
 	}
 
-	setup.WrapTestMain(g, h, m, r, logger)
+	setup.WrapTestMain(g, h, helmClient, m, r, logger)
 }

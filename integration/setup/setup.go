@@ -17,6 +17,7 @@ import (
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
+	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/microstorage"
@@ -36,10 +37,10 @@ const (
 )
 
 // WrapTestMain setup and teardown e2e testing environment.
-func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M, r *release.Release, l micrologger.Logger) {
+func WrapTestMain(g *framework.Guest, h *framework.Host, helmClient *helmclient.Client, m *testing.M, r *release.Release, l micrologger.Logger) {
 	var exitCode int
 
-	err := Setup(g, h, r)
+	err := Setup(g, helmClient, h, r)
 	if err != nil {
 		l.Log("level", "error", "message", "setup stage failed", "stack", fmt.Sprintf("%#v", err))
 		exitCode = 1
@@ -66,10 +67,10 @@ func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M, r *releas
 }
 
 // Setup e2e testing environment.
-func Setup(g *framework.Guest, h *framework.Host, r *release.Release) error {
+func Setup(g *framework.Guest, helmClient *helmclient.Client, h *framework.Host, r *release.Release) error {
 	var err error
 
-	err = Resources(g, h, r)
+	err = Resources(g, helmClient, h, r)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -83,11 +84,16 @@ func Setup(g *framework.Guest, h *framework.Host, r *release.Release) error {
 }
 
 // Resources install required charts.
-func Resources(g *framework.Guest, h *framework.Host, r *release.Release) error {
+func Resources(g *framework.Guest, helmClient *helmclient.Client, h *framework.Host, r *release.Release) error {
 	ctx := context.Background()
 	var err error
 
 	{
+		err = helmClient.EnsureTillerInstalled()
+		if err != nil {
+			microerror.Mask(err)
+		}
+
 		err = r.InstallOperator(ctx, "cert-operator", release.NewStableVersion(), e2etemplates.CertOperatorChartValues, v1alpha1.NewCertConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
