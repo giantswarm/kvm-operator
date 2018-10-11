@@ -131,6 +131,9 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 					BindingName: clusterRolePSP(env.ClusterID(), "kvm-operator"),
 					Name:        clusterRolePSP(env.ClusterID(), "kvm-operator"),
 				},
+				PSP: chartvalues.KVMOperatorPSP{
+					Name: pspName(env.ClusterID(), "kvm-operator"),
+				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
 			values, err = chartvalues.NewKVMOperator(c)
