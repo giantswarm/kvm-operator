@@ -103,6 +103,9 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 					BindingName: clusterRolePSP(env.ClusterID(), "flannel-operator"),
 					Name:        clusterRolePSP(env.ClusterID(), "flannel-operator"),
 				},
+				PSP: chartvalues.FlannelOperatorPSP{
+					Name: pspName(env.ClusterID(), "flannel-operator"),
+				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
 			flannelValues, err = chartvalues.NewFlannelOperator(c)

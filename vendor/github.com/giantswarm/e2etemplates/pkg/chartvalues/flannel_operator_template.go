@@ -14,4 +14,5 @@ Installation:
       Registry:
         PullSecret:
           DockerConfigJSON: "{\"auths\":{\"quay.io\":{\"auth\":\"{{ .RegistryPullSecret }}\"}}}"
+pspName: {{ .PSP.Name }}
 `

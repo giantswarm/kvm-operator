@@ -10,11 +10,16 @@ type FlannelOperatorConfig struct {
 	ClusterRole        FlannelOperatorClusterRole
 	ClusterRolePSP     FlannelOperatorClusterRole
 	RegistryPullSecret string
+	PSP                FlannelOperatorPSP
 }
 
 type FlannelOperatorClusterRole struct {
 	BindingName string
 	Name        string
+}
+
+type FlannelOperatorPSP struct {
+	Name string
 }
 
 func NewFlannelOperator(config FlannelOperatorConfig) (string, error) {
@@ -32,6 +37,9 @@ func NewFlannelOperator(config FlannelOperatorConfig) (string, error) {
 	}
 	if config.ClusterRolePSP.Name == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.ClusterRolePSP.Name must not be empty", config)
+	}
+	if config.PSP.Name == "" {
+		return "", microerror.Maskf(invalidConfigError, "%T.PSP.Name must not be empty", config)
 	}
 	if config.RegistryPullSecret == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.RegistryPullSecret must not be empty", config)
