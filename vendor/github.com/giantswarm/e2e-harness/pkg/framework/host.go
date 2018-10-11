@@ -24,6 +24,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	aggregationclient "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"github.com/giantswarm/e2e-harness/pkg/framework/filelogger"
 	"github.com/giantswarm/e2e-harness/pkg/harness"
@@ -47,9 +48,10 @@ type Host struct {
 	logger     micrologger.Logger
 	filelogger *filelogger.FileLogger
 
-	g8sClient  *versioned.Clientset
-	k8sClient  kubernetes.Interface
-	restConfig *rest.Config
+	g8sClient            *versioned.Clientset
+	k8sClient            kubernetes.Interface
+	k8sAggregationClient *aggregationclient.Clientset
+	restConfig           *rest.Config
 
 	clusterID       string
 	targetNamespace string
@@ -58,7 +60,7 @@ type Host struct {
 
 func NewHost(c HostConfig) (*Host, error) {
 	if c.Backoff == nil {
-		c.Backoff = backoff.NewExponential(ShortMaxWait, 60*time.Second)
+		c.Backoff = backoff.NewExponential(backoff.ShortMaxWait, backoff.LongMaxInterval)
 	}
 	if c.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", c)
@@ -86,6 +88,10 @@ func NewHost(c HostConfig) (*Host, error) {
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
+	k8sAggregationClient, err := aggregationclient.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
 	var fileLogger *filelogger.FileLogger
 	{
 		fc := filelogger.Config{
@@ -104,9 +110,10 @@ func NewHost(c HostConfig) (*Host, error) {
 		logger:     c.Logger,
 		filelogger: fileLogger,
 
-		g8sClient:  g8sClient,
-		k8sClient:  k8sClient,
-		restConfig: restConfig,
+		g8sClient:            g8sClient,
+		k8sClient:            k8sClient,
+		k8sAggregationClient: k8sAggregationClient,
+		restConfig:           restConfig,
 
 		clusterID:       c.ClusterID,
 		targetNamespace: c.TargetNamespace,
@@ -256,7 +263,7 @@ func (h *Host) DeleteGuestCluster(ctx context.Context, provider string) error {
 			}
 		}
 
-		b := backoff.NewExponential(LongMaxWait, 60*time.Second)
+		b := backoff.NewExponential(backoff.LongMaxWait, backoff.LongMaxInterval)
 		n := backoff.NewNotifier(h.logger, context.Background())
 		err := backoff.RetryNotify(o, b, n)
 		if err != nil {
@@ -420,7 +427,7 @@ func (h *Host) InstallCertResource() error {
 
 			return nil
 		}
-		b := backoff.NewExponential(ShortMaxWait, ShortMaxInterval)
+		b := backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 		n := backoff.NewNotifier(h.logger, context.Background())
 		err := backoff.RetryNotify(o, b, n)
 		if err != nil {
@@ -444,7 +451,7 @@ func (h *Host) InstallCertResource() error {
 
 			return nil
 		}
-		b := backoff.NewExponential(ShortMaxWait, ShortMaxInterval)
+		b := backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 		n := func(err error, delay time.Duration) {
 			h.logger.Log("level", "debug", "message", err.Error())
 		}
@@ -463,6 +470,11 @@ func (h *Host) InstallCertResource() error {
 // K8sClient returns the host cluster framework's Kubernetes client.
 func (h *Host) K8sClient() kubernetes.Interface {
 	return h.k8sClient
+}
+
+// K8sAggregationClient returns the host cluster framework's Kubernetes aggregation client.
+func (h *Host) K8sAggregationClient() *aggregationclient.Clientset {
+	return h.k8sAggregationClient
 }
 
 func (h *Host) PodName(namespace, labelSelector string) (string, error) {
@@ -515,7 +527,7 @@ func (h *Host) Teardown() {
 func (h *Host) WaitForPodLog(namespace, needle, podName string) error {
 	needle = os.ExpandEnv(needle)
 
-	timeout := time.After(LongMaxWait)
+	timeout := time.After(backoff.LongMaxWait)
 
 	req := h.k8sClient.CoreV1().
 		RESTClient().

@@ -76,13 +76,23 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 					key.VersionBundleVersionAnnotation: key.VersionBundleVersion(customObject),
 				},
 				Labels: map[string]string{
-					"cluster":  key.ClusterID(customObject),
-					"customer": key.ClusterCustomer(customObject),
-					"app":      key.MasterID,
-					"node":     masterNode.ID,
+					key.LabelApp:          key.MasterID,
+					"cluster":             key.ClusterID(customObject),
+					"customer":            key.ClusterCustomer(customObject),
+					key.LabelCluster:      key.ClusterID(customObject),
+					key.LabelOrganization: key.ClusterCustomer(customObject),
+					key.LabelManagedBy:    key.OperatorName,
+					"node":                masterNode.ID,
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{
+				Selector: &apismetav1.LabelSelector{
+					MatchLabels: map[string]string{
+						key.LabelApp: key.MasterID,
+						"cluster":    key.ClusterID(customObject),
+						"node":       masterNode.ID,
+					},
+				},
 				Strategy: extensionsv1.DeploymentStrategy{
 					Type: extensionsv1.RecreateDeploymentStrategyType,
 				},
@@ -98,11 +108,13 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 						},
 						GenerateName: key.MasterID,
 						Labels: map[string]string{
-							"app":               key.MasterID,
-							"cluster":           key.ClusterID(customObject),
-							"customer":          key.ClusterCustomer(customObject),
-							"node":              masterNode.ID,
-							key.PodWatcherLabel: "kvm-operator",
+							key.LabelApp:          key.MasterID,
+							"cluster":             key.ClusterID(customObject),
+							"customer":            key.ClusterCustomer(customObject),
+							key.LabelCluster:      key.ClusterID(customObject),
+							key.LabelOrganization: key.ClusterCustomer(customObject),
+							"node":                masterNode.ID,
+							key.PodWatcherLabel:   key.OperatorName,
 						},
 					},
 					Spec: apiv1.PodSpec{

@@ -69,6 +69,10 @@ required = [
 
 [[constraint]]
   branch = "master"
+  name = "github.com/giantswarm/microstorage"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/micrologger"
 
 [[constraint]]

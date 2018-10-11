@@ -161,11 +161,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6f3cde87eaf787a81904a579bae0d1d1eb36908c944c556615b02bfd2642bb1a"
+  digest = "1:aee5f8435859ee2e6c032c21d92b3b4853cd81387a3738ac1ac20c85cf3ab560"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
   pruneopts = "UT"
-  revision = "889af437b4d98f8a1ccb66cb85b93de13d8c666e"
+  revision = "ad43cca0891cbff638be34f232c85a23dc96fee9"
 
 [[projects]]
   branch = "master"
@@ -188,7 +188,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:726112bfd9e23024cd645e47c9da62db7c29f690eac83beb2590d342a688a5c8"
+  digest = "1:61741ecc81c082d51a448d70eefd55fc7c95b96df120f9cc4c912a086feee3a2"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
@@ -196,7 +196,7 @@
     "pkg/harness",
   ]
   pruneopts = "UT"
-  revision = "b8f538cd46acde7bd3570348948080de2b07b8ae"
+  revision = "05bd411c3155f53d3a73c8c4653cb9daa894c982"
 
 [[projects]]
   branch = "master"
@@ -215,7 +215,7 @@
     "update/provider",
   ]
   pruneopts = "UT"
-  revision = "bc2f34dab1e20f4be9cfdf04bb1881d47f0daffe"
+  revision = "dc4d7b3d481b35ff65c59784b4bd61bb44987d89"
 
 [[projects]]
   branch = "master"
@@ -338,11 +338,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ddd43139c09097ebf88f8748425ae83d37770763aae32f6a855782847161e587"
+  digest = "1:dcce0e2a37e13265ab8ae53d5403ad511dbad131adefc7b5452d41b1687428f6"
   name = "github.com/giantswarm/microstorage"
-  packages = ["."]
+  packages = [
+    ".",
+    "retrystorage",
+  ]
   pruneopts = "UT"
-  revision = "4411a6307c6b844b7f9e68aaba37407b41b1c4d7"
+  revision = "e7d619b8ec166cd68eb4d026b68b9193bb645d8f"
 
 [[projects]]
   branch = "master"
@@ -1303,6 +1306,22 @@
   version = "v2.10.0"
 
 [[projects]]
+  digest = "1:2af67bd2524aa5fce3cb4bd6e20fbf773b8cf5a9dfc0d1bea7441d98d55f37b5"
+  name = "k8s.io/kube-aggregator"
+  packages = [
+    "pkg/apis/apiregistration",
+    "pkg/apis/apiregistration/v1",
+    "pkg/apis/apiregistration/v1beta1",
+    "pkg/client/clientset_generated/clientset",
+    "pkg/client/clientset_generated/clientset/scheme",
+    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1",
+    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1",
+  ]
+  pruneopts = "UT"
+  revision = "239337b3ca87b9f2ce4d2f03b7a5ed985ffa8206"
+  version = "kubernetes-1.10.4"
+
+[[projects]]
   branch = "master"
   digest = "1:a2c842a1e0aed96fd732b535514556323a6f5edfded3b63e5e0ab1bce188aa54"
   name = "k8s.io/kube-openapi"
@@ -1492,6 +1511,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/cenkalti/backoff",
     "github.com/docker/distribution/reference",
     "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1",
@@ -1526,6 +1546,7 @@
     "github.com/giantswarm/micrologger",
     "github.com/giantswarm/micrologger/microloggertest",
     "github.com/giantswarm/microstorage",
+    "github.com/giantswarm/microstorage/retrystorage",
     "github.com/giantswarm/operatorkit/client/k8scrdclient",
     "github.com/giantswarm/operatorkit/client/k8srestconfig",
     "github.com/giantswarm/operatorkit/controller",
