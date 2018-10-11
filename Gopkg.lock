@@ -188,7 +188,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:61741ecc81c082d51a448d70eefd55fc7c95b96df120f9cc4c912a086feee3a2"
+  digest = "1:94e630c2cf24f5c57b685089124dab32d1e02ab80c693e557195a3910c3b056a"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
@@ -196,15 +196,19 @@
     "pkg/harness",
   ]
   pruneopts = "UT"
-  revision = "52bca47e762aaa93c4e9742020f7719942263ada"
+  revision = "022462abab6f106d3b535b39122f74e5ba76bf1e"
 
 [[projects]]
   branch = "master"
-  digest = "1:f6eb53c7787595a8e3bf6ea20b276390fc0306a7823f4ec7f6f50940decd62a6"
+  digest = "1:5ce6e24c055fa5a890a405f2ad5748dd4d49549141aeeea44b658d291159a676"
   name = "github.com/giantswarm/e2etemplates"
-  packages = ["pkg/e2etemplates"]
+  packages = [
+    "internal/render",
+    "pkg/chartvalues",
+    "pkg/e2etemplates",
+  ]
   pruneopts = "UT"
-  revision = "1e4569c89a56aeb02b9ac57847b7cd8aaa9cc603"
+  revision = "e6b37fc42f44e46d2fdf30ba65c483bfadfe3bce"
 
 [[projects]]
   branch = "master"
@@ -235,11 +239,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a7c5636a10a5693ab1df9c432704696085df0ef00fdc06fafbe6fff315ffffa5"
+  digest = "1:3228a56c6d429de153928f005709174e3606fc5d97ecfea612cf33413aa5ded6"
   name = "github.com/giantswarm/helmclient"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8c3425d2c09be34df48ee947302b34bd76f75804"
+  revision = "cc5508a1d97cba484638bba1081a86a6f5a02ffa"
 
 [[projects]]
   branch = "master"
@@ -349,7 +353,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b8b40056c375b1e73808d7ca246aba85f974cceb0c061ac588e6383123e95f29"
+  digest = "1:acba487087dbf1c4f7ea19b0a695bbd65e1074ba48e21778d777884440d1ad25"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -366,7 +370,7 @@
     "informer",
   ]
   pruneopts = "UT"
-  revision = "5c624728d9f58d3aebe2993e5c6c2091fd8d662c"
+  revision = "590c70603978ef27bc4574718b1374baea774133"
 
 [[projects]]
   branch = "master"
@@ -709,7 +713,7 @@
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "0a8115f42e037a6e327f9a269a26ff6603fb8472"
+  revision = "7866eead363ec334628dbc56e32df590a05f4696"
 
 [[projects]]
   branch = "master"
@@ -806,7 +810,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "e3636079e1a4c1f337f212cc5cd2aca108f6c900"
+  revision = "7c1a557ab941a71c619514f229f0b27ccb0c27cf"
 
 [[projects]]
   branch = "master"
@@ -1488,7 +1492,7 @@
     "pkg/volume/util/types",
   ]
   pruneopts = "UT"
-  revision = "c8454fb0872d31e3dfeedbd4a2413052db56ce61"
+  revision = "ef2c0a556fd76cf4c12b5d82a3dbc45671e05471"
 
 [[projects]]
   branch = "master"
@@ -1521,6 +1525,7 @@
     "github.com/giantswarm/certs/certstest",
     "github.com/giantswarm/crdstorage",
     "github.com/giantswarm/e2e-harness/pkg/framework",
+    "github.com/giantswarm/e2etemplates/pkg/chartvalues",
     "github.com/giantswarm/e2etemplates/pkg/e2etemplates",
     "github.com/giantswarm/e2etests/update",
     "github.com/giantswarm/e2etests/update/provider",
