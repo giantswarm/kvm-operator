@@ -3,3 +3,4 @@ clusterRoleBindingNamePSP: kvm-operator-psp
 clusterRoleName: kvm-operator
 clusterRoleNamePSP: kvm-operator-psp
 namespace: giantswarm
+pspName: kvm-operator-psp
