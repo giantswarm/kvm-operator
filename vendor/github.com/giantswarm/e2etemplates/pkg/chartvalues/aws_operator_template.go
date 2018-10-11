@@ -1,8 +1,6 @@
-package e2etemplates
+package chartvalues
 
-// AWSOperatorChartValues values required by aws-operator-chart, the environment
-// variables will be expanded before writing the contents to a file.
-const AWSOperatorChartValues = `Installation:
+const awsOperatorTemplate = `Installation:
   V1:
     Auth:
       Vault:
@@ -25,38 +23,38 @@ const AWSOperatorChartValues = `Installation:
       SSH:
         SSOPublicKey: 'test'
       Update:
-        Enabled: ${GUEST_UPDATE_ENABLED}
+        Enabled: true
     Name: ci-aws-operator
     Provider:
       AWS:
-        Region: ${AWS_REGION}
+        Region: '{{ .Provider.AWS.Region }}'
         DeleteLoggingBucket: true
         IncludeTags: true
         Route53:
           Enabled: true
-        Encrypter: 'kms'
+        Encrypter: '{{ .Provider.AWS.Encrypter }}'
         TrustedAdvisor:
           Enabled: false
     Registry:
       Domain: quay.io
     Secret:
       AWSOperator:
-        IDRSAPub: ${IDRSA_PUB}
+        IDRSAPub: {{ .Secret.AWSOperator.IDRSAPub }}
         SecretYaml: |
           service:
             aws:
               accesskey:
-                id: ${GUEST_AWS_ACCESS_KEY_ID}
-                secret: ${GUEST_AWS_SECRET_ACCESS_KEY}
-                token: ${GUEST_AWS_SESSION_TOKEN}
+                id: '{{ .Secret.AWSOperator.SecretYaml.Service.AWS.AccessKey.ID }}'
+                secret: '{{ .Secret.AWSOperator.SecretYaml.Service.AWS.AccessKey.Secret }}'
+                token: '{{ .Secret.AWSOperator.SecretYaml.Service.AWS.AccessKey.Token }}'
               hostaccesskey:
-                id: ${HOST_AWS_ACCESS_KEY_ID}
-                secret: ${HOST_AWS_SECRET_ACCESS_KEY}
-                token: ${HOST_AWS_SESSION_TOKEN}
+                id: '{{ .Secret.AWSOperator.SecretYaml.Service.AWS.HostAccessKey.ID }}'
+                secret: '{{ .Secret.AWSOperator.SecretYaml.Service.AWS.HostAccessKey.Secret }}'
+                token: '{{ .Secret.AWSOperator.SecretYaml.Service.AWS.HostAccessKey.Token }}'
 
       Registry:
         PullSecret:
-          DockerConfigJSON: "{\"auths\":{\"quay.io\":{\"auth\":\"${REGISTRY_PULL_SECRET}\"}}}"
+          DockerConfigJSON: "{\"auths\":{\"quay.io\":{\"auth\":\"{{ .RegistryPullSecret }}\"}}}"
     Security:
       RestrictAccess:
         Enabled: false
