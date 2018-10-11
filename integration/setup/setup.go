@@ -90,7 +90,27 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		err = h.InstallStableOperator("flannel-operator", "flannelconfig", template.FlannelOperatorChartValues)
+
+		var flannelValues string
+		{
+			c := chartvalues.FlannelOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.FlannelOperatorClusterRole{
+					BindingName: clusterRole(env.ClusterID(), "flannel-operator"),
+					Name:        clusterRole(env.ClusterID(), "flannel-operator"),
+				},
+				ClusterRolePSP: chartvalues.FlannelOperatorClusterRole{
+					BindingName: clusterRolePSP(env.ClusterID(), "flannel-operator"),
+					Name:        clusterRolePSP(env.ClusterID(), "flannel-operator"),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+			}
+			flannelValues, err = chartvalues.NewFlannelOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+		err = h.InstallStableOperator("flannel-operator", "flannelconfig", flannelValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -104,12 +124,12 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 			c := chartvalues.KVMOperatorConfig{
 				ClusterName: env.ClusterID(),
 				ClusterRole: chartvalues.KVMOperatorClusterRole{
-					BindingName: fmt.Sprintf("%s-kvm-operator", env.ClusterID()),
-					Name:        fmt.Sprintf("%s-kvm-operator", env.ClusterID()),
+					BindingName: clusterRole(env.ClusterID(), "kvm-operator"),
+					Name:        clusterRole(env.ClusterID(), "kvm-operator"),
 				},
 				ClusterRolePSP: chartvalues.KVMOperatorClusterRole{
-					BindingName: fmt.Sprintf("%s-kvm-operator-psp", env.ClusterID()),
-					Name:        fmt.Sprintf("%s-kvm-operator-psp", env.ClusterID()),
+					BindingName: clusterRolePSP(env.ClusterID(), "kvm-operator"),
+					Name:        clusterRolePSP(env.ClusterID(), "kvm-operator"),
 				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
