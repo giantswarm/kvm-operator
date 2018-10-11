@@ -14,6 +14,7 @@ import (
 	cenkalti "github.com/cenkalti/backoff"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
+	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -98,7 +99,27 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		err = h.InstallBranchOperator("kvm-operator", "kvmconfig", template.KVMOperatorChartValues)
+		var values string
+		{
+			c := chartvalues.KVMOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.KVMOperatorClusterRole{
+					BindingName: fmt.Sprintf("%s-kvm-operator", env.ClusterID()),
+					Name:        fmt.Sprintf("%s-kvm-operator", env.ClusterID()),
+				},
+				ClusterRolePSP: chartvalues.KVMOperatorClusterRole{
+					BindingName: fmt.Sprintf("%s-kvm-operator-psp", env.ClusterID()),
+					Name:        fmt.Sprintf("%s-kvm-operator-psp", env.ClusterID()),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+			}
+			values, err = chartvalues.NewKVMOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+
+		err = h.InstallBranchOperator("kvm-operator", "kvmconfig", values)
 		if err != nil {
 			return microerror.Mask(err)
 		}
