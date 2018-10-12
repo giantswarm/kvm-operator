@@ -159,14 +159,14 @@
   revision = "05bd411c3155f53d3a73c8c4653cb9daa894c982"
 
 [[projects]]
-  branch = "master"
+  branch = "add-k8s-template"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
     "pkg/chartvalues",
     "pkg/e2etemplates"
   ]
-  revision = "3c83a2aea37d2241582e9b9ee4481b94299a5465"
+  revision = "510c532a8fe2b41f7a44a691b2d2a931184bae5d"
 
 [[projects]]
   branch = "master"
@@ -1304,6 +1304,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e5c5383d17e895b06e92e62bee379cf1a8f5b60cc954201248430e2bfd5046b0"
+  inputs-digest = "758171f58ff0db28162ba7fcef6fceef7694646c001904bede1374aaf09d2526"
   solver-name = "gps-cdcl"
   solver-version = 1

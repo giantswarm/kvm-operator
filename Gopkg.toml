@@ -44,7 +44,7 @@ required = [
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
-  branch = "master"
+  branch = "add-k8s-template"
   name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
