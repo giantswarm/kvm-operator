@@ -87,12 +87,38 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 	var err error
 
 	{
-		err = h.InstallStableOperator("cert-operator", "certconfig", e2etemplates.CertOperatorChartValues)
+		var certOperatorValues string
+		{
+			c := chartvalues.CertOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.CertOperatorClusterRole{
+					BindingName: key.ClusterRole("cert-operator"),
+					Name:        key.ClusterRole("cert-operator"),
+				},
+				ClusterRolePSP: chartvalues.CertOperatorClusterRole{
+					BindingName: key.ClusterRolePSP("cert-operator"),
+					Name:        key.ClusterRolePSP("cert-operator"),
+				},
+				CommonDomain: env.CommonDomain(),
+				PSP: chartvalues.CertOperatorPSP{
+					Name: key.PSPName("cert-operator"),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+				Vault: chartvalues.CertOperatorVault{
+					Token: env.VaultToken(),
+				},
+			}
+			certOperatorValues, err = chartvalues.NewCertOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+		err = h.InstallStableOperator("cert-operator", "certconfig", certOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		var flannelValues string
+		var flannelOperatorValues string
 		{
 			c := chartvalues.FlannelOperatorConfig{
 				ClusterName: env.ClusterID(),
@@ -109,12 +135,12 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
-			flannelValues, err = chartvalues.NewFlannelOperator(c)
+			flannelOperatorValues, err = chartvalues.NewFlannelOperator(c)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		}
-		err = h.InstallStableOperator("flannel-operator", "flannelconfig", flannelValues)
+		err = h.InstallStableOperator("flannel-operator", "flannelconfig", flannelOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -123,7 +149,7 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		var values string
+		var kvmOperatorValues string
 		{
 			c := chartvalues.KVMOperatorConfig{
 				ClusterName: env.ClusterID(),
@@ -140,13 +166,13 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
-			values, err = chartvalues.NewKVMOperator(c)
+			kvmOperatorValues, err = chartvalues.NewKVMOperator(c)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		}
 
-		err = h.InstallBranchOperator("kvm-operator", "kvmconfig", values)
+		err = h.InstallBranchOperator("kvm-operator", "kvmconfig", kvmOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
