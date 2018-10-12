@@ -5,7 +5,7 @@ package key
 import (
 	"fmt"
 
-	"github.com/giantswarm/aws-operator/integration/env"
+	"github.com/giantswarm/kvm-operator/integration/env"
 )
 
 func ClusterRole(operator string) string {
