@@ -32,6 +32,9 @@ const (
 	// EnvVarKeepResources is the process environment variable representing the
 	// KEEP_RESOURCES env var.
 	EnvVarKeepResources = "KEEP_RESOURCES"
+	// EnvVarRegistryPullSecret is the process environment variable representing the
+	// REGISTRY_PULL_SECRET env var.
+	EnvVarRegistryPullSecret = "REGISTRY_PULL_SECRET"
 	// EnvVarTestedVersion is the process environment variable representing the
 	// TESTED_VERSION env var.
 	EnvVarTestedVersion = "TESTED_VERSION"
@@ -58,6 +61,7 @@ var (
 	testDir              string
 	testedVersion        string
 	keepResources        string
+	registryPullSecret   string
 	vaultToken           string
 	versionBundleVersion string
 )
@@ -102,6 +106,11 @@ func init() {
 		panic(fmt.Sprintf("env var %q must not be empty", EnvVarGithubBotToken))
 	}
 
+	registryPullSecret = os.Getenv(EnvVarRegistryPullSecret)
+	if registryPullSecret == "" {
+		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarRegistryPullSecret))
+	}
+
 	params := &framework.VBVParams{
 		Component: "kvm-operator",
 		Provider:  "kvm",
@@ -133,12 +142,11 @@ func CircleSHA() string {
 }
 
 // ClusterID returns a cluster ID unique to a run integration test. It might
-// look like ci-wip-3cc75-5e958.
+// look like ci-wip-3cc75.
 //
 //     ci is a static identifier stating a CI run of the aws-operator.
 //     wip is a version reference which can also be cur for the current version.
-//     3cc75 is the Git SHA.
-//     5e958 is a hash of the integration test dir, if any.
+//     3cc75 is the Git SHA and the integration test dir combined.
 //
 func ClusterID() string {
 	var parts []string
@@ -167,6 +175,10 @@ func GithubToken() string {
 
 func KeepResources() string {
 	return keepResources
+}
+
+func RegistryPullSecret() string {
+	return registryPullSecret
 }
 
 func TargetNamespace() string {

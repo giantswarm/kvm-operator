@@ -9,11 +9,13 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v13"
 	"github.com/giantswarm/kvm-operator/service/controller/v14"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch1"
+	"github.com/giantswarm/kvm-operator/service/controller/v14patch2"
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 )
 
@@ -23,7 +25,16 @@ type DeleterConfig struct {
 	K8sClient     kubernetes.Interface
 	Logger        micrologger.Logger
 
-	ProjectName string
+	CRDLabelSelector string
+	ProjectName      string
+}
+
+func (c DeleterConfig) newInformerListOptions() metav1.ListOptions {
+	listOptions := metav1.ListOptions{
+		LabelSelector: c.CRDLabelSelector,
+	}
+
+	return listOptions
 }
 
 type Deleter struct {
@@ -47,6 +58,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 			Logger:  config.Logger,
 			Watcher: config.G8sClient.ProviderV1alpha1().KVMConfigs(""),
 
+			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: 30 * time.Second,
 		}
@@ -137,6 +149,22 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV14Patch2 *controller.ResourceSet
+	{
+		c := v14patch2.DeleterResourceSetConfig{
+			CertsSearcher: config.CertsSearcher,
+			K8sClient:     config.K8sClient,
+			Logger:        config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV14Patch2, err = v14patch2.NewDeleterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceSetV15 *controller.ResourceSet
 	{
 		c := v15.DeleterResourceSetConfig{
@@ -157,6 +185,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		resourceSetV13,
 		resourceSetV14,
 		resourceSetV14Patch1,
+		resourceSetV14Patch2,
 		resourceSetV15,
 	}
 

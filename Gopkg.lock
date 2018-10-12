@@ -131,7 +131,7 @@
   branch = "master"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
-  revision = "889af437b4d98f8a1ccb66cb85b93de13d8c666e"
+  revision = "ad43cca0891cbff638be34f232c85a23dc96fee9"
 
 [[projects]]
   branch = "master"
@@ -156,13 +156,17 @@
     "pkg/framework/filelogger",
     "pkg/harness"
   ]
-  revision = "b8f538cd46acde7bd3570348948080de2b07b8ae"
+  revision = "05bd411c3155f53d3a73c8c4653cb9daa894c982"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/e2etemplates"
-  packages = ["pkg/e2etemplates"]
-  revision = "38f8d00a9526a772158c13bb40d454fa32e64ab5"
+  packages = [
+    "internal/render",
+    "pkg/chartvalues",
+    "pkg/e2etemplates"
+  ]
+  revision = "e744d24a996c43754ccfb1650420c9daf4d59e45"
 
 [[projects]]
   branch = "master"
@@ -171,7 +175,7 @@
     "update",
     "update/provider"
   ]
-  revision = "bc2f34dab1e20f4be9cfdf04bb1881d47f0daffe"
+  revision = "dc4d7b3d481b35ff65c59784b4bd61bb44987d89"
 
 [[projects]]
   branch = "master"
@@ -208,7 +212,7 @@
     "v_3_5_0",
     "v_3_6_0"
   ]
-  revision = "d85d5b5eb3de40653cbbd4bc2385298800216811"
+  revision = "f006b0a1fd85172bfb34fca24ad60b82de50eb75"
 
 [[projects]]
   branch = "master"
@@ -273,8 +277,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/microstorage"
-  packages = ["."]
-  revision = "4411a6307c6b844b7f9e68aaba37407b41b1c4d7"
+  packages = [
+    ".",
+    "retrystorage"
+  ]
+  revision = "e7d619b8ec166cd68eb4d026b68b9193bb645d8f"
 
 [[projects]]
   branch = "master"
@@ -314,7 +321,7 @@
   branch = "master"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
-  revision = "a11d285a88c64543d7c6c227e42f81cdb5a91ee6"
+  revision = "f4a1a0068353f19876ed0c4f8adee74b1a33dd00"
 
 [[projects]]
   branch = "master"
@@ -399,10 +406,10 @@
   version = "v1.2.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "c3e9de61cf0678e682ea2b98cf1301ae3a814bc8"
-  version = "v18.1.0"
+  revision = "12fb185f1e8f7f214a16faa183053a16af410c8e"
 
 [[projects]]
   branch = "master"
@@ -786,10 +793,10 @@
   version = "v2.1.8"
 
 [[projects]]
+  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
-  version = "v2.2.1"
 
 [[projects]]
   name = "k8s.io/api"
@@ -1103,6 +1110,20 @@
   version = "v2.10.0"
 
 [[projects]]
+  name = "k8s.io/kube-aggregator"
+  packages = [
+    "pkg/apis/apiregistration",
+    "pkg/apis/apiregistration/v1",
+    "pkg/apis/apiregistration/v1beta1",
+    "pkg/client/clientset_generated/clientset",
+    "pkg/client/clientset_generated/clientset/scheme",
+    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1",
+    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1"
+  ]
+  revision = "239337b3ca87b9f2ce4d2f03b7a5ed985ffa8206"
+  version = "kubernetes-1.10.4"
+
+[[projects]]
   branch = "master"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/util/proto"]
@@ -1283,6 +1304,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1d48702cc82f8f7fece0da78f77c5117cf3c139357fb414c0fa182b046d75f95"
+  inputs-digest = "e5c5383d17e895b06e92e62bee379cf1a8f5b60cc954201248430e2bfd5046b0"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v11"
@@ -23,6 +23,8 @@ import (
 	v14cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch1"
 	v14patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch1/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v14patch2"
+	v14patch2cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch2/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v2"
@@ -50,6 +52,14 @@ type ClusterConfigOIDC struct {
 	IssuerURL     string
 	UsernameClaim string
 	GroupsClaim   string
+}
+
+func (c ClusterConfig) newInformerListOptions() metav1.ListOptions {
+	listOptions := metav1.ListOptions{
+		LabelSelector: c.CRDLabelSelector,
+	}
+
+	return listOptions
 }
 
 type Cluster struct {
@@ -93,13 +103,9 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Logger:  config.Logger,
 			Watcher: config.G8sClient.ProviderV1alpha1().KVMConfigs(""),
 
+			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,
-		}
-		if config.CRDLabelSelector != "" {
-			c.ListOptions = v1.ListOptions{
-				LabelSelector: config.CRDLabelSelector,
-			}
 		}
 
 		newInformer, err = informer.New(c)
@@ -267,6 +273,32 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
+	var resourceSetV14Patch2 *controller.ResourceSet
+	{
+		c := v14patch2.ClusterResourceSetConfig{
+			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.G8sClient,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			ProjectName:        config.ProjectName,
+			OIDC: v14patch2cloudconfig.OIDCConfig{
+				ClientID:      config.OIDC.ClientID,
+				IssuerURL:     config.OIDC.IssuerURL,
+				UsernameClaim: config.OIDC.UsernameClaim,
+				GroupsClaim:   config.OIDC.GroupsClaim,
+			},
+			SSOPublicKey: config.SSOPublicKey,
+		}
+
+		resourceSetV14Patch2, err = v14patch2.NewClusterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceSetV15 *controller.ResourceSet
 	{
 		c := v15.ClusterResourceSetConfig{
@@ -307,6 +339,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				resourceSetV13,
 				resourceSetV14,
 				resourceSetV14Patch1,
+				resourceSetV14Patch2,
 				resourceSetV15,
 			},
 			RESTClient: config.G8sClient.ProviderV1alpha1().RESTClient(),

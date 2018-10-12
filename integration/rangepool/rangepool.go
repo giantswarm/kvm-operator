@@ -21,7 +21,6 @@ const (
 )
 
 func InitRangePool(crdStorage microstorage.Storage, l micrologger.Logger) (*rangepool.Service, error) {
-
 	rangePoolConfig := rangepool.DefaultConfig()
 	rangePoolConfig.Logger = l
 	rangePoolConfig.Storage = crdStorage
