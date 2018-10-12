@@ -192,6 +192,20 @@ func IsPodDraind(pod *corev1.Pod) (bool, error) {
 		return false, microerror.Mask(err)
 	}
 
+	// As a safety net check POD's container statuses. If all containers are
+	// Terminated, POD can be deleted even if annotation is missing still.
+	if !b {
+		for _, cs := range pod.Status.ContainerStatuses {
+			if cs.State.Terminated != nil {
+				b = true
+			} else {
+				// If even single container within POD is not Terminated, return false.
+				b = false
+				break
+			}
+		}
+	}
+
 	return b, nil
 }
 
