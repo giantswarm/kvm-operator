@@ -23,6 +23,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/ipam"
+	"github.com/giantswarm/kvm-operator/integration/key"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
 	"github.com/giantswarm/kvm-operator/integration/storage"
 	"github.com/giantswarm/kvm-operator/integration/teardown"
@@ -96,15 +97,15 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 			c := chartvalues.FlannelOperatorConfig{
 				ClusterName: env.ClusterID(),
 				ClusterRole: chartvalues.FlannelOperatorClusterRole{
-					BindingName: clusterRole(env.ClusterID(), "flannel-operator"),
-					Name:        clusterRole(env.ClusterID(), "flannel-operator"),
+					BindingName: key.ClusterRole("flannel-operator"),
+					Name:        key.ClusterRole("flannel-operator"),
 				},
 				ClusterRolePSP: chartvalues.FlannelOperatorClusterRole{
-					BindingName: clusterRolePSP(env.ClusterID(), "flannel-operator"),
-					Name:        clusterRolePSP(env.ClusterID(), "flannel-operator"),
+					BindingName: key.ClusterRolePSP("flannel-operator"),
+					Name:        key.ClusterRolePSP("flannel-operator"),
 				},
 				PSP: chartvalues.FlannelOperatorPSP{
-					Name: pspName(env.ClusterID(), "flannel-operator"),
+					Name: key.PSPName("flannel-operator"),
 				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
@@ -127,15 +128,15 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 			c := chartvalues.KVMOperatorConfig{
 				ClusterName: env.ClusterID(),
 				ClusterRole: chartvalues.KVMOperatorClusterRole{
-					BindingName: clusterRole(env.ClusterID(), "kvm-operator"),
-					Name:        clusterRole(env.ClusterID(), "kvm-operator"),
+					BindingName: key.ClusterRole("kvm-operator"),
+					Name:        key.ClusterRole("kvm-operator"),
 				},
 				ClusterRolePSP: chartvalues.KVMOperatorClusterRole{
-					BindingName: clusterRolePSP(env.ClusterID(), "kvm-operator"),
-					Name:        clusterRolePSP(env.ClusterID(), "kvm-operator"),
+					BindingName: key.ClusterRolePSP("kvm-operator"),
+					Name:        key.ClusterRolePSP("kvm-operator"),
 				},
 				PSP: chartvalues.KVMOperatorPSP{
-					Name: pspName(env.ClusterID(), "kvm-operator"),
+					Name: key.PSPName("kvm-operator"),
 				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
