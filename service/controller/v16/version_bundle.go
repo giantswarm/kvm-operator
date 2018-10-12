@@ -8,6 +8,26 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
+				Component:   "cloudconfig",
+				Description: "Updated Calico to 3.2.3.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Updated Calico manifest with resource limits.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Enabled admission plugins: DefaultTolerationSeconds, MutatingAdmissionWebhook, ValidatingAdmissionWebhook.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Use patched GiantSwarm build of Kubernetes (hyperkube:v1.11.1-cec4fb8023db783fbf26fb056bf6c76abfcd96cf-giantswarm).",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
 				Component:   "TODO",
 				Description: "TODO",
 				Kind:        versionbundle.KindChanged,
@@ -16,7 +36,7 @@ func VersionBundle() versionbundle.Bundle {
 		Components: []versionbundle.Component{
 			{
 				Name:    "calico",
-				Version: "3.0.5",
+				Version: "3.2.3",
 			},
 			{
 				Name:    "containerlinux",
@@ -28,7 +48,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "etcd",
-				Version: "3.3.3",
+				Version: "3.3.8",
 			},
 			{
 				Name:    "coredns",
