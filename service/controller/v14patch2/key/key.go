@@ -192,21 +192,24 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 		return false, microerror.Mask(err)
 	}
 
-	// As a safety net check POD's container statuses. If all containers are
-	// Terminated, POD can be deleted even if annotation is missing still.
-	if !b {
-		for _, cs := range pod.Status.ContainerStatuses {
-			if cs.State.Terminated != nil {
-				b = true
-			} else {
-				// If even single container within POD is not Terminated, return false.
-				b = false
-				break
-			}
+	return b, nil
+}
+
+// ArePodContainersTerminated checks ContainerState for all containers present
+// in given pod. When all containers are in Terminated state, true is returned.
+func ArePodContainersTerminated(pod *corev1.Pod) bool {
+	var b bool
+	for _, cs := range pod.Status.ContainerStatuses {
+		if cs.State.Terminated != nil {
+			b = true
+		} else {
+			// If even single container within POD is not Terminated, return false.
+			b = false
+			break
 		}
 	}
 
-	return b, nil
+	return b
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
