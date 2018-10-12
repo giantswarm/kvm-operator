@@ -32,7 +32,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	if key.IsPodDeleted(pod) {
-		isDrained, err := key.IsPodDraind(pod)
+		isDrained, err := key.IsPodDrained(pod)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
