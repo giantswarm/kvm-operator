@@ -164,7 +164,7 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 	return customObject.GetDeletionTimestamp() != nil
 }
 
-// IsPodDraind checks whether the pod status indicates it got drained. The pod
+// IsPodDrained checks whether the pod status indicates it got drained. The pod
 // status is partially reflected by its annotations. Here we check for the
 // annotation that tells us if the pod was already drained or not. In case the
 // pod does not have any annotations an unrecoverable error is returned. Such
@@ -173,7 +173,7 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 //
 // TODO(xh3b4sd) handle pod status via the runtime object status primitives
 // and not via annotations.
-func IsPodDraind(pod *corev1.Pod) (bool, error) {
+func IsPodDrained(pod *corev1.Pod) (bool, error) {
 	a := pod.GetAnnotations()
 	if a == nil {
 		return false, microerror.Mask(missingAnnotationError)
