@@ -109,7 +109,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
+  branch = "teemow-remove-aws-elb-settings"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -125,7 +125,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "e52bb804d8aced1aa7ca1aa9173cb8839edd979a"
+  revision = "7b256083d4e1bd68c50f89df78b7ec8875effda5"
 
 [[projects]]
   branch = "master"
@@ -143,10 +143,10 @@
   revision = "d7c7c20319a880eec51586b9f9865720abdf0d6c"
 
 [[projects]]
-  branch = "master"
+  branch = "teemow-update-apiextensions"
   name = "github.com/giantswarm/crdstorage"
   packages = ["."]
-  revision = "5dc8c188b55f2e4b3ba667947d2ba7d15d10c799"
+  revision = "87e5b1acec1ae5f46163dbdec4d3d760a608e168"
 
 [[projects]]
   branch = "master"
@@ -184,10 +184,10 @@
   revision = "51a7ca6b403dc133497da26a0a30684a5df56752"
 
 [[projects]]
-  branch = "master"
+  branch = "teemow-update-apiextensions"
   name = "github.com/giantswarm/guestcluster"
   packages = ["."]
-  revision = "af4b0eb24a293b1950709ac8099fa377e9702266"
+  revision = "32c6739bb31dd5faf1314049cee951b7676ac6c7"
 
 [[projects]]
   branch = "master"
@@ -202,18 +202,16 @@
   revision = "088a71e10de0b950fc9f64e52cf125c86dfb8fa0"
 
 [[projects]]
-  branch = "master"
+  branch = "teemow-prune-unused-versions"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
-    "v_1_1_0",
-    "v_2_0_1",
     "v_3_2_5",
     "v_3_4_0",
     "v_3_5_0",
     "v_3_6_0",
     "v_3_6_2"
   ]
-  revision = "5b87febc34e9d2582b09f438e220909f179af994"
+  revision = "32cf2c99944e01b21834b4d29c9af7661668e171"
 
 [[projects]]
   branch = "master"
@@ -319,10 +317,10 @@
   revision = "5e1f0ed497cf04625fccc565bf13449e4493da29"
 
 [[projects]]
-  branch = "master"
+  branch = "teemow-update-apiextensions"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
-  revision = "f4a1a0068353f19876ed0c4f8adee74b1a33dd00"
+  revision = "b219c7c9d25a34da2b2105df0d4a1ccc70352b96"
 
 [[projects]]
   branch = "master"
@@ -1305,6 +1303,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9bf68a95b4c4282eaab4dfeeabfdf2140aadc365fdc2da389ea4a1564e7cd25b"
+  inputs-digest = "190dcc69393135c0da505f408c214068e3f96f06fd9df46c3b0c0167dcbd492f"
   solver-name = "gps-cdcl"
   solver-version = 1
