@@ -27,8 +27,6 @@ import (
 	v14patch2cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch2/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v2"
-	"github.com/giantswarm/kvm-operator/service/controller/v4"
 )
 
 type ClusterConfig struct {
@@ -109,46 +107,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 
 		newInformer, err = informer.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV2 *controller.ResourceSet
-	{
-		c := v2.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			HandledVersionBundles: []string{
-				"1.0.0",
-				"0.1.0",
-				"", // This is for legacy custom objects.
-			},
-			Name: config.ProjectName,
-		}
-
-		resourceSetV2, err = v2.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV4 *controller.ResourceSet
-	{
-		c := v4.ResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-		}
-
-		resourceSetV4, err = v4.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -332,8 +290,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Informer:  newInformer,
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{
-				resourceSetV2,
-				resourceSetV4,
 				resourceSetV11,
 				resourceSetV12,
 				resourceSetV13,
