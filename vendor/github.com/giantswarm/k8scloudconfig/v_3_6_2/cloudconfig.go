@@ -1,4 +1,4 @@
-package v_4_0_0
+package v_3_6_2
 
 import (
 	"bytes"
@@ -8,7 +8,6 @@ import (
 
 	"strings"
 
-	ignition "github.com/giantswarm/k8scloudconfig/ignition/v_2_2_0"
 	"github.com/giantswarm/microerror"
 )
 
@@ -73,13 +72,7 @@ func (c *CloudConfig) ExecuteTemplate() error {
 	if err != nil {
 		return err
 	}
-
-	ignitionJSON, err := ignition.ConvertTemplatetoJSON(buf.Bytes())
-	if err != nil {
-		return err
-	}
-
-	c.config = string(ignitionJSON)
+	c.config = buf.String()
 
 	return nil
 }
