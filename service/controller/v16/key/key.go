@@ -218,18 +218,13 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 // ArePodContainersTerminated checks ContainerState for all containers present
 // in given pod. When all containers are in Terminated state, true is returned.
 func ArePodContainersTerminated(pod *corev1.Pod) bool {
-	var b bool
 	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Terminated != nil {
-			b = true
-		} else {
-			// If even single container within POD is not Terminated, return false.
-			b = false
-			break
+		if cs.State.Terminated == nil {
+			return false
 		}
 	}
 
-	return b
+	return true
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
