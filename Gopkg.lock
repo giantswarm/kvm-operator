@@ -2,14 +2,6 @@
 
 
 [[projects]]
-  digest = "1:24191498b228ccb2317e6b756082d0f2ec10e1cbc5be0cdc95e832d754a34f70"
-  name = "github.com/Azure/go-autorest"
-  packages = ["autorest/to"]
-  pruneopts = "UT"
-  revision = "4b7f49dc5db2e1e6d528524d269b4181981a7ebf"
-  version = "v11.1.1"
-
-[[projects]]
   digest = "1:9f3b30d9f8e0d7040f729b82dcbc8f0dead820a133b3147ce355fc451f32d761"
   name = "github.com/BurntSushi/toml"
   packages = ["."]
@@ -24,45 +16,6 @@
   pruneopts = "UT"
   revision = "c7af12943936e8c39859482e61f0574c2fd7fc75"
   version = "v1.4.2"
-
-[[projects]]
-  digest = "1:c4199e777f8f126719b7ac497c2d342c9f7513b555325ff8a8e65c10a68de1bf"
-  name = "github.com/aws/aws-sdk-go"
-  packages = [
-    "aws",
-    "aws/awserr",
-    "aws/awsutil",
-    "aws/client",
-    "aws/client/metadata",
-    "aws/corehandlers",
-    "aws/credentials",
-    "aws/credentials/ec2rolecreds",
-    "aws/credentials/endpointcreds",
-    "aws/credentials/stscreds",
-    "aws/csm",
-    "aws/defaults",
-    "aws/ec2metadata",
-    "aws/endpoints",
-    "aws/request",
-    "aws/session",
-    "aws/signer/v4",
-    "internal/sdkio",
-    "internal/sdkrand",
-    "internal/sdkuri",
-    "internal/shareddefaults",
-    "private/protocol",
-    "private/protocol/ec2query",
-    "private/protocol/query",
-    "private/protocol/query/queryutil",
-    "private/protocol/rest",
-    "private/protocol/xml/xmlutil",
-    "service/cloudformation",
-    "service/ec2",
-    "service/sts",
-  ]
-  pruneopts = "UT"
-  revision = "572272ee7c4503c8a32f79ec16b959c9e8a211c3"
-  version = "v1.15.55"
 
 [[projects]]
   branch = "master"
@@ -216,30 +169,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:96e513d9a9ded8b733e417f6a856f1a9f5c35614b742ed29b87a0b32668b282d"
-  name = "github.com/giantswarm/aws-operator"
-  packages = [
-    "integration/env",
-    "integration/setup",
-  ]
-  pruneopts = "UT"
-  revision = "7515045288ace31c029bbce4b40f686ee29d711b"
-
-[[projects]]
-  branch = "master"
-  digest = "1:69a7762ccf55bbfd7131d1527793889a5aa2eebd5df1c8e201c2a692d1a1393e"
-  name = "github.com/giantswarm/azure-operator"
-  packages = [
-    "integration/env",
-    "integration/network",
-    "service/controller/v3/key",
-    "service/controller/v3/network",
-  ]
-  pruneopts = "UT"
-  revision = "88694dc40f8ee7c164057beb8577fb1be19a4161"
-
-[[projects]]
-  branch = "master"
   digest = "1:aee5f8435859ee2e6c032c21d92b3b4853cd81387a3738ac1ac20c85cf3ab560"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
@@ -278,14 +207,6 @@
   ]
   pruneopts = "UT"
   revision = "022462abab6f106d3b535b39122f74e5ba76bf1e"
-
-[[projects]]
-  branch = "master"
-  digest = "1:7ed0cd22c272460826da757a7455ef5171f797fc6ec82a1130d6983cd3570b1f"
-  name = "github.com/giantswarm/e2eclients"
-  packages = ["aws"]
-  pruneopts = "UT"
-  revision = "d467639908a92260877d2158bdc747d412040db9"
 
 [[projects]]
   branch = "master"
@@ -498,14 +419,6 @@
   revision = "9a4f3249a5b5a080d13f1db2580cf09ba5d14ca1"
 
 [[projects]]
-  digest = "1:15e27372d379b45b18ac917b9dafc45c45485239490ece18cca97a12f9591146"
-  name = "github.com/go-ini/ini"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "9c8236e659b76e87bf02044d06fde8683008ff3e"
-  version = "v1.39.0"
-
-[[projects]]
   digest = "1:83a37f3bd4ccd13469775ef771e943e6c7cfaba6926decff6c83135e56512f08"
   name = "github.com/go-kit/kit"
   packages = [
@@ -712,13 +625,6 @@
   pruneopts = "UT"
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
   version = "v1.0"
-
-[[projects]]
-  digest = "1:e22af8c7518e1eab6f2eab2b7d7558927f816262586cd6ed9f349c97a6c285c4"
-  name = "github.com/jmespath/go-jmespath"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "0b12d6b5"
 
 [[projects]]
   digest = "1:3e551bbb3a7c0ab2a2bf4660e7fcad16db089fdcfbb44b0199e62838038623ea"
@@ -1626,8 +1532,6 @@
     "github.com/giantswarm/apiextensions/pkg/clientset/versioned",
     "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake",
     "github.com/giantswarm/apprclient",
-    "github.com/giantswarm/aws-operator/integration/setup",
-    "github.com/giantswarm/azure-operator/integration/env",
     "github.com/giantswarm/backoff",
     "github.com/giantswarm/certs",
     "github.com/giantswarm/certs/certstest",
