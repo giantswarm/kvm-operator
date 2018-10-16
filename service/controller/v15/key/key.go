@@ -43,6 +43,7 @@ const (
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:db5f9c0ad08fd99a7e775e31fba99e5c7f87ab59"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
+	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:dd07d71449651b2e9c8bd5d7834100451984b722"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1G"
@@ -189,7 +190,7 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 	return customObject.GetDeletionTimestamp() != nil
 }
 
-// IsPodDraind checks whether the pod status indicates it got drained. The pod
+// IsPodDrained checks whether the pod status indicates it got drained. The pod
 // status is partially reflected by its annotations. Here we check for the
 // annotation that tells us if the pod was already drained or not. In case the
 // pod does not have any annotations an unrecoverable error is returned. Such
@@ -198,7 +199,7 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 //
 // TODO(xh3b4sd) handle pod status via the runtime object status primitives
 // and not via annotations.
-func IsPodDraind(pod *corev1.Pod) (bool, error) {
+func IsPodDrained(pod *corev1.Pod) (bool, error) {
 	a := pod.GetAnnotations()
 	if a == nil {
 		return false, microerror.Mask(missingAnnotationError)

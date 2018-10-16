@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: kvm-operator-psp
+  name: {{ .Values.pspName }}
 spec:
   privileged: false
   fsGroup:

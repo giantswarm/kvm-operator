@@ -140,7 +140,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d94d9588aec831e11ac5c7812f86336dac9bd9197d0a1c11c4fa92e17ad3e9e7"
+  digest = "1:6efca326f7f84ef32aeba9fc990751adb74326ebd21dbd88a409df1f15f3682c"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -157,7 +157,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "de2e518b9b9ce196838462ab602febb94e6dafdf"
+  revision = "7cd02384d6dee74cf9932ce9e0d6d4a48e6fcdc3"
 
 [[projects]]
   branch = "master"
@@ -200,7 +200,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5ce6e24c055fa5a890a405f2ad5748dd4d49549141aeeea44b658d291159a676"
+  digest = "1:7ccfb8d35ae2a568a20e6f8c7b84b8908f1bb0e65731446297abc675c11be3bb"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
@@ -208,7 +208,7 @@
     "pkg/e2etemplates",
   ]
   pruneopts = "UT"
-  revision = "e6b37fc42f44e46d2fdf30ba65c483bfadfe3bce"
+  revision = "c53cb2d19eddbf6c67aa642622927a8f3a9401d2"
 
 [[projects]]
   branch = "master"
@@ -255,7 +255,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:eb6cc81f52025c79845c781c55cd273787230177cc38c20e24c570e487d51d26"
+  digest = "1:9c6d2fa3cad1a8f86b10709b8ab5335054b98b9b3638a7e536c6c0fe7731f282"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -264,9 +264,10 @@
     "v_3_4_0",
     "v_3_5_0",
     "v_3_6_0",
+    "v_3_6_2",
   ]
   pruneopts = "T"
-  revision = "509cd3028e75890b1ed82f506e4f25f31f046008"
+  revision = "5b87febc34e9d2582b09f438e220909f179af994"
 
 [[projects]]
   branch = "master"
@@ -503,11 +504,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c42fb0b13261a9bcd08451ee1859e61bea33aa6743916a2e3fb61f33ff6b25c7"
+  digest = "1:477593f0f2a9b84788c777582342ef5aab4fbcc23a48606e63a508bd5adda3c0"
   name = "github.com/google/go-github"
   packages = ["github"]
   pruneopts = "UT"
-  revision = "dd29b543e14c33e6373773f2c5ea008b29aeac95"
+  revision = "aa7423eb79707e88352b2af2ff5fa5a4493f88c6"
 
 [[projects]]
   digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
@@ -713,7 +714,7 @@
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "7866eead363ec334628dbc56e32df590a05f4696"
+  revision = "1cafe34db7fdec6022e17e00e1c1ea501022f3e4"
 
 [[projects]]
   branch = "master"
@@ -725,7 +726,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:63b68062b8968092eb86bedc4e68894bd096ea6b24920faca8b9dcf451f54bb5"
+  digest = "1:c0d39a0cad193ac49b6e24516e0f994b241d7c27142e5a58e8bd13defb2d9ac8"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -733,7 +734,7 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
+  revision = "bcb74de08d37a417cb6789eec1d6c810040f0470"
 
 [[projects]]
   branch = "master"
@@ -810,7 +811,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "7c1a557ab941a71c619514f229f0b27ccb0c27cf"
+  revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
 
 [[projects]]
   branch = "master"
@@ -828,7 +829,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "146acd28ed5894421fb5aac80ca93bc1b1f46f87"
+  revision = "49bb7cea24b1df9410e1712aa6433dae904ff66a"
 
 [[projects]]
   branch = "master"
@@ -851,14 +852,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:850d28ab022512e2cd3cf511a77f363c29e22689b4031f2050871f5de47ae4a0"
+  digest = "1:f5aa274a0377f85735edc7fedfb0811d3cbc20af91633797cb359e29c3272271"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4497e2df6f9e69048a54498c7affbbec3294ad47"
+  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
 
 [[projects]]
   digest = "1:e5a8511f063c38c51ab9ab80e718e9149f692652aeb4e393a8c020dd1bf38ca2"
@@ -1492,15 +1493,15 @@
     "pkg/volume/util/types",
   ]
   pruneopts = "UT"
-  revision = "ef2c0a556fd76cf4c12b5d82a3dbc45671e05471"
+  revision = "e6ab4ee54f71e7a403cc733534bab86fd959ecb7"
 
 [[projects]]
   branch = "master"
-  digest = "1:867d98a27033c52150eb4c01ca0f9be938d3010e9a4909ea3a881a83c3ac1b3f"
+  digest = "1:5f7c5c328fa635a57fa13cb90b90ab4892be3afd701fef8ec7425d7473eb9151"
   name = "k8s.io/utils"
   packages = ["exec"]
   pruneopts = "UT"
-  revision = "cd34563cd63c2bd7c6fe88a73c4dcf34ed8a67cb"
+  revision = "14b61cea4a067d0af104cea47bbf51cf100c0253"
 
 [[projects]]
   branch = "master"
@@ -1538,6 +1539,7 @@
     "github.com/giantswarm/k8scloudconfig/v_3_4_0",
     "github.com/giantswarm/k8scloudconfig/v_3_5_0",
     "github.com/giantswarm/k8scloudconfig/v_3_6_0",
+    "github.com/giantswarm/k8scloudconfig/v_3_6_2",
     "github.com/giantswarm/k8shealthz",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
     "github.com/giantswarm/microendpoint/endpoint/version",

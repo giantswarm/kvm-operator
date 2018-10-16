@@ -23,6 +23,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/ipam"
+	"github.com/giantswarm/kvm-operator/integration/key"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
 	"github.com/giantswarm/kvm-operator/integration/storage"
 	"github.com/giantswarm/kvm-operator/integration/teardown"
@@ -86,11 +87,60 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 	var err error
 
 	{
-		err = h.InstallStableOperator("cert-operator", "certconfig", e2etemplates.CertOperatorChartValues)
+		var certOperatorValues string
+		{
+			c := chartvalues.CertOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.CertOperatorClusterRole{
+					BindingName: key.ClusterRole("cert-operator"),
+					Name:        key.ClusterRole("cert-operator"),
+				},
+				ClusterRolePSP: chartvalues.CertOperatorClusterRole{
+					BindingName: key.ClusterRolePSP("cert-operator"),
+					Name:        key.ClusterRolePSP("cert-operator"),
+				},
+				CommonDomain: env.CommonDomain(),
+				PSP: chartvalues.CertOperatorPSP{
+					Name: key.PSPName("cert-operator"),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+				Vault: chartvalues.CertOperatorVault{
+					Token: env.VaultToken(),
+				},
+			}
+			certOperatorValues, err = chartvalues.NewCertOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+		err = h.InstallStableOperator("cert-operator", "certconfig", certOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		err = h.InstallStableOperator("flannel-operator", "flannelconfig", template.FlannelOperatorChartValues)
+
+		var flannelOperatorValues string
+		{
+			c := chartvalues.FlannelOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.FlannelOperatorClusterRole{
+					BindingName: key.ClusterRole("flannel-operator"),
+					Name:        key.ClusterRole("flannel-operator"),
+				},
+				ClusterRolePSP: chartvalues.FlannelOperatorClusterRole{
+					BindingName: key.ClusterRolePSP("flannel-operator"),
+					Name:        key.ClusterRolePSP("flannel-operator"),
+				},
+				PSP: chartvalues.FlannelOperatorPSP{
+					Name: key.PSPName("flannel-operator"),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+			}
+			flannelOperatorValues, err = chartvalues.NewFlannelOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+		err = h.InstallStableOperator("flannel-operator", "flannelconfig", flannelOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -99,27 +149,30 @@ func Resources(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		var values string
+		var kvmOperatorValues string
 		{
 			c := chartvalues.KVMOperatorConfig{
 				ClusterName: env.ClusterID(),
 				ClusterRole: chartvalues.KVMOperatorClusterRole{
-					BindingName: fmt.Sprintf("%s-kvm-operator", env.ClusterID()),
-					Name:        fmt.Sprintf("%s-kvm-operator", env.ClusterID()),
+					BindingName: key.ClusterRole("kvm-operator"),
+					Name:        key.ClusterRole("kvm-operator"),
 				},
 				ClusterRolePSP: chartvalues.KVMOperatorClusterRole{
-					BindingName: fmt.Sprintf("%s-kvm-operator-psp", env.ClusterID()),
-					Name:        fmt.Sprintf("%s-kvm-operator-psp", env.ClusterID()),
+					BindingName: key.ClusterRolePSP("kvm-operator"),
+					Name:        key.ClusterRolePSP("kvm-operator"),
+				},
+				PSP: chartvalues.KVMOperatorPSP{
+					Name: key.PSPName("kvm-operator"),
 				},
 				RegistryPullSecret: env.RegistryPullSecret(),
 			}
-			values, err = chartvalues.NewKVMOperator(c)
+			kvmOperatorValues, err = chartvalues.NewKVMOperator(c)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		}
 
-		err = h.InstallBranchOperator("kvm-operator", "kvmconfig", values)
+		err = h.InstallBranchOperator("kvm-operator", "kvmconfig", kvmOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
