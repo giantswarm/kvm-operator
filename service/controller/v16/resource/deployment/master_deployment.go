@@ -328,7 +328,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Command: []string{
 									"/shutdown-deferrer",
 									"daemon",
-									"--server.listen.address=http://127.0.0.1:68080",
+									"--server.listen.address=http://127.0.0.1:60080",
 								},
 							},
 						},
