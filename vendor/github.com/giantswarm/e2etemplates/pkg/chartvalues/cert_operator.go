@@ -33,22 +33,22 @@ func NewCertOperator(config CertOperatorConfig) (string, error) {
 		return "", microerror.Maskf(invalidConfigError, "%T.ClusterName must not be empty", config)
 	}
 	if config.ClusterRole.BindingName == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.ClusterRole.BindingName must not be empty", config)
+		config.ClusterRole.BindingName = "cert-operator"
 	}
 	if config.ClusterRole.Name == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.ClusterRole.Name must not be empty", config)
+		config.ClusterRole.Name = "cert-operator"
 	}
 	if config.ClusterRolePSP.BindingName == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.ClusterRolePSP.BindingName must not be empty", config)
+		config.ClusterRolePSP.BindingName = "cert-operator-psp"
 	}
 	if config.ClusterRolePSP.Name == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.ClusterRolePSP.Name must not be empty", config)
+		config.ClusterRolePSP.Name = "cert-operator-psp"
 	}
 	if config.CommonDomain == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.CommonDomain must not be empty", config)
 	}
 	if config.PSP.Name == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.PSP.Name must not be empty", config)
+		config.PSP.Name = "cert-operator-psp"
 	}
 	if config.RegistryPullSecret == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.RegistryPullSecret must not be empty", config)
