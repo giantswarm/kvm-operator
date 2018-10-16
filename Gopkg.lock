@@ -166,7 +166,7 @@
     "pkg/chartvalues",
     "pkg/e2etemplates"
   ]
-  revision = "3c83a2aea37d2241582e9b9ee4481b94299a5465"
+  revision = "199d79f25147166594f570865c54eaca99d9c37a"
 
 [[projects]]
   branch = "master"
@@ -1305,6 +1305,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9bf68a95b4c4282eaab4dfeeabfdf2140aadc365fdc2da389ea4a1564e7cd25b"
+  inputs-digest = "e5c5383d17e895b06e92e62bee379cf1a8f5b60cc954201248430e2bfd5046b0"
   solver-name = "gps-cdcl"
   solver-version = 1

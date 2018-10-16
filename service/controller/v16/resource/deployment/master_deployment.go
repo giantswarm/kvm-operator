@@ -321,6 +321,11 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									},
 								},
 							},
+							{
+								Name:            "shutdown-deferrer",
+								Image:           key.ShutdownDeferrerDocker,
+								ImagePullPolicy: apiv1.PullAlways,
+							},
 						},
 					},
 				},
