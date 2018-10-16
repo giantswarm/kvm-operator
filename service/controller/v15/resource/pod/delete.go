@@ -53,9 +53,9 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 			return nil
 		}
-		areContainersTerminated := key.ArePodContainersTerminated(currentPod)
-		if areContainersTerminated {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is already drained")
+
+		if key.ArePodContainersTerminated(currentPod) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is treated as drained")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "all pod's containers are terminated")
 			resourcecanceledcontext.SetCanceled(ctx)
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
