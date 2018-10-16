@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 
-	"github.com/giantswarm/azure-operator/integration/env"
+	"github.com/giantswarm/kvm-operator/integration/env"
 )
 
 const (
@@ -77,8 +77,9 @@ func NewConfig() (Config, error) {
 		c := framework.HostConfig{
 			Logger: logger,
 
-			ClusterID:  env.ClusterID(),
-			VaultToken: env.VaultToken(),
+			ClusterID:       env.ClusterID(),
+			TargetNamespace: env.TargetNamespace(),
+			VaultToken:      env.VaultToken(),
 		}
 
 		host, err = framework.NewHost(c)
