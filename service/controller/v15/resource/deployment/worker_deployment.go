@@ -289,8 +289,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Name:            "shutdown-deferrer",
 								Image:           key.ShutdownDeferrerDocker,
 								ImagePullPolicy: apiv1.PullAlways,
-								Command: []string{
-									"/shutdown-deferrer",
+								Args: []string{
 									"daemon",
 									"--server.listen.address=http://127.0.0.1:60080",
 								},
