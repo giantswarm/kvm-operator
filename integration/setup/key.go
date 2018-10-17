@@ -1,6 +1,6 @@
 // +build k8srequired
 
-package teardown
+package setup
 
 import (
 	"fmt"

@@ -1,6 +1,6 @@
 // +build k8srequired
 
-package teardown
+package setup
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 )
 
 // Teardown e2e testing environment.
-func Teardown(g *framework.Guest, h *framework.Host) error {
+func Teardown(config Config) error {
 	var err error
 	var errors []error
 	var l micrologger.Logger
@@ -30,13 +30,13 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 	}
-	clusterID := getClusterID(h.TargetNamespace())
+	clusterID := getClusterID(config.Host.TargetNamespace())
 	ctx := context.Background()
 
 	// get flannel info so we can delete it from rangepool
 	var flannelNetwork string
 	{
-		flannelConfig, err := h.G8sClient().CoreV1alpha1().FlannelConfigs(v1.NamespaceDefault).Get(clusterID, v1.GetOptions{})
+		flannelConfig, err := config.Host.G8sClient().CoreV1alpha1().FlannelConfigs(v1.NamespaceDefault).Get(clusterID, v1.GetOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -44,15 +44,15 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	}
 
 	{
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", h.TargetNamespace()))
+		err = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", config.Host.TargetNamespace()))
 		if err != nil {
 			errors = append(errors, microerror.Mask(err))
 		}
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", h.TargetNamespace()))
+		err = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", config.Host.TargetNamespace()))
 		if err != nil {
 			errors = append(errors, microerror.Mask(err))
 		}
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", h.TargetNamespace()))
+		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", config.Host.TargetNamespace()))
 		if err != nil {
 			errors = append(errors, microerror.Mask(err))
 		}
@@ -60,7 +60,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 
 	// wait until crds are deleted by operators
 	o := func() error {
-		certList, err := h.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{
+		certList, err := config.Host.G8sClient().CoreV1alpha1().CertConfigs(v1.NamespaceDefault).List(v1.ListOptions{
 			LabelSelector: crdLabelSelector(clusterID),
 		})
 		if err != nil {
@@ -74,7 +74,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(resourceNotDeleted)
 		}
 
-		flannelList, err := h.G8sClient().CoreV1alpha1().FlannelConfigs(v1.NamespaceDefault).List(v1.ListOptions{
+		flannelList, err := config.Host.G8sClient().CoreV1alpha1().FlannelConfigs(v1.NamespaceDefault).List(v1.ListOptions{
 			LabelSelector: crdLabelSelector(clusterID),
 		})
 
@@ -89,7 +89,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 			return microerror.Mask(resourceNotDeleted)
 		}
 
-		kvmList, err := h.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{
+		kvmList, err := config.Host.G8sClient().ProviderV1alpha1().KVMConfigs(v1.NamespaceDefault).List(v1.ListOptions{
 			LabelSelector: crdLabelSelector(clusterID),
 		})
 		if err != nil {
@@ -110,7 +110,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 	err = backoff.RetryNotify(o, b, n)
 
 	{
-		err = h.K8sClient().CoreV1().Namespaces().Delete(h.TargetNamespace(), &v1.DeleteOptions{})
+		err = config.Host.K8sClient().CoreV1().Namespaces().Delete(config.Host.TargetNamespace(), &v1.DeleteOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -118,7 +118,7 @@ func Teardown(g *framework.Guest, h *framework.Host) error {
 
 	// clear rangepool and ipam values
 	{
-		crdStorage, err := storage.InitCRDStorage(ctx, h, l)
+		crdStorage, err := storage.InitCRDStorage(ctx, config.Host, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
