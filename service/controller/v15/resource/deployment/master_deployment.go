@@ -329,6 +329,20 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									"daemon",
 									"--server.listen.address=http://127.0.0.1:60080",
 								},
+								LivenessProbe: &apiv1.Probe{
+									InitialDelaySeconds: key.InitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: int32(60080)},
+											Host: key.ProbeHost,
+										},
+									},
+								},
 							},
 						},
 					},
