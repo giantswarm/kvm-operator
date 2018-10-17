@@ -8,6 +8,7 @@ import (
 
 	"strings"
 
+	ignition "github.com/giantswarm/k8scloudconfig/ignition/v_2_2_0"
 	"github.com/giantswarm/microerror"
 )
 
@@ -72,7 +73,13 @@ func (c *CloudConfig) ExecuteTemplate() error {
 	if err != nil {
 		return err
 	}
-	c.config = buf.String()
+
+	ignitionJSON, err := ignition.ConvertTemplatetoJSON(buf.Bytes())
+	if err != nil {
+		return err
+	}
+
+	c.config = string(ignitionJSON)
 
 	return nil
 }

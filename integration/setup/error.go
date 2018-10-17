@@ -12,3 +12,13 @@ var executionFailedError = &microerror.Error{
 func IsExecutionFailedError(err error) bool {
 	return microerror.Cause(err) == executionFailedError
 }
+
+var resourceNotDeleted = &microerror.Error{
+	Kind: "resourceNotDeleted",
+	Desc: "Resource has not been deleted, but its required to be deleted.",
+}
+
+// IsResourceNotDeleted asserts resourceNotDeleted.
+func IsResourceNotDeleted(err error) bool {
+	return microerror.Cause(err) == resourceNotDeleted
+}

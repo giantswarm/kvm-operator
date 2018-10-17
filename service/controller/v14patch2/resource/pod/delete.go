@@ -42,12 +42,21 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		isDrained, err := key.IsPodDraind(currentPod)
+		isDrained, err := key.IsPodDrained(currentPod)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 		if isDrained {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is already drained")
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+			return nil
+		}
+
+		if key.ArePodContainersTerminated(currentPod) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is treated as drained")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "all pod's containers are terminated")
 			resourcecanceledcontext.SetCanceled(ctx)
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
@@ -143,11 +152,13 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 	}
 
 	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(c)
-	if err != nil {
+	if apierrors.IsAlreadyExists(err) {
+		r.logger.LogCtx(ctx, "level", "warning", "message", "drainer config for guest cluster node already exists")
+	} else if err != nil {
 		return microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for guest cluster node")
 	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for guest cluster node")
 
 	return nil
 }
