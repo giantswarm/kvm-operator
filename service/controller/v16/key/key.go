@@ -36,6 +36,10 @@ const (
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
+	// Environment variable names for Downward API use (shutdown-deferrer).
+	EnvKeyMyPodName      = "MY_POD_NAME"
+	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
+
 	FlannelEnvPathPrefix = "/run/flannel"
 	CoreosImageDir       = "/var/lib/coreos-kvm-images"
 	CoreosVersion        = "1688.5.3"

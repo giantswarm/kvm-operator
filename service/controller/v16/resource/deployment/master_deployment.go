@@ -329,6 +329,24 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									"daemon",
 									"--server.listen.address=http://127.0.0.1:60080",
 								},
+								Env: []apiv1.EnvVar{
+									{
+										Name: key.EnvKeyMyPodName,
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												FieldPath: "metadata.name",
+											},
+										},
+									},
+									{
+										Name: key.EnvKeyMyPodNamespace,
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												FieldPath: "metadata.namespace",
+											},
+										},
+									},
+								},
 								LivenessProbe: &apiv1.Probe{
 									InitialDelaySeconds: key.InitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
