@@ -6,6 +6,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -44,6 +45,34 @@ func Test_ClusterCustomer(t *testing.T) {
 
 	if ClusterCustomer(customObject) != expectedID {
 		t.Fatalf("Expected customer ID %s but was %s", expectedID, ClusterCustomer(customObject))
+	}
+}
+
+func Test_MemoryQuantityWorker(t *testing.T) {
+	kvmConfigs := []v1alpha1.KVMConfigSpecKVMNode{
+		{Memory: "8G"},
+		{Memory: "15G"},
+		{Memory: "30G"},
+		{Memory: "50G"},
+		{Memory: "100G"},
+	}
+
+	expectedQuantity := []resource.Quantity{
+		resource.MustParse("9775M"),
+		resource.MustParse("17433M"),
+		resource.MustParse("33843M"),
+		resource.MustParse("55722M"),
+		resource.MustParse("110421M"),
+	}
+
+	for i := 0; i < len(kvmConfigs); i++ {
+		quantity, err := MemoryQuantityWorker(kvmConfigs[i])
+		if err != nil {
+			t.Fatal("MemoryQuantityWorker execution failed", kvmConfigs[i])
+		}
+		if quantity.Cmp(expectedQuantity[i]) != 0 {
+			t.Fatal("test case:", i, "expected", expectedQuantity[i].String(), "got ", quantity.String())
+		}
 	}
 }
 
