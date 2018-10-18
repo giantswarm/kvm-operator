@@ -140,7 +140,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6efca326f7f84ef32aeba9fc990751adb74326ebd21dbd88a409df1f15f3682c"
+  digest = "1:393e6510024fefc06c3cbf79db791f9f9a24649a544477ae69dc8080080736c9"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -157,7 +157,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "7cd02384d6dee74cf9932ce9e0d6d4a48e6fcdc3"
+  revision = "1a11ac7c462d817d05222b1c7f83672b3f52a5a9"
 
 [[projects]]
   branch = "master"
@@ -196,7 +196,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4dbb9ba576bfefa3dba31343b3752963268f4756ad873ef223e807482c4b5690"
+  digest = "1:388d013980329ddf136ac4be05146e1e0ad428b8146f980848a48c63b84d01a3"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
@@ -206,11 +206,11 @@
     "pkg/release",
   ]
   pruneopts = "UT"
-  revision = "022462abab6f106d3b535b39122f74e5ba76bf1e"
+  revision = "3557509449cae022e9461ea164377f28e3ffaa70"
 
 [[projects]]
   branch = "master"
-  digest = "1:7ccfb8d35ae2a568a20e6f8c7b84b8908f1bb0e65731446297abc675c11be3bb"
+  digest = "1:f4588378cf47b53ca1e68c9e7cd2bf274ba6c491bac4f5194a0b20c99b2e0dd1"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
@@ -218,7 +218,7 @@
     "pkg/e2etemplates",
   ]
   pruneopts = "UT"
-  revision = "c53cb2d19eddbf6c67aa642622927a8f3a9401d2"
+  revision = "06c2c539a172dd6031805a93d4d645eef0266624"
 
 [[projects]]
   branch = "master"
@@ -265,7 +265,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9c6d2fa3cad1a8f86b10709b8ab5335054b98b9b3638a7e536c6c0fe7731f282"
+  digest = "1:3b4aad44e8bcbdaf69d854ef7bc6a75bc7877b19d4ead65dca5bebbb71cff9c9"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -277,15 +277,7 @@
     "v_3_6_2",
   ]
   pruneopts = "T"
-  revision = "5b87febc34e9d2582b09f438e220909f179af994"
-
-[[projects]]
-  branch = "master"
-  digest = "1:b08bd7378e47e7fc971a77b99c5e9fbfbc898fb648bcbd6e5ce1d6bfd7e265bb"
-  name = "github.com/giantswarm/k8shealthz"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "9abe467ab9085610b261319dfe875c6d13537b06"
+  revision = "512daada5b2f737d03c81efd123079854dbaf133"
 
 [[projects]]
   branch = "master"
@@ -825,7 +817,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1e5a14e360f8d47cb1aadb7235bae7e8b965b841b9d1a3d639318733c47f5597"
+  digest = "1:e1755c1346c4d575b8d898a77d294ff88f128a0143cf83a2ecfb8a4f2d598fb9"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -839,18 +831,18 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "49bb7cea24b1df9410e1712aa6433dae904ff66a"
+  revision = "04a2e542c03f1d053ab3e4d6e5abcd4b66e2be8e"
 
 [[projects]]
   branch = "master"
-  digest = "1:28b360454e161aae382c007449bcb1296087b5b52b4f37623bba0f9f9d7207f4"
+  digest = "1:1bce229fad01cbad9bd00e70ca32afff25ac2cea3dd710d50f88c967c1c3df65"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
     "internal",
   ]
   pruneopts = "UT"
-  revision = "c57b0facaced709681d9f90397429b9430a74754"
+  revision = "9dcd33a902f40452422c2367fefcb95b54f9f8f8"
 
 [[projects]]
   branch = "master"
@@ -1341,7 +1333,7 @@
   name = "k8s.io/kube-openapi"
   packages = ["pkg/util/proto"]
   pruneopts = "UT"
-  revision = "9dfdf9be683f61f82cda12362c44c784e0778b56"
+  revision = "5d05df014ac640f14b5e777958248251c2ef5e86"
 
 [[projects]]
   branch = "release-1.10"
@@ -1503,7 +1495,7 @@
     "pkg/volume/util/types",
   ]
   pruneopts = "UT"
-  revision = "f43f9e4d3252d59ed495010733ec91105d357777"
+  revision = "475542a33acb91c56ef6bc6f735306e72d7c1dd9"
 
 [[projects]]
   branch = "master"
@@ -1511,7 +1503,7 @@
   name = "k8s.io/utils"
   packages = ["exec"]
   pruneopts = "UT"
-  revision = "14b61cea4a067d0af104cea47bbf51cf100c0253"
+  revision = "a82851343d668ce8cdd50da9f8d565164fad6951"
 
 [[projects]]
   branch = "master"
@@ -1555,10 +1547,8 @@
     "github.com/giantswarm/k8scloudconfig/v_3_5_0",
     "github.com/giantswarm/k8scloudconfig/v_3_6_0",
     "github.com/giantswarm/k8scloudconfig/v_3_6_2",
-    "github.com/giantswarm/k8shealthz",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
     "github.com/giantswarm/microendpoint/endpoint/version",
-    "github.com/giantswarm/microendpoint/service/healthz",
     "github.com/giantswarm/microendpoint/service/version",
     "github.com/giantswarm/microerror",
     "github.com/giantswarm/microkit/command",
