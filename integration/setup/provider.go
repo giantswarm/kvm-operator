@@ -9,9 +9,12 @@ import (
 	"io/ioutil"
 	gotemplate "text/template"
 
-	cenkalti "github.com/cenkalti/backoff"
+	cenkaltibackoff "github.com/cenkalti/backoff"
+	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	providerv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
+	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -28,6 +31,8 @@ import (
 
 // provider installs the operator and tenant cluster CR.
 func provider(config Config) error {
+	ctx := context.Background()
+
 	{
 		c := chartvalues.FlannelOperatorConfig{
 			ClusterName: env.ClusterID(),
@@ -50,7 +55,7 @@ func provider(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Host.InstallStableOperator("flannel-operator", "flannelconfig", values)
+		err = config.Release.InstallOperator(ctx, "flannel-operator", release.NewStableVersion(), values, corev1alpha1.NewFlannelConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -78,7 +83,7 @@ func provider(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Host.InstallBranchOperator("kvm-operator", "kvmconfig", values)
+		err = config.Release.InstallOperator(context.Background(), "kvm-operator", release.NewVersion(env.CircleSHA()), values, providerv1alpha1.NewKVMConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -115,7 +120,7 @@ func installKVMResource(h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		b := func() cenkalti.BackOff {
+		b := func() cenkaltibackoff.BackOff {
 			return backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 		}
 
