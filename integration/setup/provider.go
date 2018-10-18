@@ -56,7 +56,7 @@ func provider(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.InstallOperator(ctx, key.ReleaseName("flannel-operator"), release.NewStableVersion(), values, corev1alpha1.NewFlannelConfigCRD())
+		err = config.Release.InstallOperator(ctx, "flannel-operator", release.NewStableVersion(), values, corev1alpha1.NewFlannelConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -85,7 +85,7 @@ func provider(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.InstallOperator(context.Background(), key.ReleaseName("kvm-operator"), release.NewVersion(env.CircleSHA()), values, providerv1alpha1.NewKVMConfigCRD())
+		err = config.Release.InstallOperator(context.Background(), "kvm-operator", release.NewVersion(env.CircleSHA()), values, providerv1alpha1.NewKVMConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}

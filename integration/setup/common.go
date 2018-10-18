@@ -45,7 +45,7 @@ func common(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.InstallOperator(ctx, key.ReleaseName("cert-operator"), release.NewStableVersion(), values, corev1alpha1.NewCertConfigCRD())
+		err = config.Release.InstallOperator(ctx, "cert-operator", release.NewStableVersion(), values, corev1alpha1.NewCertConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -62,7 +62,7 @@ func common(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.InstallOperator(ctx, key.ReleaseName("node-operator"), release.NewStableVersion(), values, corev1alpha1.NewNodeConfigCRD())
+		err = config.Release.InstallOperator(ctx, "node-operator", release.NewStableVersion(), values, corev1alpha1.NewNodeConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
