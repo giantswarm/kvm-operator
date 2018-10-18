@@ -32,6 +32,9 @@ const (
 	// EnvVarKeepResources is the process environment variable representing the
 	// KEEP_RESOURCES env var.
 	EnvVarKeepResources = "KEEP_RESOURCES"
+	// EnvVarRegistryPullSecret is the process environment variable representing the
+	// REGISTRY_PULL_SECRET env var.
+	EnvVarRegistryPullSecret = "REGISTRY_PULL_SECRET"
 	// EnvVarTestedVersion is the process environment variable representing the
 	// TESTED_VERSION env var.
 	EnvVarTestedVersion = "TESTED_VERSION"
@@ -58,6 +61,7 @@ var (
 	testDir              string
 	testedVersion        string
 	keepResources        string
+	registryPullSecret   string
 	vaultToken           string
 	versionBundleVersion string
 )
@@ -100,6 +104,11 @@ func init() {
 	githubToken = os.Getenv(EnvVarGithubBotToken)
 	if githubToken == "" {
 		panic(fmt.Sprintf("env var %q must not be empty", EnvVarGithubBotToken))
+	}
+
+	registryPullSecret = os.Getenv(EnvVarRegistryPullSecret)
+	if registryPullSecret == "" {
+		panic(fmt.Sprintf("env var '%s' must not be empty", EnvVarRegistryPullSecret))
 	}
 
 	params := &framework.VBVParams{
@@ -166,6 +175,10 @@ func GithubToken() string {
 
 func KeepResources() string {
 	return keepResources
+}
+
+func RegistryPullSecret() string {
+	return registryPullSecret
 }
 
 func TargetNamespace() string {

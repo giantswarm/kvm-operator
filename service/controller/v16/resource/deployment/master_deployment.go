@@ -86,6 +86,13 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 				},
 			},
 			Spec: extensionsv1.DeploymentSpec{
+				Selector: &apismetav1.LabelSelector{
+					MatchLabels: map[string]string{
+						key.LabelApp: key.MasterID,
+						"cluster":    key.ClusterID(customObject),
+						"node":       masterNode.ID,
+					},
+				},
 				Strategy: extensionsv1.DeploymentStrategy{
 					Type: extensionsv1.RecreateDeploymentStrategyType,
 				},
@@ -311,6 +318,29 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									{
 										Name:      "flannel",
 										MountPath: key.FlannelEnvPathPrefix,
+									},
+								},
+							},
+							{
+								Name:            "shutdown-deferrer",
+								Image:           key.ShutdownDeferrerDocker,
+								ImagePullPolicy: apiv1.PullAlways,
+								Args: []string{
+									"daemon",
+									"--server.listen.address=http://127.0.0.1:60080",
+								},
+								LivenessProbe: &apiv1.Probe{
+									InitialDelaySeconds: key.InitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: int32(60080)},
+											Host: key.ProbeHost,
+										},
 									},
 								},
 							},

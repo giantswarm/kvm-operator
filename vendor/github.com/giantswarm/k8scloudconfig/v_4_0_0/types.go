@@ -92,7 +92,7 @@ type FileMetadata struct {
 	AssetContent string
 	Path         string
 	Owner        Owner
-	Encoding     string
+	Compression  bool
 	Permissions  int
 }
 
