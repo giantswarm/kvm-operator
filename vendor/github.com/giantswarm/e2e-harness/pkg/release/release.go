@@ -163,6 +163,7 @@ func (r *Release) Install(ctx context.Context, name string, version Version, val
 	var err error
 
 	chartname := fmt.Sprintf("%s-chart", name)
+	releaseName := fmt.Sprintf("%s-%s", r.namespace, name)
 
 	var tarball string
 	if version.isChannel {
@@ -177,7 +178,7 @@ func (r *Release) Install(ctx context.Context, name string, version Version, val
 		}
 	}
 
-	err = r.helmClient.InstallFromTarball(tarball, r.namespace, helm.ReleaseName(name), helm.ValueOverrides([]byte(values)), helm.InstallWait(true))
+	err = r.helmClient.InstallFromTarball(tarball, r.namespace, helm.ReleaseName(releaseName), helm.ValueOverrides([]byte(values)), helm.InstallWait(true))
 	if err != nil {
 		return microerror.Mask(err)
 	}
