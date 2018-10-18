@@ -17,7 +17,7 @@ func ClusterRolePSP(operator string) string {
 }
 
 func ReleaseName(operator string) string {
-	return fmt.Sprintf("%s-%s", env.ClusterID(), operator)
+	return fmt.Sprintf("%s-%s", env.TargetNamespace(), operator)
 }
 
 func PSPName(operator string) string {
