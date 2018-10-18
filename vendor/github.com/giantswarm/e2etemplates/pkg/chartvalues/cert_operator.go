@@ -49,7 +49,7 @@ func NewCertOperator(config CertOperatorConfig) (string, error) {
 		return "", microerror.Maskf(invalidConfigError, "%T.CommonDomain must not be empty", config)
 	}
 	if config.Namespace == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
+		config.Namespace = "giantswarm"
 	}
 	if config.PSP.Name == "" {
 		config.PSP.Name = "cert-operator-psp"
