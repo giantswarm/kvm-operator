@@ -47,7 +47,20 @@ type workerExtension struct {
 }
 
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	var filesMeta []k8scloudconfig.FileMetadata
+	filesMeta := []k8scloudconfig.FileMetadata{
+		{
+			AssetContent: `apiVersion: kubeproxy.config.k8s.io/v1alpha1
+clientConnection:
+  kubeconfig: /etc/kubernetes/config/proxy-kubeconfig.yml
+kind: KubeProxyConfiguration
+mode: iptables
+resourceContainer: /kube-proxy
+`,
+			Path:        "/etc/kubernetes/config/proxy-config.yml",
+			Owner:       FileOwner,
+			Permissions: 0644,
+		},
+	}
 
 	for _, f := range certs.NewFilesClusterWorker(e.certs) {
 		m := k8scloudconfig.FileMetadata{

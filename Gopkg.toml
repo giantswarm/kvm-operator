@@ -53,10 +53,6 @@ required = [
 
 [[constraint]]
   branch = "master"
-  name = "github.com/giantswarm/k8shealthz"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/microendpoint"
 
 [[constraint]]
@@ -66,6 +62,10 @@ required = [
 [[constraint]]
   branch = "master"
   name = "github.com/giantswarm/microkit"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/giantswarm/microstorage"
 
 [[constraint]]
   branch = "master"
@@ -120,3 +120,7 @@ required = [
 [prune]
   go-tests = true
   unused-packages = true
+
+[[prune.project]]
+  name = "github.com/giantswarm/k8scloudconfig"
+  unused-packages = false

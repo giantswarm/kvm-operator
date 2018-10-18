@@ -7,23 +7,25 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"testing"
 	gotemplate "text/template"
 
+	cenkalti "github.com/cenkalti/backoff"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
+	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/microstorage"
+	"github.com/giantswarm/microstorage/retrystorage"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/ipam"
+	"github.com/giantswarm/kvm-operator/integration/key"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
 	"github.com/giantswarm/kvm-operator/integration/storage"
-	"github.com/giantswarm/kvm-operator/integration/teardown"
 	"github.com/giantswarm/kvm-operator/integration/template"
 )
 
@@ -33,34 +35,44 @@ const (
 )
 
 // WrapTestMain setup and teardown e2e testing environment.
-func WrapTestMain(g *framework.Guest, h *framework.Host, m *testing.M) {
+func WrapTestMain(m *testing.M, config Config) {
 	var r int
 
-	err := Setup(g, h)
+	err := Setup(config)
 	if err != nil {
-		log.Printf("%#v\n", err)
+		config.Logger.Log("level", "error", "message", "setup stage failed", "stack", fmt.Sprintf("%#v", err))
 		r = 1
 	} else {
+		config.Logger.Log("level", "info", "message", "finished setup stage")
 		r = m.Run()
+		if r != 0 {
+			config.Logger.Log("level", "error", "message", "test stage failed")
+		}
 	}
 
 	if env.KeepResources() != "true" {
-		teardown.Teardown(g, h)
+		config.Logger.Log("level", "info", "message", "removing all resources")
+		err = Teardown(config)
+		if err != nil {
+			config.Logger.Log("level", "error", "message", "teardown stage failed", "stack", fmt.Sprintf("%#v", err))
+		}
+	} else {
+		config.Logger.Log("level", "info", "message", "not removing resources because  env 'KEEP_RESOURCES' is set to true")
 	}
 
 	os.Exit(r)
 }
 
 // Setup e2e testing environment.
-func Setup(g *framework.Guest, h *framework.Host) error {
+func Setup(config Config) error {
 	var err error
 
-	err = Resources(g, h)
+	err = Resources(config)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	err = g.Setup()
+	err = config.Guest.Setup()
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -69,36 +81,108 @@ func Setup(g *framework.Guest, h *framework.Host) error {
 }
 
 // Resources install required charts.
-func Resources(g *framework.Guest, h *framework.Host) error {
+func Resources(config Config) error {
 	var err error
 
 	{
-		err = h.InstallStableOperator("cert-operator", "certconfig", e2etemplates.CertOperatorChartValues)
-		if err != nil {
-			return microerror.Mask(err)
+		var certOperatorValues string
+		{
+			c := chartvalues.CertOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.CertOperatorClusterRole{
+					BindingName: key.ClusterRole("cert-operator"),
+					Name:        key.ClusterRole("cert-operator"),
+				},
+				ClusterRolePSP: chartvalues.CertOperatorClusterRole{
+					BindingName: key.ClusterRolePSP("cert-operator"),
+					Name:        key.ClusterRolePSP("cert-operator"),
+				},
+				CommonDomain: env.CommonDomain(),
+				PSP: chartvalues.CertOperatorPSP{
+					Name: key.PSPName("cert-operator"),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+				Vault: chartvalues.CertOperatorVault{
+					Token: env.VaultToken(),
+				},
+			}
+			certOperatorValues, err = chartvalues.NewCertOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
-		err = h.InstallStableOperator("flannel-operator", "flannelconfig", template.FlannelOperatorChartValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		err = h.InstallStableOperator("node-operator", "drainerconfig", e2etemplates.NodeOperatorChartValues)
+		err = config.Host.InstallStableOperator("cert-operator", "certconfig", certOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		err = h.InstallBranchOperator("kvm-operator", "kvmconfig", template.KVMOperatorChartValues)
+		var flannelOperatorValues string
+		{
+			c := chartvalues.FlannelOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.FlannelOperatorClusterRole{
+					BindingName: key.ClusterRole("flannel-operator"),
+					Name:        key.ClusterRole("flannel-operator"),
+				},
+				ClusterRolePSP: chartvalues.FlannelOperatorClusterRole{
+					BindingName: key.ClusterRolePSP("flannel-operator"),
+					Name:        key.ClusterRolePSP("flannel-operator"),
+				},
+				PSP: chartvalues.FlannelOperatorPSP{
+					Name: key.PSPName("flannel-operator"),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+			}
+			flannelOperatorValues, err = chartvalues.NewFlannelOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+		err = config.Host.InstallStableOperator("flannel-operator", "flannelconfig", flannelOperatorValues)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		err = config.Host.InstallStableOperator("node-operator", "drainerconfig", e2etemplates.NodeOperatorChartValues)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		var kvmOperatorValues string
+		{
+			c := chartvalues.KVMOperatorConfig{
+				ClusterName: env.ClusterID(),
+				ClusterRole: chartvalues.KVMOperatorClusterRole{
+					BindingName: key.ClusterRole("kvm-operator"),
+					Name:        key.ClusterRole("kvm-operator"),
+				},
+				ClusterRolePSP: chartvalues.KVMOperatorClusterRole{
+					BindingName: key.ClusterRolePSP("kvm-operator"),
+					Name:        key.ClusterRolePSP("kvm-operator"),
+				},
+				PSP: chartvalues.KVMOperatorPSP{
+					Name: key.PSPName("kvm-operator"),
+				},
+				RegistryPullSecret: env.RegistryPullSecret(),
+			}
+			kvmOperatorValues, err = chartvalues.NewKVMOperator(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		}
+
+		err = config.Host.InstallBranchOperator("kvm-operator", "kvmconfig", kvmOperatorValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
 
 	{
-		err = h.InstallCertResource()
+		err = config.Host.InstallCertResource()
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		err = installKVMResource(h)
+		err = installKVMResource(config.Host)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -121,9 +205,24 @@ func installKVMResource(h *framework.Host) error {
 		}
 	}
 
-	var crdStorage microstorage.Storage
+	var retryingCRDStorage microstorage.Storage
 	{
-		crdStorage, err = storage.InitCRDStorage(ctx, h, l)
+		crdStorage, err := storage.InitCRDStorage(ctx, h, l)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		b := func() cenkalti.BackOff {
+			return backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
+		}
+
+		c := retrystorage.Config{
+			Logger:         l,
+			Underlying:     crdStorage,
+			NewBackOffFunc: b,
+		}
+
+		retryingCRDStorage, err = retrystorage.New(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -133,7 +232,7 @@ func installKVMResource(h *framework.Host) error {
 	{
 		kvmResourceChartValues.ClusterID = env.ClusterID()
 
-		rangePool, err := rangepool.InitRangePool(crdStorage, l)
+		rangePool, err := rangepool.InitRangePool(retryingCRDStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -163,7 +262,7 @@ func installKVMResource(h *framework.Host) error {
 		flannelResourceChartValues.ClusterID = env.ClusterID()
 		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
 
-		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), crdStorage, l)
+		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), retryingCRDStorage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -201,7 +300,7 @@ func installKVMResource(h *framework.Host) error {
 
 		return nil
 	}
-	b := backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+	b := backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 	n := backoff.NewNotifier(l, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
@@ -239,7 +338,7 @@ func installKVMResource(h *framework.Host) error {
 
 		return nil
 	}
-	b = backoff.NewExponential(framework.ShortMaxWait, framework.ShortMaxInterval)
+	b = backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
 	n = backoff.NewNotifier(l, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 	if err != nil {

@@ -42,7 +42,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		isDrained, err := key.IsPodDraind(currentPod)
+		isDrained, err := key.IsPodDrained(currentPod)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -196,11 +196,13 @@ func (r *Resource) createNodeConfig(ctx context.Context, pod *corev1.Pod) error 
 	}
 
 	_, err = r.g8sClient.CoreV1alpha1().NodeConfigs(n).Create(c)
-	if err != nil {
+	if apierrors.IsAlreadyExists(err) {
+		r.logger.LogCtx(ctx, "level", "warning", "message", "node config for guest cluster node already exists")
+	} else if err != nil {
 		return microerror.Mask(err)
+	} else {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created node config for guest cluster node")
 	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", "created node config for guest cluster node")
 
 	return nil
 }
