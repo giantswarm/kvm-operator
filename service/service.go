@@ -17,7 +17,6 @@ import (
 
 	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/service/controller"
-	"github.com/giantswarm/kvm-operator/service/healthz"
 )
 
 type Config struct {
@@ -32,7 +31,6 @@ type Config struct {
 }
 
 type Service struct {
-	Healthz *healthz.Service
 	Version *version.Service
 
 	bootOnce          sync.Once
@@ -42,17 +40,11 @@ type Service struct {
 }
 
 func New(config Config) (*Service, error) {
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
-	}
 	if config.Flag == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Flag must not be empty")
-	}
-	if config.Name == "" {
-		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Flag must not be empty", config)
 	}
 	if config.Viper == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Viper must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Viper must not be empty", config)
 	}
 
 	var err error
@@ -102,19 +94,6 @@ func New(config Config) (*Service, error) {
 		}
 
 		certsSearcher, err = certs.NewSearcher(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var healthzService *healthz.Service
-	{
-		healthzConfig := healthz.DefaultConfig()
-
-		healthzConfig.K8sClient = k8sClient
-		healthzConfig.Logger = config.Logger
-
-		healthzService, err = healthz.New(healthzConfig)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -200,7 +179,6 @@ func New(config Config) (*Service, error) {
 	}
 
 	newService := &Service{
-		Healthz: healthzService,
 		Version: versionService,
 
 		bootOnce:          sync.Once{},
