@@ -44,6 +44,7 @@ func provider(config Config) error {
 				BindingName: key.ClusterRolePSP("flannel-operator"),
 				Name:        key.ClusterRolePSP("flannel-operator"),
 			},
+			Namespace: env.TargetNamespace(),
 			PSP: chartvalues.FlannelOperatorPSP{
 				Name: key.PSPName("flannel-operator"),
 			},
@@ -55,7 +56,7 @@ func provider(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.InstallOperator(ctx, "flannel-operator", release.NewStableVersion(), values, corev1alpha1.NewFlannelConfigCRD())
+		err = config.Release.InstallOperator(ctx, key.ReleaseName("flannel-operator"), release.NewStableVersion(), values, corev1alpha1.NewFlannelConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -72,6 +73,7 @@ func provider(config Config) error {
 				BindingName: key.ClusterRolePSP("kvm-operator"),
 				Name:        key.ClusterRolePSP("kvm-operator"),
 			},
+			Namespace: env.TargetNamespace(),
 			PSP: chartvalues.KVMOperatorPSP{
 				Name: key.PSPName("kvm-operator"),
 			},
@@ -83,7 +85,7 @@ func provider(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.InstallOperator(context.Background(), "kvm-operator", release.NewVersion(env.CircleSHA()), values, providerv1alpha1.NewKVMConfigCRD())
+		err = config.Release.InstallOperator(context.Background(), key.ReleaseName("kvm-operator"), release.NewVersion(env.CircleSHA()), values, providerv1alpha1.NewKVMConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
