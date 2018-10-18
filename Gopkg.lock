@@ -210,12 +210,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f4588378cf47b53ca1e68c9e7cd2bf274ba6c491bac4f5194a0b20c99b2e0dd1"
+  digest = "1:edee3769b234f0928e7af1116290d3038dae42d2e6e4c11e87a4bcab547c74bd"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
     "pkg/chartvalues",
-    "pkg/e2etemplates",
   ]
   pruneopts = "UT"
   revision = "06c2c539a172dd6031805a93d4d645eef0266624"
@@ -1517,7 +1516,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/cenkalti/backoff",
     "github.com/docker/distribution/reference",
     "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1",
@@ -1533,7 +1531,6 @@
     "github.com/giantswarm/e2e-harness/pkg/framework/resource",
     "github.com/giantswarm/e2e-harness/pkg/release",
     "github.com/giantswarm/e2etemplates/pkg/chartvalues",
-    "github.com/giantswarm/e2etemplates/pkg/e2etemplates",
     "github.com/giantswarm/e2etests/update",
     "github.com/giantswarm/e2etests/update/provider",
     "github.com/giantswarm/errors/guest",
