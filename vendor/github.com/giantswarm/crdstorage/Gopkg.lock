@@ -63,7 +63,7 @@
     ".",
     "storagetest"
   ]
-  revision = "4411a6307c6b844b7f9e68aaba37407b41b1c4d7"
+  revision = "e7d619b8ec166cd68eb4d026b68b9193bb645d8f"
 
 [[projects]]
   branch = "master"
@@ -183,8 +183,8 @@
     "assert",
     "require"
   ]
-  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
-  version = "v1.2.2"
+  revision = "b91bfb9ebec76498946beb6af7c0230c7cc7ba6c"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"

@@ -41,14 +41,15 @@ const (
 	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:db5f9c0ad08fd99a7e775e31fba99e5c7f87ab59"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:690c2ffed5d610689345da335175c6cc840ec308"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
+	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:dd07d71449651b2e9c8bd5d7834100451984b722"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1G"
 	baseWorkerMemoryOverheadMB   = 512
-	baseWorkerOverheadMultiplier = 2
-	baseWorkerOverheadModulator  = 12
+	baseWorkerOverheadMultiplier = 1
+	baseWorkerOverheadModulator  = 41.0 / 300.0
 	workerIOOverhead             = "512M"
 
 	// DefaultDockerDiskSize defines the space used to partition the docker FS
@@ -215,6 +216,18 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 	return b, nil
 }
 
+// ArePodContainersTerminated checks ContainerState for all containers present
+// in given pod. When all containers are in Terminated state, true is returned.
+func ArePodContainersTerminated(pod *corev1.Pod) bool {
+	for _, cs := range pod.Status.ContainerStatuses {
+		if cs.State.Terminated == nil {
+			return false
+		}
+	}
+
+	return true
+}
+
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
 	return int32(portBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
@@ -261,13 +274,18 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	q.Add(ioOverhead)
 
 	// memory overhead is more complex as it increases with the size of the memory
-	// basic calculation is (2 + (memory / 12))*512M
+	// basic calculation is (1 + memory/15 + memory/25 + memory/50 + memory/100)*512M
+	// simplified to  (1 + (41/300)*memory)
 	// examples:
-	// Memory under 15G >> overhead 1024M
-	// memory between 15 - 30G >> overhead 1536M
-	// memory between 30 - 45G >> overhead 2048M
-	overheadMultiplier := int(baseWorkerOverheadMultiplier + mQuantity.ScaledValue(resource.Giga)/baseWorkerOverheadModulator)
-	workerMemoryOverhead := strconv.Itoa(baseWorkerMemoryOverheadMB*overheadMultiplier) + "M"
+	// memory 8GB   -> overhead 1071MB
+	// memory 15GB  -> overhead 1561MB
+	// memory 30GB  -> overhead 2713MB
+	// memory 50GB  -> overhead 4010MB
+	// memory 100GB -> overhead 7509MB
+	// memory 110GB -> overhead 8209MB
+
+	overheadMultiplier := baseWorkerOverheadMultiplier + float64(mQuantity.ScaledValue(resource.Giga))*baseWorkerOverheadModulator
+	workerMemoryOverhead := strconv.Itoa(int(baseWorkerMemoryOverheadMB*overheadMultiplier)) + "M"
 
 	memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
 	if err != nil {
