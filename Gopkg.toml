@@ -53,10 +53,6 @@ required = [
 
 [[constraint]]
   branch = "master"
-  name = "github.com/giantswarm/k8shealthz"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/microendpoint"
 
 [[constraint]]

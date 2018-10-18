@@ -22,7 +22,7 @@ func (s DrainerConfigStatus) NewTimeoutCondition() DrainerConfigStatusCondition 
 	return DrainerConfigStatusCondition{
 		LastTransitionTime: DeepCopyTime{time.Now()},
 		Status:             DrainerConfigStatusStatusTrue,
-		Type:               DrainerConfigStatusTypeDrained,
+		Type:               DrainerConfigStatusTypeTimeout,
 	}
 }
 
