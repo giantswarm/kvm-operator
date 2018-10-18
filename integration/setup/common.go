@@ -30,6 +30,7 @@ func common(config Config) error {
 				Name:        key.ClusterRolePSP("cert-operator"),
 			},
 			CommonDomain: env.CommonDomain(),
+			Namespace:    env.TargetNamespace(),
 			PSP: chartvalues.CertOperatorPSP{
 				Name: key.PSPName("cert-operator"),
 			},
