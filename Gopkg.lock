@@ -209,15 +209,15 @@
   revision = "3557509449cae022e9461ea164377f28e3ffaa70"
 
 [[projects]]
-  branch = "master"
-  digest = "1:edee3769b234f0928e7af1116290d3038dae42d2e6e4c11e87a4bcab547c74bd"
+  branch = "namespace"
+  digest = "1:024f2c9c2a7567c93bb713bf2401c8d485171ad962218c3f57c5b2c424a9fbab"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
     "pkg/chartvalues",
   ]
   pruneopts = "UT"
-  revision = "06c2c539a172dd6031805a93d4d645eef0266624"
+  revision = "09a672efdd7262f7dcb15464f74e55fc4890e481"
 
 [[projects]]
   branch = "master"
@@ -1332,7 +1332,7 @@
   name = "k8s.io/kube-openapi"
   packages = ["pkg/util/proto"]
   pruneopts = "UT"
-  revision = "5d05df014ac640f14b5e777958248251c2ef5e86"
+  revision = "e494cc58111187acad93e64529228a2fc0153e39"
 
 [[projects]]
   branch = "release-1.10"
@@ -1516,6 +1516,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/cenkalti/backoff",
     "github.com/docker/distribution/reference",
     "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1",

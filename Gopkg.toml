@@ -48,7 +48,7 @@ required = [
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
-  branch = "master"
+  branch = "namespace"
   name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
