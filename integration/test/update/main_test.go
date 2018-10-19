@@ -3,6 +3,7 @@
 package update
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ func init() {
 	{
 		config, err = setup.NewConfig()
 		if err != nil {
-			panic(err.Error())
+			panic(fmt.Sprintf("%#v\n", err))
 		}
 	}
 
@@ -40,7 +41,7 @@ func init() {
 
 		p, err = provider.NewKVM(c)
 		if err != nil {
-			panic(err.Error())
+			panic(fmt.Sprintf("%#v\n", err))
 		}
 	}
 
@@ -54,7 +55,7 @@ func init() {
 
 		updateTest, err = update.New(c)
 		if err != nil {
-			panic(err.Error())
+			panic(fmt.Sprintf("%#v\n", err))
 		}
 	}
 }
