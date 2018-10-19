@@ -19,8 +19,11 @@ const (
 	MasterID = "master"
 	WorkerID = "worker"
 	EtcdPort = 443
-	// portBase is a baseline for computing the port for liveness probes.
-	portBase = 23000
+	// livenessPortBase is a baseline for computing the port for liveness probes.
+	livenessPortBase = 23000
+	// shutdownDeferrerPortBase is a baseline for computing the port for
+	// shutdown-deferrer.
+	shutdownDeferrerPortBase = 47000
 	// HealthEndpoint is http path for liveness probe.
 	HealthEndpoint = "/healthz"
 	// ProbeHost host for liveness probe.
@@ -45,7 +48,7 @@ const (
 	CoreosVersion        = "1688.5.3"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:a0244ff22e93f4b677bd2f27c6116f3937ebd635"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:572b91d1f819a7a96076716a4f7394da04825251"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:df998d7c99cb9eee766e6d57dcb882113132ac8c"
 
@@ -233,7 +236,7 @@ func ArePodContainersTerminated(pod *corev1.Pod) bool {
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
-	return int32(portBase + customObject.Spec.KVM.Network.Flannel.VNI)
+	return int32(livenessPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
 
 func MasterCount(customObject v1alpha1.KVMConfig) int {
@@ -372,6 +375,11 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 
 func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
+}
+
+func ShutdownDeferrerListenAddress(customObject v1alpha1.KVMConfig) string {
+	listenPort := int(shutdownDeferrerPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
+	return "http://" + ProbeHost + ":" + strconv.Itoa(listenPort)
 }
 
 func StorageType(customObject v1alpha1.KVMConfig) string {

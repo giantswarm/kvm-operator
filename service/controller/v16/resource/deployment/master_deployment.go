@@ -250,7 +250,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
-											Command: []string{"/qemu-shutdown"},
+											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerListenAddress(customObject)},
 										},
 									},
 								},
@@ -327,7 +327,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								ImagePullPolicy: apiv1.PullAlways,
 								Args: []string{
 									"daemon",
-									"--server.listen.address=http://127.0.0.1:60080",
+									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customObject),
 								},
 								Env: []apiv1.EnvVar{
 									{
