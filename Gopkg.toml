@@ -68,8 +68,8 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/microkit"
 
-[[constraint]]
-  branch = "master"
+[[override]]
+  branch = "vendor"
   name = "github.com/giantswarm/microstorage"
 
 [[constraint]]

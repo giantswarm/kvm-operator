@@ -206,7 +206,7 @@
     "pkg/release",
   ]
   pruneopts = "UT"
-  revision = "28e53a614f3ff91d031d5c5694feeaffe73e1e62"
+  revision = "fbe93ae67e9007ae93c0ab4055b5e05885eb271f"
 
 [[projects]]
   branch = "master"
@@ -229,7 +229,7 @@
     "update/provider",
   ]
   pruneopts = "UT"
-  revision = "dc4d7b3d481b35ff65c59784b4bd61bb44987d89"
+  revision = "405a9175c7e190e331ce0e1f65245788841b06a2"
 
 [[projects]]
   branch = "master"
@@ -344,15 +344,15 @@
   revision = "22dc3b5565d150e1f94fbed50df3baf6cd40fac9"
 
 [[projects]]
-  branch = "master"
-  digest = "1:dcce0e2a37e13265ab8ae53d5403ad511dbad131adefc7b5452d41b1687428f6"
+  branch = "vendor"
+  digest = "1:988d96bfe95b2b441aa697adb79b8a92782f6e0068d931503ce2dffd0ce74509"
   name = "github.com/giantswarm/microstorage"
   packages = [
     ".",
     "retrystorage",
   ]
   pruneopts = "UT"
-  revision = "e7d619b8ec166cd68eb4d026b68b9193bb645d8f"
+  revision = "2ef9ed731b863beb55d860ba2d2df968ec93a2e3"
 
 [[projects]]
   branch = "master"
@@ -1517,7 +1517,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/cenkalti/backoff",
     "github.com/docker/distribution/reference",
     "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1",
