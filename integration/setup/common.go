@@ -8,6 +8,7 @@ import (
 	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
+	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
@@ -52,17 +53,7 @@ func common(config Config) error {
 	}
 
 	{
-		c := chartvalues.NodeOperatorConfig{
-			Namespace:          env.TargetNamespace(),
-			RegistryPullSecret: env.RegistryPullSecret(),
-		}
-
-		values, err := chartvalues.NewNodeOperator(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = config.Release.InstallOperator(ctx, "node-operator", release.NewStableVersion(), values, corev1alpha1.NewNodeConfigCRD())
+		err := config.Host.InstallStableOperator("node-operator", "drainerconfig", e2etemplates.NodeOperatorChartValues)
 		if err != nil {
 			return microerror.Mask(err)
 		}
