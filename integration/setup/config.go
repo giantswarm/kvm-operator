@@ -1,8 +1,11 @@
 package setup
 
 import (
+	"context"
+
 	"github.com/giantswarm/apprclient"
 	"github.com/giantswarm/backoff"
+	"github.com/giantswarm/crdstorage"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2e-harness/pkg/framework/filelogger"
 	"github.com/giantswarm/e2e-harness/pkg/framework/resource"
@@ -10,11 +13,18 @@ import (
 	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/microstorage"
+	"github.com/giantswarm/microstorage/retrystorage"
+	"github.com/giantswarm/operatorkit/client/k8scrdclient"
+	"k8s.io/api/core/v1"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 )
 
 const (
+	namespace       = "giantswarm"
 	organization    = "giantswarm"
 	quayAddress     = "https://quay.io"
 	tillerNamespace = "kube-system"
@@ -26,6 +36,7 @@ type Config struct {
 	Logger   micrologger.Logger
 	Release  *release.Release
 	Resource *resource.Resource
+	Storage  microstorage.Storage
 }
 
 func NewConfig() (Config, error) {
@@ -82,6 +93,24 @@ func NewConfig() (Config, error) {
 		}
 
 		host, err = framework.NewHost(c)
+		if err != nil {
+			return Config{}, microerror.Mask(err)
+		}
+	}
+
+	k8sExtClient, err := apiextensionsclient.NewForConfig(host.RestConfig())
+	if err != nil {
+		return Config{}, microerror.Mask(err)
+	}
+
+	var crdClient *k8scrdclient.CRDClient
+	{
+		c := k8scrdclient.Config{
+			K8sExtClient: k8sExtClient,
+			Logger:       logger,
+		}
+
+		crdClient, err = k8scrdclient.New(c)
 		if err != nil {
 			return Config{}, microerror.Mask(err)
 		}
@@ -152,12 +181,55 @@ func NewConfig() (Config, error) {
 		}
 	}
 
+	var crdStorage microstorage.Storage
+	{
+		c := crdstorage.Config{
+			CRDClient: crdClient,
+			G8sClient: host.G8sClient(),
+			K8sClient: host.K8sClient(),
+			Logger:    logger,
+
+			Name: "kvm-e2e",
+			Namespace: &v1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			},
+		}
+
+		s, err := crdstorage.New(c)
+		if err != nil {
+			return Config{}, microerror.Mask(err)
+		}
+
+		err = s.Boot(context.Background())
+		if err != nil {
+			return Config{}, microerror.Mask(err)
+		}
+
+		crdStorage = s
+	}
+
+	var retryStorage microstorage.Storage
+	{
+		c := retrystorage.Config{
+			Logger:     logger,
+			Underlying: crdStorage,
+		}
+
+		retryStorage, err = retrystorage.New(c)
+		if err != nil {
+			return Config{}, microerror.Mask(err)
+		}
+	}
+
 	c := Config{
 		Guest:    guest,
 		Host:     host,
 		Logger:   logger,
 		Release:  newRelease,
 		Resource: newResource,
+		Storage:  retryStorage,
 	}
 
 	return c, nil
