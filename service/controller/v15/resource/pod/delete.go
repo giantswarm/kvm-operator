@@ -53,15 +53,6 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 			return nil
 		}
-
-		if key.ArePodContainersTerminated(currentPod) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is treated as drained")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "all pod's containers are terminated")
-			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-
-			return nil
-		}
 	}
 
 	{
@@ -100,22 +91,31 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-		}
-
-		if drainerConfig.Status.HasTimeoutCondition() {
+		} else if drainerConfig.Status.HasTimeoutCondition() {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has timeout condition")
 
 			err := r.finishDraining(ctx, currentPod, drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
+		} else if key.ArePodContainersTerminated(currentPod) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is treated as drained")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "all pod's containers are terminated")
+
+			err := r.finishDraining(ctx, currentPod, drainerConfig)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+		} else {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "node termination is still in progress")
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has no drained condition")
-	resourcecanceledcontext.SetCanceled(ctx)
-	finalizerskeptcontext.SetKept(ctx)
 	r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
+	resourcecanceledcontext.SetCanceled(ctx)
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finelizers")
+	finalizerskeptcontext.SetKept(ctx)
 
 	return nil
 }
