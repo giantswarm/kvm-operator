@@ -44,8 +44,8 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/certs"
 
-[[override]]
-  branch = "release-namespace"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]

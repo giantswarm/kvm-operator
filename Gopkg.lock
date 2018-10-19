@@ -157,7 +157,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "1a11ac7c462d817d05222b1c7f83672b3f52a5a9"
+  revision = "a84525e0d4456d858683e715200eb2201c746700"
 
 [[projects]]
   branch = "master"
@@ -195,8 +195,8 @@
   revision = "f9f38487a68ed44e84a44de49dcfc39fe2e98eff"
 
 [[projects]]
-  branch = "release-namespace"
-  digest = "1:2c175dc8811267547cf3d753d301b03f91f721444673181d40ad297218c798fe"
+  branch = "master"
+  digest = "1:7cf4c62b0d4dbff563db8fa5eaea67cdb65c38431f84d446e975864556f59d45"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
@@ -206,7 +206,7 @@
     "pkg/release",
   ]
   pruneopts = "UT"
-  revision = "23d9438ec0dacfd01ec1f56130f5d00b46b16708"
+  revision = "28e53a614f3ff91d031d5c5694feeaffe73e1e62"
 
 [[projects]]
   branch = "master"
