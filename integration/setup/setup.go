@@ -3,30 +3,13 @@
 package setup
 
 import (
-	"bytes"
-	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
-	gotemplate "text/template"
 
-	cenkalti "github.com/cenkalti/backoff"
-	"github.com/giantswarm/backoff"
-	"github.com/giantswarm/e2e-harness/pkg/framework"
-	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
-	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/microstorage"
-	"github.com/giantswarm/microstorage/retrystorage"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
-	"github.com/giantswarm/kvm-operator/integration/ipam"
-	"github.com/giantswarm/kvm-operator/integration/key"
-	"github.com/giantswarm/kvm-operator/integration/rangepool"
-	"github.com/giantswarm/kvm-operator/integration/storage"
-	"github.com/giantswarm/kvm-operator/integration/template"
 )
 
 const (
@@ -67,280 +50,17 @@ func WrapTestMain(m *testing.M, config Config) {
 func Setup(config Config) error {
 	var err error
 
-	err = Resources(config)
+	err = common(config)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	err = provider(config)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
 	err = config.Guest.Setup()
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	return nil
-}
-
-// Resources install required charts.
-func Resources(config Config) error {
-	var err error
-
-	{
-		var certOperatorValues string
-		{
-			c := chartvalues.CertOperatorConfig{
-				ClusterName: env.ClusterID(),
-				ClusterRole: chartvalues.CertOperatorClusterRole{
-					BindingName: key.ClusterRole("cert-operator"),
-					Name:        key.ClusterRole("cert-operator"),
-				},
-				ClusterRolePSP: chartvalues.CertOperatorClusterRole{
-					BindingName: key.ClusterRolePSP("cert-operator"),
-					Name:        key.ClusterRolePSP("cert-operator"),
-				},
-				CommonDomain: env.CommonDomain(),
-				PSP: chartvalues.CertOperatorPSP{
-					Name: key.PSPName("cert-operator"),
-				},
-				RegistryPullSecret: env.RegistryPullSecret(),
-				Vault: chartvalues.CertOperatorVault{
-					Token: env.VaultToken(),
-				},
-			}
-			certOperatorValues, err = chartvalues.NewCertOperator(c)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-		}
-		err = config.Host.InstallStableOperator("cert-operator", "certconfig", certOperatorValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		var flannelOperatorValues string
-		{
-			c := chartvalues.FlannelOperatorConfig{
-				ClusterName: env.ClusterID(),
-				ClusterRole: chartvalues.FlannelOperatorClusterRole{
-					BindingName: key.ClusterRole("flannel-operator"),
-					Name:        key.ClusterRole("flannel-operator"),
-				},
-				ClusterRolePSP: chartvalues.FlannelOperatorClusterRole{
-					BindingName: key.ClusterRolePSP("flannel-operator"),
-					Name:        key.ClusterRolePSP("flannel-operator"),
-				},
-				PSP: chartvalues.FlannelOperatorPSP{
-					Name: key.PSPName("flannel-operator"),
-				},
-				RegistryPullSecret: env.RegistryPullSecret(),
-			}
-			flannelOperatorValues, err = chartvalues.NewFlannelOperator(c)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-		}
-		err = config.Host.InstallStableOperator("flannel-operator", "flannelconfig", flannelOperatorValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		err = config.Host.InstallStableOperator("node-operator", "drainerconfig", e2etemplates.NodeOperatorChartValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		var kvmOperatorValues string
-		{
-			c := chartvalues.KVMOperatorConfig{
-				ClusterName: env.ClusterID(),
-				ClusterRole: chartvalues.KVMOperatorClusterRole{
-					BindingName: key.ClusterRole("kvm-operator"),
-					Name:        key.ClusterRole("kvm-operator"),
-				},
-				ClusterRolePSP: chartvalues.KVMOperatorClusterRole{
-					BindingName: key.ClusterRolePSP("kvm-operator"),
-					Name:        key.ClusterRolePSP("kvm-operator"),
-				},
-				PSP: chartvalues.KVMOperatorPSP{
-					Name: key.PSPName("kvm-operator"),
-				},
-				RegistryPullSecret: env.RegistryPullSecret(),
-			}
-			kvmOperatorValues, err = chartvalues.NewKVMOperator(c)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-		}
-
-		err = config.Host.InstallBranchOperator("kvm-operator", "kvmconfig", kvmOperatorValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	{
-		err = config.Host.InstallCertResource()
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = installKVMResource(config.Host)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	return nil
-}
-
-func installKVMResource(h *framework.Host) error {
-	var err error
-	ctx := context.Background()
-
-	var l micrologger.Logger
-	{
-		c := micrologger.Config{}
-
-		l, err = micrologger.New(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	var retryingCRDStorage microstorage.Storage
-	{
-		crdStorage, err := storage.InitCRDStorage(ctx, h, l)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		b := func() cenkalti.BackOff {
-			return backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-		}
-
-		c := retrystorage.Config{
-			Logger:         l,
-			Underlying:     crdStorage,
-			NewBackOffFunc: b,
-		}
-
-		retryingCRDStorage, err = retrystorage.New(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	var kvmResourceChartValues template.KVMConfigE2eChartValues
-	{
-		kvmResourceChartValues.ClusterID = env.ClusterID()
-
-		rangePool, err := rangepool.InitRangePool(retryingCRDStorage, l)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		{
-			vni, err := rangepool.GenerateVNI(ctx, rangePool, env.ClusterID())
-			if err != nil {
-				return microerror.Mask(err)
-			}
-			kvmResourceChartValues.VNI = vni
-		}
-
-		{
-			httpPort, httpsPort, err := rangepool.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
-			if err != nil {
-				return microerror.Mask(err)
-			}
-			kvmResourceChartValues.HttpNodePort = httpPort
-			kvmResourceChartValues.HttpsNodePort = httpsPort
-		}
-
-		kvmResourceChartValues.VersionBundleVersion = env.VersionBundleVersion()
-	}
-
-	var flannelResourceChartValues template.FlannelConfigE2eChartValues
-	{
-		flannelResourceChartValues.ClusterID = env.ClusterID()
-		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
-
-		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), retryingCRDStorage, l)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		flannelResourceChartValues.Network = network
-	}
-
-	o := func() error {
-		// NOTE we ignore errors here because we cannot get really useful error
-		// handling done. This here should anyway only be a quick fix until we use
-		// the helm client lib. Then error handling will be better.
-		framework.HelmCmd(fmt.Sprintf("delete --purge %s-flannel-config-e2e", h.TargetNamespace()))
-
-		var buffer bytes.Buffer
-
-		tmpl, err := gotemplate.New("flannel-e2e-values").Parse(template.ApiextensionsFlannelConfigE2EChartValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = tmpl.Execute(&buffer, flannelResourceChartValues)
-
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = ioutil.WriteFile(flannelResourceValuesFile, buffer.Bytes(), 0644)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-flannel-config-e2e-chart:stable -- -n %s-flannel-config-e2e --values %s", h.TargetNamespace(), flannelResourceValuesFile))
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		return nil
-	}
-	b := backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-	n := backoff.NewNotifier(l, context.Background())
-	err = backoff.RetryNotify(o, b, n)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	o = func() error {
-		// NOTE we ignore errors here because we cannot get really useful error
-		// handling done. This here should anyway only be a quick fix until we use
-		// the helm client lib. Then error handling will be better.
-		framework.HelmCmd(fmt.Sprintf("delete --purge %s-kvm-config-e2e", h.TargetNamespace()))
-
-		var buffer bytes.Buffer
-
-		tmpl, err := gotemplate.New("kvm-e2e-values").Parse(template.ApiextensionsKVMConfigE2EChartValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = tmpl.Execute(&buffer, kvmResourceChartValues)
-
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = ioutil.WriteFile(kvmResourceValuesFile, buffer.Bytes(), 0644)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-kvm-config-e2e-chart:stable -- -n %s-kvm-config-e2e --values %s", h.TargetNamespace(), kvmResourceValuesFile))
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		return nil
-	}
-	b = backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-	n = backoff.NewNotifier(l, context.Background())
-	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
 		return microerror.Mask(err)
 	}
