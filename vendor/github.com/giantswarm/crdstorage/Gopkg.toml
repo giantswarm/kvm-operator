@@ -22,8 +22,8 @@
 
 
 [[constraint]]
-  name = "github.com/cenkalti/backoff"
-  version = "2.0.0"
+  branch = "master"
+  name = "github.com/giantswarm/backoff"
 
 [[constraint]]
   branch = "master"
@@ -37,8 +37,8 @@
   branch = "master"
   name = "github.com/giantswarm/micrologger"
 
-[[constraint]]
-  branch = "master"
+[[override]]
+  branch = "vendor"
   name = "github.com/giantswarm/microstorage"
 
 [[constraint]]

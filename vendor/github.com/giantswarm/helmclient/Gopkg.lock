@@ -189,6 +189,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:5ad5c525f99c4568ca9219e51708231cbe0710659ec3fd5a26d232139b840a82"
+  name = "github.com/giantswarm/e2esetup"
+  packages = ["k8s"]
+  pruneopts = "UT"
+  revision = "47891250152bdd807b032f78bb4f320a64c74149"
+
+[[projects]]
+  branch = "master"
   digest = "1:a880954e10c62b72dd4c6085d3a64d659b51c10116d2ceb17edbc483a5e4b101"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
@@ -1217,6 +1225,7 @@
     "github.com/giantswarm/backoff",
     "github.com/giantswarm/e2e-harness/pkg/framework",
     "github.com/giantswarm/e2e-harness/pkg/harness",
+    "github.com/giantswarm/e2esetup/k8s",
     "github.com/giantswarm/errors/guest",
     "github.com/giantswarm/k8sportforward",
     "github.com/giantswarm/microerror",

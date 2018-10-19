@@ -187,12 +187,12 @@
   revision = "4bf2b99ebf79cb800cb21ec1a4541e6582e3a0b7"
 
 [[projects]]
-  branch = "master"
-  digest = "1:0e5a18960f9b734ea0dd69f037e1c9031d4dbff0b97d4ba2a0eee828e46aaa1e"
+  branch = "vendor"
+  digest = "1:52f45cbebdcbd97d716b239bd98b9f6c9f7e99d24e728801808a18ecfaec8f74"
   name = "github.com/giantswarm/crdstorage"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f9f38487a68ed44e84a44de49dcfc39fe2e98eff"
+  revision = "c8d3b1ff6f76fb18337db247ff71234e6a4f1bc2"
 
 [[projects]]
   branch = "master"
@@ -249,11 +249,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3228a56c6d429de153928f005709174e3606fc5d97ecfea612cf33413aa5ded6"
+  digest = "1:ec875f964f5c2101de2b645421902190417a0741b177eb45ac58ca323c265b93"
   name = "github.com/giantswarm/helmclient"
   packages = ["."]
   pruneopts = "UT"
-  revision = "cc5508a1d97cba484638bba1081a86a6f5a02ffa"
+  revision = "f994c18fc5d9d8f154c6188ed8466b71d8a1128e"
 
 [[projects]]
   branch = "master"
@@ -1495,7 +1495,7 @@
     "pkg/volume/util/types",
   ]
   pruneopts = "UT"
-  revision = "475542a33acb91c56ef6bc6f735306e72d7c1dd9"
+  revision = "2f079348dd322bae0c3286c1be5436a02e2d2e1a"
 
 [[projects]]
   branch = "master"
