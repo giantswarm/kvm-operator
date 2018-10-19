@@ -44,8 +44,8 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/certs"
 
-[[override]]
-  branch = "vendor"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/crdstorage"
 
 [[constraint]]
@@ -72,8 +72,8 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/microkit"
 
-[[override]]
-  branch = "vendor"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/microstorage"
 
 [[constraint]]

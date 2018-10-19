@@ -71,7 +71,7 @@
   revision = "22dc3b5565d150e1f94fbed50df3baf6cd40fac9"
 
 [[projects]]
-  branch = "vendor"
+  branch = "master"
   digest = "1:dcd0745539f32fcb0b8a35bb36302cefa926b9fb3d916254fddae6e099994caf"
   name = "github.com/giantswarm/microstorage"
   packages = [
@@ -79,7 +79,7 @@
     "storagetest",
   ]
   pruneopts = "UT"
-  revision = "2ef9ed731b863beb55d860ba2d2df968ec93a2e3"
+  revision = "5a0784e0ee23c5b732c0d15023ac3dce8aef145a"
 
 [[projects]]
   branch = "master"
@@ -260,14 +260,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bececf436a23bf63181438c4ef4f7f47816b87ff879083d83ca1321f9001a354"
+  digest = "1:56e0fb6e56fa651d9183abd2db5f29d05da203a7c50bf9b331259e5087aca683"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "8f1d3d21f81be6e86ebcd6febee89c89bc50719f"
+  revision = "8e24a49d80f82323e1c4db1b5da3e0f31171a151"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"

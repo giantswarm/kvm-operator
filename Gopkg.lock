@@ -187,12 +187,12 @@
   revision = "4bf2b99ebf79cb800cb21ec1a4541e6582e3a0b7"
 
 [[projects]]
-  branch = "vendor"
-  digest = "1:52f45cbebdcbd97d716b239bd98b9f6c9f7e99d24e728801808a18ecfaec8f74"
+  branch = "master"
+  digest = "1:220c7b2b114238251d4cc4641d5cec912be618e883fb1896f54ab5567d78246a"
   name = "github.com/giantswarm/crdstorage"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c8d3b1ff6f76fb18337db247ff71234e6a4f1bc2"
+  revision = "f452f3c97eda9564a1d0331447bc1a0414c03974"
 
 [[projects]]
   branch = "master"
@@ -249,11 +249,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ec875f964f5c2101de2b645421902190417a0741b177eb45ac58ca323c265b93"
+  digest = "1:03a2b9a49e3d1a599e3c560c9a6ffa89e124e74e5aa92d563e0dbc292d9de7a1"
   name = "github.com/giantswarm/helmclient"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f994c18fc5d9d8f154c6188ed8466b71d8a1128e"
+  revision = "aacff2d7e72d62d92bbdeedda4f57ef95aec0472"
 
 [[projects]]
   branch = "master"
@@ -344,7 +344,7 @@
   revision = "22dc3b5565d150e1f94fbed50df3baf6cd40fac9"
 
 [[projects]]
-  branch = "vendor"
+  branch = "master"
   digest = "1:988d96bfe95b2b441aa697adb79b8a92782f6e0068d931503ce2dffd0ce74509"
   name = "github.com/giantswarm/microstorage"
   packages = [
@@ -352,7 +352,7 @@
     "retrystorage",
   ]
   pruneopts = "UT"
-  revision = "2ef9ed731b863beb55d860ba2d2df968ec93a2e3"
+  revision = "5a0784e0ee23c5b732c0d15023ac3dce8aef145a"
 
 [[projects]]
   branch = "master"
@@ -854,14 +854,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bececf436a23bf63181438c4ef4f7f47816b87ff879083d83ca1321f9001a354"
+  digest = "1:56e0fb6e56fa651d9183abd2db5f29d05da203a7c50bf9b331259e5087aca683"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "8f1d3d21f81be6e86ebcd6febee89c89bc50719f"
+  revision = "8e24a49d80f82323e1c4db1b5da3e0f31171a151"
 
 [[projects]]
   digest = "1:e5a8511f063c38c51ab9ab80e718e9149f692652aeb4e393a8c020dd1bf38ca2"

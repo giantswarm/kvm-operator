@@ -37,8 +37,8 @@
   branch = "master"
   name = "github.com/giantswarm/micrologger"
 
-[[override]]
-  branch = "vendor"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/microstorage"
 
 [[constraint]]

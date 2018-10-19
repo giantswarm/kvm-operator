@@ -46,14 +46,6 @@
   version = "v2.0.0"
 
 [[projects]]
-  digest = "1:0ef770954bca104ee99b3b6b7f9b240605ac03517d9f98cbc1893daa03f3c038"
-  name = "github.com/coreos/go-semver"
-  packages = ["semver"]
-  pruneopts = "UT"
-  revision = "8ab6407b697782a06568d4b7f1db25550ec2e4c6"
-  version = "v0.2.0"
-
-[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -152,23 +144,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:910fa8591d50ee561e953624cb1d777ba0f89f6c72d0db58dc85010130fa31ac"
-  name = "github.com/giantswarm/apiextensions"
-  packages = [
-    "pkg/apis/core/v1alpha1",
-    "pkg/apis/example/v1alpha1",
-    "pkg/apis/provider/v1alpha1",
-    "pkg/clientset/versioned",
-    "pkg/clientset/versioned/scheme",
-    "pkg/clientset/versioned/typed/core/v1alpha1",
-    "pkg/clientset/versioned/typed/example/v1alpha1",
-    "pkg/clientset/versioned/typed/provider/v1alpha1",
-  ]
-  pruneopts = "UT"
-  revision = "de2e518b9b9ce196838462ab602febb94e6dafdf"
-
-[[projects]]
-  branch = "master"
   digest = "1:aee5f8435859ee2e6c032c21d92b3b4853cd81387a3738ac1ac20c85cf3ab560"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
@@ -177,23 +152,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:61741ecc81c082d51a448d70eefd55fc7c95b96df120f9cc4c912a086feee3a2"
+  digest = "1:b40633b8a09feb7c61a64d01302dd96da21dd3872fee968cbc762170b120234d"
   name = "github.com/giantswarm/e2e-harness"
-  packages = [
-    "pkg/framework",
-    "pkg/framework/filelogger",
-    "pkg/harness",
-  ]
+  packages = ["pkg/harness"]
   pruneopts = "UT"
   revision = "8c4c798088217968915821ef7ffb4d11d8add062"
 
 [[projects]]
   branch = "master"
-  digest = "1:5ad5c525f99c4568ca9219e51708231cbe0710659ec3fd5a26d232139b840a82"
+  digest = "1:b50befcc0b01f8000103d2c07a8b47be2547d272a01b8689cc044281d48fe069"
   name = "github.com/giantswarm/e2esetup"
   packages = ["k8s"]
   pruneopts = "UT"
-  revision = "47891250152bdd807b032f78bb4f320a64c74149"
+  revision = "fbdbd487bc645dcb941f3f889a6db3345947fe3e"
 
 [[projects]]
   branch = "master"
@@ -232,14 +203,6 @@
   revision = "22dc3b5565d150e1f94fbed50df3baf6cd40fac9"
 
 [[projects]]
-  branch = "master"
-  digest = "1:e9b2472b310a35332ee67b9189452b51c19599d249bd25440365cd97c97d5a98"
-  name = "github.com/giantswarm/versionbundle"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "9a4f3249a5b5a080d13f1db2580cf09ba5d14ca1"
-
-[[projects]]
   digest = "1:0cfcded8689c2c964c223650009c5dd9e283c22d57f18f2335aafa16cc22acf1"
   name = "github.com/go-kit/kit"
   packages = ["log"]
@@ -254,14 +217,6 @@
   pruneopts = "UT"
   revision = "390ab7935ee28ec6b286364bba9b4dd6410cb3d5"
   version = "v0.3.0"
-
-[[projects]]
-  digest = "1:b7fc4c3fd91df516486f53cc86f4b55a0c815782dbe852c5a19cce8e6c577aac"
-  name = "github.com/go-resty/resty"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "d4920dcf5b7689548a6db640278a9b35a5b48ec6"
-  version = "v1.9.1"
 
 [[projects]]
   digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
@@ -328,22 +283,6 @@
   pruneopts = "UT"
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
   version = "v1.2.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:c42fb0b13261a9bcd08451ee1859e61bea33aa6743916a2e3fb61f33ff6b25c7"
-  name = "github.com/google/go-github"
-  packages = ["github"]
-  pruneopts = "UT"
-  revision = "dd29b543e14c33e6373773f2c5ea008b29aeac95"
-
-[[projects]]
-  digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
-  name = "github.com/google/go-querystring"
-  packages = ["query"]
-  pruneopts = "UT"
-  revision = "44c6ddd0a2342c386950e880b658017258da92fc"
-  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -555,40 +494,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1e5a14e360f8d47cb1aadb7235bae7e8b965b841b9d1a3d639318733c47f5597"
+  digest = "1:505dbee0833715a72a529bb57c354826ad42a4496fad787fa143699b4de1a6d0"
   name = "golang.org/x/net"
   packages = [
     "context",
-    "context/ctxhttp",
     "http/httpguts",
     "http2",
     "http2/hpack",
     "idna",
     "internal/timeseries",
-    "publicsuffix",
     "trace",
   ]
   pruneopts = "UT"
   revision = "146acd28ed5894421fb5aac80ca93bc1b1f46f87"
-
-[[projects]]
-  branch = "master"
-  digest = "1:28b360454e161aae382c007449bcb1296087b5b52b4f37623bba0f9f9d7207f4"
-  name = "golang.org/x/oauth2"
-  packages = [
-    ".",
-    "internal",
-  ]
-  pruneopts = "UT"
-  revision = "c57b0facaced709681d9f90397429b9430a74754"
-
-[[projects]]
-  branch = "master"
-  digest = "1:39ebcc2b11457b703ae9ee2e8cca0f68df21969c6102cb3b705f76cca0ea0239"
-  name = "golang.org/x/sync"
-  packages = ["errgroup"]
-  pruneopts = "UT"
-  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
 
 [[projects]]
   branch = "master"
@@ -637,22 +555,6 @@
   packages = ["rate"]
   pruneopts = "UT"
   revision = "fbb02b2291d28baffd63558aa44b4b56f178d650"
-
-[[projects]]
-  digest = "1:6247f76e55a1e1a5c19a81e2d4b4dff6730461eeb5bbb0a16dd4a8ec8637ee93"
-  name = "google.golang.org/appengine"
-  packages = [
-    "internal",
-    "internal/base",
-    "internal/datastore",
-    "internal/log",
-    "internal/remote_api",
-    "internal/urlfetch",
-    "urlfetch",
-  ]
-  pruneopts = "UT"
-  revision = "ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06"
-  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -765,13 +667,9 @@
   version = "kubernetes-1.10.4"
 
 [[projects]]
-  digest = "1:8470a20b4ff580042a40b3cabc77f56e3f5630bc2ff13236dcfdec96d4ff1b7d"
+  digest = "1:b46a162d7c7e9117ae2dd9a73ee4dc2181ad9ea9d505fd7c5eb63c96211dc9dd"
   name = "k8s.io/apiextensions-apiserver"
-  packages = [
-    "pkg/apis/apiextensions",
-    "pkg/apis/apiextensions/v1beta1",
-    "pkg/features",
-  ]
+  packages = ["pkg/features"]
   pruneopts = "UT"
   revision = "8e7f43002fec5394a8d96ebca781aa9d4b37aaef"
   version = "kubernetes-1.10.4"
@@ -1016,22 +914,6 @@
   version = "v2.8.2"
 
 [[projects]]
-  digest = "1:2af67bd2524aa5fce3cb4bd6e20fbf773b8cf5a9dfc0d1bea7441d98d55f37b5"
-  name = "k8s.io/kube-aggregator"
-  packages = [
-    "pkg/apis/apiregistration",
-    "pkg/apis/apiregistration/v1",
-    "pkg/apis/apiregistration/v1beta1",
-    "pkg/client/clientset_generated/clientset",
-    "pkg/client/clientset_generated/clientset/scheme",
-    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1",
-    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1",
-  ]
-  pruneopts = "UT"
-  revision = "239337b3ca87b9f2ce4d2f03b7a5ed985ffa8206"
-  version = "kubernetes-1.10.4"
-
-[[projects]]
   branch = "master"
   digest = "1:a2c842a1e0aed96fd732b535514556323a6f5edfded3b63e5e0ab1bce188aa54"
   name = "k8s.io/kube-openapi"
@@ -1223,7 +1105,6 @@
     "github.com/Azure/go-autorest/autorest",
     "github.com/docker/distribution/reference",
     "github.com/giantswarm/backoff",
-    "github.com/giantswarm/e2e-harness/pkg/framework",
     "github.com/giantswarm/e2e-harness/pkg/harness",
     "github.com/giantswarm/e2esetup/k8s",
     "github.com/giantswarm/errors/guest",
