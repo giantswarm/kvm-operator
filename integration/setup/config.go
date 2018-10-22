@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	namespace       = "giantswarm"
 	organization    = "giantswarm"
 	quayAddress     = "https://quay.io"
 	tillerNamespace = "kube-system"
@@ -128,7 +127,7 @@ func NewConfig() (Config, error) {
 			K8sClient:  host.K8sClient(),
 			Logger:     logger,
 
-			Namespace: namespace,
+			Namespace: env.TargetNamespace(),
 		}
 
 		newRelease, err = release.New(c)
@@ -144,7 +143,7 @@ func NewConfig() (Config, error) {
 			HelmClient: helmClient,
 			Logger:     logger,
 
-			Namespace: namespace,
+			Namespace: env.TargetNamespace(),
 		}
 
 		newResource, err = resource.New(c)

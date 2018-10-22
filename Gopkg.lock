@@ -157,7 +157,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "1a11ac7c462d817d05222b1c7f83672b3f52a5a9"
+  revision = "a84525e0d4456d858683e715200eb2201c746700"
 
 [[projects]]
   branch = "master"
@@ -169,11 +169,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:aee5f8435859ee2e6c032c21d92b3b4853cd81387a3738ac1ac20c85cf3ab560"
+  digest = "1:ab67fdefbc890c7880ffc2904048d7b9d14e29ebc716f8d637a17b16bb91d9e6"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
   pruneopts = "UT"
-  revision = "ae0aa12120a391889540e6c67d0d0e65b73580b9"
+  revision = "9d3f2935ad1be88042bb0c2d46f2f41cfe573fd8"
 
 [[projects]]
   branch = "master"
@@ -196,7 +196,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:388d013980329ddf136ac4be05146e1e0ad428b8146f980848a48c63b84d01a3"
+  digest = "1:7cf4c62b0d4dbff563db8fa5eaea67cdb65c38431f84d446e975864556f59d45"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "pkg/framework",
@@ -206,11 +206,11 @@
     "pkg/release",
   ]
   pruneopts = "UT"
-  revision = "3557509449cae022e9461ea164377f28e3ffaa70"
+  revision = "28e53a614f3ff91d031d5c5694feeaffe73e1e62"
 
 [[projects]]
   branch = "master"
-  digest = "1:f4588378cf47b53ca1e68c9e7cd2bf274ba6c491bac4f5194a0b20c99b2e0dd1"
+  digest = "1:c571cee14e80465a8e4a34910616a289817bbd92e8a90bbd694fb31057286764"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
@@ -218,7 +218,7 @@
     "pkg/e2etemplates",
   ]
   pruneopts = "UT"
-  revision = "06c2c539a172dd6031805a93d4d645eef0266624"
+  revision = "2317c4461793d11afa8fc01e23c62761688614c1"
 
 [[projects]]
   branch = "master"
@@ -728,7 +728,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c0d39a0cad193ac49b6e24516e0f994b241d7c27142e5a58e8bd13defb2d9ac8"
+  digest = "1:1261069fb38fbe59aba55117ee39c59814f211c027d66d59ed1c60e5c11b377c"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -736,7 +736,7 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "bcb74de08d37a417cb6789eec1d6c810040f0470"
+  revision = "16b4535ad14a9ef20a9d9fd8055143c5faa15224"
 
 [[projects]]
   branch = "master"
@@ -854,14 +854,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f5aa274a0377f85735edc7fedfb0811d3cbc20af91633797cb359e29c3272271"
+  digest = "1:bececf436a23bf63181438c4ef4f7f47816b87ff879083d83ca1321f9001a354"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
+  revision = "8f1d3d21f81be6e86ebcd6febee89c89bc50719f"
 
 [[projects]]
   digest = "1:e5a8511f063c38c51ab9ab80e718e9149f692652aeb4e393a8c020dd1bf38ca2"
@@ -1333,7 +1333,7 @@
   name = "k8s.io/kube-openapi"
   packages = ["pkg/util/proto"]
   pruneopts = "UT"
-  revision = "5d05df014ac640f14b5e777958248251c2ef5e86"
+  revision = "e494cc58111187acad93e64529228a2fc0153e39"
 
 [[projects]]
   branch = "release-1.10"

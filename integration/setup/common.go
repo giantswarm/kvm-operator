@@ -3,6 +3,10 @@
 package setup
 
 import (
+	"context"
+
+	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
 	"github.com/giantswarm/e2etemplates/pkg/e2etemplates"
 	"github.com/giantswarm/microerror"
@@ -13,6 +17,8 @@ import (
 
 // common installs components required to run the operator.
 func common(config Config) error {
+	ctx := context.Background()
+
 	{
 		c := chartvalues.CertOperatorConfig{
 			ClusterName: env.ClusterID(),
@@ -25,6 +31,7 @@ func common(config Config) error {
 				Name:        key.ClusterRolePSP("cert-operator"),
 			},
 			CommonDomain: env.CommonDomain(),
+			Namespace:    env.TargetNamespace(),
 			PSP: chartvalues.CertOperatorPSP{
 				Name: key.PSPName("cert-operator"),
 			},
@@ -39,7 +46,7 @@ func common(config Config) error {
 			return microerror.Mask(err)
 		}
 
-		err = config.Host.InstallStableOperator("cert-operator", "certconfig", values)
+		err = config.Release.InstallOperator(ctx, "cert-operator", release.NewStableVersion(), values, corev1alpha1.NewCertConfigCRD())
 		if err != nil {
 			return microerror.Mask(err)
 		}
