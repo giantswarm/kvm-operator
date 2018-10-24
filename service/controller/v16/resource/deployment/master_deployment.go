@@ -4,14 +4,13 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/core/v1"
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
 )
 
 func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
@@ -356,7 +355,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: int32(60080)},
+											Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(customObject))},
 											Host: key.ProbeHost,
 										},
 									},

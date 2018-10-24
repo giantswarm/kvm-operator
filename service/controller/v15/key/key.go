@@ -377,9 +377,12 @@ func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
 
+func ShutdownDeferrerListenPort(customObject v1alpha1.KVMConfig) int {
+	return int(shutdownDeferrerPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
+}
+
 func ShutdownDeferrerListenAddress(customObject v1alpha1.KVMConfig) string {
-	listenPort := int(shutdownDeferrerPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
-	return "http://" + ProbeHost + ":" + strconv.Itoa(listenPort)
+	return "http://" + ProbeHost + ":" + strconv.Itoa(ShutdownDeferrerListenPort(customObject))
 }
 
 func StorageType(customObject v1alpha1.KVMConfig) string {
