@@ -290,7 +290,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								ImagePullPolicy: apiv1.PullAlways,
 								Args: []string{
 									"daemon",
-									"--server.listen.address=http://127.0.0.1:60080",
+									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customObject),
 								},
 								Env: []apiv1.EnvVar{
 									{
