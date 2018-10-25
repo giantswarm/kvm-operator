@@ -43,7 +43,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "etcd",
-				Version: "3.3.9",
+				Version: "3.3.8",
 			},
 			{
 				Name:    "coredns",
