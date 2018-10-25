@@ -38,11 +38,12 @@ func InitCRDStorage(ctx context.Context, h *framework.Host, l micrologger.Logger
 		}
 	}
 
-	c := crdstorage.DefaultConfig()
-	c.CRDClient = k8sCrdClient
-	c.G8sClient = h.G8sClient()
-	c.K8sClient = h.K8sClient()
-	c.Logger = l
+	c := crdstorage.Config{
+		CRDClient: k8sCrdClient,
+		G8sClient: h.G8sClient(),
+		K8sClient: h.K8sClient(),
+		Logger:    l,
+	}
 
 	c.Name = "kvm-e2e"
 	c.Namespace = &v1.Namespace{
