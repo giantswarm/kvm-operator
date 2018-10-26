@@ -35,11 +35,11 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1800.7.0",
+				Version: "1855.5.0",
 			},
 			{
 				Name:    "docker",
-				Version: "18.03.1",
+				Version: "18.06.1",
 			},
 			{
 				Name:    "etcd",
