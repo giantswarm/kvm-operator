@@ -309,7 +309,15 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 											},
 										},
 									},
-								}, LivenessProbe: &apiv1.Probe{
+								},
+								Lifecycle: &apiv1.Lifecycle{
+									PreStop: &apiv1.Handler{
+										Exec: &apiv1.ExecAction{
+											Command: []string{"/pre-shutdown-hook"},
+										},
+									},
+								},
+								LivenessProbe: &apiv1.Probe{
 									InitialDelaySeconds: key.InitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
