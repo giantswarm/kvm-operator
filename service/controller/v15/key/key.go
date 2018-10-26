@@ -50,7 +50,7 @@ const (
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:572b91d1f819a7a96076716a4f7394da04825251"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
-	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:fd354f99ecb29905d97307faf545be9e405df834"
+	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:fb9f319bed465ac3bd4844659503c409d7b22b71"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1G"
