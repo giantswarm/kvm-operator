@@ -41,7 +41,7 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: key.ClusterRoleBindingName(customObject),
 			Labels: map[string]string{
-				"app": "kvm-operator",
+				"app":                       "kvm-operator",
 				"giantswarm.io/cluster-id":  key.ClusterID(customObject),
 				"giantswarm.io/customer-id": key.ClusterCustomer(customObject),
 			},
@@ -70,7 +70,7 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 		ObjectMeta: apismetav1.ObjectMeta{
 			Name: key.ClusterRoleBindingPSPName(customObject),
 			Labels: map[string]string{
-				"app": "kvm-operator",
+				"app":                       "kvm-operator",
 				"giantswarm.io/cluster-id":  key.ClusterID(customObject),
 				"giantswarm.io/customer-id": key.ClusterCustomer(customObject),
 			},
