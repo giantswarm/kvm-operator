@@ -217,7 +217,7 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
-											Command: []string{"/qemu-shutdown"},
+											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerListenAddress(customObject)},
 										},
 									},
 								},
