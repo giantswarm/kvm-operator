@@ -264,7 +264,7 @@
   revision = "c602ada3153f4d322c4e726800f84cec2cf534dd"
 
 [[projects]]
-  branch = "teemow-k8s-1.12"
+  branch = "master"
   digest = "1:b2b67a5a84a1bba9d02c8dbc681fcd8ce97524446cd47192531c4d0e5a30e5cc"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
@@ -277,7 +277,7 @@
     "v_3_7_0",
   ]
   pruneopts = "T"
-  revision = "573e46a1d0087499e862520b37d78ff6950a177f"
+  revision = "d300c379cd27e4af3885b3061f7f767efa01b7c0"
 
 [[projects]]
   branch = "master"
