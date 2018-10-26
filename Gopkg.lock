@@ -264,8 +264,8 @@
   revision = "c602ada3153f4d322c4e726800f84cec2cf534dd"
 
 [[projects]]
-  branch = "master"
-  digest = "1:636dba52aa976a05a9e9ca637cb0849c868031cdcc5c88efeaf137f6c1e04201"
+  branch = "teemow-k8s-1.12"
+  digest = "1:a7397aa74ecedcc9fbd2819b2c788102d89682ddfd38639f3e7d7750aa341ba6"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -274,10 +274,10 @@
     "v_3_4_0",
     "v_3_5_0",
     "v_3_6_0",
-    "v_3_6_2",
+    "v_3_7_0",
   ]
   pruneopts = "T"
-  revision = "ad1b57374455997f8817f33ee3aa11a29666baf9"
+  revision = "d6b75e099cfd2332bf826894a3dc4f42fbd38dd1"
 
 [[projects]]
   branch = "master"
@@ -1543,7 +1543,7 @@
     "github.com/giantswarm/k8scloudconfig/v_3_4_0",
     "github.com/giantswarm/k8scloudconfig/v_3_5_0",
     "github.com/giantswarm/k8scloudconfig/v_3_6_0",
-    "github.com/giantswarm/k8scloudconfig/v_3_6_2",
+    "github.com/giantswarm/k8scloudconfig/v_3_7_0",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
     "github.com/giantswarm/microendpoint/endpoint/version",
     "github.com/giantswarm/microendpoint/service/version",
