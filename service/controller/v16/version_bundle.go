@@ -8,8 +8,23 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "TODO",
-				Description: "TODO",
+				Component:   "cloudconfig",
+				Description: "Update Kubernetes to 1.12.1. More info here: https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.12.md",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Updated Calico manifest with resource limits to get QoS policy guaranteed.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Adapted limit calculation for very big kvm pods.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Enabled admission plugins: DefaultTolerationSeconds, MutatingAdmissionWebhook, ValidatingAdmissionWebhook.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -20,15 +35,15 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1688.5.3",
+				Version: "1855.5.0",
 			},
 			{
 				Name:    "docker",
-				Version: "17.12.1",
+				Version: "18.06.1",
 			},
 			{
 				Name:    "etcd",
-				Version: "3.3.8",
+				Version: "3.3.9",
 			},
 			{
 				Name:    "coredns",
@@ -36,10 +51,10 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.11.1",
+				Version: "1.12.1",
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.0.1",
+		Version: "3.1.0",
 	}
 }
