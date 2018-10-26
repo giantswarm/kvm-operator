@@ -14,7 +14,6 @@ import (
 
 	"github.com/giantswarm/kvm-operator/integration/ipam"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
-	"github.com/giantswarm/kvm-operator/integration/storage"
 )
 
 // Teardown e2e testing environment.
@@ -118,11 +117,7 @@ func Teardown(config Config) error {
 
 	// clear rangepool and ipam values
 	{
-		crdStorage, err := storage.InitCRDStorage(ctx, config.Host, l)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-		rangePool, err := rangepool.InitRangePool(crdStorage, l)
+		rangePool, err := rangepool.InitRangePool(config.Storage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -137,7 +132,7 @@ func Teardown(config Config) error {
 			return microerror.Mask(err)
 		}
 		l.LogCtx(ctx, "level", "info", "message", "Deleted Ingress node port reservation in rangepool.")
-		err = ipam.DeleteFlannelNetwork(ctx, flannelNetwork, crdStorage, l)
+		err = ipam.DeleteFlannelNetwork(ctx, flannelNetwork, config.Storage, l)
 		if err != nil {
 			return microerror.Mask(err)
 		}

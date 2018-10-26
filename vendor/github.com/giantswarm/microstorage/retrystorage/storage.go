@@ -5,106 +5,47 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cenkalti/backoff"
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/microstorage"
 )
 
-const (
-	// defaultMaxAttempts is the default number of attempts of each storate
-	// operations before it finally fails.
-	defaultMaxAttempts = 3
-)
-
-type stoppingBackOff struct {
-	attempts    int
-	MaxAttempts int
-	Underlying  backoff.BackOff
-}
-
-func (s *stoppingBackOff) NextBackOff() time.Duration {
-	if s.attempts >= s.MaxAttempts {
-		return backoff.Stop
-	}
-	s.attempts++
-	return s.Underlying.NextBackOff()
-}
-
-func (s *stoppingBackOff) Reset() {
-	s.attempts = 0
-	s.Underlying.Reset()
-}
-
 type Config struct {
-	// Dependencies.
-
 	Logger     micrologger.Logger
 	Underlying microstorage.Storage
 
-	// Settings.
-
-	NewBackOffFunc func() backoff.BackOff
-}
-
-func DefaultConfig() Config {
-	return Config{
-		// Dependencies.
-
-		Logger:     nil, // Required.
-		Underlying: nil, // Required.
-
-		// Settings.
-
-		NewBackOffFunc: func() backoff.BackOff {
-			return &stoppingBackOff{
-				MaxAttempts: defaultMaxAttempts,
-				Underlying:  backoff.NewExponentialBackOff(),
-			}
-		},
-	}
+	NewBackOffFunc func() backoff.Interface
 }
 
 type Storage struct {
 	logger         micrologger.Logger
 	underlying     microstorage.Storage
-	newBackOffFunc func() backoff.BackOff
+	newBackOffFunc func() backoff.Interface
 }
 
 func New(config Config) (*Storage, error) {
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger is empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 	if config.Underlying == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Underlying is empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Underlying must not be empty", config)
 	}
+
 	if config.NewBackOffFunc == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.NewBackOffFunc is empty")
+		config.NewBackOffFunc = func() backoff.Interface {
+			return backoff.NewMaxRetries(3, backoff.ShortMaxInterval)
+		}
 	}
 
 	s := &Storage{
-		logger:         config.Logger,
-		underlying:     config.Underlying,
+		logger:     config.Logger,
+		underlying: config.Underlying,
+
 		newBackOffFunc: config.NewBackOffFunc,
 	}
 
 	return s, nil
-}
-
-func (s *Storage) Put(ctx context.Context, kv microstorage.KV) error {
-	b := s.newBackOffFunc()
-	op := func() error {
-		err := s.underlying.Put(ctx, kv)
-		if microstorage.IsInvalidKey(err) || microstorage.IsNotFound(err) {
-			return backoff.Permanent(err)
-		}
-		return err
-	}
-	notify := func(err error, delay time.Duration) {
-		s.logger.Log("warning", "retrying", "op", "put", "key", kv.Key, "delay", delay, "err", fmt.Sprintf("%#v", err))
-	}
-	err := backoff.RetryNotify(op, b, notify)
-	return microerror.Mask(err)
 }
 
 func (s *Storage) Delete(ctx context.Context, key microstorage.K) error {
@@ -157,6 +98,22 @@ func (s *Storage) List(ctx context.Context, key microstorage.K) ([]microstorage.
 	}
 	err := backoff.RetryNotify(op, b, notify)
 	return list, microerror.Mask(err)
+}
+
+func (s *Storage) Put(ctx context.Context, kv microstorage.KV) error {
+	b := s.newBackOffFunc()
+	op := func() error {
+		err := s.underlying.Put(ctx, kv)
+		if microstorage.IsInvalidKey(err) || microstorage.IsNotFound(err) {
+			return backoff.Permanent(err)
+		}
+		return err
+	}
+	notify := func(err error, delay time.Duration) {
+		s.logger.Log("warning", "retrying", "op", "put", "key", kv.Key, "delay", delay, "err", fmt.Sprintf("%#v", err))
+	}
+	err := backoff.RetryNotify(op, b, notify)
+	return microerror.Mask(err)
 }
 
 func (s *Storage) Search(ctx context.Context, key microstorage.K) (microstorage.KV, error) {
