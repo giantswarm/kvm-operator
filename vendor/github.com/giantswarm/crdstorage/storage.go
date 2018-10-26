@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/microstorage"
@@ -29,19 +29,6 @@ type Config struct {
 	Namespace *corev1.Namespace
 }
 
-func DefaultConfig() Config {
-	return Config{
-		CRDClient: nil,
-		G8sClient: nil,
-		K8sClient: nil,
-		Logger:    nil,
-
-		CRD:       v1alpha1.NewStorageConfigCRD(),
-		Name:      "",
-		Namespace: nil,
-	}
-}
-
 type Storage struct {
 	crdClient *k8scrdclient.CRDClient
 	g8sClient versioned.Interface
@@ -58,26 +45,26 @@ type Storage struct {
 // instance.
 func New(config Config) (*Storage, error) {
 	if config.CRDClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.CRDClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.CRDClient must not be empty", config)
 	}
 	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.G8sClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
 	}
 	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
 	if config.CRD == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.CRD must not be empty")
+		config.CRD = v1alpha1.NewStorageConfigCRD()
 	}
 	if config.Name == "" {
-		return nil, microerror.Maskf(invalidConfigError, "config.Name must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Name must not be empty", config)
 	}
 	if config.Namespace == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Namespace must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
 	}
 
 	s := &Storage{
@@ -102,11 +89,9 @@ func New(config Config) (*Storage, error) {
 func (s *Storage) Boot(ctx context.Context) error {
 	// Create CRD.
 	{
-		b := backoff.NewExponentialBackOff()
-		b.MaxElapsedTime = 0
-		backOff := backoff.WithMaxRetries(b, 7)
+		b := backoff.NewMaxRetries(7, backoff.ShortMaxInterval)
 
-		err := s.crdClient.EnsureCreated(ctx, s.crd, backOff)
+		err := s.crdClient.EnsureCreated(ctx, s.crd, b)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -147,11 +132,9 @@ func (s *Storage) Boot(ctx context.Context) error {
 			return nil
 		}
 
-		b := backoff.NewExponentialBackOff()
-		b.MaxElapsedTime = 0
-		backOff := backoff.WithMaxRetries(b, 7)
+		b := backoff.NewMaxRetries(7, backoff.ShortMaxInterval)
 
-		err := backoff.Retry(operation, backOff)
+		err := backoff.Retry(operation, b)
 		if err != nil {
 			return microerror.Mask(err)
 		}
