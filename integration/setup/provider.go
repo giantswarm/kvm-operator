@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	gotemplate "text/template"
 
-	cenkaltibackoff "github.com/cenkalti/backoff"
 	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	providerv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/backoff"
@@ -17,15 +16,11 @@ import (
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/microstorage"
-	"github.com/giantswarm/microstorage/retrystorage"
 
 	"github.com/giantswarm/kvm-operator/integration/env"
 	"github.com/giantswarm/kvm-operator/integration/ipam"
 	"github.com/giantswarm/kvm-operator/integration/key"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
-	"github.com/giantswarm/kvm-operator/integration/storage"
 	"github.com/giantswarm/kvm-operator/integration/template"
 )
 
@@ -92,7 +87,7 @@ func provider(config Config) error {
 	}
 
 	{
-		err := installKVMResource(config.Host)
+		err := installKVMResource(config)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -101,48 +96,15 @@ func provider(config Config) error {
 	return nil
 }
 
-func installKVMResource(h *framework.Host) error {
+func installKVMResource(config Config) error {
 	var err error
 	ctx := context.Background()
-
-	var l micrologger.Logger
-	{
-		c := micrologger.Config{}
-
-		l, err = micrologger.New(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
-
-	var retryingCRDStorage microstorage.Storage
-	{
-		crdStorage, err := storage.InitCRDStorage(ctx, h, l)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		b := func() cenkaltibackoff.BackOff {
-			return backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-		}
-
-		c := retrystorage.Config{
-			Logger:         l,
-			Underlying:     crdStorage,
-			NewBackOffFunc: b,
-		}
-
-		retryingCRDStorage, err = retrystorage.New(c)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-	}
 
 	var kvmResourceChartValues template.KVMConfigE2eChartValues
 	{
 		kvmResourceChartValues.ClusterID = env.ClusterID()
 
-		rangePool, err := rangepool.InitRangePool(retryingCRDStorage, l)
+		rangePool, err := rangepool.InitRangePool(config.Storage, config.Logger)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -172,7 +134,7 @@ func installKVMResource(h *framework.Host) error {
 		flannelResourceChartValues.ClusterID = env.ClusterID()
 		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
 
-		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), retryingCRDStorage, l)
+		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), config.Storage, config.Logger)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -183,7 +145,7 @@ func installKVMResource(h *framework.Host) error {
 		// NOTE we ignore errors here because we cannot get really useful error
 		// handling done. This here should anyway only be a quick fix until we use
 		// the helm client lib. Then error handling will be better.
-		framework.HelmCmd(fmt.Sprintf("delete --purge %s-flannel-config-e2e", h.TargetNamespace()))
+		framework.HelmCmd(fmt.Sprintf("delete --purge %s-flannel-config-e2e", env.TargetNamespace()))
 
 		var buffer bytes.Buffer
 
@@ -203,7 +165,7 @@ func installKVMResource(h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-flannel-config-e2e-chart:stable -- -n %s-flannel-config-e2e --values %s", h.TargetNamespace(), flannelResourceValuesFile))
+		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-flannel-config-e2e-chart:stable -- -n %s-flannel-config-e2e --values %s", env.TargetNamespace(), flannelResourceValuesFile))
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -211,7 +173,7 @@ func installKVMResource(h *framework.Host) error {
 		return nil
 	}
 	b := backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-	n := backoff.NewNotifier(l, context.Background())
+	n := backoff.NewNotifier(config.Logger, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
 		return microerror.Mask(err)
@@ -221,7 +183,7 @@ func installKVMResource(h *framework.Host) error {
 		// NOTE we ignore errors here because we cannot get really useful error
 		// handling done. This here should anyway only be a quick fix until we use
 		// the helm client lib. Then error handling will be better.
-		framework.HelmCmd(fmt.Sprintf("delete --purge %s-kvm-config-e2e", h.TargetNamespace()))
+		framework.HelmCmd(fmt.Sprintf("delete --purge %s-kvm-config-e2e", env.TargetNamespace()))
 
 		var buffer bytes.Buffer
 
@@ -241,7 +203,7 @@ func installKVMResource(h *framework.Host) error {
 			return microerror.Mask(err)
 		}
 
-		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-kvm-config-e2e-chart:stable -- -n %s-kvm-config-e2e --values %s", h.TargetNamespace(), kvmResourceValuesFile))
+		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-kvm-config-e2e-chart:stable -- -n %s-kvm-config-e2e --values %s", env.TargetNamespace(), kvmResourceValuesFile))
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -249,7 +211,7 @@ func installKVMResource(h *framework.Host) error {
 		return nil
 	}
 	b = backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-	n = backoff.NewNotifier(l, context.Background())
+	n = backoff.NewNotifier(config.Logger, context.Background())
 	err = backoff.RetryNotify(o, b, n)
 	if err != nil {
 		return microerror.Mask(err)
