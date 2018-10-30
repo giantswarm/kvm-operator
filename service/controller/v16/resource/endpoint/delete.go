@@ -84,7 +84,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		} else {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found the current version of the reconciled pod in the Kubernetes API")
 
-			if key.ArePodContainersTerminated(currentPod) {
+			if !key.ArePodContainersTerminated(currentPod) {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
 
 				resourcecanceledcontext.SetCanceled(ctx)
