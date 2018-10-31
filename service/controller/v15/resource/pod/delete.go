@@ -114,7 +114,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
 	resourcecanceledcontext.SetCanceled(ctx)
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finelizers")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
 	finalizerskeptcontext.SetKept(ctx)
 
 	return nil
