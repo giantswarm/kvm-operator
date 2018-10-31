@@ -141,6 +141,13 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 										" --service.kubernetes.inCluster=true" +
 										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
+								Lifecycle: &apiv1.Lifecycle{
+									PreStop: &apiv1.Handler{
+										Exec: &apiv1.ExecAction{
+											Command: []string{"/bin/sleep", "5"},
+										},
+									},
+								},
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
 								},
@@ -272,6 +279,13 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									{
 										Name:  "NETWORK_ENV_FILE_PATH",
 										Value: key.NetworkEnvFilePath(customObject),
+									},
+								},
+								Lifecycle: &apiv1.Lifecycle{
+									PreStop: &apiv1.Handler{
+										Exec: &apiv1.ExecAction{
+											Command: []string{"/bin/sleep", "5"},
+										},
 									},
 								},
 								SecurityContext: &apiv1.SecurityContext{
