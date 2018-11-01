@@ -264,8 +264,8 @@
   revision = "c602ada3153f4d322c4e726800f84cec2cf534dd"
 
 [[projects]]
-  branch = "master"
-  digest = "1:28dcfe9354f7ec64ffa7da448dc2b39ca1beea6affa75e57827773c78ed01282"
+  branch = "teemow-remove-anonymous-kubelet-access"
+  digest = "1:f37dbebce7d0259fa682bf35ef251789069c2435ece5ecb8ce1e5ef477f0d7fe"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -277,7 +277,7 @@
     "v_3_7_0",
   ]
   pruneopts = "T"
-  revision = "f0511d02b5d0dc99101a5b9fb587e7cddcbceffc"
+  revision = "fdc94f01371d974c9db1608b5eb41be7be8a2b0e"
 
 [[projects]]
   branch = "master"
