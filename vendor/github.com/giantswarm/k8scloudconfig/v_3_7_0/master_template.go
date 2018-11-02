@@ -1365,6 +1365,8 @@ write_files:
     - kind: ServiceAccount
       name: nginx-ingress-controller
       namespace: kube-system
+    - kind: Group
+      name: system:nodes
     roleRef:
        apiGroup: rbac.authorization.k8s.io
        kind: ClusterRole
@@ -1587,7 +1589,7 @@ write_files:
       x509:
         clientCAFile: /etc/kubernetes/ssl/apiserver-ca.pem
     readOnlyPort: 10255 # Used by heapster. Defaults to 0 (disabled) as of 1.10. Needed for metrics.
-- path: /etc/kubernetes/config/kubelet-bootstrap-kubeconfig.yaml
+- path: /etc/kubernetes/config/kubelet-kubeconfig.yaml
   owner: root
   permissions: 0644
   content: |
@@ -1735,7 +1737,7 @@ write_files:
         - --kubelet-https=true
         - --kubelet-preferred-address-types=InternalIP
         - --kubelet-client-certificate=/etc/kubernetes/ssl/apiserver-crt.pem
-        - --kubelet-client-client=/etc/kubernetes/ssl/apiserver-key.pem
+        - --kubelet-client-key=/etc/kubernetes/ssl/apiserver-key.pem
         - --kubelet-certificate-authority=/etc/kubernetes/ssl/cluster-ca.pem
         - --secure-port={{.Cluster.Kubernetes.API.SecurePort}}
         - --bind-address=$(HOST_IP)
@@ -2287,7 +2289,6 @@ coreos:
       --register-node=true \
       --register-with-taints=node-role.kubernetes.io/master=:NoSchedule \
       --kubeconfig=/etc/kubernetes/config/kubelet-kubeconfig.yaml \
-      --bootstrap-kubeconfig=/etc/kubernetes/config/kubelet-bootstrap-kubeconfig.yaml \
       --node-labels="node-role.kubernetes.io/master,role=master,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
       --v=2"
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
