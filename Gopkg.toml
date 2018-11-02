@@ -57,7 +57,7 @@ required = [
   name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
-  branch = "teemow-remove-anonymous-kubelet-access"
+  branch = "teemow-kubelet-webhook-authentication"
   name = "github.com/giantswarm/k8scloudconfig"
 
 [[constraint]]

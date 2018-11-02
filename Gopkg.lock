@@ -264,8 +264,8 @@
   revision = "c602ada3153f4d322c4e726800f84cec2cf534dd"
 
 [[projects]]
-  branch = "teemow-remove-anonymous-kubelet-access"
-  digest = "1:f37dbebce7d0259fa682bf35ef251789069c2435ece5ecb8ce1e5ef477f0d7fe"
+  branch = "teemow-kubelet-webhook-authentication"
+  digest = "1:63e97a992adae469af404f88ae5e8bce527c24ab64a64a958557142588d6c607"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -277,7 +277,7 @@
     "v_3_7_0",
   ]
   pruneopts = "T"
-  revision = "fdc94f01371d974c9db1608b5eb41be7be8a2b0e"
+  revision = "01dcbd78fad89ed49a01d99aba85363dceb63ad6"
 
 [[projects]]
   branch = "master"
