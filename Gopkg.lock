@@ -265,7 +265,7 @@
 
 [[projects]]
   branch = "teemow-kubelet-webhook-authentication"
-  digest = "1:c1084cc9c0937518cd3dcfd7d4d8b66bd333d1507c2adb91374ec181e1c233df"
+  digest = "1:8f2d86a167774f93da3b9df70ed36714acc3d5c529d2034ab9f87b44f4482c01"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -277,7 +277,7 @@
     "v_3_7_0",
   ]
   pruneopts = "T"
-  revision = "99cdecc9ca6f5a17fef88c6cafa2d80fd90de4cc"
+  revision = "df6667ef038232bd4d7fe31ebc669999f0a79769"
 
 [[projects]]
   branch = "master"

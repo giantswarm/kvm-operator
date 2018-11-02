@@ -1745,7 +1745,7 @@ write_files:
         - --profiling=false
         - --repair-malformed-updates=false
         - --service-account-lookup=true
-        - --authorization-mode=RBAC
+        - --authorization-mode=Node,RBAC
         - --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,ResourceQuota,DefaultStorageClass,PersistentVolumeClaimResize,PodSecurityPolicy,Priority,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook
         - --cloud-provider={{.Cluster.Kubernetes.CloudProvider}}
         - --service-cluster-ip-range={{.Cluster.Kubernetes.API.ClusterIPRange}}
