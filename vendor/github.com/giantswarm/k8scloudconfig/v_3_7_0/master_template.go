@@ -2079,10 +2079,11 @@ coreos:
       Environment="CLUSTER_CA_CERT=/etc/kubernetes/ssl/cluster-ca.pem"
       Environment="APISERVER_CA=/etc/kubernetes/ssl/apiserver-ca.pem"
       Environment="APISERVER_BUNDLE=/etc/kubernetes/ssl/apiserver-ca-bundle.pem"
+      Environment="HOME=/root"
 
-      ExecStartPre=/bin/bash -c "if [ ! -f ${CLUSTER_CA_KEY} ]; then openssl genrsa -out ${CLUSTER_CA_KEY} 2048; fi"
-      ExecStartPre=/bin/bash -c "if [ ! -f ${CLUSTER_CA_CERT} ]; then openssl req -x509 -new -nodes -key ${CLUSTER_CA_KEY} -subj "/CN=clusterca" -days 10000 -out ${CLUSTER_CA_CERT}"
-      ExecStartPre=/bin/bash -c "if [ ! -f ${APISERVER_BUNDLE} ]; then cat ${CLUSTER_CA_CERT} ${APISERVER_CA} > ${APISERVER_BUNDLE}"
+      ExecStartPre=/bin/bash -c "if [ ! -f ${CLUSTER_CA_KEY} ]; then openssl genrsa -out ${CLUSTER_CA_KEY} 2048; fi; \
+                                 if [ ! -f ${CLUSTER_CA_CERT} ]; then openssl req -x509 -new -nodes -key ${CLUSTER_CA_KEY} -subj \"/CN=clusterca\" -days 10000 -out ${CLUSTER_CA_CERT}; fi; \
+                                 if [ ! -f ${APISERVER_BUNDLE} ]; then cat ${CLUSTER_CA_CERT} ${APISERVER_CA} > ${APISERVER_BUNDLE}; fi"
       ExecStart=/bin/bash -c '/usr/bin/envsubst </etc/kubernetes/config/kubelet-config.yaml.tmpl >/etc/kubernetes/config/kubelet-config.yaml'
 
       [Install]
