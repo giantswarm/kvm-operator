@@ -70,7 +70,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the current version of the reconciled pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current version of the reconciled pod in the Kubernetes API")
 
 		currentPod, err := r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(reconciledPod.Name, metav1.GetOptions{})
 		if errors.IsNotFound(err) {
