@@ -385,6 +385,10 @@ func ShutdownDeferrerListenAddress(customObject v1alpha1.KVMConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(ShutdownDeferrerListenPort(customObject))
 }
 
+func ShutdownDeferrerPollPath(customObject v1alpha1.KVMConfig) string {
+	return fmt.Sprintf("%s/v1/defer/", ShutdownDeferrerListenAddress(customObject))
+}
+
 func StorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }

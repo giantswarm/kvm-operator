@@ -249,7 +249,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
-											Command: []string{"/qemu-shutdown", fmt.Sprintf("%s/v1/defer/", key.ShutdownDeferrerListenAddress(customObject))},
+											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerPollPath(customObject)},
 										},
 									},
 								},
@@ -349,7 +349,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
-											Command: []string{"/pre-shutdown-hook", fmt.Sprintf("%s/v1/defer/", key.ShutdownDeferrerListenAddress(customObject))},
+											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(customObject)},
 										},
 									},
 								},
