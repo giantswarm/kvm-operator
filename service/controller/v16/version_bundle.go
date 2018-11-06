@@ -8,6 +8,11 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
+				Component:   "cloudconfig",
+				Description: "Removed CoreDNS related components (now managed by chart-operator).",
+				Kind:        versionbundle.KindRemoved,
+			},
+			{
 				Component:   "kubernetes",
 				Description: "Updated Kubernetes to 1.12.2. More info here: https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.12.md",
 				Kind:        versionbundle.KindChanged,
@@ -59,10 +64,6 @@ func VersionBundle() versionbundle.Bundle {
 			{
 				Name:    "etcd",
 				Version: "3.3.9",
-			},
-			{
-				Name:    "coredns",
-				Version: "1.1.1",
 			},
 			{
 				Name:    "kubernetes",
