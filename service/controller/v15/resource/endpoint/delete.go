@@ -70,7 +70,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the current version of the reconciled pod in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current version of the reconciled pod in the Kubernetes API")
 
 		currentPod, err := r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(reconciledPod.Name, metav1.GetOptions{})
 		if errors.IsNotFound(err) {
@@ -78,17 +78,16 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 			// informer's watch event is outdated and the pod got already deleted in
 			// the Kubernetes API. This is a normal transition behaviour, so we just
 			// ignore it and continue with endpoint deletion.
-			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot find the current version of the reconciled pod in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find current version of the reconciled pod in the Kubernetes API")
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found the current version of the reconciled pod in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found current version of the reconciled pod in the Kubernetes API")
 
 			if !key.ArePodContainersTerminated(currentPod) {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
-
-				resourcecanceledcontext.SetCanceled(ctx)
 				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+				resourcecanceledcontext.SetCanceled(ctx)
 
 				r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
 				finalizerskeptcontext.SetKept(ctx)
