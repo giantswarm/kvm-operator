@@ -78,7 +78,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 			// informer's watch event is outdated and the pod got already deleted in
 			// the Kubernetes API. This is a normal transition behaviour, so we just
 			// ignore it and continue with endpoint deletion.
-			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot find the current version of the reconciled pod in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find current version of the reconciled pod in the Kubernetes API")
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
