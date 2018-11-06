@@ -86,7 +86,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 			if !key.ArePodContainersTerminated(currentPod) {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
-
+				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 				resourcecanceledcontext.SetCanceled(ctx)
 				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
