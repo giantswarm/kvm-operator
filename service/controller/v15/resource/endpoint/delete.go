@@ -88,7 +88,6 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
 				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 				resourcecanceledcontext.SetCanceled(ctx)
-				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
 				r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
 				finalizerskeptcontext.SetKept(ctx)
