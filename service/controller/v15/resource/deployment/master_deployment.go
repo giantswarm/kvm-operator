@@ -4,14 +4,13 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/kvm-operator/service/controller/v15/key"
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/core/v1"
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v15/key"
 )
 
 func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
@@ -250,7 +249,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
-											Command: []string{"/qemu-shutdown"},
+											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerPollPath(customObject)},
 										},
 									},
 								},
@@ -327,7 +326,32 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								ImagePullPolicy: apiv1.PullAlways,
 								Args: []string{
 									"daemon",
-									"--server.listen.address=http://127.0.0.1:60080",
+									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customObject),
+								},
+								Env: []apiv1.EnvVar{
+									{
+										Name: key.EnvKeyMyPodName,
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												FieldPath: "metadata.name",
+											},
+										},
+									},
+									{
+										Name: key.EnvKeyMyPodNamespace,
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												FieldPath: "metadata.namespace",
+											},
+										},
+									},
+								},
+								Lifecycle: &apiv1.Lifecycle{
+									PreStop: &apiv1.Handler{
+										Exec: &apiv1.ExecAction{
+											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(customObject)},
+										},
+									},
 								},
 								LivenessProbe: &apiv1.Probe{
 									InitialDelaySeconds: key.InitialDelaySeconds,
@@ -338,7 +362,7 @@ func newMasterDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: int32(60080)},
+											Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(customObject))},
 											Host: key.ProbeHost,
 										},
 									},
