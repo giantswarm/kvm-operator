@@ -48,9 +48,9 @@ const (
 	CoreosVersion        = "1855.5.0"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:df982fc73b71e60fc70a7444c068b52441ddb30e"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:648853b8a0e804eb06738438a2a5f21c673f5be4"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:f33392c3eff8adac6eb17339d31047deb60a8162"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:ddf211dfed52086ade32ab8c45e44eb0273319ef"
-	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:fc61a09a64b72e184033a74bfd67b3853241d54a"
+	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:45615c93bf089f31930494cd32b54a7b3cb4d946"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1G"
