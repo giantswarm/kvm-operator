@@ -136,9 +136,9 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 									"/opt/k8s-endpoint-updater",
 									"update",
 									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
-									" --service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
-									" --service.kubernetes.cluster.service=" + key.WorkerID,
-									" --service.kubernetes.inCluster=true",
+									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
+									"--service.kubernetes.cluster.service=" + key.WorkerID,
+									"--service.kubernetes.inCluster=true",
 								},
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
