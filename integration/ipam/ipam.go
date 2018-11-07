@@ -37,7 +37,7 @@ func GenerateFlannelNetwork(ctx context.Context, clusterID string, crdStorage mi
 
 	cidrMask := net.CIDRMask(flannelCidrSize, 32)
 
-	cidr, err := ipamService.CreateSubnet(ctx, cidrMask, flannelNetworkAnnotation(clusterID))
+	cidr, err := ipamService.CreateSubnet(ctx, cidrMask, flannelNetworkAnnotation(clusterID), nil)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
