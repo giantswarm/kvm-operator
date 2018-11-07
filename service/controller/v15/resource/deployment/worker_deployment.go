@@ -133,12 +133,13 @@ func newWorkerDeployments(customObject v1alpha1.KVMConfig) ([]*extensionsv1.Depl
 								Image:           key.K8SEndpointUpdaterDocker,
 								ImagePullPolicy: apiv1.PullIfNotPresent,
 								Command: []string{
-									"/opt/k8s-endpoint-updater",
-									"update",
-									"--provider.bridge.name=" + key.NetworkBridgeName(customObject),
-									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject),
-									"--service.kubernetes.cluster.service=" + key.WorkerID,
-									"--service.kubernetes.inCluster=true",
+									"exec",
+									"/opt/k8s-endpoint-updater update" +
+										" --provider.bridge.name=" + key.NetworkBridgeName(customObject) +
+										" --service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customObject) +
+										" --service.kubernetes.cluster.service=" + key.WorkerID +
+										" --service.kubernetes.inCluster=true" +
+										" --service.kubernetes.pod.name=${POD_NAME}",
 								},
 								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
