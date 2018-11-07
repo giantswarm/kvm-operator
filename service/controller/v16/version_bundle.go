@@ -14,7 +14,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "calico",
-				Description: "Updated to 3.2.3. Also the manifest has proper resource limits to get QoS policy guaranteed.",
+				Description: "Updated to 3.2.3. Also the manifest has proper resource limits and priority class to get QoS policy guaranteed.",
 				Kind:        versionbundle.KindChanged,
 			},
 			{
@@ -40,6 +40,16 @@ func VersionBundle() versionbundle.Bundle {
 			{
 				Component:   "docker",
 				Description: "Updated to 18.06.1",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "kube-proxy",
+				Description: "Several configuration fixes and it now gets installed and upgraded before Calico.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Updated k8scloudconfig to 3.7.1",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
