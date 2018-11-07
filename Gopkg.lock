@@ -209,15 +209,15 @@
   revision = "3745b233e840c5073e5b14a2281c774412409298"
 
 [[projects]]
-  branch = "optional-label-selector"
-  digest = "1:1448b16ed75a300ce94fb20b4ef1743e85ad558a82f489f85b96fb97d9b64a16"
+  branch = "master"
+  digest = "1:c53358b6b1558b3940421e4e192d95f8f14ad6873c362f6e40aab7d5b7083259"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
     "pkg/chartvalues",
   ]
   pruneopts = "UT"
-  revision = "76af59e00424ec47c0bd595755f9a0d341aa4b86"
+  revision = "3aa5db40ae4484507d28cb2ec6992889a506d86e"
 
 [[projects]]
   branch = "master"
@@ -264,7 +264,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c80e85078d15cf3373be5dfceaf78617b631d1edbd38161f4b17c34b757a0a17"
+  digest = "1:208f2d22ffd819b407db0c885b56acb86b58e0ce55b8c7a47fe8b0f02ba5f0a7"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_1_1_0",
@@ -276,7 +276,7 @@
     "v_3_7_0",
   ]
   pruneopts = "T"
-  revision = "1b74b9361ef3b35f9c10227815a1989339923b5c"
+  revision = "5a69fc09728cccb426e841c18ca3a92f6bba50df"
 
 [[projects]]
   branch = "master"
