@@ -80,8 +80,8 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/micrologger"
 
-[[override]]
-  branch = "metrics-cache-update"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
 
 [[constraint]]
