@@ -14,7 +14,7 @@ import (
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customResource, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -27,7 +27,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the deployments in the Kubernetes API")
 
 		for _, deployment := range deploymentsToDelete {
-			n := key.ClusterNamespace(customObject)
+			n := key.ClusterNamespace(customResource)
 			err := r.k8sClient.Extensions().Deployments(n).Delete(deployment.Name, newDeleteOptions())
 			if apierrors.IsNotFound(err) {
 				// fall through

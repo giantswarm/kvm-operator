@@ -12,7 +12,7 @@ import (
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customResource, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -25,7 +25,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(configMapsToCreate) != 0 {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the config maps in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customResource)
 		for _, configMap := range configMapsToCreate {
 			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Create(configMap)
 			if apierrors.IsAlreadyExists(err) {

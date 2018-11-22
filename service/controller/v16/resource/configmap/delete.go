@@ -14,7 +14,7 @@ import (
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customResource, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -27,7 +27,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the config maps in the Kubernetes API")
 
 		// Create the config maps in the Kubernetes API.
-		namespace := key.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customResource)
 		for _, configMap := range configMapsToDelete {
 			err := r.k8sClient.CoreV1().ConfigMaps(namespace).Delete(configMap.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {

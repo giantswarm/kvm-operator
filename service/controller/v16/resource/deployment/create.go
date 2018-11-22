@@ -12,7 +12,7 @@ import (
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	customResource, err := key.ToCustomObject(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(deploymentsToCreate) != 0 {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the deployments in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customResource)
 		for _, deployment := range deploymentsToCreate {
 			_, err := r.k8sClient.Extensions().Deployments(namespace).Create(deployment)
 			if apierrors.IsAlreadyExists(err) {

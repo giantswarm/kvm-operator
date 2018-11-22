@@ -16,7 +16,7 @@ import (
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customResource, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -25,7 +25,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentDeployments []*v1beta1.Deployment
 	{
-		namespace := key.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customResource)
 		deploymentList, err := r.k8sClient.Extensions().Deployments(namespace).List(apismetav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)
@@ -37,7 +37,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 				currentDeployments = append(currentDeployments, &d)
 			}
 
-			r.updateVersionBundleVersionGauge(ctx, customObject, metric.VersionBundleVersionGauge, currentDeployments)
+			r.updateVersionBundleVersionGauge(ctx, customResource, metric.VersionBundleVersionGauge, currentDeployments)
 		}
 	}
 
@@ -46,7 +46,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	return currentDeployments, nil
 }
 
-func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customObject v1alpha1.KVMConfig, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
+func (r *Resource) updateVersionBundleVersionGauge(ctx context.Context, customResource v1alpha1.KVMConfig, gauge *prometheus.GaugeVec, deployments []*v1beta1.Deployment) {
 	versionCounts := map[string]float64{}
 
 	for _, d := range deployments {

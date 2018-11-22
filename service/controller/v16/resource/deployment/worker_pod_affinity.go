@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
 )
 
-func newWorkerPodAfinity(customObject v1alpha1.KVMConfig) *apiv1.Affinity {
+func newWorkerPodAfinity(customResource v1alpha1.KVMConfig) *apiv1.Affinity {
 	podAffinity := &apiv1.Affinity{
 		PodAntiAffinity: &apiv1.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []apiv1.PodAffinityTerm{
@@ -27,7 +27,7 @@ func newWorkerPodAfinity(customObject v1alpha1.KVMConfig) *apiv1.Affinity {
 					},
 					TopologyKey: "kubernetes.io/hostname",
 					Namespaces: []string{
-						key.ClusterID(customObject),
+						key.ClusterID(customResource),
 					},
 				},
 			},
