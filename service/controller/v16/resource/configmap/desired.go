@@ -13,14 +13,14 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customResource, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new config maps")
 
-	configMaps, err := r.newConfigMaps(customObject)
+	configMaps, err := r.newConfigMaps(customResource)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -30,26 +30,26 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return configMaps, nil
 }
 
-func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.ConfigMap, error) {
+func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.ConfigMap, error) {
 	var configMaps []*apiv1.ConfigMap
 
-	certs, err := r.certsSearcher.SearchCluster(key.ClusterID(customObject))
+	certs, err := r.certsSearcher.SearchCluster(key.ClusterID(customResource))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	keys, err := r.keyWatcher.SearchCluster(key.ClusterID(customObject))
+	keys, err := r.keyWatcher.SearchCluster(key.ClusterID(customResource))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	for _, node := range customObject.Spec.Cluster.Masters {
-		template, err := r.cloudConfig.NewMasterTemplate(customObject, certs, node, keys)
+	for _, node := range customResource.Spec.Cluster.Masters {
+		template, err := r.cloudConfig.NewMasterTemplate(customResource, certs, node, keys)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, key.MasterID)
+		configMap, err := r.newConfigMap(customResource, template, node, key.MasterID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -57,13 +57,13 @@ func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.Conf
 		configMaps = append(configMaps, configMap)
 	}
 
-	for _, node := range customObject.Spec.Cluster.Workers {
-		template, err := r.cloudConfig.NewWorkerTemplate(customObject, certs, node)
+	for _, node := range customResource.Spec.Cluster.Workers {
+		template, err := r.cloudConfig.NewWorkerTemplate(customResource, certs, node)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customObject, template, node, key.WorkerID)
+		configMap, err := r.newConfigMap(customResource, template, node, key.WorkerID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -75,19 +75,19 @@ func (r *Resource) newConfigMaps(customObject v1alpha1.KVMConfig) ([]*apiv1.Conf
 }
 
 // newConfigMap creates a new Kubernetes configmap using the provided
-// information. customObject is used for name and label creation. params serves
-// as structure being injected into the template execution to interpolate
+// information. customResource is used for name and label creation. params
+// serves as structure being injected into the template execution to interpolate
 // variables. prefix can be either "master" or "worker" and is used to prefix
 // the configmap name.
-func (r *Resource) newConfigMap(customObject v1alpha1.KVMConfig, template string, node v1alpha1.ClusterNode, prefix string) (*apiv1.ConfigMap, error) {
+func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template string, node v1alpha1.ClusterNode, prefix string) (*apiv1.ConfigMap, error) {
 	var newConfigMap *apiv1.ConfigMap
 	{
 		newConfigMap = &apiv1.ConfigMap{
 			ObjectMeta: apismetav1.ObjectMeta{
-				Name: key.ConfigMapName(customObject, node, prefix),
+				Name: key.ConfigMapName(customResource, node, prefix),
 				Labels: map[string]string{
-					"cluster":  key.ClusterID(customObject),
-					"customer": key.ClusterCustomer(customObject),
+					"cluster":  key.ClusterID(customResource),
+					"customer": key.ClusterCustomer(customResource),
 				},
 			},
 			Data: map[string]string{
