@@ -11,7 +11,7 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	customResource, err := key.ToCustomObject(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -21,13 +21,13 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	var deployments []*v1beta1.Deployment
 
 	{
-		masterDeployments, err := newMasterDeployments(customObject)
+		masterDeployments, err := newMasterDeployments(customResource)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		deployments = append(deployments, masterDeployments...)
 
-		workerDeployments, err := newWorkerDeployments(customObject)
+		workerDeployments, err := newWorkerDeployments(customResource)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
