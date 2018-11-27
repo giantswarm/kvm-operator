@@ -1,7 +1,7 @@
 package v1alpha1
 
 type ClusterGuestConfig struct {
-	AvailabilityZones int `json:"availability_zones,omitempty" yaml:"availability_zones,omitempty"`
+	AvailabilityZones int `json:"availabilityZones,omitempty" yaml:"availabilityZones,omitempty"`
 	// DNSZone for guest cluster is supplemented with host prefixes for
 	// specific services such as Kubernetes API or Etcd. In general this DNS
 	// Zone should start with `k8s` like for example
