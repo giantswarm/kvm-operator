@@ -2,15 +2,14 @@ package v16
 
 import (
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v16/resource/node"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v16/resource/node"
 )
 
 type DeleterResourceSetConfig struct {
