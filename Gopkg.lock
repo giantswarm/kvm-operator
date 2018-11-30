@@ -395,11 +395,11 @@
 
 [[projects]]
   branch = "update-times"
-  digest = "1:38b61628a84fe2976d8f86e3cd9d9869ba7ca8cbefa347f3d0e81f340827b34b"
+  digest = "1:f842a7c2f28ac0558bb89ab37af2486c5e6bde1b15e448e0279dd1289473078d"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
   pruneopts = "UT"
-  revision = "cb74314c22ef298c12af57bd184a5fb2f19d02bc"
+  revision = "02560cdca3de1da74e343ccd6401efbb626573ed"
 
 [[projects]]
   branch = "master"
@@ -1502,7 +1502,7 @@
     "pkg/volume/util/types",
   ]
   pruneopts = "UT"
-  revision = "94f2fe5e1bc08f92304c5f6577016ca260f5122a"
+  revision = "deae5dc2b7c5d82064afd79065833e02a161eb43"
 
 [[projects]]
   branch = "master"
