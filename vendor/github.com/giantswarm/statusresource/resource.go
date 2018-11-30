@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	HeartBeatUpdateThreshold = 10 * time.Minute
+	HeartBeatUpdateThreshold = 30 * time.Minute
 )
 
 const (
