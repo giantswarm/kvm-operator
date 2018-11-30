@@ -337,20 +337,19 @@ func allNodesHaveVersion(nodes []providerv1alpha1.StatusClusterNode, version str
 }
 
 func allNodesEqual(aNodes []providerv1alpha1.StatusClusterNode, bNodes []providerv1alpha1.StatusClusterNode) bool {
-	aRemoved := removeHeartBeatFromNodes(aNodes)
-	bRemoved := removeHeartBeatFromNodes(bNodes)
+	aRemoved := removeTimesFromNodes(aNodes)
+	bRemoved := removeTimesFromNodes(bNodes)
 
 	return reflect.DeepEqual(aRemoved, bRemoved)
 }
 
-func removeHeartBeatFromNodes(nodes []providerv1alpha1.StatusClusterNode) []providerv1alpha1.StatusClusterNode {
+func removeTimesFromNodes(nodes []providerv1alpha1.StatusClusterNode) []providerv1alpha1.StatusClusterNode {
 	var newNodes []providerv1alpha1.StatusClusterNode
 
 	for _, n := range nodes {
 		newNodes = append(newNodes, providerv1alpha1.StatusClusterNode{
-			LastTransitionTime: n.LastTransitionTime,
-			Name:               n.Name,
-			Version:            n.Version,
+			Name:    n.Name,
+			Version: n.Version,
 		})
 	}
 
