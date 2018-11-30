@@ -139,8 +139,8 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:de0f9b4eb3b18ebb108f28854b44a683768dc9f7b723fdf74b838895c8728d4d"
+  branch = "extend-status-time"
+  digest = "1:63ea912d7053476ca93e82424fd4d7279c68c5ff760cf81350f3f6321e8a915e"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -157,7 +157,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "ef294f85b0e43c4278f3ab273ca387eefbfe8975"
+  revision = "b5beb3ac9cdf40f213442d5e635f2d19937e6b4a"
 
 [[projects]]
   branch = "master"
