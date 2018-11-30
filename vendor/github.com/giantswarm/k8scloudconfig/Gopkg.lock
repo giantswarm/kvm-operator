@@ -10,12 +10,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "clean-api"
-  digest = "1:dcbf7bcd1b9cfe634e347a5d2e507c6270d6184367eff82f746525d86e1ad7ec"
+  branch = "master"
+  digest = "1:5a4b630f34244a67d838887f2ae84f94165e7bf6776c6d1cb18badafec70d3df"
   name = "github.com/giantswarm/apiextensions"
   packages = ["pkg/apis/provider/v1alpha1"]
   pruneopts = "UT"
-  revision = "f972c639f8228d506ea3cade281942cbfd1a0b1d"
+  revision = "ef294f85b0e43c4278f3ab273ca387eefbfe8975"
 
 [[projects]]
   branch = "master"
