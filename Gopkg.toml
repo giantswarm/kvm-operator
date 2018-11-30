@@ -89,7 +89,7 @@ required = [
   name = "github.com/giantswarm/randomkeys"
 
 [[override]]
-  branch = "use-tenant-lib"
+  branch = "update-times"
   name = "github.com/giantswarm/statusresource"
 
 [[constraint]]
