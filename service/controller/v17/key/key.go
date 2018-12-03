@@ -63,6 +63,10 @@ const (
 	// within k8s-kvm. Note we use this only for masters, since the value for the
 	// workers can be configured at runtime by the user.
 	DefaultDockerDiskSize = "50G"
+	// DefaultKubeletDiskSize defines the space used to partition the kubelet FS
+	// within k8s-kvm. Note we use this only for masters, since the value for the
+	// workers can be configured at runtime by the user.
+	DefaultKubeletDiskSize = "5G"
 	// DefaultOSDiskSize defines the space used to partition the root FS within
 	// k8s-kvm.
 	DefaultOSDiskSize = "5G"
@@ -221,6 +225,21 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 	}
 
 	return b, nil
+}
+
+func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
+	// TODO: calvix
+	// TODO: for now we use same value as for DockerVolumeSizeFromNode, when we have kubelet size in spec we should use that.
+
+	if node.DockerVolumeSizeGB != 0 {
+		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
+	}
+
+	if node.Disk != 0 {
+		return fmt.Sprintf("%sG", strconv.FormatFloat(node.Disk, 'f', 0, 64))
+	}
+
+	return DefaultKubeletDiskSize
 }
 
 // ArePodContainersTerminated checks ContainerState for all containers present
