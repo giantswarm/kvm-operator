@@ -7,7 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v17/key"
 )
 
 const (
