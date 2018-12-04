@@ -228,7 +228,7 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 }
 
 func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
-	// TODO: calvix
+	// TODO: https://github.com/giantswarm/giantswarm/issues/4105#issuecomment-421772917
 	// TODO: for now we use same value as for DockerVolumeSizeFromNode, when we have kubelet size in spec we should use that.
 
 	if node.DockerVolumeSizeGB != 0 {
