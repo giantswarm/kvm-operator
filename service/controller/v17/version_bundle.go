@@ -12,6 +12,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Add separate volume for /var/lib/kubelet and allow specifying its size.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "kubernetes",
+				Description: "Update to 1.12.3 (CVE-2018-1002105).",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -32,7 +37,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.12.2",
+				Version: "1.12.3",
 			},
 		},
 		Name:    "kvm-operator",
