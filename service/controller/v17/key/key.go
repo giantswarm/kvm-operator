@@ -48,7 +48,7 @@ const (
 	CoreosVersion        = "1855.5.0"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:f33392c3eff8adac6eb17339d31047deb60a8162"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:75994050b92498ef3a8fa3bac22e17f5e6c62956"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:6e345a9250097f83f42bae5a002c04f772cd3c2f"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:b2ffdb2c4ec93fe6bf2d4af8e55c8a4b11253611"
 
@@ -63,6 +63,10 @@ const (
 	// within k8s-kvm. Note we use this only for masters, since the value for the
 	// workers can be configured at runtime by the user.
 	DefaultDockerDiskSize = "50G"
+	// DefaultKubeletDiskSize defines the space used to partition the kubelet FS
+	// within k8s-kvm. Note we use this only for masters, since the value for the
+	// workers can be configured at runtime by the user.
+	DefaultKubeletDiskSize = "5G"
 	// DefaultOSDiskSize defines the space used to partition the root FS within
 	// k8s-kvm.
 	DefaultOSDiskSize = "5G"
@@ -221,6 +225,21 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 	}
 
 	return b, nil
+}
+
+func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
+	// TODO: https://github.com/giantswarm/giantswarm/issues/4105#issuecomment-421772917
+	// TODO: for now we use same value as for DockerVolumeSizeFromNode, when we have kubelet size in spec we should use that.
+
+	if node.DockerVolumeSizeGB != 0 {
+		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
+	}
+
+	if node.Disk != 0 {
+		return fmt.Sprintf("%sG", strconv.FormatFloat(node.Disk, 'f', 0, 64))
+	}
+
+	return DefaultKubeletDiskSize
 }
 
 // ArePodContainersTerminated checks ContainerState for all containers present

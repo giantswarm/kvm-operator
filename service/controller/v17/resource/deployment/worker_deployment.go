@@ -179,6 +179,10 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 										Value: key.DockerVolumeSizeFromNode(capabilities),
 									},
 									{
+										Name:  "DISK_KUBELET",
+										Value: key.KubeletVolumeSizeFromNode(capabilities),
+									},
+									{
 										Name:  "DISK_OS",
 										Value: key.DefaultOSDiskSize,
 									},

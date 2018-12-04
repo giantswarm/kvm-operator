@@ -211,6 +211,10 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 										Value: key.DefaultDockerDiskSize,
 									},
 									{
+										Name:  "DISK_KUBELET",
+										Value: key.DefaultKubeletDiskSize,
+									},
+									{
 										Name:  "DISK_OS",
 										Value: key.DefaultOSDiskSize,
 									},

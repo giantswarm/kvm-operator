@@ -134,6 +134,21 @@ WantedBy=multi-user.target
 			Command: "start",
 		},
 		{
+			AssetContent: `[Unit]
+Before=docker.service
+Description=Mount for kubelet volume
+[Mount]
+What=/dev/disk/by-id/virtio-kubeletfs
+Where=/var/lib/kubelet
+Type=xfs
+[Install]
+WantedBy=multi-user.target
+`,
+			Name:    "var-lib-kubelet.mount",
+			Enable:  true,
+			Command: "start",
+		},
+		{
 			Name:    "iscsid.service",
 			Enable:  true,
 			Command: "start",
