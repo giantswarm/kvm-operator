@@ -8,9 +8,9 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "cloudconfig",
-				Description: "Add kube-proxy configuration files, required for updating kube-proxy daemonset.",
-				Kind:        versionbundle.KindAdded,
+				Component:   "kubernetes",
+				Description: "Update to 1.10.11 (CVE-2018-1002105).",
+				Kind:        versionbundle.KindChanged,
 			},
 		},
 		Components: []versionbundle.Component{
@@ -36,10 +36,10 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.10.4",
+				Version: "1.10.11",
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "2.5.2",
+		Version: "2.5.3",
 	}
 }
