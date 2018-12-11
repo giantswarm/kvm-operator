@@ -199,6 +199,10 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 								},
 								Env: []apiv1.EnvVar{
 									{
+										Name:  "CHECK_K8S_API",
+										Value: key.CheckK8sApi,
+									},
+									{
 										Name:  "CORES",
 										Value: fmt.Sprintf("%d", capabilities.CPUs),
 									},

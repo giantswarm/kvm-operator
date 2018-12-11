@@ -29,15 +29,18 @@ const (
 	// ProbeHost host for liveness probe.
 	ProbeHost = "127.0.0.1"
 	// InitialDelaySeconds is InitialDelaySeconds param in liveness probe config
-	InitialDelaySeconds = 60
+	InitialDelaySeconds = 180
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config
-	TimeoutSeconds = 3
+	TimeoutSeconds = 5
 	// PeriodSeconds is PeriodSeconds param in liveness probe config
-	PeriodSeconds = 20
+	PeriodSeconds = 30
 	// FailureThreshold is FailureThreshold param in liveness probe config
 	FailureThreshold = 4
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
+
+	// enable k8s-kvm-health check for k8s api
+	CheckK8sApi = "true"
 
 	// Environment variable names for Downward API use (shutdown-deferrer).
 	EnvKeyMyPodName      = "MY_POD_NAME"
@@ -49,7 +52,7 @@ const (
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:75994050b92498ef3a8fa3bac22e17f5e6c62956"
-	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:6e345a9250097f83f42bae5a002c04f772cd3c2f"
+	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:b4022815db3286bb166443524bd0d7308102bc3e"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:b2ffdb2c4ec93fe6bf2d4af8e55c8a4b11253611"
 
 	// constants for calculation qemu memory overhead.

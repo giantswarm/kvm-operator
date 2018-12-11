@@ -9,13 +9,8 @@ func VersionBundle() versionbundle.Bundle {
 		Changelogs: []versionbundle.Changelog{
 			{
 				Component:   "kvm-operator",
-				Description: "Add separate volume for /var/lib/kubelet and allow specifying its size.",
+				Description: "Add k8s api and kubelet health check to kvm pod.",
 				Kind:        versionbundle.KindAdded,
-			},
-			{
-				Component:   "kubernetes",
-				Description: "Update to 1.12.3 (CVE-2018-1002105).",
-				Kind:        versionbundle.KindChanged,
 			},
 		},
 		Components: []versionbundle.Component{
@@ -41,6 +36,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.1.1",
+		Version: "3.1.2",
 	}
 }
