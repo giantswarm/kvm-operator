@@ -41,6 +41,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.1.1",
+		Version: "3.2.1",
 	}
 }
