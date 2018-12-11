@@ -1,10 +1,10 @@
-package v17
+package v18
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
-	"github.com/giantswarm/kvm-operator/service/controller/v17/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v17/resource/endpoint"
-	"github.com/giantswarm/kvm-operator/service/controller/v17/resource/pod"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/endpoint"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/pod"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
