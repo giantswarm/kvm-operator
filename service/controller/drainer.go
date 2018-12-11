@@ -12,12 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v11"
-	"github.com/giantswarm/kvm-operator/service/controller/v12"
-	"github.com/giantswarm/kvm-operator/service/controller/v13"
-	"github.com/giantswarm/kvm-operator/service/controller/v14"
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch1"
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch2"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	"github.com/giantswarm/kvm-operator/service/controller/v16"
@@ -110,102 +104,6 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, error) {
 	var err error
 
-	var resourceSetV11 *controller.ResourceSet
-	{
-		c := v11.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV11, err = v11.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV12 *controller.ResourceSet
-	{
-		c := v12.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV12, err = v12.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV13 *controller.ResourceSet
-	{
-		c := v13.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV13, err = v13.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV14 *controller.ResourceSet
-	{
-		c := v14.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV14, err = v14.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV14Patch1 *controller.ResourceSet
-	{
-		c := v14patch1.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV14Patch1, err = v14patch1.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV14Patch2 *controller.ResourceSet
-	{
-		c := v14patch2.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV14Patch2, err = v14patch2.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var resourceSetV14Patch3 *controller.ResourceSet
 	{
 		c := v14patch3.DrainerResourceSetConfig{
@@ -271,12 +169,6 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	}
 
 	resourceSets := []*controller.ResourceSet{
-		resourceSetV11,
-		resourceSetV12,
-		resourceSetV13,
-		resourceSetV14,
-		resourceSetV14Patch1,
-		resourceSetV14Patch2,
 		resourceSetV14Patch3,
 		resourceSetV15,
 		resourceSetV16,
