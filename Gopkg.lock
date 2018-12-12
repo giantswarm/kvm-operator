@@ -139,8 +139,8 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "extend-status-time"
-  digest = "1:6b6ae86bd6c4a1694a6cb003615a6ddb7b6a81d7b34a36ef105c092810f5658e"
+  branch = "master"
+  digest = "1:9ab18280471a87f974caebc313b3d1d4edb80887d4ab64885d9c6e25ac10f037"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/app/v1alpha1",
@@ -160,7 +160,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "2b8ab775bda73af716fe553217ae791de9dc703e"
+  revision = "31f93192df189b6e72ada2d4db36d0a0a2dca171"
 
 [[projects]]
   branch = "master"
@@ -399,12 +399,12 @@
   revision = "5e1f0ed497cf04625fccc565bf13449e4493da29"
 
 [[projects]]
-  branch = "update-times"
-  digest = "1:de7cb9b7f757e04a5944e9af1b072aaa4e25a34941e8fb2615a3312ccdb0a861"
+  branch = "master"
+  digest = "1:4843fd065294029a1ac603792afe37d6fa0cf2adc601033221c8df1ef225c76c"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
   pruneopts = "UT"
-  revision = "0ec4a7582d985b0f54c95a8b26fa3ee7ec081984"
+  revision = "82b584aecdbd0f7b2ca2496868a921919aa34211"
 
 [[projects]]
   branch = "master"
@@ -1512,7 +1512,7 @@
     "pkg/volume/util/types",
   ]
   pruneopts = "UT"
-  revision = "f614805c29fd3d5a0e55fa4691b6d8df2704bede"
+  revision = "54a061aba41ff4d91a337e04cf828b71118f522d"
 
 [[projects]]
   branch = "master"

@@ -32,8 +32,8 @@ required = [
   branch = "master"
   name = "github.com/docker/distribution"
 
-[[override]]
-  branch = "extend-status-time"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]
@@ -88,8 +88,8 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/randomkeys"
 
-[[override]]
-  branch = "update-times"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/statusresource"
 
 [[constraint]]
