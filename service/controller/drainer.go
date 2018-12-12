@@ -18,9 +18,12 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v14"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch1"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch2"
+	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	"github.com/giantswarm/kvm-operator/service/controller/v16"
 	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v17"
+	"github.com/giantswarm/kvm-operator/service/controller/v18"
 )
 
 type DrainerConfig struct {
@@ -204,6 +207,22 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV14Patch3 *controller.ResourceSet
+	{
+		c := v14patch3.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV14Patch3, err = v14patch3.NewDrainerResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceSetV15 *controller.ResourceSet
 	{
 		c := v15.DrainerResourceSetConfig{
@@ -236,6 +255,38 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV17 *controller.ResourceSet
+	{
+		c := v17.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV17, err = v17.NewDrainerResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var resourceSetV18 *controller.ResourceSet
+	{
+		c := v18.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV18, err = v18.NewDrainerResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV11,
 		resourceSetV12,
@@ -243,8 +294,11 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		resourceSetV14,
 		resourceSetV14Patch1,
 		resourceSetV14Patch2,
+		resourceSetV14Patch3,
 		resourceSetV15,
 		resourceSetV16,
+		resourceSetV17,
+		resourceSetV18,
 	}
 
 	return resourceSets, nil
