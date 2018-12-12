@@ -33,13 +33,13 @@ const (
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config
 	TimeoutSeconds = 5
 	// PeriodSeconds is PeriodSeconds param in liveness probe config
-	PeriodSeconds = 30
+	PeriodSeconds = 20
 	// FailureThreshold is FailureThreshold param in liveness probe config
-	FailureThreshold = 4
+	FailureThreshold = 3
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
-	// enable k8s-kvm-health check for k8s api
+	// Enable k8s-kvm-health check for k8s api.
 	CheckK8sApi = "true"
 
 	// Environment variable names for Downward API use (shutdown-deferrer).
