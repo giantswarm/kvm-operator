@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/giantswarm/backoff"
@@ -634,7 +636,7 @@ func (c *Client) newTunnel() (*k8sportforward.Tunnel, error) {
 		return nil, nil
 	}
 
-	podName, err := getPodName(c.k8sClient, tillerLabelSelector, c.tillerNamespace)
+	pod, err := getPod(c.k8sClient, tillerLabelSelector, c.tillerNamespace)
 	if IsNotFound(err) {
 		return nil, microerror.Maskf(tillerNotFoundError, "label selector: %#q namespace: %#q", tillerLabelSelector, c.tillerNamespace)
 	} else if err != nil {
@@ -655,57 +657,13 @@ func (c *Client) newTunnel() (*k8sportforward.Tunnel, error) {
 
 	var tunnel *k8sportforward.Tunnel
 	{
-		tunnel, err = forwarder.ForwardPort(c.tillerNamespace, podName, tillerPort)
+		tunnel, err = forwarder.ForwardPort(c.tillerNamespace, pod.Name, tillerPort)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	return tunnel, nil
-}
-
-func getPodName(client kubernetes.Interface, labelSelector, namespace string) (string, error) {
-	o := metav1.ListOptions{
-		LabelSelector: labelSelector,
-	}
-	pods, err := client.CoreV1().Pods(namespace).List(o)
-	if err != nil {
-		return "", microerror.Mask(err)
-	}
-
-	if len(pods.Items) > 1 {
-		return "", microerror.Maskf(tooManyResultsError, "%d", len(pods.Items))
-	}
-	if len(pods.Items) == 0 {
-		return "", microerror.Maskf(notFoundError, "%s", labelSelector)
-	}
-	pod := pods.Items[0]
-
-	return pod.Name, nil
-}
-
-func releaseToReleaseContent(release *hapirelease.Release) (*ReleaseContent, error) {
-	var err error
-
-	// If parameterizable values were passed at release creation time, raw values
-	// are returned by the Tiller API and we convert these to a map. First we need
-	// to check if there are values actually passed.
-	var values chartutil.Values
-	if release.Config != nil {
-		raw := []byte(release.Config.Raw)
-		values, err = chartutil.ReadValues(raw)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	content := &ReleaseContent{
-		Name:   release.Name,
-		Status: release.Info.Status.Code.String(),
-		Values: values.AsMap(),
-	}
-
-	return content, nil
 }
 
 // filterList returns a list scrubbed of old releases.
@@ -731,4 +689,119 @@ func filterList(rels []*hapirelease.Release) []*hapirelease.Release {
 		}
 	}
 	return uniq
+}
+
+func getPod(client kubernetes.Interface, labelSelector, namespace string) (*corev1.Pod, error) {
+	o := metav1.ListOptions{
+		LabelSelector: labelSelector,
+	}
+	pods, err := client.CoreV1().Pods(namespace).List(o)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	if len(pods.Items) > 1 {
+		return nil, microerror.Maskf(tooManyResultsError, "%d", len(pods.Items))
+	}
+	if len(pods.Items) == 0 {
+		return nil, microerror.Maskf(notFoundError, "%s", labelSelector)
+	}
+
+	return &pods.Items[0], nil
+}
+
+func getTillerImage(pod *corev1.Pod) (string, error) {
+	if len(pod.Spec.Containers) > 1 {
+		return "", microerror.Maskf(tooManyResultsError, "%d", len(pod.Spec.Containers))
+	}
+	if len(pod.Spec.Containers) == 0 {
+		return "", microerror.Mask(notFoundError)
+	}
+
+	tillerImage := pod.Spec.Containers[0].Image
+	if tillerImage == "" {
+		return "", microerror.Maskf(executionFailedError, "tiller image is empty")
+	}
+
+	return tillerImage, nil
+}
+
+func isTillerOutdated(pod *corev1.Pod) error {
+	currentTillerImage, err := getTillerImage(pod)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	currentTillerVersion, err := parseTillerVersion(currentTillerImage)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	desiredTillerVersion, err := parseTillerVersion(tillerImageSpec)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	for i, currentVersion := range currentTillerVersion {
+		desiredVersion := desiredTillerVersion[i]
+		if currentVersion < desiredVersion {
+			return microerror.Maskf(tillerOutdatedError, "%#q older than %#q", currentTillerImage, tillerImageSpec)
+		}
+	}
+
+	return nil
+}
+
+func parseTillerVersion(tillerImage string) ([]int, error) {
+	version := make([]int, 3)
+
+	// Tiller image tag has the version.
+	imageParts := strings.Split(tillerImage, ":v")
+	if len(imageParts) != 2 {
+		return version, microerror.Maskf(executionFailedError, "tiller image %#q is invalid", tillerImage)
+	}
+
+	// Version may be a release candidate. If so remove the -rc suffix.
+	tag := imageParts[1]
+	tagParts := strings.Split(tag, "-")
+
+	versionParts := strings.Split(tagParts[0], ".")
+	if len(versionParts) != 3 {
+		return version, microerror.Maskf(executionFailedError, "version has %d parts expected 3", len(tagParts))
+	}
+
+	for i, s := range versionParts {
+		v, err := strconv.Atoi(s)
+		if err != nil {
+			return version, microerror.Maskf(executionFailedError, "cannot convert part %d of version %#q", i, tag)
+		}
+
+		version[i] = v
+	}
+
+	return version, nil
+}
+
+func releaseToReleaseContent(release *hapirelease.Release) (*ReleaseContent, error) {
+	var err error
+
+	// If parameterizable values were passed at release creation time, raw values
+	// are returned by the Tiller API and we convert these to a map. First we need
+	// to check if there are values actually passed.
+	var values chartutil.Values
+	if release.Config != nil {
+		raw := []byte(release.Config.Raw)
+		values, err = chartutil.ReadValues(raw)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	content := &ReleaseContent{
+		Name:   release.Name,
+		Status: release.Info.Status.Code.String(),
+		Values: values.AsMap(),
+	}
+
+	return content, nil
 }
