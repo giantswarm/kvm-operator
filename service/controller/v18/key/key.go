@@ -33,9 +33,9 @@ const (
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config
 	TimeoutSeconds = 5
 	// PeriodSeconds is PeriodSeconds param in liveness probe config
-	PeriodSeconds = 20
+	PeriodSeconds = 30
 	// FailureThreshold is FailureThreshold param in liveness probe config
-	FailureThreshold = 3
+	FailureThreshold = 4
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
@@ -52,7 +52,7 @@ const (
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:42b9987667392934e3e59247b68bcfd4152b5c2c"
-	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:b4022815db3286bb166443524bd0d7308102bc3e"
+	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:b042af5fa1c8315fbd4865ec26f18d211820997b"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:b2ffdb2c4ec93fe6bf2d4af8e55c8a4b11253611"
 
 	// constants for calculation qemu memory overhead.
