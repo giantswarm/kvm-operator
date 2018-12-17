@@ -50,13 +50,13 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "master"
   name = "github.com/docker/distribution"
   packages = [
     "digestset",
     "reference"
   ]
   revision = "40b7b5830a2337bb07627617740c0e39eb92800c"
+  version = "v2.7.0"
 
 [[projects]]
   branch = "master"
@@ -99,7 +99,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake"
   ]
-  revision = "31f93192df189b6e72ada2d4db36d0a0a2dca171"
+  revision = "111e3c8bf5b33f0ba733d33bc721e5bab29da0a3"
 
 [[projects]]
   branch = "master"
@@ -138,7 +138,7 @@
     "pkg/harness",
     "pkg/release"
   ]
-  revision = "b40d6c4bd0ebf5c4ae9584b74b2dee411b672c69"
+  revision = "377e40fd69b43251b0527f37a8c4c6ab1f5b3aa2"
 
 [[projects]]
   branch = "master"
@@ -156,7 +156,7 @@
     "update",
     "update/provider"
   ]
-  revision = "cdffbee84ee5cf071ac93f80264be05c1d59513d"
+  revision = "f4d1e78f2af58dc3e9181a0a34c20b16430a538b"
 
 [[projects]]
   branch = "master"
@@ -196,7 +196,7 @@
     "v_3_7_1",
     "v_3_7_3"
   ]
-  revision = "f95777dc57c1828518870f944f5dc45cd8e53b32"
+  revision = "f5524a6086a6e54ddb255731a8a823ffc30d811b"
 
 [[projects]]
   branch = "master"
@@ -384,10 +384,10 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "4076fd7418e5e1b04d32ffba6adf5084891952d5"
+  revision = "7c7d51f489bc54d96dfa34c497601b4a05d760c7"
+  version = "v20.0.0"
 
 [[projects]]
   name = "github.com/google/go-querystring"
@@ -540,7 +540,6 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
@@ -548,6 +547,7 @@
     "prometheus/promhttp"
   ]
   revision = "505eaef017263e299324067d40ca2c48f6a2cf50"
+  version = "v0.9.2"
 
 [[projects]]
   branch = "master"
@@ -582,8 +582,8 @@
     ".",
     "mem"
   ]
-  revision = "d40851caa0d747393da1ffb28f7f9d8b4eeffebd"
-  version = "v1.1.2"
+  revision = "a5d6946387efe7d64d09dcba68cdd523dc1273a3"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/spf13/cast"
@@ -639,7 +639,7 @@
     "publicsuffix",
     "trace"
   ]
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
 
 [[projects]]
   branch = "master"
@@ -663,7 +663,7 @@
     "unix",
     "windows"
   ]
-  revision = "b05ddf57801d2239d6ab0ee35f9d981e0420f4ac"
+  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -710,7 +710,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "936bffa7f85bf0dd0ec21b13d4d1a022672eeb98"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -758,10 +758,10 @@
   version = "v0.9.1"
 
 [[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
+  version = "v2.2.2"
 
 [[projects]]
   name = "k8s.io/api"
@@ -1002,7 +1002,7 @@
   branch = "release-1.10"
   name = "k8s.io/kubernetes"
   packages = ["pkg/api/v1/node"]
-  revision = "54a061aba41ff4d91a337e04cf828b71118f522d"
+  revision = "c757b93cf034d49af3a3b8ecee3b9639a7a11df7"
 
 [solve-meta]
   analyzer-name = "dep"
