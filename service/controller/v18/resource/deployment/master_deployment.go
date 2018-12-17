@@ -305,6 +305,10 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 								ImagePullPolicy: apiv1.PullAlways,
 								Env: []apiv1.EnvVar{
 									{
+										Name:  "CHECK_K8S_API",
+										Value: key.CheckK8sApi,
+									},
+									{
 										Name:  "LISTEN_ADDRESS",
 										Value: key.HealthListenAddress(customResource),
 									},
