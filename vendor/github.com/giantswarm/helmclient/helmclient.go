@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/errors/guest"
 	"github.com/giantswarm/k8sportforward"
@@ -56,6 +56,7 @@ type Config struct {
 	Logger     micrologger.Logger
 
 	RestConfig      *rest.Config
+	TillerImage     string
 	TillerNamespace string
 }
 
@@ -66,6 +67,7 @@ type Client struct {
 	logger     micrologger.Logger
 
 	restConfig      *rest.Config
+	tillerImage     string
 	tillerNamespace string
 }
 
@@ -82,8 +84,11 @@ func New(config Config) (*Client, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.RestConfig must not be empty", config)
 	}
 
+	if config.TillerImage == "" {
+		config.TillerImage = defaultTillerImage
+	}
 	if config.TillerNamespace == "" {
-		config.TillerNamespace = tillerDefaultNamespace
+		config.TillerNamespace = defaultTillerNamespace
 	}
 
 	c := &Client{
@@ -93,6 +98,8 @@ func New(config Config) (*Client, error) {
 
 		restConfig:      config.RestConfig,
 		tillerNamespace: config.TillerNamespace,
+
+		tillerImage: config.TillerImage,
 	}
 
 	return c, nil
@@ -141,7 +148,7 @@ func (c *Client) EnsureTillerInstalled(ctx context.Context) error {
 		t, err := c.newTunnel()
 		defer c.closeTunnel(ctx, t)
 		if err != nil {
-			// fall through, we may need to create Tiller.
+			// fall through, we may need to create or upgrade Tiller.
 			c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found that tiller is not installed in namespace %#q", c.tillerNamespace))
 		} else {
 			err = c.newHelmClientFromTunnel(t).PingTiller()
@@ -228,26 +235,20 @@ func (c *Client) EnsureTillerInstalled(ctx context.Context) error {
 		}
 	}
 
-	// Install the tiller deployment in the tenant cluster.
+	var err error
+	var installTiller bool
+	var pod *corev1.Pod
+	var upgradeTiller bool
+
 	{
-		c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating tiller in namespace %#q", c.tillerNamespace))
-
 		o := func() error {
-			i := &installer.Options{
-				ImageSpec:      tillerImageSpec,
-				MaxHistory:     defaultMaxHistory,
-				Namespace:      c.tillerNamespace,
-				ServiceAccount: tillerPodName,
-			}
-
-			err := installer.Install(c.k8sClient, i)
-			if errors.IsAlreadyExists(err) {
-				c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("tiller in namespace %#q already exists", c.tillerNamespace))
-				// fall through
+			pod, err = getPod(c.k8sClient, tillerLabelSelector, c.tillerNamespace)
+			if IsNotFound(err) {
+				// Fall through as we need to install Tiller.
+				installTiller = true
+				return nil
 			} else if err != nil {
 				return microerror.Mask(err)
-			} else {
-				c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created tiller in namespace %#q", c.tillerNamespace))
 			}
 
 			return nil
@@ -259,6 +260,38 @@ func (c *Client) EnsureTillerInstalled(ctx context.Context) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
+	}
+
+	if pod != nil {
+		err = validateTillerVersion(pod, c.tillerImage)
+		if IsTillerOutdated(err) {
+			upgradeTiller = true
+		} else if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	i := &installer.Options{
+		AutoMountServiceAccountToken: true,
+		ImageSpec:                    c.tillerImage,
+		MaxHistory:                   defaultMaxHistory,
+		Namespace:                    c.tillerNamespace,
+		ServiceAccount:               tillerPodName,
+	}
+
+	// Install the tiller deployment in the tenant cluster.
+	if installTiller && !upgradeTiller {
+		err = c.installTiller(ctx, i)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	} else if !installTiller && upgradeTiller {
+		err = c.upgradeTiller(ctx, i)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	} else {
+		return microerror.Maskf(executionFailedError, "invalid state cannot both install and upgrade tiller")
 	}
 
 	// Wait for tiller to be up and running. When verifying to be able to ping
@@ -446,6 +479,7 @@ func (c *Client) InstallReleaseFromTarball(ctx context.Context, path, ns string,
 	return nil
 }
 
+// ListReleaseContents gets the current status of all Helm Releases.
 func (c *Client) ListReleaseContents(ctx context.Context) ([]*ReleaseContent, error) {
 	var releases []*hapirelease.Release
 	{
@@ -617,6 +651,33 @@ func (c *Client) closeTunnel(ctx context.Context, t *k8sportforward.Tunnel) {
 	}
 }
 
+func (c *Client) installTiller(ctx context.Context, installerOptions *installer.Options) error {
+	c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating tiller in namespace %#q", c.tillerNamespace))
+
+	o := func() error {
+		err := installer.Install(c.k8sClient, installerOptions)
+		if errors.IsAlreadyExists(err) {
+			c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("tiller in namespace %#q already exists", c.tillerNamespace))
+			// fall through
+		} else if err != nil {
+			return microerror.Mask(err)
+		} else {
+			c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created tiller in namespace %#q", c.tillerNamespace))
+		}
+
+		return nil
+	}
+	b := backoff.NewExponential(2*time.Minute, 5*time.Second)
+	n := backoff.NewNotifier(c.logger, context.Background())
+
+	err := backoff.RetryNotify(o, b, n)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	return nil
+}
+
 func (c *Client) newHelmClientFromTunnel(t *k8sportforward.Tunnel) helmclient.Interface {
 	// In case a helm client is configured we just go with it.
 	if c.helmClient != nil {
@@ -643,6 +704,12 @@ func (c *Client) newTunnel() (*k8sportforward.Tunnel, error) {
 		return nil, microerror.Mask(err)
 	}
 
+	// Do not create a tunnel if tiller is outdated.
+	err = validateTillerVersion(pod, c.tillerImage)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	var forwarder *k8sportforward.Forwarder
 	{
 		c := k8sportforward.ForwarderConfig{
@@ -664,6 +731,30 @@ func (c *Client) newTunnel() (*k8sportforward.Tunnel, error) {
 	}
 
 	return tunnel, nil
+}
+
+func (c *Client) upgradeTiller(ctx context.Context, installerOptions *installer.Options) error {
+	c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("upgrading tiller in namespace %#q", c.tillerNamespace))
+
+	o := func() error {
+		err := installer.Upgrade(c.k8sClient, installerOptions)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		c.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("upgraded tiller in namespace %#q", c.tillerNamespace))
+
+		return nil
+	}
+	b := backoff.NewExponential(2*time.Minute, 5*time.Second)
+	n := backoff.NewNotifier(c.logger, context.Background())
+
+	err := backoff.RetryNotify(o, b, n)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	return nil
 }
 
 // filterList returns a list scrubbed of old releases.
@@ -710,7 +801,7 @@ func getPod(client kubernetes.Interface, labelSelector, namespace string) (*core
 	return &pods.Items[0], nil
 }
 
-func getTillerImage(pod *corev1.Pod) (string, error) {
+func getPodImage(pod *corev1.Pod) (string, error) {
 	if len(pod.Spec.Containers) > 1 {
 		return "", microerror.Maskf(tooManyResultsError, "%d", len(pod.Spec.Containers))
 	}
@@ -726,57 +817,44 @@ func getTillerImage(pod *corev1.Pod) (string, error) {
 	return tillerImage, nil
 }
 
-func isTillerOutdated(pod *corev1.Pod) error {
-	currentTillerImage, err := getTillerImage(pod)
+func validateTillerVersion(pod *corev1.Pod, desiredImage string) error {
+	currentImage, err := getPodImage(pod)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	currentTillerVersion, err := parseTillerVersion(currentTillerImage)
+	currentVersion, err := parseTillerVersion(currentImage)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	desiredTillerVersion, err := parseTillerVersion(tillerImageSpec)
+	desiredVersion, err := parseTillerVersion(desiredImage)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	for i, currentVersion := range currentTillerVersion {
-		desiredVersion := desiredTillerVersion[i]
-		if currentVersion < desiredVersion {
-			return microerror.Maskf(tillerOutdatedError, "%#q older than %#q", currentTillerImage, tillerImageSpec)
-		}
+	if currentVersion.GreaterThan(desiredVersion) {
+		return microerror.Maskf(executionFailedError, "current tiller version %#q is greater than desired tiller version %#q", currentVersion.String(), desiredVersion.String())
+	}
+
+	if currentVersion.LessThan(desiredVersion) {
+		return microerror.Maskf(tillerOutdatedError, "current tiller version %#q is lower than desired tiller version %#q", currentVersion.String(), desiredVersion.String())
 	}
 
 	return nil
 }
 
-func parseTillerVersion(tillerImage string) ([]int, error) {
-	version := make([]int, 3)
-
+func parseTillerVersion(tillerImage string) (*semver.Version, error) {
 	// Tiller image tag has the version.
-	imageParts := strings.Split(tillerImage, ":v")
+	imageParts := strings.Split(tillerImage, ":")
 	if len(imageParts) != 2 {
-		return version, microerror.Maskf(executionFailedError, "tiller image %#q is invalid", tillerImage)
+		return nil, microerror.Maskf(executionFailedError, "tiller image %#q is invalid", tillerImage)
 	}
 
-	// Version may be a release candidate. If so remove the -rc suffix.
 	tag := imageParts[1]
-	tagParts := strings.Split(tag, "-")
-
-	versionParts := strings.Split(tagParts[0], ".")
-	if len(versionParts) != 3 {
-		return version, microerror.Maskf(executionFailedError, "version has %d parts expected 3", len(tagParts))
-	}
-
-	for i, s := range versionParts {
-		v, err := strconv.Atoi(s)
-		if err != nil {
-			return version, microerror.Maskf(executionFailedError, "cannot convert part %d of version %#q", i, tag)
-		}
-
-		version[i] = v
+	version, err := semver.NewVersion(tag)
+	if err != nil {
+		return nil, microerror.Maskf(executionFailedError, "parsing version %#q failed with error %#q", tag, err)
 	}
 
 	return version, nil
