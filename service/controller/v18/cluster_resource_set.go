@@ -34,6 +34,7 @@ type ClusterResourceSetConfig struct {
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 
+	IgnitionPath       string
 	OIDC               cloudconfig.OIDCConfig
 	GuestUpdateEnabled bool
 	ProjectName        string
@@ -48,6 +49,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := cloudconfig.Config{
 			Logger: config.Logger,
 
+			IgnitionPath: config.IgnitionPath,
 			OIDC:         config.OIDC,
 			SSOPublicKey: config.SSOPublicKey,
 		}

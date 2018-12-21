@@ -35,6 +35,7 @@ type ClusterConfig struct {
 
 	CRDLabelSelector   string
 	GuestUpdateEnabled bool
+	IgnitionPath       string
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
 	SSOPublicKey       string
@@ -223,6 +224,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			IgnitionPath:       config.IgnitionPath,
 			ProjectName:        config.ProjectName,
 			OIDC: v18cloudconfig.OIDCConfig{
 				ClientID:      config.OIDC.ClientID,
