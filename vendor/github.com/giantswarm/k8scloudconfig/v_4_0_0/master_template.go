@@ -301,6 +301,8 @@ systemd:
       Type=oneshot
       EnvironmentFile=/etc/network-environment
       ExecStart=/opt/k8s-addons
+      # https://github.com/kubernetes/kubernetes/issues/71078
+      ExecStartPost=/usr/bin/systemctl restart k8s-kubelet.service
       [Install]
       WantedBy=multi-user.target
 
@@ -318,40 +320,6 @@ storage:
       mode: 0644
       contents:
         source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/calico-all.yaml" }}"
-    {{- end }}
-
-    {{- if not .DisableCoreDNS }}
-    - path: /srv/coredns.yaml
-      filesystem: root
-      mode: 0644
-      contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/coredns.yaml" }}"
-    {{- end }}
-
-    {{- if not .DisableIngressController }}
-    - path: /srv/default-backend-dep.yaml
-      filesystem: root
-      mode: 0644
-      contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/default-backend-dep.yaml" }}"
-
-    - path: /srv/default-backend-svc.yaml
-      filesystem: root
-      mode: 0644
-      contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/default-backend-svc.yaml" }}"
-
-    - path: /srv/ingress-controller-cm.yaml
-      filesystem: root
-      mode: 0644
-      contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/ingress-controller-cm.yaml" }}"
-
-    - path: /srv/ingress-controller-dep.yaml
-      filesystem: root
-      mode: 0644
-      contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/ingress-controller-dep.yaml" }}"
     {{- end }}
 
     {{- if not .DisableIngressControllerService }}

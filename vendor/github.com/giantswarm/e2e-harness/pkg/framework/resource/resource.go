@@ -114,7 +114,7 @@ func (r *Resource) Install(name, values, channel string, conditions ...func() er
 
 	chartname := fmt.Sprintf("%s-chart", name)
 
-	tarball, err := r.apprClient.PullChartTarball(chartname, channel)
+	tarball, err := r.apprClient.PullChartTarball(ctx, chartname, channel)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -138,7 +138,7 @@ func (r *Resource) Update(name, values, channel string, conditions ...func() err
 
 	chartname := fmt.Sprintf("%s-chart", name)
 
-	tarballPath, err := r.apprClient.PullChartTarball(chartname, channel)
+	tarballPath, err := r.apprClient.PullChartTarball(ctx, chartname, channel)
 	if err != nil {
 		return microerror.Mask(err)
 	}
