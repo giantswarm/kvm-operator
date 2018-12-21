@@ -16,9 +16,7 @@ import (
 )
 
 // common installs components required to run the operator.
-func common(config Config) error {
-	ctx := context.Background()
-
+func common(ctx context.Context, config Config) error {
 	{
 		c := chartvalues.CertOperatorConfig{
 			ClusterRole: chartvalues.CertOperatorConfigClusterRole{
