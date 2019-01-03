@@ -16,6 +16,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 	{
 		params = k8scloudconfig.DefaultParams()
 
+		params.BaseDomain = strings.TrimPrefix(customObject.Spec.Cluster.Kubernetes.API.Domain, "api.")
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &workerExtension{
 			certs: certs,

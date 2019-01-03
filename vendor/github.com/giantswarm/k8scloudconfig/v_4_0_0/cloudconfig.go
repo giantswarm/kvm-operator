@@ -6,8 +6,6 @@ import (
 	"encoding/base64"
 	"text/template"
 
-	"strings"
-
 	ignition "github.com/giantswarm/k8scloudconfig/ignition/v_2_2_0"
 	"github.com/giantswarm/microerror"
 )
@@ -55,9 +53,6 @@ func NewCloudConfig(config CloudConfigConfig) (*CloudConfig, error) {
 	if config.Template == "" {
 		return nil, microerror.Maskf(invalidConfigError, "config.Template must not be empty")
 	}
-
-	// extract cluster base domain
-	config.Params.BaseDomain = strings.TrimPrefix(config.Params.Cluster.Kubernetes.API.Domain, "api.")
 
 	c := &CloudConfig{
 		config:   "",
