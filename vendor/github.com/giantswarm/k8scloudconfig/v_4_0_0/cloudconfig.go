@@ -16,6 +16,7 @@ const (
 	defaultRegistryDomain = "quay.io"
 	kubernetesImage       = "giantswarm/hyperkube:v1.12.3"
 	etcdImage             = "giantswarm/etcd:v3.3.9"
+	etcdPort              = 443
 )
 
 type CloudConfigConfig struct {
@@ -32,6 +33,7 @@ func DefaultCloudConfigConfig() CloudConfigConfig {
 
 func DefaultParams() Params {
 	return Params{
+		EtcdPort:       etcdPort,
 		RegistryDomain: defaultRegistryDomain,
 		Images: Images{
 			Kubernetes: kubernetesImage,
@@ -52,11 +54,6 @@ func NewCloudConfig(config CloudConfigConfig) (*CloudConfig, error) {
 	}
 	if config.Template == "" {
 		return nil, microerror.Maskf(invalidConfigError, "config.Template must not be empty")
-	}
-
-	// Default to 443 for non AWS providers.
-	if config.Params.EtcdPort == 0 {
-		config.Params.EtcdPort = 443
 	}
 
 	// extract cluster base domain

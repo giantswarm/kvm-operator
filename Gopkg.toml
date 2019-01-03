@@ -57,7 +57,7 @@ required = [
   name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
-  branch = "master"
+  branch = "etcdPort_default"
   name = "github.com/giantswarm/k8scloudconfig"
 
 [[constraint]]
