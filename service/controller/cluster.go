@@ -34,6 +34,7 @@ type ClusterConfig struct {
 	Logger        micrologger.Logger
 
 	CRDLabelSelector   string
+	DNSServers         string
 	GuestUpdateEnabled bool
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
@@ -222,6 +223,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 
+			DNSServers:         config.DNSServers,
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			ProjectName:        config.ProjectName,
 			OIDC: v18cloudconfig.OIDCConfig{

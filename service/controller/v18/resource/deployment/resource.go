@@ -17,6 +17,7 @@ const (
 // Config represents the configuration used to create a new deployment resource.
 type Config struct {
 	// Dependencies.
+	DNSServers string
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 }
@@ -26,6 +27,7 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
+		DNSServers string,
 		K8sClient: nil,
 		Logger:    nil,
 	}
@@ -34,6 +36,7 @@ func DefaultConfig() Config {
 // Resource implements the deployment resource.
 type Resource struct {
 	// Dependencies.
+	dnsServers string,
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 }
@@ -41,6 +44,9 @@ type Resource struct {
 // New creates a new configured deployment resource.
 func New(config Config) (*Resource, error) {
 	// Dependencies.
+	if config.DNSServers == "" {
+		return nil, microerror.Maskf(invalidConfigError, "config.DNSServers must not be empty")
+	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
@@ -50,6 +56,7 @@ func New(config Config) (*Resource, error) {
 
 	newResource := &Resource{
 		// Dependencies.
+		dnsServers: config.DNSServers,
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
 	}
