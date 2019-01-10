@@ -1,6 +1,6 @@
 ## User
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: giantswarm-admin
 subjects:
@@ -14,7 +14,7 @@ roleRef:
 ---
 ## Worker
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: kubelet
 subjects:
@@ -27,7 +27,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: proxy
 subjects:
@@ -41,7 +41,7 @@ roleRef:
 ---
 ## Master
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: kube-controller-manager
 subjects:
@@ -54,7 +54,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: kube-scheduler
 subjects:
@@ -93,33 +93,3 @@ roleRef:
   kind: ClusterRole
   name: prometheus-external
   apiGroup: rbac.authorization.k8s.io
-{{- if not .DisableIngressController }}
----
-## IC
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: nginx-ingress-controller
-subjects:
-- kind: ServiceAccount
-  name: nginx-ingress-controller
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: nginx-ingress-controller
-  apiGroup: rbac.authorization.k8s.io
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: nginx-ingress-controller
-  namespace: kube-system
-subjects:
-- kind: ServiceAccount
-  name: nginx-ingress-controller
-  namespace: kube-system
-roleRef:
-  kind: Role
-  name: nginx-ingress-role
-  apiGroup: rbac.authorization.k8s.io
-{{- end }}
