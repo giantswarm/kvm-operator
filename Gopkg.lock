@@ -232,7 +232,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:805c3b77689961556f77bddba7bc328ee3f486e6cdae610ad46c40ab63efdaa9"
+  digest = "1:3088a424300aba4a0eb539622b971a8f0844a16fba0a9b2a41fd8cd26c9d64c8"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_3_5_2",
@@ -241,7 +241,7 @@
     "v_3_7_3",
   ]
   pruneopts = "T"
-  revision = "fb840e5053b06fa1da9dc0adc0f06173087202bc"
+  revision = "4cf32bebc391160c41dca87bc632240f15c7a558"
 
 [[projects]]
   branch = "master"
