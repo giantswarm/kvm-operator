@@ -217,6 +217,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := DefaultConfig()
+		resourceConfig.DNSServers = "dnsserver1,dnsserver2"
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
