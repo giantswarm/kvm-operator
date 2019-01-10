@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
+	"github.com/giantswarm/tenantcluster"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -24,6 +25,7 @@ type DeleterConfig struct {
 	G8sClient     versioned.Interface
 	K8sClient     kubernetes.Interface
 	Logger        micrologger.Logger
+	TenantCluster tenantcluster.Interface
 
 	CRDLabelSelector string
 	ProjectName      string
@@ -168,9 +170,9 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV18 *controller.ResourceSet
 	{
 		c := v18.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
 			K8sClient:     config.K8sClient,
 			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
 
 			ProjectName: config.ProjectName,
 		}

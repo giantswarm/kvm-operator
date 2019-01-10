@@ -1,21 +1,22 @@
 package v18
 
 import (
-	"github.com/giantswarm/certs"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/node"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
+	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/node"
 )
 
 type DeleterResourceSetConfig struct {
-	CertsSearcher certs.Interface
 	K8sClient     kubernetes.Interface
 	Logger        micrologger.Logger
+	TenantCluster tenantcluster.Interface
 
 	ProjectName string
 }
@@ -39,9 +40,9 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 	var nodeResource controller.Resource
 	{
 		c := node.Config{
-			CertsSearcher: config.CertsSearcher,
 			K8sClient:     config.K8sClient,
 			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
 		}
 
 		nodeResource, err = node.New(c)
