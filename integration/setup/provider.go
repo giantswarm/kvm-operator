@@ -25,9 +25,7 @@ import (
 )
 
 // provider installs the operator and tenant cluster CR.
-func provider(config Config) error {
-	ctx := context.Background()
-
+func provider(ctx context.Context, config Config) error {
 	{
 		c := chartvalues.FlannelOperatorConfig{
 			ClusterName: env.ClusterID(),

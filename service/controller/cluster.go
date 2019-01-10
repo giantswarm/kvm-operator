@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
+	"github.com/giantswarm/tenantcluster"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -32,6 +33,7 @@ type ClusterConfig struct {
 	K8sClient     kubernetes.Interface
 	K8sExtClient  apiextensionsclient.Interface
 	Logger        micrologger.Logger
+	TenantCluster tenantcluster.Interface
 
 	CRDLabelSelector   string
 	DNSServers         string
@@ -222,6 +224,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
+			TenantCluster:      config.TenantCluster,
 
 			DNSServers:         config.DNSServers,
 			GuestUpdateEnabled: config.GuestUpdateEnabled,

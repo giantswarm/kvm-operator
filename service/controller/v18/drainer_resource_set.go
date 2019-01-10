@@ -2,15 +2,16 @@ package v18
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/endpoint"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/pod"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/endpoint"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/pod"
 )
 
 type DrainerResourceSetConfig struct {
