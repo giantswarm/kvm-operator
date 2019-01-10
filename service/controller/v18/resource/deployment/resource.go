@@ -27,7 +27,7 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		DNSServers string,
+		DNSServers: "",
 		K8sClient: nil,
 		Logger:    nil,
 	}
@@ -36,7 +36,7 @@ func DefaultConfig() Config {
 // Resource implements the deployment resource.
 type Resource struct {
 	// Dependencies.
-	dnsServers string,
+	dnsServers string
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 }
