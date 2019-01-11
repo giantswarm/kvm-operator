@@ -110,6 +110,10 @@ const (
 	PodDeletionGracePeriod = 5 * time.Minute
 )
 
+func BaseDomain(customObject v1alpha1.KVMConfig) string {
+	return strings.TrimPrefix(customObject.Spec.Cluster.Kubernetes.API.Domain, "api.")
+}
+
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
 }
