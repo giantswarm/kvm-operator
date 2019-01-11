@@ -5,16 +5,6 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/clusterrolebinding"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/configmap"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/deployment"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/ingress"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/namespace"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/pvc"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/service"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/serviceaccount"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -25,6 +15,17 @@ import (
 	"github.com/giantswarm/statusresource"
 	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/clusterrolebinding"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/deployment"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/ingress"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/namespace"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/pvc"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/service"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/serviceaccount"
 )
 
 type ClusterResourceSetConfig struct {
@@ -33,7 +34,9 @@ type ClusterResourceSetConfig struct {
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
+	TenantCluster      tenantcluster.Interface
 
+	DNSServers         string
 	IgnitionPath       string
 	OIDC               cloudconfig.OIDCConfig
 	GuestUpdateEnabled bool
@@ -139,6 +142,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	{
 		c := deployment.DefaultConfig()
 
+		c.DNSServers = config.DNSServers
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 
@@ -207,21 +211,6 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var tenantCluster tenantcluster.Interface
-	{
-		c := tenantcluster.Config{
-			CertsSearcher: config.CertsSearcher,
-			Logger:        config.Logger,
-
-			CertID: certs.APICert,
-		}
-
-		tenantCluster, err = tenantcluster.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var statusResource controller.Resource
 	{
 		c := statusresource.ResourceConfig{
@@ -231,7 +220,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			NodeCountFunc:            key.ToNodeCount,
 			Logger:                   config.Logger,
 			RESTClient:               config.G8sClient.ProviderV1alpha1().RESTClient(),
-			TenantCluster:            tenantCluster,
+			TenantCluster:            config.TenantCluster,
 			VersionBundleVersionFunc: key.ToVersionBundleVersion,
 		}
 

@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
+	"github.com/giantswarm/tenantcluster"
 	"github.com/spf13/viper"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
@@ -99,6 +100,21 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var tenantCluster tenantcluster.Interface
+	{
+		c := tenantcluster.Config{
+			CertsSearcher: certsSearcher,
+			Logger:        config.Logger,
+
+			CertID: certs.APICert,
+		}
+
+		tenantCluster, err = tenantcluster.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var clusterController *controller.Cluster
 	{
 		c := controller.ClusterConfig{
@@ -107,11 +123,13 @@ func New(config Config) (*Service, error) {
 			K8sClient:     k8sClient,
 			K8sExtClient:  k8sExtClient,
 			Logger:        config.Logger,
+			TenantCluster: tenantCluster,
 
 			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled),
 			ProjectName:        config.Name,
 
+			DNSServers: config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Guest.Ignition.Path),
 			OIDC: controller.ClusterConfigOIDC{
 				ClientID:      config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.ClientID),
@@ -135,6 +153,7 @@ func New(config Config) (*Service, error) {
 			G8sClient:     g8sClient,
 			K8sClient:     k8sClient,
 			Logger:        config.Logger,
+			TenantCluster: tenantCluster,
 
 			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			ProjectName:      config.Name,

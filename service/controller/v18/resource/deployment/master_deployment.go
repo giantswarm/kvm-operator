@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.Deployment, error) {
+func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) ([]*extensionsv1.Deployment, error) {
 	var deployments []*extensionsv1.Deployment
 
 	privileged := true
@@ -217,6 +217,10 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 									{
 										Name:  "DISK_OS",
 										Value: key.DefaultOSDiskSize,
+									},
+									{
+										Name:  "DNS_SERVERS",
+										Value: dnsServers,
 									},
 									{
 										Name: "HOSTNAME",
