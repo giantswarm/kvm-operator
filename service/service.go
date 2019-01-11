@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -211,8 +212,8 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.clusterController.Boot()
-		go s.deleterController.Boot()
-		go s.drainerController.Boot()
+		go s.clusterController.Boot(context.Background())
+		go s.deleterController.Boot(context.Background())
+		go s.drainerController.Boot(context.Background())
 	})
 }
