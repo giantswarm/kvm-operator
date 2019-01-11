@@ -28,11 +28,11 @@ const (
 	HealthEndpoint = "/healthz"
 	// ProbeHost host for liveness probe.
 	ProbeHost = "127.0.0.1"
-	// InitialDelaySeconds is InitialDelaySeconds param in liveness probe config
+	// InitialDelaySeconds is InitialDelaySeconds param in liveness probe config.
 	InitialDelaySeconds = 360
-	// TimeoutSeconds is TimeoutSeconds param in liveness probe config
+	// TimeoutSeconds is TimeoutSeconds param in liveness probe config.
 	TimeoutSeconds = 5
-	// PeriodSeconds is PeriodSeconds param in liveness probe config
+	// PeriodSeconds is PeriodSeconds param in liveness probe config.
 	PeriodSeconds = 35
 	// FailureThreshold is FailureThreshold param in liveness probe config
 	FailureThreshold = 4
