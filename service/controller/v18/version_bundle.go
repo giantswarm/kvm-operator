@@ -15,12 +15,12 @@ func VersionBundle() versionbundle.Bundle {
 			{
 				Component:   "cloudconfig",
 				Description: "Switch from cloudinit to ignition.",
-				Kind:        versionbundle.KindChaged,
+				Kind:        versionbundle.KindChanged,
 			},
 			{
 				Component:   "cloudconfig",
 				Description: "Update tenant cluster container with Fedora 29.",
-				Kind:        versionbundle.KindChaged,
+				Kind:        versionbundle.KindChanged,
 			},
 		},
 		Components: []versionbundle.Component{
