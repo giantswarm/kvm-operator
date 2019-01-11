@@ -36,6 +36,7 @@ type ClusterResourceSetConfig struct {
 	RandomkeysSearcher randomkeys.Interface
 	TenantCluster      tenantcluster.Interface
 
+	DNSServers         string
 	OIDC               cloudconfig.OIDCConfig
 	GuestUpdateEnabled bool
 	ProjectName        string
@@ -139,6 +140,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	{
 		c := deployment.DefaultConfig()
 
+		c.DNSServers = config.DNSServers
 		c.K8sClient = config.K8sClient
 		c.Logger = config.Logger
 

@@ -36,6 +36,7 @@ type ClusterConfig struct {
 	TenantCluster tenantcluster.Interface
 
 	CRDLabelSelector   string
+	DNSServers         string
 	GuestUpdateEnabled bool
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
@@ -225,6 +226,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
 
+			DNSServers:         config.DNSServers,
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			ProjectName:        config.ProjectName,
 			OIDC: v18cloudconfig.OIDCConfig{

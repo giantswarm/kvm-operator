@@ -105,7 +105,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b0660fd3264d20a25f3a2bd7e11c6ba6d8b5fa50f3ab6fc69714db59c80a5398"
+  digest = "1:cff547e39188d55bafae3d4f2e9ba8ab6e9247f54594a1a7c542b44296762a29"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
@@ -125,7 +125,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "501ab139e06931011ab14410fb86432625563477"
+  revision = "e6019b36b55cc6d700b86bc2e68b3f561d8eab82"
 
 [[projects]]
   branch = "master"
@@ -232,7 +232,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:805c3b77689961556f77bddba7bc328ee3f486e6cdae610ad46c40ab63efdaa9"
+  digest = "1:3088a424300aba4a0eb539622b971a8f0844a16fba0a9b2a41fd8cd26c9d64c8"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "v_3_5_2",
@@ -241,7 +241,7 @@
     "v_3_7_3",
   ]
   pruneopts = "T"
-  revision = "fb840e5053b06fa1da9dc0adc0f06173087202bc"
+  revision = "4cf32bebc391160c41dca87bc632240f15c7a558"
 
 [[projects]]
   branch = "master"
@@ -320,7 +320,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:95663bac14c97d187e43adee211045612a0424a21b4acea08ac9fb6596151797"
+  digest = "1:bef1716f3c2301de12e2cd5419589fde8c8c130ab1dfa6844aeceff3e765a34f"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -337,7 +337,7 @@
     "informer/collector",
   ]
   pruneopts = "UT"
-  revision = "72ea7fb5425d64aaa8a86cfad43cf4641dc538f3"
+  revision = "93da7f80196f4e174d44ff920503b1d1e8366aa2"
 
 [[projects]]
   branch = "master"
@@ -661,6 +661,14 @@
   pruneopts = "UT"
   revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
   version = "v1.0.0-rc1"
+
+[[projects]]
+  digest = "1:808cdddf087fb64baeae67b8dfaee2069034d9704923a3cb8bd96a995421a625"
+  name = "github.com/patrickmn/go-cache"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a3647f8e31d79543b2d0f0ae2fe5c379d72cedc0"
+  version = "v2.1.0"
 
 [[projects]]
   digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
