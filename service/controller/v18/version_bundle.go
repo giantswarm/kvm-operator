@@ -12,6 +12,16 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Add k8s api and kubelet health check to kvm pod.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "cloudconfig",
+				Description: "Switch from cloudinit to ignition.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "cloudconfig",
+				Description: "Update tenant cluster container with Fedora 29.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -20,7 +30,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1855.5.0",
+				Version: "1911.5.0",
 			},
 			{
 				Name:    "docker",
@@ -36,6 +46,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.2.1",
+		Version: "3.2.0",
 	}
 }

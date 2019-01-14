@@ -130,7 +130,8 @@ func New(config Config) (*Service, error) {
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled),
 			ProjectName:        config.Name,
 
-			DNSServers: config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
+			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
+			IgnitionPath: config.Viper.GetString(config.Flag.Service.Guest.Ignition.Path),
 			OIDC: controller.ClusterConfigOIDC{
 				ClientID:      config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.ClientID),
 				IssuerURL:     config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),

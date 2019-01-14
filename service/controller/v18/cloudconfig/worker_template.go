@@ -3,7 +3,8 @@ package cloudconfig
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_7_3"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_0_0"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
 	"github.com/giantswarm/microerror"
 )
 
@@ -14,12 +15,21 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 
 	var params k8scloudconfig.Params
 	{
+		params = k8scloudconfig.DefaultParams()
+
+		params.BaseDomain = key.BaseDomain(customObject)
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &workerExtension{
 			certs: certs,
 		}
 		params.Node = node
 		params.SSOPublicKey = c.ssoPublicKey
+
+		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
+		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
 	}
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
@@ -53,8 +63,11 @@ func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		m := k8scloudconfig.FileMetadata{
 			AssetContent: string(f.Data),
 			Path:         f.AbsolutePath,
-			Owner:        FileOwner,
-			Permissions:  FilePermission,
+			Owner: k8scloudconfig.Owner{
+				User:  FileOwnerUser,
+				Group: FileOwnerGroup,
+			},
+			Permissions: FilePermission,
 		}
 		filesMeta = append(filesMeta, m)
 	}
@@ -62,7 +75,7 @@ func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	var newFiles []k8scloudconfig.FileAsset
 
 	for _, fm := range filesMeta {
-		c, err := k8scloudconfig.RenderAssetContent(fm.AssetContent, nil)
+		c, err := k8scloudconfig.RenderFileAssetContent(fm.AssetContent, nil)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -92,8 +105,7 @@ Type=xfs
 WantedBy=multi-user.target
 `,
 			Name:    "var-lib-docker.mount",
-			Enable:  true,
-			Command: "start",
+			Enabled: true,
 		},
 		{
 			AssetContent: `[Unit]
@@ -107,18 +119,15 @@ Type=xfs
 WantedBy=multi-user.target
 `,
 			Name:    "var-lib-kubelet.mount",
-			Enable:  true,
-			Command: "start",
+			Enabled: true,
 		},
 		{
 			Name:    "iscsid.service",
-			Enable:  true,
-			Command: "start",
+			Enabled: true,
 		},
 		{
 			Name:    "multipathd.service",
-			Enable:  true,
-			Command: "start",
+			Enabled: true,
 		},
 	}
 

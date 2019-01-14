@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	FileOwner      = "root:root"
+	FileOwnerUser  = "root"
+	FileOwnerGroup = "root"
 	FilePermission = 0700
 )
 
@@ -17,6 +18,7 @@ type Config struct {
 	// Dependencies.
 	Logger micrologger.Logger
 
+	IgnitionPath string
 	OIDC         OIDCConfig
 	SSOPublicKey string
 }
@@ -35,6 +37,7 @@ type CloudConfig struct {
 	// Dependencies.
 	logger micrologger.Logger
 
+	ignitionPath    string
 	k8sAPIExtraArgs []string
 	ssoPublicKey    string
 }
@@ -52,6 +55,10 @@ func New(config Config) (*CloudConfig, error) {
 	// Dependencies.
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
+	}
+
+	if config.IgnitionPath == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.IgnitionPath must not be empty", config)
 	}
 
 	var k8sAPIExtraArgs []string
@@ -74,6 +81,7 @@ func New(config Config) (*CloudConfig, error) {
 		// Dependencies.
 		logger: config.Logger,
 
+		ignitionPath:    config.IgnitionPath,
 		k8sAPIExtraArgs: k8sAPIExtraArgs,
 		ssoPublicKey:    config.SSOPublicKey,
 	}

@@ -28,11 +28,11 @@ const (
 	HealthEndpoint = "/healthz"
 	// ProbeHost host for liveness probe.
 	ProbeHost = "127.0.0.1"
-	// InitialDelaySeconds is InitialDelaySeconds param in liveness probe config
-	InitialDelaySeconds = 240
-	// TimeoutSeconds is TimeoutSeconds param in liveness probe config
+	// InitialDelaySeconds is InitialDelaySeconds param in liveness probe config.
+	InitialDelaySeconds = 360
+	// TimeoutSeconds is TimeoutSeconds param in liveness probe config.
 	TimeoutSeconds = 5
-	// PeriodSeconds is PeriodSeconds param in liveness probe config
+	// PeriodSeconds is PeriodSeconds param in liveness probe config.
 	PeriodSeconds = 35
 	// FailureThreshold is FailureThreshold param in liveness probe config
 	FailureThreshold = 4
@@ -48,10 +48,10 @@ const (
 
 	FlannelEnvPathPrefix = "/run/flannel"
 	CoreosImageDir       = "/var/lib/coreos-kvm-images"
-	CoreosVersion        = "1855.5.0"
+	CoreosVersion        = "1911.5.0"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:42b9987667392934e3e59247b68bcfd4152b5c2c"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:236c812dd5d8bf0eabe0b6116014fb88a2bacfb0"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:1b1983e44775736bb0b9d7a08ca0ba888fda6567"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:b2ffdb2c4ec93fe6bf2d4af8e55c8a4b11253611"
 
@@ -109,6 +109,10 @@ const (
 const (
 	PodDeletionGracePeriod = 5 * time.Minute
 )
+
+func BaseDomain(customObject v1alpha1.KVMConfig) string {
+	return strings.TrimPrefix(customObject.Spec.Cluster.Kubernetes.API.Domain, "api.")
+}
 
 func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.Kubernetes.API.Domain
