@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v17/key"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
@@ -12,6 +11,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/kvm-operator/service/controller/v17/key"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
@@ -105,7 +106,9 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 			IPs:              cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs),
 		}
 		deleteChange, err = r.newK8sEndpoint(endpoint)
-		if err != nil {
+		if IsServiceNotFound(err) {
+			// fall through
+		} else if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}

@@ -1,13 +1,13 @@
 package endpoint
 
 import (
-	"k8s.io/client-go/kubernetes"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -62,7 +62,9 @@ func (r *Resource) newK8sEndpoint(endpoint *Endpoint) (*corev1.Endpoints, error)
 	}
 
 	k8sService, err := r.k8sClient.CoreV1().Services(endpoint.ServiceNamespace).Get(endpoint.ServiceName, metav1.GetOptions{})
-	if err != nil {
+	if errors.IsNotFound(err) {
+		return nil, microerror.Mask(serviceNotFoundError)
+	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
