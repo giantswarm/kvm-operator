@@ -131,12 +131,17 @@ func getAnnotations(pod corev1.Pod, ipAnnotationName string, serviceAnnotationNa
 	return ipAnnotationValue, serviceAnnotationValue, nil
 }
 
-func isEmptyEndpoint(endpoint corev1.Endpoints) bool {
+func isEmptyEndpoint(endpoint *corev1.Endpoints) bool {
+	if endpoint == nil {
+		return true
+	}
+
 	for _, subset := range endpoint.Subsets {
 		if len(subset.Addresses) > 0 {
 			return false
 		}
 	}
+
 	return true
 }
 

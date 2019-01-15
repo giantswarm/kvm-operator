@@ -15,7 +15,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 		return microerror.Mask(err)
 	}
 
-	if !isEmptyEndpoint(*endpointToUpdate) {
+	if !isEmptyEndpoint(endpointToUpdate) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating endpoint '%s'", endpointToUpdate.GetName()))
 
 		_, err = r.k8sClient.CoreV1().Endpoints(endpointToUpdate.Namespace).Update(endpointToUpdate)

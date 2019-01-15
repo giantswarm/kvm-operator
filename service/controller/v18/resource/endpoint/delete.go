@@ -25,7 +25,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	// times. We do not want to delete the whole endpoint only because one pod is
 	// gone. We only delete the whole endpoint when it does not contain any IP
 	// anymore. Removing IPs is done on update events.
-	if isEmptyEndpoint(*endpointToDelete) {
+	if isEmptyEndpoint(endpointToDelete) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting endpoint '%s'", endpointToDelete.GetName()))
 
 		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(endpointToDelete.Name, &metav1.DeleteOptions{})

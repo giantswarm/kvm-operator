@@ -15,7 +15,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState inter
 		return microerror.Mask(err)
 	}
 
-	if !isEmptyEndpoint(*endpointToCreate) {
+	if !isEmptyEndpoint(endpointToCreate) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating endpoint '%s'", endpointToCreate.GetName()))
 
 		_, err = r.k8sClient.CoreV1().Endpoints(endpointToCreate.Namespace).Create(endpointToCreate)
