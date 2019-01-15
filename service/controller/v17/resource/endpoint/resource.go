@@ -71,23 +71,6 @@ func (r *Resource) newK8sEndpoint(endpoint *Endpoint) *corev1.Endpoints {
 	return k8sEndpoint
 }
 
-func cutIPs(base []string, cutset []string) []string {
-	resultIPs := []string{}
-	// Deduplicate entries from base.
-	for _, baseIP := range base {
-		if !containsIP(resultIPs, baseIP) {
-			resultIPs = append(resultIPs, baseIP)
-		}
-	}
-	// Cut the cutset out of base.
-	for _, cutsetIP := range cutset {
-		if containsIP(resultIPs, cutsetIP) {
-			resultIPs = removeIP(resultIPs, cutsetIP)
-		}
-	}
-	return resultIPs
-}
-
 func containsIP(ips []string, ip string) bool {
 	for _, foundIP := range ips {
 		if foundIP == ip {

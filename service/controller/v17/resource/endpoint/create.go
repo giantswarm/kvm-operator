@@ -43,21 +43,10 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	var ips []string
-	{
-		var l []string
-		for _, ip := range desiredEndpoint.IPs {
-			if !containsIP(l, ip) {
-				l = append(l, ip)
-			}
-		}
-		if len(currentEndpoint.IPs) == 0 {
-			ips = l
-		}
-	}
-
 	var createChange *corev1.Endpoints
 	{
+		ips := ipsForCreateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
+
 		e := &Endpoint{
 			Addresses:        ipsToAddresses(ips),
 			IPs:              ips,
@@ -70,4 +59,20 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	return createChange, nil
+}
+
+func ipsForCreateChange(currentIPs []string, desiredIPs []string) []string {
+	var ips []string
+
+	for _, ip := range desiredIPs {
+		if !containsIP(ips, ip) {
+			ips = append(ips, ip)
+		}
+	}
+
+	if len(currentIPs) == 0 {
+		return ips
+	}
+
+	return nil
 }

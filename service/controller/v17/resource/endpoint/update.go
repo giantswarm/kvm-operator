@@ -59,24 +59,10 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	var ips []string
-	{
-		var l []string
-		for _, ip := range currentEndpoint.IPs {
-			l = append(l, ip)
-		}
-		for _, ip := range desiredEndpoint.IPs {
-			if !containsIP(l, ip) {
-				l = append(l, ip)
-			}
-		}
-		if len(currentEndpoint.IPs) > 0 {
-			ips = l
-		}
-	}
-
 	var updateChange *corev1.Endpoints
 	{
+		ips := ipsForUpdateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
+
 		e := &Endpoint{
 			Addresses:        ipsToAddresses(ips),
 			IPs:              ips,
@@ -89,4 +75,24 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	return updateChange, nil
+}
+
+func ipsForUpdateChange(currentIPs []string, desiredIPs []string) []string {
+	var ips []string
+
+	for _, ip := range currentIPs {
+		ips = append(ips, ip)
+	}
+
+	for _, ip := range desiredIPs {
+		if !containsIP(ips, ip) {
+			ips = append(ips, ip)
+		}
+	}
+
+	if len(currentIPs) > 0 {
+		return ips
+	}
+
+	return nil
 }

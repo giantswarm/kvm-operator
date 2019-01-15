@@ -64,7 +64,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 	var deleteChange *corev1.Endpoints
 	{
-		ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
+		ips := ipsForDeleteChange(currentEndpoint.IPs, desiredEndpoint.IPs)
 
 		e := &Endpoint{
 			Addresses:        ipsToAddresses(ips),
@@ -78,4 +78,22 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 	}
 
 	return deleteChange, nil
+}
+
+func ipsForDeleteChange(currentIPs []string, desiredIPs []string) []string {
+	var ips []string
+
+	for _, ip := range currentIPs {
+		if !containsIP(ips, ip) {
+			ips = append(ips, ip)
+		}
+	}
+
+	for _, ip := range desiredIPs {
+		if containsIP(ips, ip) {
+			ips = removeIP(ips, ip)
+		}
+	}
+
+	return ips
 }
