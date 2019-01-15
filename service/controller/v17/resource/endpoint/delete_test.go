@@ -161,11 +161,10 @@ func Test_Resource_Endpoint_ApplyDeleteChange(t *testing.T) {
 
 func Test_Resource_Endpoint_ipsForDeleteChange(t *testing.T) {
 	testCases := []struct {
-		name         string
-		base         []string
-		cutset       []string
-		expectedSet  []string
-		errorMatcher func(error) bool
+		name        string
+		base        []string
+		cutset      []string
+		expectedSet []string
 	}{
 		{
 			name: "case 0: Base has one more address than the cutset",
@@ -179,7 +178,6 @@ func Test_Resource_Endpoint_ipsForDeleteChange(t *testing.T) {
 			expectedSet: []string{
 				"0.0.0.0",
 			},
-			errorMatcher: nil,
 		},
 		{
 			name: "case 1: Base and cutset have the same addresses",
@@ -189,8 +187,7 @@ func Test_Resource_Endpoint_ipsForDeleteChange(t *testing.T) {
 			cutset: []string{
 				"1.1.1.1",
 			},
-			expectedSet:  []string{},
-			errorMatcher: nil,
+			expectedSet: []string{},
 		},
 		{
 			name: "case 2: Cutset has one more address than base",
@@ -201,8 +198,7 @@ func Test_Resource_Endpoint_ipsForDeleteChange(t *testing.T) {
 				"1.1.1.1",
 				"0.0.0.0",
 			},
-			expectedSet:  []string{},
-			errorMatcher: nil,
+			expectedSet: []string{},
 		},
 	}
 
