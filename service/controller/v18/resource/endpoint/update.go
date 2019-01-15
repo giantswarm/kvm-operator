@@ -61,31 +61,38 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	var updateChange *corev1.Endpoints
 	{
-		var ips []string
-		for _, ip := range currentEndpoint.IPs {
-			ips = append(ips, ip)
-		}
-		for _, ip := range desiredEndpoint.IPs {
-			if !containsIP(ips, ip) {
-				ips = append(ips, ip)
-			}
+		ips := ipsForUpdateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
+
+		e := &Endpoint{
+			Addresses:        ipsToAddresses(ips),
+			IPs:              ips,
+			Ports:            currentEndpoint.Ports,
+			ServiceName:      currentEndpoint.ServiceName,
+			ServiceNamespace: currentEndpoint.ServiceNamespace,
 		}
 
-		endpoint := &Endpoint{
-			IPs:              []string{},
-			ServiceName:      desiredEndpoint.ServiceName,
-			ServiceNamespace: desiredEndpoint.ServiceNamespace,
-		}
-
-		if len(currentEndpoint.IPs) > 0 {
-			endpoint.IPs = ips
-		}
-
-		updateChange, err = r.newK8sEndpoint(endpoint)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
+		updateChange = r.newK8sEndpoint(e)
 	}
 
 	return updateChange, nil
+}
+
+func ipsForUpdateChange(currentIPs []string, desiredIPs []string) []string {
+	var ips []string
+
+	for _, ip := range currentIPs {
+		ips = append(ips, ip)
+	}
+
+	for _, ip := range desiredIPs {
+		if !containsIP(ips, ip) {
+			ips = append(ips, ip)
+		}
+	}
+
+	if len(currentIPs) > 0 {
+		return ips
+	}
+
+	return nil
 }

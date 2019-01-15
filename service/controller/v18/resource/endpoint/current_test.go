@@ -3,6 +3,7 @@ package endpoint
 import (
 	"context"
 	"reflect"
+	"strconv"
 	"testing"
 
 	g8sfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
@@ -31,7 +32,6 @@ func Test_Resource_Endpoint_GetCurrentState(t *testing.T) {
 				},
 			},
 			ExpectedEndpoints: &Endpoint{
-				IPs:              []string{},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
 			},
@@ -99,6 +99,11 @@ func Test_Resource_Endpoint_GetCurrentState(t *testing.T) {
 				},
 			},
 			ExpectedEndpoints: &Endpoint{
+				Addresses: []corev1.EndpointAddress{
+					{
+						IP: "1.1.1.1",
+					},
+				},
 				IPs: []string{
 					"1.1.1.1",
 				},
@@ -138,6 +143,14 @@ func Test_Resource_Endpoint_GetCurrentState(t *testing.T) {
 				},
 			},
 			ExpectedEndpoints: &Endpoint{
+				Addresses: []corev1.EndpointAddress{
+					{
+						IP: "1.1.1.1",
+					},
+					{
+						IP: "1.2.3.4",
+					},
+				},
 				IPs: []string{
 					"1.1.1.1",
 					"1.2.3.4",
@@ -185,6 +198,14 @@ func Test_Resource_Endpoint_GetCurrentState(t *testing.T) {
 				},
 			},
 			ExpectedEndpoints: &Endpoint{
+				Addresses: []corev1.EndpointAddress{
+					{
+						IP: "1.1.1.1",
+					},
+					{
+						IP: "1.2.3.4",
+					},
+				},
 				IPs: []string{
 					"1.1.1.1",
 					"1.2.3.4",
@@ -197,33 +218,35 @@ func Test_Resource_Endpoint_GetCurrentState(t *testing.T) {
 	var err error
 
 	for i, tc := range testCases {
-		fakeG8sClient := g8sfake.NewSimpleClientset()
-		fakeK8sClient := fake.NewSimpleClientset()
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			fakeG8sClient := g8sfake.NewSimpleClientset()
+			fakeK8sClient := fake.NewSimpleClientset()
 
-		var newResource *Resource
-		{
-			c := Config{
-				G8sClient: fakeG8sClient,
-				K8sClient: fakeK8sClient,
-				Logger:    microloggertest.New(),
+			var newResource *Resource
+			{
+				c := Config{
+					G8sClient: fakeG8sClient,
+					K8sClient: fakeK8sClient,
+					Logger:    microloggertest.New(),
+				}
+				newResource, err = New(c)
+				if err != nil {
+					t.Fatal("expected", nil, "got", err)
+				}
 			}
-			newResource, err = New(c)
+
+			for _, k8sEndpoint := range tc.SetupEndpoints {
+				if _, err := fakeK8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Create(k8sEndpoint); err != nil {
+					t.Fatalf("%d: error returned setting up k8s endpoint: %s\n", i, err)
+				}
+			}
+			result, err := newResource.GetCurrentState(resourcecanceledcontext.NewContext(context.TODO(), make(chan struct{})), tc.Obj)
 			if err != nil {
-				t.Fatal("expected", nil, "got", err)
+				t.Fatal("case", i, "expected", nil, "got", err)
 			}
-		}
-
-		for _, k8sEndpoint := range tc.SetupEndpoints {
-			if _, err := fakeK8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Create(k8sEndpoint); err != nil {
-				t.Fatalf("%d: error returned setting up k8s endpoint: %s\n", i, err)
+			if !reflect.DeepEqual(tc.ExpectedEndpoints, result) {
+				t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedEndpoints, result)
 			}
-		}
-		result, err := newResource.GetCurrentState(resourcecanceledcontext.NewContext(context.TODO(), make(chan struct{})), tc.Obj)
-		if err != nil {
-			t.Fatal("case", i, "expected", nil, "got", err)
-		}
-		if !reflect.DeepEqual(tc.ExpectedEndpoints, result) {
-			t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedEndpoints, result)
-		}
+		})
 	}
 }
