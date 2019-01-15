@@ -113,15 +113,11 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 				IPs: []string{
 					"1.1.1.1",
 				},
-				Ports: serviceToPorts(&corev1.Service{
-					Spec: corev1.ServiceSpec{
-						Ports: []corev1.ServicePort{
-							{
-								Port: 1234,
-							},
-						},
+				Ports: []corev1.EndpointPort{
+					{
+						Port: 1234,
 					},
-				}),
+				},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
 			},
@@ -155,15 +151,11 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 		{
 			CurrentState: &Endpoint{
 				IPs: []string{},
-				Ports: serviceToPorts(&corev1.Service{
-					Spec: corev1.ServiceSpec{
-						Ports: []corev1.ServicePort{
-							{
-								Port: 1234,
-							},
-						},
+				Ports: []corev1.EndpointPort{
+					{
+						Port: 1234,
 					},
-				}),
+				},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
 			},
