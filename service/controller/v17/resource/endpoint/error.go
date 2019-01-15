@@ -21,15 +21,6 @@ func IsMissingAnnotationError(err error) bool {
 	return microerror.Cause(err) == missingAnnotationError
 }
 
-var serviceNotFoundError = &microerror.Error{
-	Kind: "serviceNotFoundError",
-}
-
-// IsServiceNotFound asserts serviceNotFoundError.
-func IsServiceNotFound(err error) bool {
-	return microerror.Cause(err) == serviceNotFoundError
-}
-
 var wrongTypeError = &microerror.Error{
 	Kind: "wrongTypeError",
 }

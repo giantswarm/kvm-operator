@@ -59,32 +59,33 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	var updateChange *corev1.Endpoints
+	var ips []string
 	{
-		var ips []string
+		var l []string
 		for _, ip := range currentEndpoint.IPs {
-			ips = append(ips, ip)
+			l = append(l, ip)
 		}
 		for _, ip := range desiredEndpoint.IPs {
-			if !containsIP(ips, ip) {
-				ips = append(ips, ip)
+			if !containsIP(l, ip) {
+				l = append(l, ip)
 			}
 		}
-
-		endpoint := &Endpoint{
-			IPs:              []string{},
-			ServiceName:      desiredEndpoint.ServiceName,
-			ServiceNamespace: desiredEndpoint.ServiceNamespace,
-		}
-
 		if len(currentEndpoint.IPs) > 0 {
-			endpoint.IPs = ips
+			ips = l
+		}
+	}
+
+	var updateChange *corev1.Endpoints
+	{
+		e := &Endpoint{
+			Addresses:        ipsToAddresses(ips),
+			IPs:              ips,
+			Ports:            currentEndpoint.Ports,
+			ServiceName:      currentEndpoint.ServiceName,
+			ServiceNamespace: currentEndpoint.ServiceNamespace,
 		}
 
-		updateChange, err = r.newK8sEndpoint(endpoint)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
+		updateChange = r.newK8sEndpoint(e)
 	}
 
 	return updateChange, nil

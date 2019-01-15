@@ -76,7 +76,6 @@ func Test_Resource_Endpoint_newK8sEndpoint(t *testing.T) {
 		setupService        *corev1.Service
 		endpoint            *Endpoint
 		expectedK8sEndpoint *corev1.Endpoints
-		errorMatcher        func(error) bool
 	}{
 		{
 			name: "case 0: Without adresses, empty k8sEndpoint desired",
@@ -107,7 +106,6 @@ func Test_Resource_Endpoint_newK8sEndpoint(t *testing.T) {
 					},
 				},
 			},
-			errorMatcher: nil,
 		},
 		{
 			name: "case 1: With addresses, no ports",
@@ -145,7 +143,6 @@ func Test_Resource_Endpoint_newK8sEndpoint(t *testing.T) {
 					},
 				},
 			},
-			errorMatcher: nil,
 		},
 		{
 			name: "case 2: With addresses and ports",
@@ -192,7 +189,6 @@ func Test_Resource_Endpoint_newK8sEndpoint(t *testing.T) {
 					},
 				},
 			},
-			errorMatcher: nil,
 		},
 		{
 			name: "case 3: Without addresses but ports",
@@ -232,7 +228,6 @@ func Test_Resource_Endpoint_newK8sEndpoint(t *testing.T) {
 					},
 				},
 			},
-			errorMatcher: nil,
 		},
 	}
 
@@ -262,20 +257,7 @@ func Test_Resource_Endpoint_newK8sEndpoint(t *testing.T) {
 				}
 			}
 
-			k8sEndpoints, err := newResource.newK8sEndpoint(tc.endpoint)
-
-			switch {
-			case err == nil && tc.errorMatcher == nil: // correct; carry on
-			case err != nil && tc.errorMatcher != nil:
-				if !tc.errorMatcher(err) {
-					t.Fatalf("error == %#v, want matching", err)
-				}
-			case err != nil && tc.errorMatcher == nil:
-				t.Fatalf("error == %#v, want nil", err)
-			case err == nil && tc.errorMatcher != nil:
-				t.Fatalf("error == nil, want non-nil")
-			}
-
+			k8sEndpoints := newResource.newK8sEndpoint(tc.endpoint)
 			if !reflect.DeepEqual(k8sEndpoints, tc.expectedK8sEndpoint) {
 				t.Fatalf("k8sEndpoint == %q, want %q", k8sEndpoints, tc.expectedK8sEndpoint)
 			}

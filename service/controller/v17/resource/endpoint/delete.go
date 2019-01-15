@@ -25,10 +25,10 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	// times. We do not want to delete the whole endpoint only because one pod is
 	// gone. We only delete the whole endpoint when it does not contain any IP
 	// anymore. Removing IPs is done on update events.
-	if endpointToDelete != nil && isEmptyEndpoint(endpointToDelete) {
+	if isEmptyEndpoint(endpointToDelete) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting endpoint '%s'", endpointToDelete.GetName()))
 
-		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(endpointToDelete.Name, &metav1.DeleteOptions{})
+		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(endpointToDelete.GetName(), &metav1.DeleteOptions{})
 		if errors.IsNotFound(err) {
 			// fall through
 		} else if err != nil {
@@ -100,17 +100,17 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 	var deleteChange *corev1.Endpoints
 	{
-		endpoint := &Endpoint{
+		ips := cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs)
+
+		e := &Endpoint{
+			Addresses:        ipsToAddresses(ips),
+			IPs:              ips,
+			Ports:            currentEndpoint.Ports,
 			ServiceName:      currentEndpoint.ServiceName,
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
-			IPs:              cutIPs(currentEndpoint.IPs, desiredEndpoint.IPs),
 		}
-		deleteChange, err = r.newK8sEndpoint(endpoint)
-		if IsServiceNotFound(err) {
-			// fall through
-		} else if err != nil {
-			return nil, microerror.Mask(err)
-		}
+
+		deleteChange = r.newK8sEndpoint(e)
 	}
 
 	return deleteChange, nil
