@@ -14,7 +14,7 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "kubernetes-1.13.2"
+  branch = "master"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
@@ -28,7 +28,7 @@
     "pkg/clientset/versioned/typed/example/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1"
   ]
-  revision = "243452e56259a3c7e00616ef89d97b912c63e776"
+  revision = "0584389c4f82e52ba980c14dc31434d922245a46"
 
 [[projects]]
   branch = "master"
@@ -62,13 +62,13 @@
   revision = "5a0784e0ee23c5b732c0d15023ac3dce8aef145a"
 
 [[projects]]
-  branch = "kubernetes-1.13.2"
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
     "client/k8srestconfig"
   ]
-  revision = "dfeb06fe04cff5c9a6fbf8ef777f0fb31ee40462"
+  revision = "43dd8d30de6553f21effdd2d11c363613a9997bb"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -223,7 +223,7 @@
     ".",
     "internal"
   ]
-  revision = "36a7019397c4c86cf59eeab3bc0d188bac444277"
+  revision = "5dab4167f31cbd76b407f1486c86b40748bc5073"
 
 [[projects]]
   branch = "master"
@@ -232,7 +232,7 @@
     "unix",
     "windows"
   ]
-  revision = "2be51725563103c17124a318f1745b66f2347acb"
+  revision = "11f53e03133963fb11ae0588e08b5e0b85be8be5"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -452,6 +452,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e8d97c122e0f21643ba343d2c59ab6dc32db6635c9e4a3ca82c151fda65a0910"
+  inputs-digest = "b34fce0804ce70a3acab36f5d35c9b437d5c687664278a602e7cb7a6eb2b0ee9"
   solver-name = "gps-cdcl"
   solver-version = 1
