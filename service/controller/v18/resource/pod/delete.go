@@ -146,7 +146,7 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 				},
 			},
 			VersionBundle: corev1alpha1.DrainerConfigSpecVersionBundle{
-				Version: "0.1.0",
+				Version: "0.2.0",
 			},
 		},
 	}
