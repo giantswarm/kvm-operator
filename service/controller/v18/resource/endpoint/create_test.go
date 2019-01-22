@@ -107,12 +107,16 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 		DesiredState        *Endpoint
 		ExpectedCreateState *corev1.Endpoints
 		Obj                 interface{}
-		SetupService        *corev1.Service
 	}{
 		{
 			CurrentState: &Endpoint{
 				IPs: []string{
 					"1.1.1.1",
+				},
+				Ports: []corev1.EndpointPort{
+					{
+						Port: 1234,
+					},
 				},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
@@ -123,19 +127,6 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 				},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
-			},
-			SetupService: &corev1.Service{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "TestService",
-					Namespace: "TestNamespace",
-				},
-				Spec: corev1.ServiceSpec{
-					Ports: []corev1.ServicePort{
-						{
-							Port: 1234,
-						},
-					},
-				},
 			},
 			ExpectedCreateState: &corev1.Endpoints{
 				TypeMeta: metav1.TypeMeta{
@@ -152,14 +143,19 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 								Port: 1234,
 							},
 						},
-						Addresses: []corev1.EndpointAddress{},
+						Addresses: nil,
 					},
 				},
 			},
 		},
 		{
 			CurrentState: &Endpoint{
-				IPs:              []string{},
+				IPs: []string{},
+				Ports: []corev1.EndpointPort{
+					{
+						Port: 1234,
+					},
+				},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
 			},
@@ -169,19 +165,6 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 				},
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
-			},
-			SetupService: &corev1.Service{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "TestService",
-					Namespace: "TestNamespace",
-				},
-				Spec: corev1.ServiceSpec{
-					Ports: []corev1.ServicePort{
-						{
-							Port: 1234,
-						},
-					},
-				},
 			},
 			ExpectedCreateState: &corev1.Endpoints{
 				TypeMeta: metav1.TypeMeta{
@@ -211,25 +194,16 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 	for i, tc := range testCases {
 		var err error
 
-		fakeG8sClient := g8sfake.NewSimpleClientset()
-		fakeK8sClient := fake.NewSimpleClientset()
-
 		var newResource *Resource
 		{
 			c := Config{
-				G8sClient: fakeG8sClient,
-				K8sClient: fakeK8sClient,
+				G8sClient: g8sfake.NewSimpleClientset(),
+				K8sClient: fake.NewSimpleClientset(),
 				Logger:    microloggertest.New(),
 			}
 			newResource, err = New(c)
 			if err != nil {
 				t.Fatal("expected", nil, "got", err)
-			}
-		}
-
-		if tc.SetupService != nil {
-			if _, err := newResource.k8sClient.CoreV1().Services(tc.SetupService.Namespace).Create(tc.SetupService); err != nil {
-				t.Fatalf("%d: error returned setting up k8s service: %s\n", i, err)
 			}
 		}
 

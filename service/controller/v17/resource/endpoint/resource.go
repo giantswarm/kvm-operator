@@ -1,13 +1,12 @@
 package endpoint
 
 import (
-	"k8s.io/client-go/kubernetes"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -52,20 +51,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func (r *Resource) newK8sEndpoint(endpoint *Endpoint) (*corev1.Endpoints, error) {
-	k8sAddresses := []corev1.EndpointAddress{}
-	for _, endpointIP := range endpoint.IPs {
-		k8sAddress := corev1.EndpointAddress{
-			IP: endpointIP,
-		}
-		k8sAddresses = append(k8sAddresses, k8sAddress)
-	}
-
-	k8sService, err := r.k8sClient.CoreV1().Services(endpoint.ServiceNamespace).Get(endpoint.ServiceName, metav1.GetOptions{})
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
+func (r *Resource) newK8sEndpoint(endpoint *Endpoint) *corev1.Endpoints {
 	k8sEndpoint := &corev1.Endpoints{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
@@ -76,33 +62,13 @@ func (r *Resource) newK8sEndpoint(endpoint *Endpoint) (*corev1.Endpoints, error)
 		},
 		Subsets: []corev1.EndpointSubset{
 			{
-				Ports: serviceToPorts(k8sService),
+				Addresses: endpoint.Addresses,
+				Ports:     endpoint.Ports,
 			},
 		},
 	}
 
-	for i := range k8sEndpoint.Subsets {
-		k8sEndpoint.Subsets[i].Addresses = k8sAddresses
-	}
-
-	return k8sEndpoint, nil
-}
-
-func cutIPs(base []string, cutset []string) []string {
-	resultIPs := []string{}
-	// Deduplicate entries from base.
-	for _, baseIP := range base {
-		if !containsIP(resultIPs, baseIP) {
-			resultIPs = append(resultIPs, baseIP)
-		}
-	}
-	// Cut the cutset out of base.
-	for _, cutsetIP := range cutset {
-		if containsIP(resultIPs, cutsetIP) {
-			resultIPs = removeIP(resultIPs, cutsetIP)
-		}
-	}
-	return resultIPs
+	return k8sEndpoint
 }
 
 func containsIP(ips []string, ip string) bool {
@@ -111,6 +77,7 @@ func containsIP(ips []string, ip string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -129,12 +96,30 @@ func getAnnotations(pod corev1.Pod, ipAnnotationName string, serviceAnnotationNa
 	return ipAnnotationValue, serviceAnnotationValue, nil
 }
 
-func isEmptyEndpoint(endpoint corev1.Endpoints) bool {
+func ipsToAddresses(ips []string) []corev1.EndpointAddress {
+	var addresses []corev1.EndpointAddress
+
+	for _, ip := range ips {
+		k8sAddress := corev1.EndpointAddress{
+			IP: ip,
+		}
+		addresses = append(addresses, k8sAddress)
+	}
+
+	return addresses
+}
+
+func isEmptyEndpoint(endpoint *corev1.Endpoints) bool {
+	if endpoint == nil {
+		return true
+	}
+
 	for _, subset := range endpoint.Subsets {
 		if len(subset.Addresses) > 0 {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -145,21 +130,6 @@ func removeIP(ips []string, ip string) []string {
 		}
 	}
 	return ips
-}
-
-func serviceToPorts(s *corev1.Service) []corev1.EndpointPort {
-	var ports []corev1.EndpointPort
-
-	for _, p := range s.Spec.Ports {
-		port := corev1.EndpointPort{
-			Name: p.Name,
-			Port: p.Port,
-		}
-
-		ports = append(ports, port)
-	}
-
-	return ports
 }
 
 func toEndpoint(v interface{}) (*Endpoint, error) {
