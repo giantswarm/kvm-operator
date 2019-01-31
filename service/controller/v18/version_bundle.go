@@ -27,6 +27,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Improved node draining during updates and scaling.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "cloudconfig",
+				Description: "Add static initiator name for each vm.",
+				Kind:        versionbundle.KindAdded,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
