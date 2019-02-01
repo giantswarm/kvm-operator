@@ -94,6 +94,7 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 	filesMeta = append(filesMeta, iscsiInitiatorFile)
 
+	// iscsi config as workaround for this bug https://github.com/kubernetes/kubernetes/issues/73181
 	iscsiConfigFile := k8scloudconfig.FileMetadata{
 		AssetContent: IscsiConfigFileContent,
 		Path:         IscsiConfigFilePath,
