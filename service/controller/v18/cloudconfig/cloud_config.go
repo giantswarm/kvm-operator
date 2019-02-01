@@ -12,7 +12,8 @@ const (
 	FileOwnerGroup = "root"
 	FilePermission = 0700
 
-	IscsiInitiatorNameFilePath = "/etc/iscsi/initiatorname.iscsi"
+	IscsiInitiatorNameFilePath    = "/etc/iscsi/initiatorname.iscsi"
+	IscsiInitiatorFilePermissions = 0644
 )
 
 // Config represents the configuration used to create a cloud config service.

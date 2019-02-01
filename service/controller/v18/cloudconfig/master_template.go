@@ -90,7 +90,7 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			User:  FileOwnerUser,
 			Group: FileOwnerGroup,
 		},
-		Permissions: FilePermission,
+		Permissions: IscsiInitiatorFilePermissions,
 	}
 	filesMeta = append(filesMeta, iscsiInitiatorFile)
 
