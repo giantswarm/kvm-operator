@@ -94,6 +94,17 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 	filesMeta = append(filesMeta, iscsiInitiatorFile)
 
+	iscsiConfigFile := k8scloudconfig.FileMetadata{
+		AssetContent: IscsiConfigFileContent,
+		Path:         IscsiConfigFilePath,
+		Owner: k8scloudconfig.Owner{
+			User:  FileOwnerUser,
+			Group: FileOwnerGroup,
+		},
+		Permissions: IscsiConfigFilePermissions,
+	}
+	filesMeta = append(filesMeta, iscsiConfigFile)
+
 	var newFiles []k8scloudconfig.FileAsset
 
 	for _, fm := range filesMeta {

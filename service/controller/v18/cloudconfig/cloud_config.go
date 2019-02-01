@@ -14,6 +14,13 @@ const (
 
 	IscsiInitiatorNameFilePath    = "/etc/iscsi/initiatorname.iscsi"
 	IscsiInitiatorFilePermissions = 0644
+
+	IscsiConfigFilePath        = "/etc/iscsi/iscsid.conf"
+	IscsiConfigFilePermissions = 0644
+	IscsiConfigFileContent     = `
+# Check for active mounts on devices reachable through a session
+# and refuse to logout if there are any.  Defaults to "No".
+iscsid.safe_logout = Yes`
 )
 
 // Config represents the configuration used to create a cloud config service.
