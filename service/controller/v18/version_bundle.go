@@ -29,7 +29,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "cloudconfig",
-				Description: "Add static initiator name for each vm.",
+				Description: "Add static iSCSI initiator name for each vm.",
 				Kind:        versionbundle.KindAdded,
 			},
 		},
