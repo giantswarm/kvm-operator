@@ -1,6 +1,7 @@
 package cloudconfig
 
 import (
+	"fmt"
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_0_0"
@@ -25,7 +26,9 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 		// removed in a later migration.
 		params.DisableIngressControllerService = false
 		params.Extension = &masterExtension{
-			certs: certs,
+			certs:        certs,
+			customObject: customObject,
+			node:         node,
 		}
 		params.Node = node
 		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
@@ -59,7 +62,9 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 }
 
 type masterExtension struct {
-	certs certs.Cluster
+	certs        certs.Cluster
+	customObject v1alpha1.KVMConfig
+	node         v1alpha1.ClusterNode
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
@@ -77,6 +82,29 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		}
 		filesMeta = append(filesMeta, m)
 	}
+
+	iscsiInitiatorFile := k8scloudconfig.FileMetadata{
+		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.node, key.MasterID)),
+		Path:         IscsiInitiatorNameFilePath,
+		Owner: k8scloudconfig.Owner{
+			User:  FileOwnerUser,
+			Group: FileOwnerGroup,
+		},
+		Permissions: IscsiInitiatorFilePermissions,
+	}
+	filesMeta = append(filesMeta, iscsiInitiatorFile)
+
+	// iscsi config as workaround for this bug https://github.com/kubernetes/kubernetes/issues/73181
+	iscsiConfigFile := k8scloudconfig.FileMetadata{
+		AssetContent: IscsiConfigFileContent,
+		Path:         IscsiConfigFilePath,
+		Owner: k8scloudconfig.Owner{
+			User:  FileOwnerUser,
+			Group: FileOwnerGroup,
+		},
+		Permissions: IscsiConfigFilePermissions,
+	}
+	filesMeta = append(filesMeta, iscsiConfigFile)
 
 	var newFiles []k8scloudconfig.FileAsset
 

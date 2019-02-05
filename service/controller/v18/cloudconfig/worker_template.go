@@ -1,6 +1,7 @@
 package cloudconfig
 
 import (
+	"fmt"
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_0_0"
@@ -20,7 +21,9 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 		params.BaseDomain = key.BaseDomain(customObject)
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &workerExtension{
-			certs: certs,
+			certs:        certs,
+			customObject: customObject,
+			node:         node,
 		}
 		params.Node = node
 		params.SSOPublicKey = c.ssoPublicKey
@@ -53,7 +56,9 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 }
 
 type workerExtension struct {
-	certs certs.Cluster
+	certs        certs.Cluster
+	customObject v1alpha1.KVMConfig
+	node         v1alpha1.ClusterNode
 }
 
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
@@ -71,6 +76,29 @@ func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		}
 		filesMeta = append(filesMeta, m)
 	}
+
+	iscsiInitiatorFile := k8scloudconfig.FileMetadata{
+		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.node, key.WorkerID)),
+		Path:         IscsiInitiatorNameFilePath,
+		Owner: k8scloudconfig.Owner{
+			User:  FileOwnerUser,
+			Group: FileOwnerGroup,
+		},
+		Permissions: IscsiInitiatorFilePermissions,
+	}
+	filesMeta = append(filesMeta, iscsiInitiatorFile)
+
+	// iscsi config as workaround for this bug https://github.com/kubernetes/kubernetes/issues/73181
+	iscsiConfigFile := k8scloudconfig.FileMetadata{
+		AssetContent: IscsiConfigFileContent,
+		Path:         IscsiConfigFilePath,
+		Owner: k8scloudconfig.Owner{
+			User:  FileOwnerUser,
+			Group: FileOwnerGroup,
+		},
+		Permissions: IscsiConfigFilePermissions,
+	}
+	filesMeta = append(filesMeta, iscsiConfigFile)
 
 	var newFiles []k8scloudconfig.FileAsset
 
