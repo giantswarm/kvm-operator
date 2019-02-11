@@ -9,19 +9,25 @@ The latest version is considered WIP and it is a subject of change. All other
 versions are frozen. To freeze current version all files are copied to a new
 version directory, and then changes are introduced.
 
-## [v4.0.0] WIP
+## [v4.1.0] WIP
+
+## [v3.8.0] WIP
+
+## [v4.0.0]
 
 ### Changed
 - Switched from cloudinit to ignition.
 - Double the inotify watches.
 - Switch kube-proxy from `iptables` to `ipvs`.
+- Add worker node labels.
+- Increase timeouts for etcd defragmentaion.
 
 ### Removed
 
 - Ingress Controller and CoreDNS manifests. Now migrated to chart-operator.
 - Removed nodename_file_optional from calico configmap.
 
-## [v3.7.4] WIP
+## [v3.7.4]
 
 ### Changed
 - Double the inotify watches.
@@ -53,8 +59,8 @@ version directory, and then changes are introduced.
 ## [v3.7.1]
 
 ### Changed
-- The pod priority class for calico got lost. We found it again! 
-- kube-proxy is now installed before calico during cluster creation and upgrades. 
+- The pod priority class for calico got lost. We found it again!
+- kube-proxy is now installed before calico during cluster creation and upgrades.
 
 ## [v3.7.0]
 
