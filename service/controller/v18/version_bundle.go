@@ -32,6 +32,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Add static iSCSI initiator name for each vm.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "cloudconfig",
+				Description: "Bring back missing kubelet resources reservation for systemd and container runtime.",
+				Kind:        versionbundle.KindAdded,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
