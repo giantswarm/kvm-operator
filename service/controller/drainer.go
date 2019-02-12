@@ -13,10 +13,12 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
+	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	"github.com/giantswarm/kvm-operator/service/controller/v16"
 	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
 	"github.com/giantswarm/kvm-operator/service/controller/v17"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
 	"github.com/giantswarm/kvm-operator/service/controller/v18"
 )
 
@@ -121,6 +123,22 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV14Patch4 *controller.ResourceSet
+	{
+		c := v14patch4.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV14Patch4, err = v14patch4.NewDrainerResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceSetV15 *controller.ResourceSet
 	{
 		c := v15.DrainerResourceSetConfig{
@@ -169,6 +187,22 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV17patch1 *controller.ResourceSet
+	{
+		c := v17patch1.DrainerResourceSetConfig{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV17patch1, err = v17patch1.NewDrainerResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceSetV18 *controller.ResourceSet
 	{
 		c := v18.DrainerResourceSetConfig{
@@ -187,9 +221,11 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV14Patch3,
+		resourceSetV14Patch4,
 		resourceSetV15,
 		resourceSetV16,
 		resourceSetV17,
+		resourceSetV17patch1,
 		resourceSetV18,
 	}
 
