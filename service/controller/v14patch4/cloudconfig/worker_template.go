@@ -3,7 +3,7 @@ package cloudconfig
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_5_2"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_3_5_3"
 	"github.com/giantswarm/microerror"
 )
 

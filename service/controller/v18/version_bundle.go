@@ -32,6 +32,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Add static iSCSI initiator name for each vm.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "containerlinux",
+				Description: "Update to 1967.5.0 (CVE-2019-5736).",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
