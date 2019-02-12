@@ -5,11 +5,10 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
-
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	"github.com/giantswarm/kvm-operator/service/controller/v16"
 	"github.com/giantswarm/kvm-operator/service/controller/v17"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
 	"github.com/giantswarm/kvm-operator/service/controller/v18"
 )
 
