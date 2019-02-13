@@ -31,6 +31,9 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/v18"
 	v18cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
+
+	"github.com/giantswarm/kvm-operator/service/controller/v19"
+	v19cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v19/cloudconfig"
 )
 
 type ClusterConfig struct {
@@ -304,6 +307,35 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
+	var resourceSetV19 *controller.ResourceSet
+	{
+		c := v19.ClusterResourceSetConfig{
+			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.G8sClient,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+			TenantCluster:      config.TenantCluster,
+
+			DNSServers:         config.DNSServers,
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			IgnitionPath:       config.IgnitionPath,
+			ProjectName:        config.ProjectName,
+			OIDC: v19cloudconfig.OIDCConfig{
+				ClientID:      config.OIDC.ClientID,
+				IssuerURL:     config.OIDC.IssuerURL,
+				UsernameClaim: config.OIDC.UsernameClaim,
+				GroupsClaim:   config.OIDC.GroupsClaim,
+			},
+			SSOPublicKey: config.SSOPublicKey,
+		}
+
+		resourceSetV19, err = v19.NewClusterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
@@ -319,6 +351,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				resourceSetV17,
 				resourceSetV17patch1,
 				resourceSetV18,
+				resourceSetV19,
 			},
 			RESTClient: config.G8sClient.ProviderV1alpha1().RESTClient(),
 
