@@ -218,22 +218,6 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
-	var resourceSetV19 *controller.ResourceSet
-	{
-		c := v19.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV19, err = v19.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV14Patch3,
 		resourceSetV14Patch4,
@@ -242,7 +226,6 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		resourceSetV17,
 		resourceSetV17patch1,
 		resourceSetV18,
-		resourceSetV19,
 	}
 
 	return resourceSets, nil
