@@ -17,12 +17,18 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
 	v14patch3cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch3/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
+	v14patch4cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch4/cloudconfig"
+
 	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v16"
 	v16cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v16/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v17"
 	v17cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
+	v17patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17patch1/cloudconfig"
+
 	"github.com/giantswarm/kvm-operator/service/controller/v18"
 	v18cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
 )
@@ -139,6 +145,32 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
+	var resourceSetV14Patch4 *controller.ResourceSet
+	{
+		c := v14patch4.ClusterResourceSetConfig{
+			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.G8sClient,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			ProjectName:        config.ProjectName,
+			OIDC: v14patch4cloudconfig.OIDCConfig{
+				ClientID:      config.OIDC.ClientID,
+				IssuerURL:     config.OIDC.IssuerURL,
+				UsernameClaim: config.OIDC.UsernameClaim,
+				GroupsClaim:   config.OIDC.GroupsClaim,
+			},
+			SSOPublicKey: config.SSOPublicKey,
+		}
+
+		resourceSetV14Patch4, err = v14patch4.NewClusterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceSetV15 *controller.ResourceSet
 	{
 		c := v15.ClusterResourceSetConfig{
@@ -217,6 +249,32 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
+	var resourceSetV17patch1 *controller.ResourceSet
+	{
+		c := v17patch1.ClusterResourceSetConfig{
+			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.G8sClient,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			ProjectName:        config.ProjectName,
+			OIDC: v17patch1cloudconfig.OIDCConfig{
+				ClientID:      config.OIDC.ClientID,
+				IssuerURL:     config.OIDC.IssuerURL,
+				UsernameClaim: config.OIDC.UsernameClaim,
+				GroupsClaim:   config.OIDC.GroupsClaim,
+			},
+			SSOPublicKey: config.SSOPublicKey,
+		}
+
+		resourceSetV17patch1, err = v17patch1.NewClusterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var resourceSetV18 *controller.ResourceSet
 	{
 		c := v18.ClusterResourceSetConfig{
@@ -255,9 +313,11 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{
 				resourceSetV14Patch3,
+				resourceSetV14Patch4,
 				resourceSetV15,
 				resourceSetV16,
 				resourceSetV17,
+				resourceSetV17patch1,
 				resourceSetV18,
 			},
 			RESTClient: config.G8sClient.ProviderV1alpha1().RESTClient(),

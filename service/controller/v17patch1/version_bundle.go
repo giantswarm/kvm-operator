@@ -8,13 +8,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "kvm-operator",
-				Description: "Add separate volume for /var/lib/kubelet and allow specifying its size.",
-				Kind:        versionbundle.KindAdded,
-			},
-			{
-				Component:   "kubernetes",
-				Description: "Update to 1.12.3 (CVE-2018-1002105).",
+				Component:   "containerlinux",
+				Description: "Update to 1967.5.0 (CVE-2019-5736).",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -25,7 +20,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1855.5.0",
+				Version: "1967.5.0",
 			},
 			{
 				Name:    "docker",
@@ -41,6 +36,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.1.1",
+		Version: "3.1.2",
 	}
 }
