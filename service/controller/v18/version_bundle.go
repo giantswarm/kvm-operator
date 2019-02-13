@@ -37,6 +37,16 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update to 1967.5.0 (CVE-2019-5736).",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kubernetes",
+				Description: "Update to 1.13.3.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "etcd",
+				Description: "Update to 3.3.12.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -45,7 +55,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1911.5.0",
+				Version: "1967.5.0",
 			},
 			{
 				Name:    "docker",
@@ -53,11 +63,11 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "etcd",
-				Version: "3.3.9",
+				Version: "3.3.12",
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.12.3",
+				Version: "1.13.3",
 			},
 		},
 		Name:    "kvm-operator",
