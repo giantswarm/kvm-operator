@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"github.com/giantswarm/kvm-operator/service/controller/v19"
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"

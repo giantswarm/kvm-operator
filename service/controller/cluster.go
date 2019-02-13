@@ -31,9 +31,6 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/v18"
 	v18cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v19"
-	v19cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v19/cloudconfig"
 )
 
 type ClusterConfig struct {
