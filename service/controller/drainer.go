@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"github.com/giantswarm/kvm-operator/service/controller/v19"
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
@@ -220,22 +219,6 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
-	var resourceSetV19 *controller.ResourceSet
-	{
-		c := v19.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV19, err = v19.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV14Patch3,
 		resourceSetV14Patch4,
@@ -244,7 +227,6 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		resourceSetV17,
 		resourceSetV17patch1,
 		resourceSetV18,
-		resourceSetV19,
 	}
 
 	return resourceSets, nil
