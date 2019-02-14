@@ -6,7 +6,8 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
@@ -62,7 +63,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which services have to be updated")
 
-	servicesToUpdate := make([]*apiv1.Service, 0)
+	servicesToUpdate := make([]*corev1.Service, 0)
 
 	for _, currentService := range currentServices {
 		desiredService, err := getServiceByName(desiredServices, currentService.Name)
@@ -74,9 +75,13 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		}
 
 		if isServiceModified(desiredService, currentService) {
-			// Make a copy and set the resource version so the service can be updated.
+			latest, err := r.k8sClient.CoreV1().Services(desiredService.GetNamespace()).Get(desiredService.GetName(), metav1.GetOptions{})
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+
 			serviceToUpdate := desiredService.DeepCopy()
-			serviceToUpdate.ObjectMeta.ResourceVersion = currentService.ObjectMeta.ResourceVersion
+			serviceToUpdate.ObjectMeta.ResourceVersion = latest.GetResourceVersion()
 			serviceToUpdate.Spec.ClusterIP = currentService.Spec.ClusterIP
 
 			servicesToUpdate = append(servicesToUpdate, serviceToUpdate)
