@@ -17,11 +17,16 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update to 3.3.12.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "calico",
+				Description: "Update to 3.5.3.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
 				Name:    "calico",
-				Version: "3.2.3",
+				Version: "3.5.3",
 			},
 			{
 				Name:    "containerlinux",
@@ -37,7 +42,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.12.3",
+				Version: "1.13.3",
 			},
 		},
 		Name:    "kvm-operator",
