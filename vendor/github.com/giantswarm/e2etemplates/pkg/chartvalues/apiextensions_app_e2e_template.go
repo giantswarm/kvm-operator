@@ -15,6 +15,7 @@ app:
   version: "{{ .App.Version }}"
 
 appCatalog:
+  name: "{{ .AppCatalog.Name }}"
   title: "{{ .AppCatalog.Title }}"
   description: "{{ .AppCatalog.Description }}"
   logoURL: "{{ .AppCatalog.LogoURL }}"

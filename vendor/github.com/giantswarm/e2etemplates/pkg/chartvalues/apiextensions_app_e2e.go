@@ -24,6 +24,7 @@ type APIExtensionsAppE2EConfigApp struct {
 }
 
 type APIExtensionsAppE2EConfigAppCatalog struct {
+	Name        string
 	Title       string
 	Description string
 	LogoURL     string
@@ -76,6 +77,15 @@ func NewAPIExtensionsAppE2E(config APIExtensionsAppE2EConfig) (string, error) {
 	}
 	if config.App.Version == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.App.Version must not be empty", config)
+	}
+	if config.AppCatalog.Name == "" {
+		return "", microerror.Maskf(invalidConfigError, "%T.AppCatalog.Name must not be empty", config)
+	}
+	if config.AppCatalog.Storage.Type == "" {
+		return "", microerror.Maskf(invalidConfigError, "%T.AppCatalog.Storage.Type must not be empty", config)
+	}
+	if config.AppCatalog.Storage.URL == "" {
+		return "", microerror.Maskf(invalidConfigError, "%T.AppCatalog.Storage.URL must not be empty", config)
 	}
 	if config.AppOperator.Version == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.AppOperator.Version must not be empty", config)
