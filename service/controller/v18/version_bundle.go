@@ -37,11 +37,26 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update to 1967.5.0 (CVE-2019-5736).",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kubernetes",
+				Description: "Updated kubernetes to 1.13.3.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "calico",
+				Description: "Updated calico to 3.5.3.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "etcd",
+				Description: "Updated calico to 3.3.12.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
 				Name:    "calico",
-				Version: "3.2.3",
+				Version: "3.5.3",
 			},
 			{
 				Name:    "containerlinux",
@@ -53,11 +68,11 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "etcd",
-				Version: "3.3.9",
+				Version: "3.3.12",
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.12.3",
+				Version: "1.13.3",
 			},
 		},
 		Name:    "kvm-operator",
