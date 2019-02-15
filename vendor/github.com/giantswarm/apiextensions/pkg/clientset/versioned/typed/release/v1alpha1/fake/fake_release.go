@@ -19,7 +19,7 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	v1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -30,13 +30,13 @@ import (
 
 // FakeReleases implements ReleaseInterface
 type FakeReleases struct {
-	Fake *FakeCoreV1alpha1
+	Fake *FakeReleaseV1alpha1
 	ns   string
 }
 
-var releasesResource = schema.GroupVersionResource{Group: "core.giantswarm.io", Version: "v1alpha1", Resource: "releases"}
+var releasesResource = schema.GroupVersionResource{Group: "release.giantswarm.io", Version: "v1alpha1", Resource: "releases"}
 
-var releasesKind = schema.GroupVersionKind{Group: "core.giantswarm.io", Version: "v1alpha1", Kind: "Release"}
+var releasesKind = schema.GroupVersionKind{Group: "release.giantswarm.io", Version: "v1alpha1", Kind: "Release"}
 
 // Get takes name of the release, and returns the corresponding release object, and an error if there is any.
 func (c *FakeReleases) Get(name string, options v1.GetOptions) (result *v1alpha1.Release, err error) {
