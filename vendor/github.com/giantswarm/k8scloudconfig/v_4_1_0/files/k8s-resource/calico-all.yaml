@@ -135,7 +135,7 @@ spec:
         # This container installs the Calico CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: calico/cni:v3.5.1
+          image: {{ .RegistryDomain }}/giantswarm/cni:v3.5.1
           command: ["/install-cni.sh"]
           env:
             # Name of the CNI config file to create.
