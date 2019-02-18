@@ -407,10 +407,6 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	return names
 }
 
-func ReadinessPort(customObject v1alpha1.KVMConfig) int32 {
-	return int32(livenessPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
-}
-
 func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }

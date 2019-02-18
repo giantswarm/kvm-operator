@@ -283,7 +283,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.ReadinessPort(customResource)},
+											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
 											Host: key.ProbeHost,
 										},
 									},
