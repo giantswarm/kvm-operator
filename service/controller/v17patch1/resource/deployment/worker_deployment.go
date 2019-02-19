@@ -335,7 +335,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.InitialDelaySeconds,
+									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
