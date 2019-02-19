@@ -31,7 +31,7 @@ const (
 	// LivenessProbeInitialDelaySeconds is LivenessProbeInitialDelaySeconds param in liveness probe config.
 	LivenessProbeInitialDelaySeconds = 360
 	// ReadinessProbeInitialDelaySeconds is ReadinessProbeInitialDelaySeconds param in readiness probe config.
-	ReadinessProbeInitialDelaySeconds = 60
+	ReadinessProbeInitialDelaySeconds = 100
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config.
 	TimeoutSeconds = 5
 	// PeriodSeconds is PeriodSeconds param in liveness probe config.
