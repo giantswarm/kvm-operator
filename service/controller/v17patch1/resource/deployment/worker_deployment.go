@@ -238,6 +238,20 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 										},
 									},
 								},
+								ReadinessProbe: &apiv1.Probe{
+									InitialDelaySeconds: key.InitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
+											Host: key.ProbeHost,
+										},
+									},
+								},
 								Resources: apiv1.ResourceRequirements{
 									Requests: map[apiv1.ResourceName]resource.Quantity{
 										apiv1.ResourceCPU:    cpuQuantity,
