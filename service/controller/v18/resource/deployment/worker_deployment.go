@@ -229,7 +229,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.InitialDelaySeconds,
+									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
@@ -243,7 +243,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 									},
 								},
 								ReadinessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.InitialDelaySeconds,
+									InitialDelaySeconds: key.ReadinessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
@@ -339,7 +339,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.InitialDelaySeconds,
+									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
