@@ -13,6 +13,19 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
+	endpointIP, serviceName, err := getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	desiredEndpoint := &Endpoint{
+		IPs: []string{
+			endpointIP,
+		},
+		RemoveEndpoint:   false,
+		ServiceName:      serviceName,
+		ServiceNamespace: pod.GetNamespace(),
+	}
+
 	podIsReady := false
 	for _, condition := range pod.Status.Conditions {
 		if condition.Type == corev1.PodReady && condition.Status == corev1.ConditionTrue {
@@ -22,23 +35,11 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	}
 	// If the pod is not ready so we should not add the ip to the endpoint list.
 	if !podIsReady {
-		return nil, nil
+		desiredEndpoint.IPs = []string{}
 	}
 	// If pod has deletionTimestamp consider it dead and remove endpoint ip.
 	if pod.DeletionTimestamp != nil {
-		return nil, nil
-	}
-
-	endpointIP, serviceName, err := getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	desiredEndpoint := &Endpoint{
-		IPs: []string{
-			endpointIP,
-		},
-		ServiceName:      serviceName,
-		ServiceNamespace: pod.GetNamespace(),
+		desiredEndpoint.RemoveEndpoint = true
 	}
 
 	return desiredEndpoint, nil

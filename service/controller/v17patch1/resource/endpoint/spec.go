@@ -10,6 +10,7 @@ type Endpoint struct {
 	Addresses        []corev1.EndpointAddress
 	Ports            []corev1.EndpointPort
 	IPs              []string
+	RemoveEndpoint   bool
 	ServiceName      string
 	ServiceNamespace string
 }

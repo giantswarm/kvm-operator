@@ -58,13 +58,10 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	if desiredEndpoint == nil {
-		return nil, nil
-	}
 
 	var updateChange *corev1.Endpoints
 	{
-		ips := ipsForUpdateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
+		ips := ipsForUpdateChange(currentEndpoint, desiredEndpoint)
 
 		e := &Endpoint{
 			Addresses:        ipsToAddresses(ips),
@@ -80,20 +77,22 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	return updateChange, nil
 }
 
-func ipsForUpdateChange(currentIPs []string, desiredIPs []string) []string {
+func ipsForUpdateChange(currentEndpoint *Endpoint, desiredEndpoint *Endpoint) []string {
 	var ips []string
 
-	for _, ip := range currentIPs {
+	for _, ip := range currentEndpoint.IPs {
 		ips = append(ips, ip)
 	}
 
-	for _, ip := range desiredIPs {
-		if !containsIP(ips, ip) {
+	for _, ip := range desiredEndpoint.IPs {
+		if desiredEndpoint.RemoveEndpoint {
+			ips = removeIP(ips, ip)
+		} else if !containsIP(ips, ip) {
 			ips = append(ips, ip)
 		}
 	}
 
-	if len(currentIPs) > 0 {
+	if len(currentEndpoint.IPs) > 0 {
 		return ips
 	}
 
