@@ -257,7 +257,21 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.InitialDelaySeconds,
+									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
+											Host: key.ProbeHost,
+										},
+									},
+								},
+								ReadinessProbe: &apiv1.Probe{
+									InitialDelaySeconds: key.ReadinessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
@@ -304,6 +318,10 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 								Image:           key.K8SKVMHealthDocker,
 								ImagePullPolicy: apiv1.PullAlways,
 								Env: []apiv1.EnvVar{
+									{
+										Name:  "CHECK_K8S_API",
+										Value: key.CheckK8sApi,
+									},
 									{
 										Name:  "LISTEN_ADDRESS",
 										Value: key.HealthListenAddress(customResource),
@@ -357,7 +375,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig) ([]*extensionsv1.De
 									},
 								},
 								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.InitialDelaySeconds,
+									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,

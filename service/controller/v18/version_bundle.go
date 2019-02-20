@@ -13,6 +13,11 @@ func VersionBundle() versionbundle.Bundle {
 				Kind:        versionbundle.KindAdded,
 			},
 			{
+				Component:   "kvm-operator",
+				Description: "Add readiness probe to kvm pod to improve updates.",
+				Kind:        versionbundle.KindAdded,
+			},
+			{
 				Component:   "cloudconfig",
 				Description: "Switch from cloudinit to ignition.",
 				Kind:        versionbundle.KindChanged,
