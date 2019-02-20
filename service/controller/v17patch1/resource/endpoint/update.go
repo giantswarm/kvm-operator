@@ -58,6 +58,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
+	if desiredEndpoint == nil {
+		return nil, nil
+	}
 
 	var updateChange *corev1.Endpoints
 	{
