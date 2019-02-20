@@ -33,13 +33,16 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 			break
 		}
 	}
-	// If the pod is not ready so we should not add the ip to the endpoint list.
-	if !podIsReady {
-		desiredEndpoint.IPs = []string{}
-	}
+
 	// If pod has deletionTimestamp consider it dead and remove endpoint ip.
 	if pod.DeletionTimestamp != nil {
 		desiredEndpoint.RemoveEndpoint = true
+		r.logger.Log("deletion timestamp")
+	}
+
+	// If the pod is not ready so we should not add the ip to the endpoint list.
+	if !podIsReady && pod.DeletionTimestamp == nil {
+		desiredEndpoint.IPs = []string{}
 	}
 
 	return desiredEndpoint, nil
