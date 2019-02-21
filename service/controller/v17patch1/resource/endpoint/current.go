@@ -2,6 +2,8 @@ package endpoint
 
 import (
 	"context"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/key"
+	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
@@ -80,6 +82,35 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		endpoint.Addresses = ipsToAddresses(endpoint.IPs)
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", "found endpoint")
+	}
+
+	// Remove master endpoint ip only after pod is fully terminated because we still need to drain master before we remove it.
+	if serviceName == key.MasterID && key.IsPodDeleted(pod) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current version of the reconciled pod in the Kubernetes API")
+
+		currentPod, err := r.k8sClient.CoreV1().Pods(pod.GetNamespace()).Get(pod.GetName(), metav1.GetOptions{})
+		if errors.IsNotFound(err) {
+			// In case we reconcile a pod we cannot find anymore this means the
+			// informer's watch event is outdated and the pod got already deleted in
+			// the Kubernetes API. This is a normal transition behaviour, so we just
+			// ignore it and continue with endpoint deletion.
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find current version of the reconciled pod in the Kubernetes API")
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		} else {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found current version of the reconciled pod in the Kubernetes API")
+
+			if !key.ArePodContainersTerminated(currentPod) {
+				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
+				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+				resourcecanceledcontext.SetCanceled(ctx)
+
+				r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
+				finalizerskeptcontext.SetKept(ctx)
+
+				return nil, nil
+			}
+		}
 	}
 
 	return endpoint, nil
