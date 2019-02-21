@@ -98,18 +98,18 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		} else {
 			/*
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found current version of the reconciled pod in the Kubernetes API")
+				r.logger.LogCtx(ctx, "level", "debug", "message", "found current version of the reconciled pod in the Kubernetes API")
 
-			if !key.ArePodContainersTerminated(currentPod) {
-				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
-				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-				resourcecanceledcontext.SetCanceled(ctx)
+				if !key.ArePodContainersTerminated(currentPod) {
+					r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
+					r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+					resourcecanceledcontext.SetCanceled(ctx)
 
-				r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
-				finalizerskeptcontext.SetKept(ctx)
+					r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
+					finalizerskeptcontext.SetKept(ctx)
 
-				return nil, nil
-			}*/
+					return nil, nil
+				}*/
 		}
 	}
 
