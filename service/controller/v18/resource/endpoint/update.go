@@ -85,9 +85,7 @@ func ipsForUpdateChange(currentEndpoint *Endpoint, desiredEndpoint *Endpoint) []
 	}
 
 	for _, ip := range desiredEndpoint.IPs {
-		if desiredEndpoint.RemoveEndpoint {
-			ips = removeIP(ips, ip)
-		} else if !containsIP(ips, ip) {
+		if !containsIP(ips, ip) {
 			ips = append(ips, ip)
 		}
 	}
