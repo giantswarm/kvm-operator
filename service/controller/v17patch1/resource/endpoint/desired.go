@@ -33,7 +33,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
-	// If the pod is not ready so we should not add the ip to the endpoint list.
+	// If the pod is not ready we should not add the ip to the endpoint list.
 	if !podIsReady {
 		desiredEndpoint.IPs = []string{}
 	}
