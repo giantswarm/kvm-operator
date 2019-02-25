@@ -125,8 +125,6 @@ type Source struct {
 	ID    *int64  `json:"id,omitempty"`
 	URL   *string `json:"url,omitempty"`
 	Actor *User   `json:"actor,omitempty"`
-	Type  *string `json:"type,omitempty"`
-	Issue *Issue  `json:"issue,omitempty"`
 }
 
 // ListIssueTimeline lists events for the specified issue.

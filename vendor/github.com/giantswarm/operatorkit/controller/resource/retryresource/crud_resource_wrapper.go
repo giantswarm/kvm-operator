@@ -23,10 +23,10 @@ type crudResourceWrapper struct {
 
 func newCRUDResourceWrapper(config Config) (*crudResourceWrapper, error) {
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 	if config.Resource == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Resource must not be empty", config)
+		return nil, microerror.Maskf(invalidConfigError, "config.Resource must not be empty")
 	}
 
 	if config.BackOff == nil {

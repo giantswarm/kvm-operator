@@ -243,7 +243,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c2b8f9530c424d07020ec9a951a65b38aca208b89ade7dc7f6ccca830105ec75"
+  digest = "1:b27137f793ddc96a22ab6ae32aa4ad43022265db9df5af9018891bd1c33e74e2"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -252,10 +252,10 @@
     "v_3_6_0",
     "v_3_7_1",
     "v_3_7_3",
-    "v_4_0_0",
+    "v_4_1_0",
   ]
   pruneopts = "T"
-  revision = "f66d4b0ddf57eca9b72bc941a72c9336db295bfa"
+  revision = "44a194073a519bf1aca2a447abb9353ddb71aa09"
 
 [[projects]]
   branch = "master"
@@ -1315,7 +1315,7 @@
     "github.com/giantswarm/k8scloudconfig/v_3_6_0",
     "github.com/giantswarm/k8scloudconfig/v_3_7_1",
     "github.com/giantswarm/k8scloudconfig/v_3_7_3",
-    "github.com/giantswarm/k8scloudconfig/v_4_0_0",
+    "github.com/giantswarm/k8scloudconfig/v_4_1_0",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
     "github.com/giantswarm/microendpoint/endpoint/version",
     "github.com/giantswarm/microendpoint/service/version",
