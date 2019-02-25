@@ -8,6 +8,12 @@
   version = "v0.3.1"
 
 [[projects]]
+  name = "github.com/Masterminds/goutils"
+  packages = ["."]
+  revision = "41ac8693c5c10a92ea1ff5ac3a7f95646f6123b0"
+  version = "v1.1.0"
+
+[[projects]]
   name = "github.com/Masterminds/semver"
   packages = ["."]
   revision = "c7af12943936e8c39859482e61f0574c2fd7fc75"
@@ -16,14 +22,8 @@
 [[projects]]
   name = "github.com/Masterminds/sprig"
   packages = ["."]
-  revision = "544a9b1d90f323f6509491b389714fbbd126bee3"
-  version = "v2.17.1"
-
-[[projects]]
-  name = "github.com/aokoli/goutils"
-  packages = ["."]
-  revision = "41ac8693c5c10a92ea1ff5ac3a7f95646f6123b0"
-  version = "v1.1.0"
+  revision = "b1fe2752acccf8c3d7f8a1e7c75c7ae7d83a1975"
+  version = "v2.18.0"
 
 [[projects]]
   name = "github.com/cenkalti/backoff"
@@ -38,7 +38,7 @@
     "digestset",
     "reference"
   ]
-  revision = "b75069ef13a1de846c0cdf964f5917f5b00c1a47"
+  revision = "0d3efadf0154c2b8a4e7b6621fff9809655cc580"
 
 [[projects]]
   branch = "master"
@@ -63,14 +63,16 @@
     "pkg/apis/core/v1alpha1",
     "pkg/apis/example/v1alpha1",
     "pkg/apis/provider/v1alpha1",
+    "pkg/apis/release/v1alpha1",
     "pkg/clientset/versioned",
     "pkg/clientset/versioned/scheme",
     "pkg/clientset/versioned/typed/application/v1alpha1",
     "pkg/clientset/versioned/typed/core/v1alpha1",
     "pkg/clientset/versioned/typed/example/v1alpha1",
-    "pkg/clientset/versioned/typed/provider/v1alpha1"
+    "pkg/clientset/versioned/typed/provider/v1alpha1",
+    "pkg/clientset/versioned/typed/release/v1alpha1"
   ]
-  revision = "0584389c4f82e52ba980c14dc31434d922245a46"
+  revision = "f7142f26f519703d5b2543338a05ed3f606dea5b"
 
 [[projects]]
   branch = "master"
@@ -82,7 +84,7 @@
   branch = "master"
   name = "github.com/giantswarm/certs"
   packages = ["."]
-  revision = "fa33cb56aee232aee5d6bb4d954846c21952d206"
+  revision = "f0fb2f61d78e06f2d1e17f940fd782b92bf29642"
 
 [[projects]]
   branch = "master"
@@ -94,7 +96,7 @@
   branch = "master"
   name = "github.com/giantswarm/helmclient"
   packages = ["."]
-  revision = "21bfc966a189d131b08ba4014ca4ffaadc3e1809"
+  revision = "8b2aa2e7ebec773dcf8e02e9e34c8085ef08697f"
 
 [[projects]]
   branch = "master"
@@ -106,7 +108,7 @@
   branch = "master"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
-  revision = "3bc3cb1a36700aa4bbfcf6c335bc2ab92ad66d8d"
+  revision = "dc32fd459f94c7f9f938366135f6a19b3f9c63a9"
 
 [[projects]]
   branch = "master"
@@ -115,13 +117,19 @@
     ".",
     "loggermeta"
   ]
-  revision = "39ed6a99d31b8962e38dfaff287125fb756e8b2a"
+  revision = "0926d9b7c5419173936b4556411a103bdf8d5966"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/operatorkit"
   packages = ["client/k8srestconfig"]
-  revision = "43dd8d30de6553f21effdd2d11c363613a9997bb"
+  revision = "07c6a937025573b73339f7b33ec5605f7f4a7b3a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/to"
+  packages = ["."]
+  revision = "ad9fc4aaa835db2a17ddb188047aff6a436886d7"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -162,8 +170,8 @@
     "proto",
     "sortkeys"
   ]
-  revision = "4cbf7e384e768b4e01799441fdf2a706a5635ae7"
-  version = "v1.2.0"
+  revision = "ba06b47c162d49f2af050fb4c75bcbc86a159d5c"
+  version = "v1.2.1"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -212,7 +220,7 @@
     ".",
     "diskcache"
   ]
-  revision = "c63ab54fda8f77302f8d414e19933f2b6026a089"
+  revision = "3befbb6ad0cc97d4c25d851e9528915809e1a22f"
 
 [[projects]]
   name = "github.com/huandu/xstrings"
@@ -223,8 +231,8 @@
 [[projects]]
   name = "github.com/imdario/mergo"
   packages = ["."]
-  revision = "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4"
-  version = "v0.3.6"
+  revision = "7c29201646fa3de8506f701213473dd407f19646"
+  version = "v0.3.7"
 
 [[projects]]
   name = "github.com/json-iterator/go"
@@ -280,8 +288,8 @@
     ".",
     "mem"
   ]
-  revision = "a5d6946387efe7d64d09dcba68cdd523dc1273a3"
-  version = "v1.2.0"
+  revision = "f4711e4db9e9a1d3887343acb72b2bbfc2f686f5"
+  version = "v1.2.1"
 
 [[projects]]
   branch = "master"
@@ -291,7 +299,7 @@
     "scrypt",
     "ssh/terminal"
   ]
-  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
+  revision = "a4c6cb3142f211c99e4bf4cd769535b29a9b616f"
 
 [[projects]]
   branch = "master"
@@ -306,7 +314,7 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "915654e7eabcea33ae277abbecf52f0d8b7a9fdc"
+  revision = "3a22650c66bd7f4fb6d1e8072ffd7b75c8a27898"
 
 [[projects]]
   branch = "master"
@@ -315,7 +323,13 @@
     ".",
     "internal"
   ]
-  revision = "5dab4167f31cbd76b407f1486c86b40748bc5073"
+  revision = "4b83411ed2b36bd4e3302e9b1d3c973fb1ba24db"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sync"
+  packages = ["errgroup"]
+  revision = "37e7f081c4d4c64e13b10787722085407fe5d15f"
 
 [[projects]]
   branch = "master"
@@ -324,7 +338,7 @@
     "unix",
     "windows"
   ]
-  revision = "11f53e03133963fb11ae0588e08b5e0b85be8be5"
+  revision = "90b0e4468f9980bf79a2290394adaf7f045c5d24"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -371,7 +385,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
+  revision = "082222b4a5c572e33e82ee9162d1352c7cf38682"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -473,7 +487,6 @@
   version = "kubernetes-1.13.2"
 
 [[projects]]
-  branch = "release-1.13"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/errors",
@@ -518,6 +531,7 @@
     "third_party/forked/golang/reflect"
   ]
   revision = "2b1284ed4c93a43499e781493253e2ac5959c4fd"
+  version = "kubernetes-1.13.0"
 
 [[projects]]
   name = "k8s.io/apiserver"
@@ -614,8 +628,8 @@
 [[projects]]
   name = "k8s.io/klog"
   packages = ["."]
-  revision = "a5bc97fbc634d635061f3146511332c7e313a55a"
-  version = "v0.1.0"
+  revision = "71442cd4037d612096940ceb0f3fec3f7fff66e0"
+  version = "v0.2.0"
 
 [[projects]]
   name = "sigs.k8s.io/yaml"
