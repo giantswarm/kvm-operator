@@ -80,10 +80,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	{
-		cr.Status.KVM.NodeIndexes = nodeIndexes
-	}
-
 	return nil
 }
 

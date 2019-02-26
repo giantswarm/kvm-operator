@@ -14,13 +14,13 @@ import (
 func Test_EnsureCreated(t *testing.T) {
 	testCases := []struct {
 		name              string
-		inputKVMConfig         *v1alpha1.KVMConfig
+		inputKVMConfig    *v1alpha1.KVMConfig
 		expectedKVMConfig *v1alpha1.KVMConfig
 		errorMatcher      func(error) bool
 	}{
 		{
 			name: "case 0: no status, add indexes for nodes",
-			kvmConfig: &v1alpha1.KVMConfig{
+			inputKVMConfig: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
@@ -78,7 +78,7 @@ func Test_EnsureCreated(t *testing.T) {
 		},
 		{
 			name: "case 1: existing nodeindexes, add new node node",
-			kvmConfig: &v1alpha1.KVMConfig{
+			inputKVMConfig: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
@@ -153,7 +153,7 @@ func Test_EnsureCreated(t *testing.T) {
 		},
 		{
 			name: "case 2: existing nodeindexes with a whole, add two new node nodes",
-			kvmConfig: &v1alpha1.KVMConfig{
+			inputKVMConfig: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
@@ -235,7 +235,7 @@ func Test_EnsureCreated(t *testing.T) {
 		},
 		{
 			name: "case 3: existing nodeindexes, remove two nodes",
-			kvmConfig: &v1alpha1.KVMConfig{
+			inputKVMConfig: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
@@ -310,7 +310,7 @@ func Test_EnsureCreated(t *testing.T) {
 			var r *Resource
 			{
 				c := Config{
-					G8sClient: fake.NewSimpleClientset(tc.kvmConfig),
+					G8sClient: fake.NewSimpleClientset(tc.inputKVMConfig),
 					Logger:    microloggertest.New(),
 				}
 
@@ -321,7 +321,7 @@ func Test_EnsureCreated(t *testing.T) {
 				}
 			}
 
-			err := r.EnsureCreated(context.Background(), tc.kvmConfig)
+			err := r.EnsureCreated(context.Background(), tc.inputKVMConfig)
 
 			switch {
 			case err == nil && tc.errorMatcher == nil:
@@ -334,7 +334,7 @@ func Test_EnsureCreated(t *testing.T) {
 				t.Fatalf("error == %#v, want matching", err)
 			}
 
-			kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(tc.kvmConfig.GetNamespace()).Get(tc.kvmConfig.GetName(), metav1.GetOptions{})
+			kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(tc.inputKVMConfig.GetNamespace()).Get(tc.inputKVMConfig.GetName(), metav1.GetOptions{})
 			if err != nil {
 				t.Fatal(err)
 			}

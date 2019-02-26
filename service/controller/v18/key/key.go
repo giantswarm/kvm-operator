@@ -116,21 +116,21 @@ const (
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
 	var results []v1alpha1.ClusterNode
 
-	for _, v := range customObject.Spec.Cluster.Masters {
+	for _, v := range cr.Spec.Cluster.Masters {
 		results = append(results, v)
 	}
 
-	for _, v := range customObject.Spec.Cluster.Workers {
+	for _, v := range cr.Spec.Cluster.Workers {
 		results = append(results, v)
 	}
 
 	return results
 }
 
-func AllocatedNodeIndexes(customObject v1alpha1.KVMConfig) []int {
+func AllocatedNodeIndexes(cr v1alpha1.KVMConfig) []int {
 	var results []int
 
-	for _, v := range customObject.Status.KVM.NodeIndexes {
+	for _, v := range cr.Status.KVM.NodeIndexes {
 		results = append(results, v)
 	}
 
@@ -192,8 +192,8 @@ func ClusterRoleBindingPSPName(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject) + "-psp"
 }
 
-func ConfigMapName(customObject v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
-	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
+func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
+	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
 }
 
 func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
@@ -393,8 +393,8 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
-func NodeIndex(customObject v1alpha1.KVMConfig, nodeID string) (int, bool) {
-	idx, present := customObject.Status.KVM.NodeIndexes[nodeID]
+func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
+	idx, present := cr.Status.KVM.NodeIndexes[nodeID]
 	return idx, present
 }
 
