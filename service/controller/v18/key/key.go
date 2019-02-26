@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -109,6 +110,32 @@ const (
 const (
 	PodDeletionGracePeriod = 5 * time.Minute
 )
+
+func AllNodes(customObject v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
+	var results []v1alpha1.ClusterNode
+
+	for _, v := range customObject.Spec.Cluster.Masters {
+		results = append(results, v)
+	}
+
+	for _, v := range customObject.Spec.Cluster.Workers {
+		results = append(results, v)
+	}
+
+	return results
+}
+
+func AllocatedNodeIndexes(customObject v1alpha1.KVMConfig) []int {
+	var results []int
+
+	for _, v := range customObject.Status.KVM.NodeIndexes {
+		results = append(results, v)
+	}
+
+	sort.Ints(results)
+
+	return results
+}
 
 func BaseDomain(customObject v1alpha1.KVMConfig) string {
 	return strings.TrimPrefix(customObject.Spec.Cluster.Kubernetes.API.Domain, "api.")
@@ -362,6 +389,11 @@ func NetworkNTPBlock(servers []net.IP) string {
 	ntpBlock := strings.Join(ntpBlockParts, "\n")
 
 	return ntpBlock
+}
+
+func NodeIndex(customObject v1alpha1.KVMConfig, nodeID string) (int, bool) {
+	idx, present := customObject.Status.KVM.NodeIndexes[nodeID]
+	return idx, present
 }
 
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
