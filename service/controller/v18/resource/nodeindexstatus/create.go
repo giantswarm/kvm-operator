@@ -92,7 +92,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 //
 // Examples:
 //	In: []
-//	Out: [1], 4
+//	Out: [1], 1
 //
 //	In: [1,2,3]
 //  Out: [1,2,3,4], 4
