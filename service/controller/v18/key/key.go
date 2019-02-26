@@ -113,7 +113,7 @@ const (
 	PodDeletionGracePeriod = 5 * time.Minute
 )
 
-func AllNodes(customObject v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
+func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
 	var results []v1alpha1.ClusterNode
 
 	for _, v := range customObject.Spec.Cluster.Masters {
