@@ -25,18 +25,18 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dcli",
+								ID: "c",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 						},
 					},
@@ -47,18 +47,18 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dcli",
+								ID: "c",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 						},
 					},
@@ -66,10 +66,10 @@ func Test_EnsureCreated(t *testing.T) {
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
-							"1dkfa": 1,
-							"1ddqd": 2,
-							"1dcli": 3,
-							"1dlev": 4,
+							"a": 1,
+							"b": 2,
+							"c": 3,
+							"d": 4,
 						},
 					},
 				},
@@ -83,21 +83,21 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dcli",
+								ID: "c",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 							{
-								ID: "1dmus",
+								ID: "e",
 							},
 						},
 					},
@@ -105,10 +105,10 @@ func Test_EnsureCreated(t *testing.T) {
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
-							"1dkfa": 1,
-							"1ddqd": 2,
-							"1dcli": 3,
-							"1dlev": 4,
+							"a": 1,
+							"b": 2,
+							"c": 3,
+							"d": 4,
 						},
 					},
 				},
@@ -118,21 +118,21 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dcli",
+								ID: "c",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 							{
-								ID: "1dmus",
+								ID: "e",
 							},
 						},
 					},
@@ -140,11 +140,11 @@ func Test_EnsureCreated(t *testing.T) {
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
-							"1dkfa": 1,
-							"1ddqd": 2,
-							"1dcli": 3,
-							"1dlev": 4,
-							"1dmus": 5,
+							"a": 1,
+							"b": 2,
+							"c": 3,
+							"d": 4,
+							"e": 5,
 						},
 					},
 				},
@@ -158,24 +158,24 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dcli",
+								ID: "c",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 							{
-								ID: "1dmus",
+								ID: "e",
 							},
 							{
-								ID: "1dmyp",
+								ID: "f",
 							},
 						},
 					},
@@ -183,10 +183,10 @@ func Test_EnsureCreated(t *testing.T) {
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
-							"1dkfa": 1,
-							"1ddqd": 2,
-							"1dcli": 4,
-							"1dlev": 5,
+							"a": 1,
+							"b": 2,
+							"c": 4,
+							"d": 5,
 						},
 					},
 				},
@@ -196,24 +196,24 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dcli",
+								ID: "c",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 							{
-								ID: "1dmus",
+								ID: "e",
 							},
 							{
-								ID: "1dmyp",
+								ID: "f",
 							},
 						},
 					},
@@ -221,12 +221,12 @@ func Test_EnsureCreated(t *testing.T) {
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
-							"1dkfa": 1,
-							"1ddqd": 2,
-							"1dmus": 3,
-							"1dcli": 4,
-							"1dlev": 5,
-							"1dmyp": 6,
+							"a": 1,
+							"b": 2,
+							"e": 3,
+							"c": 4,
+							"d": 5,
+							"f": 6,
 						},
 					},
 				},
@@ -240,18 +240,18 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 							{
-								ID: "1dmus",
+								ID: "e",
 							},
 						},
 					},
@@ -259,12 +259,12 @@ func Test_EnsureCreated(t *testing.T) {
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
-							"1dkfa": 1,
-							"1ddqd": 2,
-							"1dmus": 3,
-							"1dcli": 4,
-							"1dlev": 5,
-							"1dmyp": 6,
+							"a": 1,
+							"b": 2,
+							"e": 3,
+							"c": 4,
+							"d": 5,
+							"f": 6,
 						},
 					},
 				},
@@ -274,18 +274,18 @@ func Test_EnsureCreated(t *testing.T) {
 					Cluster: v1alpha1.Cluster{
 						Masters: []v1alpha1.ClusterNode{
 							{
-								ID: "1dkfa",
+								ID: "a",
 							},
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{
-								ID: "1ddqd",
+								ID: "b",
 							},
 							{
-								ID: "1dlev",
+								ID: "d",
 							},
 							{
-								ID: "1dmus",
+								ID: "e",
 							},
 						},
 					},
@@ -293,10 +293,10 @@ func Test_EnsureCreated(t *testing.T) {
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
-							"1dkfa": 1,
-							"1ddqd": 2,
-							"1dmus": 3,
-							"1dlev": 5,
+							"a": 1,
+							"b": 2,
+							"e": 3,
+							"d": 5,
 						},
 					},
 				},
