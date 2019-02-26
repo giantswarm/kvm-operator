@@ -48,8 +48,8 @@ required = [
   branch = "master"
   name = "github.com/giantswarm/crdstorage"
 
-[[override]]
-  branch = "cleanup"
+[[constraint]]
+  branch = "master"
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
