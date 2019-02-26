@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
+	corev1 "k8s.io/api/core/v1"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -22,6 +23,19 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		},
 		ServiceName:      serviceName,
 		ServiceNamespace: pod.GetNamespace(),
+	}
+
+	podIsReady := false
+	for _, condition := range pod.Status.Conditions {
+		if condition.Type == corev1.PodReady && condition.Status == corev1.ConditionTrue {
+			podIsReady = true
+			break
+		}
+	}
+
+	// If the pod is not ready so we should not add the ip to the endpoint list.
+	if !podIsReady {
+		desiredEndpoint.IPs = []string{}
 	}
 
 	return desiredEndpoint, nil
