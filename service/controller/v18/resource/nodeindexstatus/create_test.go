@@ -14,7 +14,7 @@ import (
 func Test_EnsureCreated(t *testing.T) {
 	testCases := []struct {
 		name              string
-		kvmConfig         *v1alpha1.KVMConfig
+		inputKVMConfig         *v1alpha1.KVMConfig
 		expectedKVMConfig *v1alpha1.KVMConfig
 		errorMatcher      func(error) bool
 	}{
