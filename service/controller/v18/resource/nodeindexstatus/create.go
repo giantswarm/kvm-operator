@@ -23,7 +23,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		var idx int
 		allocations := key.AllocatedNodeIndexes(cr)
 		nodes := key.AllNodes(cr)
-		nodeIndexes = cr.Status.KVM.NodeIndexes
+		nodeIndexes = copyMap(cr.Status.KVM.NodeIndexes)
 		if nodeIndexes == nil {
 			nodeIndexes = make(map[string]int)
 		}
@@ -57,12 +57,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "updating status with node indexes")
 
-		newObj, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
-		if err != nil {
-			return microerror.Mask(err)
-		}
+		if !reflect.DeepEqual(cr.Status.KVM.NodeIndexes, nodeIndexes) {
+			newObj, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
 
-		if !reflect.DeepEqual(newObj.Status.KVM.NodeIndexes, nodeIndexes) {
 			newObj.Status.KVM.NodeIndexes = nodeIndexes
 			_, err = r.g8sClient.ProviderV1alpha1().KVMConfigs(newObj.GetNamespace()).UpdateStatus(newObj)
 			if err != nil {
@@ -123,4 +123,12 @@ func allocateIndex(indexes []int) ([]int, int) {
 	idx := len(indexes) + 1
 
 	return append(indexes, idx), idx
+}
+
+func copyMap(v map[string]int) map[string]int {
+	m := make(map[string]int)
+	for k, v := range v {
+		m[k] = v
+	}
+	return m
 }
