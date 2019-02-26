@@ -113,7 +113,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d2ec14d311dbbb8dd49043ab8d55f7c0e62d300a1c01fa2f5f47a1e7d851dbcd"
+  digest = "1:c9a9dfa36cccd6c916d5c00b5d30223eed474522383a61f5d95465fd379f2987"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
@@ -136,7 +136,7 @@
     "pkg/clientset/versioned/typed/release/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "f7142f26f519703d5b2543338a05ed3f606dea5b"
+  revision = "4e9d6bf841efa1805106573fc68b6f833adfbaab"
 
 [[projects]]
   branch = "master"
@@ -252,7 +252,7 @@
     "v_3_6_0",
     "v_3_7_1",
     "v_3_7_3",
-    "v_4_0_0",
+    "v_4_1_0",
   ]
   pruneopts = "T"
   revision = "f66d4b0ddf57eca9b72bc941a72c9336db295bfa"
@@ -1328,7 +1328,7 @@
     "github.com/giantswarm/k8scloudconfig/v_3_6_0",
     "github.com/giantswarm/k8scloudconfig/v_3_7_1",
     "github.com/giantswarm/k8scloudconfig/v_3_7_3",
-    "github.com/giantswarm/k8scloudconfig/v_4_0_0",
+    "github.com/giantswarm/k8scloudconfig/v_4_1_0",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
     "github.com/giantswarm/microendpoint/endpoint/version",
     "github.com/giantswarm/microendpoint/service/version",

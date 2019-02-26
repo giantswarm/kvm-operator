@@ -5,20 +5,18 @@ import (
 	"encoding/base64"
 	"strings"
 	"text/template"
-
-	"github.com/giantswarm/microerror"
 )
 
 func RenderAssetContent(assetContent string, params interface{}) ([]string, error) {
 	tmpl, err := template.New("").Parse(assetContent)
 	if err != nil {
-		return nil, microerror.Mask(err)
+		return nil, err
 	}
 
 	buf := new(bytes.Buffer)
 
 	if err := tmpl.Execute(buf, params); err != nil {
-		return nil, microerror.Mask(err)
+		return nil, err
 	}
 
 	content := strings.Split(buf.String(), "\n")
@@ -29,13 +27,13 @@ func RenderAssetContent(assetContent string, params interface{}) ([]string, erro
 func RenderFileAssetContent(assetContent string, params interface{}) (string, error) {
 	tmpl, err := template.New("").Parse(assetContent)
 	if err != nil {
-		return "", microerror.Mask(err)
+		return "", err
 	}
 
 	buf := new(bytes.Buffer)
 
 	if err := tmpl.Execute(buf, params); err != nil {
-		return "", microerror.Mask(err)
+		return "", err
 	}
 
 	content := base64.StdEncoding.EncodeToString(buf.Bytes())

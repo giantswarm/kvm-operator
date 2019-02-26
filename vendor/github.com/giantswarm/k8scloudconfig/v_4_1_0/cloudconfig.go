@@ -12,8 +12,8 @@ import (
 
 const (
 	defaultRegistryDomain = "quay.io"
-	kubernetesImage       = "giantswarm/hyperkube:v1.13.3"
-	etcdImage             = "giantswarm/etcd:v3.3.12"
+	kubernetesImage       = "giantswarm/hyperkube:v1.12.3"
+	etcdImage             = "giantswarm/etcd:v3.3.9"
 	etcdPort              = 443
 )
 
@@ -66,18 +66,18 @@ func NewCloudConfig(config CloudConfigConfig) (*CloudConfig, error) {
 func (c *CloudConfig) ExecuteTemplate() error {
 	tmpl, err := template.New("cloudconfig").Parse(c.template)
 	if err != nil {
-		return microerror.Mask(err)
+		return err
 	}
 
 	buf := new(bytes.Buffer)
 	err = tmpl.Execute(buf, c.params)
 	if err != nil {
-		return microerror.Mask(err)
+		return err
 	}
 
 	ignitionJSON, err := ignition.ConvertTemplatetoJSON(buf.Bytes())
 	if err != nil {
-		return microerror.Mask(err)
+		return err
 	}
 
 	c.config = string(ignitionJSON)

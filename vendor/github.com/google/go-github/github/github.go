@@ -128,9 +128,6 @@ const (
 
 	// https://developer.github.com/changes/2018-12-18-interactions-preview/
 	mediaTypeInteractionRestrictionsPreview = "application/vnd.github.sombra-preview+json"
-
-	// https://developer.github.com/changes/2019-02-14-draft-pull-requests/
-	mediaTypeDraftPreview = "application/vnd.github.shadow-cat-preview+json"
 )
 
 // A Client manages communication with the GitHub API.
@@ -194,9 +191,7 @@ type ListOptions struct {
 
 // UploadOptions specifies the parameters to methods that support uploads.
 type UploadOptions struct {
-	Name      string `url:"name,omitempty"`
-	Label     string `url:"label,omitempty"`
-	MediaType string `url:"-"`
+	Name string `url:"name,omitempty"`
 }
 
 // RawType represents type of raw format of a request instead of JSON.

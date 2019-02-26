@@ -28,10 +28,10 @@ type crudResourceWrapperOps struct {
 
 func newCRUDResourceWrapperOps(config crudResourceOpsWrapperConfig) (*crudResourceWrapperOps, error) {
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 	if config.Ops == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Ops must not be empty", config)
+		return nil, microerror.Maskf(invalidConfigError, "config.Ops must not be empty")
 	}
 
 	if config.BackOff == nil {
