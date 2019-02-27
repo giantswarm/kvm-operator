@@ -11,9 +11,10 @@ import (
 )
 
 const (
+	calicoVersion         = "v3.5.2"
 	defaultRegistryDomain = "quay.io"
-	kubernetesImage       = "giantswarm/hyperkube:v1.12.3"
-	etcdImage             = "giantswarm/etcd:v3.3.9"
+	kubernetesImage       = "giantswarm/hyperkube:v1.13.3"
+	etcdImage             = "giantswarm/etcd:v3.3.12"
 	etcdPort              = 443
 )
 
@@ -34,6 +35,7 @@ func DefaultParams() Params {
 		EtcdPort:       etcdPort,
 		RegistryDomain: defaultRegistryDomain,
 		Images: Images{
+			Calico:     calicoVersion,
 			Kubernetes: kubernetesImage,
 			Etcd:       etcdImage,
 		},

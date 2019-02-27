@@ -50,6 +50,7 @@ func (p *Params) Validate() error {
 }
 
 type Images struct {
+	Calico     string
 	Kubernetes string
 	Etcd       string
 }
