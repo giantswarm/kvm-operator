@@ -21,7 +21,6 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	var ingresses []*v1beta1.Ingress
 
 	ingresses = append(ingresses, newAPIIngress(customObject))
-	ingresses = append(ingresses, newEtcdIngress(customObject))
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed the %d new ingresses", len(ingresses)))
 

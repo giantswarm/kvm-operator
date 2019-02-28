@@ -16,7 +16,6 @@ const (
 	defaultRegistryDomain = "quay.io"
 	kubernetesImage       = "giantswarm/hyperkube:v1.13.3"
 	etcdImage             = "giantswarm/etcd:v3.3.12"
-	etcdPort              = 443
 )
 
 type CloudConfigConfig struct {
@@ -38,7 +37,6 @@ func DefaultParams() Params {
 			TyphaReplicas: calicoTyphaReplicas,
 			Version:       calicoVersion,
 		},
-		EtcdPort:       etcdPort,
 		RegistryDomain: defaultRegistryDomain,
 		Images: Images{
 			Kubernetes: kubernetesImage,

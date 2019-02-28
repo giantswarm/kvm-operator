@@ -25,10 +25,6 @@ type Params struct {
 	// to hyperkube image commands. This allows to e.g. add cloud provider
 	// extensions.
 	Hyperkube Hyperkube
-	// EtcdPort allows the Etcd port to be specified.
-	// aws-operator sets this to the Etcd listening port so Calico on the
-	// worker nodes can access via a CNAME record to the master.
-	EtcdPort  int
 	Extension Extension
 	// ExtraManifests allows to specify extra Kubernetes manifests in
 	// /opt/k8s-addons script. The manifests are applied after calico is

@@ -37,16 +37,6 @@ do
     fi
 done
 
-# wait for etcd dns (return code 35 is bad certificate which is good enough here)
-while
-    curl "https://{{ .Cluster.Etcd.Domain }}:{{ .EtcdPort }}" -k 2>/dev/null >/dev/null
-    RET_CODE=$?
-    [ "$RET_CODE" -ne "35" ]
-do
-    echo "Waiting for etcd to be ready . . "
-    sleep 3s
-done
-
 # create kube-proxy configmap
 while
     /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv $KUBECTL create configmap kube-proxy --from-file=kube-proxy.yaml=/srv/kube-proxy-config.yaml -o yaml --dry-run \
@@ -83,7 +73,7 @@ while
     /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/$CALICO_FILE
     [ "$?" -ne "0" ]
 do
-    echo "failed to apply /srv/$manifest, retrying in 5 sec"
+    echo "failed to apply /srv/$CALICO_FILE, retrying in 5 sec"
     sleep 5s
 done
 
