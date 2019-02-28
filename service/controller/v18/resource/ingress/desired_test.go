@@ -12,8 +12,8 @@ import (
 
 func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 	testCases := []struct {
-		Obj               interface{}
-		ExpectedAPICount  int
+		Obj              interface{}
+		ExpectedAPICount int
 	}{
 		// Test 1 ensures there is one ingress for master and worker each when there
 		// is one master and one worker node in the custom object.
@@ -31,7 +31,7 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedAPICount:  1,
+			ExpectedAPICount: 1,
 		},
 
 		// Test 2 ensures there is one ingress for master and worker each when there
@@ -52,7 +52,7 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedAPICount:  1,
+			ExpectedAPICount: 1,
 		},
 
 		// Test 3 ensures there is one ingress for master and worker each when there
@@ -75,7 +75,7 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 					},
 				},
 			},
-			ExpectedAPICount:  1,
+			ExpectedAPICount: 1,
 		},
 	}
 
