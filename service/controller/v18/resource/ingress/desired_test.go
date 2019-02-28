@@ -14,7 +14,6 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 	testCases := []struct {
 		Obj               interface{}
 		ExpectedAPICount  int
-		ExpectedEtcdCount int
 	}{
 		// Test 1 ensures there is one ingress for master and worker each when there
 		// is one master and one worker node in the custom object.
@@ -33,7 +32,6 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 				},
 			},
 			ExpectedAPICount:  1,
-			ExpectedEtcdCount: 1,
 		},
 
 		// Test 2 ensures there is one ingress for master and worker each when there
@@ -55,7 +53,6 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 				},
 			},
 			ExpectedAPICount:  1,
-			ExpectedEtcdCount: 1,
 		},
 
 		// Test 3 ensures there is one ingress for master and worker each when there
@@ -79,7 +76,6 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 				},
 			},
 			ExpectedAPICount:  1,
-			ExpectedEtcdCount: 1,
 		},
 	}
 
@@ -110,12 +106,8 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %d master nodes got %d", i+1, tc.ExpectedAPICount, testGetAPICount(ingresses))
 		}
 
-		if testGetEtcdCount(ingresses) != tc.ExpectedEtcdCount {
-			t.Fatalf("case %d expected %d worker nodes got %d", i+1, tc.ExpectedEtcdCount, testGetEtcdCount(ingresses))
-		}
-
-		if len(ingresses) != tc.ExpectedAPICount+tc.ExpectedEtcdCount {
-			t.Fatalf("case %d expected %d nodes got %d", i+1, tc.ExpectedAPICount+tc.ExpectedEtcdCount, len(ingresses))
+		if len(ingresses) != tc.ExpectedAPICount {
+			t.Fatalf("case %d expected %d nodes got %d", i+1, tc.ExpectedAPICount, len(ingresses))
 		}
 	}
 }
