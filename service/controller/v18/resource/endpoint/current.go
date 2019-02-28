@@ -110,6 +110,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 				finalizerskeptcontext.SetKept(ctx)
 
 				return nil, nil
+			} else {
+				r.logger.LogCtx(ctx, "level", "debug", "message", "deleting master endpoint", "endpoint", endpoint)
 			}
 		}
 	}
