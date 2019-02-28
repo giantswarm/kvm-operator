@@ -12,7 +12,7 @@ import (
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, randomKeys randomkeys.Cluster) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, randomKeys randomkeys.Cluster, nodeCount int) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
@@ -34,6 +34,10 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
 		params.SSOPublicKey = c.ssoPublicKey
 
+		// in case of very small cluster we set calico-typha replicas to 1 (default is 3)
+		if nodeCount < 3 {
+			params.Calico.TyphaReplicas = 1
+		}
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
 		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
 		if err != nil {

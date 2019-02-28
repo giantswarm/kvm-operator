@@ -1,11 +1,14 @@
-# CALICO HAS SEPARATE MANIFEST FOR AZURE
-# the azure manifest can be found in: https://github.com/giantswarm/azure-operator/blob/master/service/controller/vX/cloudconfig/template.go
-# where X is the version of azure operator
-#
 # Extra changes:
 #  - Added resource limits to calico-node and calico-kube-controller.
 #  - Added resource limits to install-cni.
 #  - Added 'priorityClassName: system-cluster-critical' to calico daemonset.
+#  - Added 'update' and 'patch' verbs for nodes to calico-node clusterRole
+#  - apiGroups: [""]
+#      resources:
+#        - nodes
+#     verbs:
+#        - update
+#        - patch
 #
 # Calico Version {{ .Calico.Version }}
 # https://docs.projectcalico.org/v3.5/releases#{{ .Calico.Version }}
@@ -64,7 +67,7 @@ data:
 ---
 # This manifest creates a Service, which will be backed by Calico's Typha daemon.
 # Typha sits in between Felix and the API server, reducing Calico's load on the API server.
-
+install-cni
 apiVersion: v1
 kind: Service
 metadata:
@@ -249,12 +252,7 @@ spec:
             # Use Kubernetes API as the backing datastore.
             - name: DATASTORE_TYPE
               value: "kubernetes"
-            # Typha support: controlled by the ConfigMap.
-            - name: FELIX_TYPHAK8SSERVICENAME
-              valueFrom:
-                configMapKeyRef:
-                  name: calico-config
-                  key: typha_service_name
+
             # Wait for the datastore.
             - name: WAIT_FOR_DATASTORE
               value: "true"
@@ -305,8 +303,17 @@ spec:
               value: "false"
             # Set Felix logging to "info"
             - name: FELIX_LOGSEVERITYSCREEN
-              value: "warn"
+              value: "WARNING"
             - name: FELIX_HEALTHENABLED
+              value: "true"
+            # Typha support: controlled by the ConfigMap.
+            - name: FELIX_TYPHAK8SSERVICENAME
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: typha_service_name
+            # Enable IP-in-IP within Felix.
+            - name: FELIX_IPINIPENABLED
               value: "true"
           securityContext:
             privileged: true
@@ -323,13 +330,15 @@ spec:
               port: 9099
               host: localhost
             periodSeconds: 10
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             failureThreshold: 6
           readinessProbe:
             httpGet:
               path: /readiness
               port: 9099
+              host: localhost
             periodSeconds: 10
+            initialDelaySeconds: 20
           volumeMounts:
             - mountPath: /lib/modules
               name: lib-modules
@@ -368,7 +377,7 @@ spec:
                   key: veth_mtu
             # Prevents the container from sleeping forever.
             - name: SLEEP
-              value: "false"
+              value: "true"
           # install-cni also monitors etcd certificates,
           # so use reasonable resource limits.
           resources:
@@ -560,57 +569,61 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: calico-node
 rules:
-  - apiGroups: [""]
-    resources:
-      - namespaces
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups: [""]
-    resources:
-      - pods/status
-    verbs:
-      - update
+  # The CNI plugin needs to get pods, nodes, and namespaces.
   - apiGroups: [""]
     resources:
       - pods
+      - namespaces
     verbs:
       - get
-      - list
-      - watch
-      - patch
+  # added by giantswarm
   - apiGroups: [""]
-    resources:
-      - services
-    verbs:
-      - get
+      resources:
+        - nodes
+      verbs:
+        - update
+        - patch
   - apiGroups: [""]
     resources:
       - endpoints
+      - services
     verbs:
+      # Used to discover service IPs for advertisement.
+      - watch
+      - list
+      # Used to discover Typhas.
       - get
   - apiGroups: [""]
     resources:
-      - nodes
+      - nodes/status
     verbs:
-      - get
-      - list
+      # Needed for clearing NodeNetworkUnavailable flag.
+      - patch
+      # Calico stores some configuration information in node annotations.
       - update
-      - watch
-  - apiGroups: ["extensions"]
-    resources:
-      - networkpolicies
-    verbs:
-      - get
-      - list
-      - watch
+  # Watch for changes to Kubernetes NetworkPolicies.
   - apiGroups: ["networking.k8s.io"]
     resources:
       - networkpolicies
     verbs:
       - watch
       - list
+  # Used by Calico for policy information.
+  - apiGroups: [""]
+    resources:
+      - pods
+      - namespaces
+      - serviceaccounts
+    verbs:
+      - list
+      - watch
+  # The CNI plugin patches pods/status.
+  - apiGroups: [""]
+    resources:
+      - pods/status
+    verbs:
+      - patch
+  # Calico monitors various CRDs for config.
   - apiGroups: ["crd.projectcalico.org"]
     resources:
       - globalfelixconfigs
@@ -625,11 +638,35 @@ rules:
       - clusterinformations
       - hostendpoints
     verbs:
-      - create
       - get
       - list
-      - update
       - watch
+  # Calico must create and update some CRDs on startup.
+  - apiGroups: ["crd.projectcalico.org"]
+    resources:
+      - ippools
+      - felixconfigurations
+      - clusterinformations
+    verbs:
+      - create
+      - update
+  # Calico stores some configuration information on the node.
+  - apiGroups: [""]
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  # These permissions are only requried for upgrade from v2.6, and can
+  # be removed after upgrade or on fresh installations.
+  - apiGroups: ["crd.projectcalico.org"]
+    resources:
+      - bgpconfigurations
+      - bgppeers
+    verbs:
+      - create
+      - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding

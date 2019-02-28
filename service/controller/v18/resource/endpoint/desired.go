@@ -2,8 +2,6 @@ package endpoint
 
 import (
 	"context"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
-
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -35,7 +33,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	}
 
 	// If the pod is not ready so we should not add the ip to the endpoint list.
-	if !podIsReady && serviceName == key.WorkerID {
+	if !podIsReady {
 		desiredEndpoint.IPs = []string{}
 	}
 

@@ -43,8 +43,10 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 		return nil, microerror.Mask(err)
 	}
 
+	workerCount := len(customResource.Spec.Cluster.Workers)
+
 	for _, node := range customResource.Spec.Cluster.Masters {
-		template, err := r.cloudConfig.NewMasterTemplate(customResource, certs, node, keys)
+		template, err := r.cloudConfig.NewMasterTemplate(customResource, certs, node, keys, workerCount)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
