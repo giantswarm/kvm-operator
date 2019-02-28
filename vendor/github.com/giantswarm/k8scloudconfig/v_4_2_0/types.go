@@ -9,6 +9,7 @@ type Params struct {
 	// etcd data.
 	APIServerEncryptionKey string
 	BaseDomain             string
+	Calico                 Calico
 	Cluster                v1alpha1.Cluster
 	// DisableCalico flag. When set removes all calico related Kubernetes
 	// manifests from the cloud config together with their initialization.
@@ -50,9 +51,14 @@ func (p *Params) Validate() error {
 }
 
 type Images struct {
-	Calico     string
 	Kubernetes string
 	Etcd       string
+}
+
+type Calico struct {
+	TyphaEnabled  bool
+	TyphaReplicas int
+	Version       string
 }
 
 type Hyperkube struct {

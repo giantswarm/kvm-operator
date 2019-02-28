@@ -20,6 +20,10 @@ spec:
     - --logtostderr=true
     - --v=2
     - --cloud-provider={{.Cluster.Kubernetes.CloudProvider}}
+    {{- if .Calico.TyphaEnabled }}
+    - --cluster-cidr={{.Cluster.Calico.Subnet}}/{{.Cluster.Calico.CIDR}}
+    - --allocate-node-cidrs=true
+    {{- end }}
     - --terminated-pod-gc-threshold=10
     - --use-service-account-credentials=true
     - --kubeconfig=/etc/kubernetes/kubeconfig/controller-manager.yaml
