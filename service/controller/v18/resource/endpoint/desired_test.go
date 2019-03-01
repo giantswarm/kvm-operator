@@ -29,6 +29,14 @@ func Test_Resource_Endpoint_GetDesiredState(t *testing.T) {
 						"endpoint.kvm.giantswarm.io/service": "TestService",
 					},
 				},
+				Status: corev1.PodStatus{
+					Conditions: []corev1.PodCondition{
+						{
+							Type:   corev1.PodReady,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
 			},
 			ExpectedEndpoint: &Endpoint{
 				IPs: []string{
@@ -48,6 +56,14 @@ func Test_Resource_Endpoint_GetDesiredState(t *testing.T) {
 						"endpoint.kvm.giantswarm.io/ip": "1.1.1.1",
 					},
 				},
+				Status: corev1.PodStatus{
+					Conditions: []corev1.PodCondition{
+						{
+							Type:   corev1.PodReady,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
 			},
 			ExpectedErrorHandler: IsMissingAnnotationError,
 			ExpectedEndpoint:     nil,
@@ -62,6 +78,14 @@ func Test_Resource_Endpoint_GetDesiredState(t *testing.T) {
 						"wocky":  "abcd",
 					},
 				},
+				Status: corev1.PodStatus{
+					Conditions: []corev1.PodCondition{
+						{
+							Type:   corev1.PodReady,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
 			},
 			ExpectedErrorHandler: IsMissingAnnotationError,
 			ExpectedEndpoint:     nil,
@@ -71,6 +95,14 @@ func Test_Resource_Endpoint_GetDesiredState(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "TestPod",
 					Namespace: "TestNamespace",
+				},
+				Status: corev1.PodStatus{
+					Conditions: []corev1.PodCondition{
+						{
+							Type:   corev1.PodReady,
+							Status: corev1.ConditionTrue,
+						},
+					},
 				},
 			},
 			ExpectedErrorHandler: IsMissingAnnotationError,

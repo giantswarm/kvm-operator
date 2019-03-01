@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -28,8 +29,10 @@ const (
 	HealthEndpoint = "/healthz"
 	// ProbeHost host for liveness probe.
 	ProbeHost = "127.0.0.1"
-	// InitialDelaySeconds is InitialDelaySeconds param in liveness probe config.
-	InitialDelaySeconds = 360
+	// LivenessProbeInitialDelaySeconds is LivenessProbeInitialDelaySeconds param in liveness probe config.
+	LivenessProbeInitialDelaySeconds = 360
+	// ReadinessProbeInitialDelaySeconds is ReadinessProbeInitialDelaySeconds param in readiness probe config.
+	ReadinessProbeInitialDelaySeconds = 100
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config.
 	TimeoutSeconds = 5
 	// PeriodSeconds is PeriodSeconds param in liveness probe config.
@@ -51,7 +54,7 @@ const (
 	CoreosVersion        = "1967.5.0"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:236c812dd5d8bf0eabe0b6116014fb88a2bacfb0"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:13b00b725fa2e5ed402f1f5973e1aaf14d193de2"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:1b1983e44775736bb0b9d7a08ca0ba888fda6567"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:b2ffdb2c4ec93fe6bf2d4af8e55c8a4b11253611"
 
@@ -110,6 +113,32 @@ const (
 	PodDeletionGracePeriod = 5 * time.Minute
 )
 
+func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
+	var results []v1alpha1.ClusterNode
+
+	for _, v := range cr.Spec.Cluster.Masters {
+		results = append(results, v)
+	}
+
+	for _, v := range cr.Spec.Cluster.Workers {
+		results = append(results, v)
+	}
+
+	return results
+}
+
+func AllocatedNodeIndexes(cr v1alpha1.KVMConfig) []int {
+	var results []int
+
+	for _, v := range cr.Status.KVM.NodeIndexes {
+		results = append(results, v)
+	}
+
+	sort.Ints(results)
+
+	return results
+}
+
 func BaseDomain(customObject v1alpha1.KVMConfig) string {
 	return strings.TrimPrefix(customObject.Spec.Cluster.Kubernetes.API.Domain, "api.")
 }
@@ -163,8 +192,8 @@ func ClusterRoleBindingPSPName(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject) + "-psp"
 }
 
-func ConfigMapName(customObject v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
-	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(customObject), node.ID)
+func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
+	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
 }
 
 func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
@@ -362,6 +391,11 @@ func NetworkNTPBlock(servers []net.IP) string {
 	ntpBlock := strings.Join(ntpBlockParts, "\n")
 
 	return ntpBlock
+}
+
+func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
+	idx, present := cr.Status.KVM.NodeIndexes[nodeID]
+	return idx, present
 }
 
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {

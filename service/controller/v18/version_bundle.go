@@ -13,6 +13,11 @@ func VersionBundle() versionbundle.Bundle {
 				Kind:        versionbundle.KindAdded,
 			},
 			{
+				Component:   "kvm-operator",
+				Description: "Add readiness probe to kvm pod to improve updates.",
+				Kind:        versionbundle.KindAdded,
+			},
+			{
 				Component:   "cloudconfig",
 				Description: "Switch from cloudinit to ignition.",
 				Kind:        versionbundle.KindChanged,
@@ -37,15 +42,30 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update to 1967.5.0 (CVE-2019-5736).",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kubernetes",
+				Description: "Updated kubernetes to 1.13.3.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "calico",
+				Description: "Updated calico to 3.5.1.",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
+				Component:   "etcd",
+				Description: "Updated calico to 3.3.12.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
 				Name:    "calico",
-				Version: "3.2.3",
+				Version: "3.5.1",
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1911.5.0",
+				Version: "1967.5.0",
 			},
 			{
 				Name:    "docker",
@@ -53,11 +73,11 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "etcd",
-				Version: "3.3.9",
+				Version: "3.3.12",
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.12.3",
+				Version: "1.13.3",
 			},
 		},
 		Name:    "kvm-operator",
