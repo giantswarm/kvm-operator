@@ -7,10 +7,9 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/backoff"
-	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/integration/ipam"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
@@ -53,7 +52,7 @@ func Teardown(config Config) error {
 			err = config.Release.EnsureDeleted(ctx, release)
 			if err != nil {
 				config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete release %q", release))
-				errors = append(errors, microerror.Mask(err)
+				errors = append(errors, microerror.Mask(err))
 			}
 		}
 	}

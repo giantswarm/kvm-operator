@@ -88,7 +88,6 @@ func provider(ctx context.Context, config Config) error {
 }
 
 func installKVMResource(config Config) error {
-	var err error
 	ctx := context.Background()
 
 	var httpPort, httpsPort, vni int
@@ -125,12 +124,12 @@ func installKVMResource(config Config) error {
 			VNI:       vni,
 		}
 
-		values, err = chartvalues.NewAPIExtensionsFlannelConfigE2E(c)
+		values, err := chartvalues.NewAPIExtensionsFlannelConfigE2E(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.EnsureInstalled(ctx, key.FlannelReleaseName(env.TargetNamespace()), release.NewStableVersion("apiextensions-flannel-config-e2e-chart"), values)
+		err = config.Release.EnsureInstalled(ctx, key.FlannelReleaseName(env.TargetNamespace()), release.NewStableChartInfo("apiextensions-flannel-config-e2e-chart"), values)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -145,12 +144,12 @@ func installKVMResource(config Config) error {
 			VNI:                  vni,
 		}
 
-		values, err = chartvalues.NewAPIExtensionsKVMConfigE2E(c)
+		values, err := chartvalues.NewAPIExtensionsKVMConfigE2E(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		err = config.Release.EnsureInstalled(ctx, key.KVMReleaseName(env.TargetNamespace()), release.NewStableVersion("apiextensions-kvm-config-e2e-chart"), values)
+		err = config.Release.EnsureInstalled(ctx, key.KVMReleaseName(env.TargetNamespace()), release.NewStableChartInfo("apiextensions-kvm-config-e2e-chart"), values)
 		if err != nil {
 			return microerror.Mask(err)
 		}
