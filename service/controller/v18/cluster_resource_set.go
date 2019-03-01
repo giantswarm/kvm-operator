@@ -23,6 +23,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/deployment"
 	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/ingress"
 	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/namespace"
+	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/nodeindexstatus"
 	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/pvc"
 	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/service"
 	"github.com/giantswarm/kvm-operator/service/controller/v18/resource/serviceaccount"
@@ -175,6 +176,19 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
+	var nodeIndexStatusResource controller.Resource
+	{
+		c := nodeindexstatus.Config{
+			G8sClient: config.G8sClient,
+			Logger:    config.Logger,
+		}
+
+		nodeIndexStatusResource, err = nodeindexstatus.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var pvcResource controller.Resource
 	{
 		c := pvc.DefaultConfig()
@@ -232,6 +246,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	resources := []controller.Resource{
 		statusResource,
+		nodeIndexStatusResource,
 		clusterRoleBindingResource,
 		namespaceResource,
 		serviceAccountResource,

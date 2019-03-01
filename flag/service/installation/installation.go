@@ -2,11 +2,11 @@ package installation
 
 import (
 	"github.com/giantswarm/kvm-operator/flag/service/installation/dns"
-	"github.com/giantswarm/kvm-operator/flag/service/installation/guest"
+	"github.com/giantswarm/kvm-operator/flag/service/installation/tenant"
 )
 
 type Installation struct {
-	DNS   dns.DNS
-	Guest guest.Guest
-	Name  string
+	DNS    dns.DNS
+	Name   string
+	Tenant tenant.Tenant
 }
