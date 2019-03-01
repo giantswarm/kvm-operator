@@ -127,18 +127,18 @@ func New(config Config) (*Service, error) {
 			TenantCluster: tenantCluster,
 
 			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Guest.Update.Enabled),
+			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
 			ProjectName:        config.Name,
 
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
-			IgnitionPath: config.Viper.GetString(config.Flag.Service.Guest.Ignition.Path),
+			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
 			OIDC: controller.ClusterConfigOIDC{
-				ClientID:      config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.ClientID),
-				IssuerURL:     config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
-				UsernameClaim: config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
-				GroupsClaim:   config.Viper.GetString(config.Flag.Service.Installation.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
+				ClientID:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
+				IssuerURL:     config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
+				UsernameClaim: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
+				GroupsClaim:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
 			},
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Guest.SSH.SSOPublicKey),
+			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 		}
 
 		clusterController, err = controller.NewCluster(c)
