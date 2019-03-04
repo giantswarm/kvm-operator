@@ -15,11 +15,12 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
-	"github.com/giantswarm/kvm-operator/service/controller/v15"
-	"github.com/giantswarm/kvm-operator/service/controller/v16"
-	"github.com/giantswarm/kvm-operator/service/controller/v17"
+	v15 "github.com/giantswarm/kvm-operator/service/controller/v15"
+	v16 "github.com/giantswarm/kvm-operator/service/controller/v16"
+	v17 "github.com/giantswarm/kvm-operator/service/controller/v17"
 	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
-	"github.com/giantswarm/kvm-operator/service/controller/v18"
+	v18 "github.com/giantswarm/kvm-operator/service/controller/v18"
+	v19 "github.com/giantswarm/kvm-operator/service/controller/v19"
 )
 
 type DeleterConfig struct {
@@ -217,6 +218,22 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV19 *controller.ResourceSet
+	{
+		c := v19.DeleterResourceSetConfig{
+			K8sClient:     config.K8sClient,
+			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV19, err = v19.NewDeleterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV14Patch3,
 		resourceSetV14Patch4,
@@ -225,6 +242,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		resourceSetV17,
 		resourceSetV17patch1,
 		resourceSetV18,
+		resourceSetV19,
 	}
 
 	return resourceSets, nil
