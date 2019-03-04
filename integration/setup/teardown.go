@@ -7,10 +7,9 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/backoff"
-	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/integration/ipam"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
@@ -43,17 +42,18 @@ func Teardown(config Config) error {
 	}
 
 	{
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-cert-config-e2e --purge", config.Host.TargetNamespace()))
-		if err != nil {
-			errors = append(errors, microerror.Mask(err))
+		releases := []string{
+			fmt.Sprintf("%s-cert-config-e2e", config.Host.TargetNamespace()),
+			fmt.Sprintf("%s-flannel-config-e2e", config.Host.TargetNamespace()),
+			fmt.Sprintf("%s-kvm-config-e2e", config.Host.TargetNamespace()),
 		}
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-flannel-config-e2e --purge", config.Host.TargetNamespace()))
-		if err != nil {
-			errors = append(errors, microerror.Mask(err))
-		}
-		err = framework.HelmCmd(fmt.Sprintf("delete %s-kvm-config-e2e --purge", config.Host.TargetNamespace()))
-		if err != nil {
-			errors = append(errors, microerror.Mask(err))
+
+		for _, release := range releases {
+			err = config.Release.EnsureDeleted(ctx, release)
+			if err != nil {
+				config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete release %q", release))
+				errors = append(errors, microerror.Mask(err))
+			}
 		}
 	}
 
