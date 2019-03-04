@@ -56,7 +56,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the drainer config for the guest cluster")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the drainer config for the tenant cluster")
 
 		n := currentPod.GetNamespace()
 		p := currentPod.GetName()
@@ -64,7 +64,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 		drainerConfig, err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Get(p, o)
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for guest cluster node")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for tenant cluster node")
 
 			err := r.createDrainerConfig(ctx, currentPod)
 			if err != nil {
@@ -79,20 +79,20 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		} else if err != nil {
 			return microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found drainer config for the guest cluster")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "found drainer config for the tenant cluster")
 
 			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for inspection of the reconciled pod")
 		}
 
 		if drainerConfig.Status.HasDrainedCondition() {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has drained condition")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of tenant cluster has drained condition")
 
 			err := r.finishDraining(ctx, currentPod, drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		} else if drainerConfig.Status.HasTimeoutCondition() {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of guest cluster has timeout condition")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of tenant cluster has timeout condition")
 
 			err := r.finishDraining(ctx, currentPod, drainerConfig)
 			if err != nil {
@@ -121,7 +121,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 }
 
 func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) error {
-	r.logger.LogCtx(ctx, "level", "debug", "message", "creating drainer config for guest cluster node")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "creating drainer config for tenant cluster node")
 
 	apiEndpoint, err := key.ClusterAPIEndpointFromPod(pod)
 	if err != nil {
@@ -153,11 +153,11 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 
 	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(c)
 	if apierrors.IsAlreadyExists(err) {
-		r.logger.LogCtx(ctx, "level", "warning", "message", "drainer config for guest cluster node already exists")
+		r.logger.LogCtx(ctx, "level", "warning", "message", "drainer config for tenant cluster node already exists")
 	} else if err != nil {
 		return microerror.Mask(err)
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for guest cluster node")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for tenant cluster node")
 	}
 
 	return nil
@@ -167,7 +167,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 	var err error
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting drainer config for guest cluster node")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting drainer config for tenant cluster node")
 
 		n := currentPod.GetNamespace()
 		i := currentPod.GetName()
@@ -175,11 +175,11 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 
 		err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Delete(i, o)
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config for guest cluster node already deleted")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config for tenant cluster node already deleted")
 		} else if err != nil {
 			return microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "deleted drainer config for guest cluster node")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "deleted drainer config for tenant cluster node")
 		}
 	}
 
