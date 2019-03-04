@@ -11,7 +11,7 @@ import (
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
@@ -23,7 +23,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 		params.Extension = &workerExtension{
 			certs:        certs,
 			customObject: customObject,
-			nodeIndex:    nodeIndex,
+			node:         node,
 		}
 		params.Node = node
 		params.SSOPublicKey = c.ssoPublicKey
@@ -58,7 +58,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 type workerExtension struct {
 	certs        certs.Cluster
 	customObject v1alpha1.KVMConfig
-	nodeIndex    int
+	node         v1alpha1.ClusterNode
 }
 
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
@@ -78,7 +78,7 @@ func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 
 	iscsiInitiatorFile := k8scloudconfig.FileMetadata{
-		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.nodeIndex, key.WorkerID)),
+		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.node, key.WorkerID)),
 		Path:         IscsiInitiatorNameFilePath,
 		Owner: k8scloudconfig.Owner{
 			User:  FileOwnerUser,

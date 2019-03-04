@@ -43,8 +43,8 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 		return nil, microerror.Mask(err)
 	}
 
-	for i, node := range customResource.Spec.Cluster.Masters {
-		template, err := r.cloudConfig.NewMasterTemplate(customResource, certs, node, keys, i)
+	for _, node := range customResource.Spec.Cluster.Masters {
+		template, err := r.cloudConfig.NewMasterTemplate(customResource, certs, node, keys)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -57,8 +57,8 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 		configMaps = append(configMaps, configMap)
 	}
 
-	for i, node := range customResource.Spec.Cluster.Workers {
-		template, err := r.cloudConfig.NewWorkerTemplate(customResource, certs, node, i)
+	for _, node := range customResource.Spec.Cluster.Workers {
+		template, err := r.cloudConfig.NewWorkerTemplate(customResource, certs, node)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -12,7 +12,7 @@ import (
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, randomKeys randomkeys.Cluster, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, randomKeys randomkeys.Cluster) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
@@ -28,7 +28,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 		params.Extension = &masterExtension{
 			certs:        certs,
 			customObject: customObject,
-			nodeIndex:    nodeIndex,
+			node:         node,
 		}
 		params.Node = node
 		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
@@ -64,7 +64,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs c
 type masterExtension struct {
 	certs        certs.Cluster
 	customObject v1alpha1.KVMConfig
-	nodeIndex    int
+	node         v1alpha1.ClusterNode
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
@@ -84,7 +84,7 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 
 	iscsiInitiatorFile := k8scloudconfig.FileMetadata{
-		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.nodeIndex, key.MasterID)),
+		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.node, key.MasterID)),
 		Path:         IscsiInitiatorNameFilePath,
 		Owner: k8scloudconfig.Owner{
 			User:  FileOwnerUser,

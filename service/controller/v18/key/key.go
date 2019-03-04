@@ -233,8 +233,8 @@ func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
 }
 
-func IscsiInitiatorName(customObject v1alpha1.KVMConfig, nodeIndex int, nodeRole string) string {
-	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(customObject), nodeRole, nodeIndex+1)
+func IscsiInitiatorName(customObject v1alpha1.KVMConfig, node v1alpha1.ClusterNode, nodeRole string) string {
+	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%s", ClusterID(customObject), nodeRole, node.ID)
 }
 
 func IsDeleted(customObject v1alpha1.KVMConfig) bool {
