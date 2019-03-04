@@ -3,16 +3,10 @@
 package setup
 
 import (
-	"bytes"
 	"context"
-	"fmt"
-	"io/ioutil"
-	gotemplate "text/template"
 
 	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	providerv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/backoff"
-	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
 	"github.com/giantswarm/microerror"
@@ -21,7 +15,6 @@ import (
 	"github.com/giantswarm/kvm-operator/integration/ipam"
 	"github.com/giantswarm/kvm-operator/integration/key"
 	"github.com/giantswarm/kvm-operator/integration/rangepool"
-	"github.com/giantswarm/kvm-operator/integration/template"
 )
 
 // provider installs the operator and tenant cluster CR.
@@ -95,124 +88,71 @@ func provider(ctx context.Context, config Config) error {
 }
 
 func installKVMResource(config Config) error {
-	var err error
 	ctx := context.Background()
 
-	var kvmResourceChartValues template.KVMConfigE2eChartValues
+	var httpPort, httpsPort, vni int
 	{
-		kvmResourceChartValues.ClusterID = env.ClusterID()
-
 		rangePool, err := rangepool.InitRangePool(config.Storage, config.Logger)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
 		{
-			vni, err := rangepool.GenerateVNI(ctx, rangePool, env.ClusterID())
+			vni, err = rangepool.GenerateVNI(ctx, rangePool, env.ClusterID())
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			kvmResourceChartValues.VNI = vni
 		}
 
 		{
-			httpPort, httpsPort, err := rangepool.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
+			httpPort, httpsPort, err = rangepool.GenerateIngressNodePorts(ctx, rangePool, env.ClusterID())
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			kvmResourceChartValues.HttpNodePort = httpPort
-			kvmResourceChartValues.HttpsNodePort = httpsPort
 		}
-
-		kvmResourceChartValues.VersionBundleVersion = env.VersionBundleVersion()
 	}
 
-	var flannelResourceChartValues template.FlannelConfigE2eChartValues
 	{
-		flannelResourceChartValues.ClusterID = env.ClusterID()
-		flannelResourceChartValues.VNI = kvmResourceChartValues.VNI
-
 		network, err := ipam.GenerateFlannelNetwork(ctx, env.ClusterID(), config.Storage, config.Logger)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		flannelResourceChartValues.Network = network
+
+		c := chartvalues.APIExtensionsFlannelConfigE2EConfig{
+			ClusterID: env.ClusterID(),
+			Network:   network,
+			VNI:       vni,
+		}
+
+		values, err := chartvalues.NewAPIExtensionsFlannelConfigE2E(c)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		err = config.Release.EnsureInstalled(ctx, key.FlannelReleaseName(env.TargetNamespace()), release.NewStableChartInfo("apiextensions-flannel-config-e2e-chart"), values)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
-	o := func() error {
-		// NOTE we ignore errors here because we cannot get really useful error
-		// handling done. This here should anyway only be a quick fix until we use
-		// the helm client lib. Then error handling will be better.
-		framework.HelmCmd(fmt.Sprintf("delete --purge %s-flannel-config-e2e", env.TargetNamespace()))
+	{
+		c := chartvalues.APIExtensionsKVMConfigE2EConfig{
+			ClusterID:            env.ClusterID(),
+			HttpNodePort:         httpPort,
+			HttpsNodePort:        httpsPort,
+			VersionBundleVersion: env.VersionBundleVersion(),
+			VNI:                  vni,
+		}
 
-		var buffer bytes.Buffer
-
-		tmpl, err := gotemplate.New("flannel-e2e-values").Parse(template.ApiextensionsFlannelConfigE2EChartValues)
+		values, err := chartvalues.NewAPIExtensionsKVMConfigE2E(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		err = tmpl.Execute(&buffer, flannelResourceChartValues)
-
+		err = config.Release.EnsureInstalled(ctx, key.KVMReleaseName(env.TargetNamespace()), release.NewStableChartInfo("apiextensions-kvm-config-e2e-chart"), values)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-
-		err = ioutil.WriteFile(flannelResourceValuesFile, buffer.Bytes(), 0644)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-flannel-config-e2e-chart:stable -- -n %s-flannel-config-e2e --values %s", env.TargetNamespace(), flannelResourceValuesFile))
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		return nil
-	}
-	b := backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-	n := backoff.NewNotifier(config.Logger, context.Background())
-	err = backoff.RetryNotify(o, b, n)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
-	o = func() error {
-		// NOTE we ignore errors here because we cannot get really useful error
-		// handling done. This here should anyway only be a quick fix until we use
-		// the helm client lib. Then error handling will be better.
-		framework.HelmCmd(fmt.Sprintf("delete --purge %s-kvm-config-e2e", env.TargetNamespace()))
-
-		var buffer bytes.Buffer
-
-		tmpl, err := gotemplate.New("kvm-e2e-values").Parse(template.ApiextensionsKVMConfigE2EChartValues)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = tmpl.Execute(&buffer, kvmResourceChartValues)
-
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = ioutil.WriteFile(kvmResourceValuesFile, buffer.Bytes(), 0644)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		err = framework.HelmCmd(fmt.Sprintf("registry install quay.io/giantswarm/apiextensions-kvm-config-e2e-chart:stable -- -n %s-kvm-config-e2e --values %s", env.TargetNamespace(), kvmResourceValuesFile))
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		return nil
-	}
-	b = backoff.NewExponential(backoff.ShortMaxWait, backoff.ShortMaxInterval)
-	n = backoff.NewNotifier(config.Logger, context.Background())
-	err = backoff.RetryNotify(o, b, n)
-	if err != nil {
-		return microerror.Mask(err)
 	}
 
 	return nil
