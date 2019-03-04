@@ -45,13 +45,13 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d ingresses in the Kubernetes API", len(ingresses)))
 
-	// In case a cluster deletion happens, we want to delete the guest cluster
+	// In case a cluster deletion happens, we want to delete the tenant cluster
 	// ingresses. We still need to use the ingresses for ingress routing in order
 	// to drain nodes on KVM though. So as long as pods are there we delay the
 	// deletion of the ingresses here in order to still be able to route traffic
-	// to the guest cluster API. As soon as the draining was done and the pods got
-	// removed we get an empty list here after the delete event got replayed. Then
-	// we just remove the ingresses as usual.
+	// to the tenant cluster API. As soon as the draining was done and the pods
+	// got removed we get an empty list here after the delete event got replayed.
+	// Then we just remove the ingresses as usual.
 	if key.IsDeleted(customObject) {
 		n := key.ClusterNamespace(customObject)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
