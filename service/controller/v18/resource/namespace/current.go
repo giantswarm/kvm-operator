@@ -63,7 +63,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, nil
 	}
 
-	// In case a cluster deletion happens, we want to delete the guest cluster
+	// In case a cluster deletion happens, we want to delete the tenant cluster
 	// namespace. We still need to use the namespace for resource creation in
 	// order to drain nodes on KVM though. So as long as pods are there we delay
 	// the deletion of the namespace here in order to still be able to create
