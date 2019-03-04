@@ -234,7 +234,7 @@ func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 }
 
 func IscsiInitiatorName(customObject v1alpha1.KVMConfig, nodeIndex int, nodeRole string) string {
-	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(customObject), nodeRole, nodeIndex+1)
+	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(customObject), nodeRole, nodeIndex)
 }
 
 func IsDeleted(customObject v1alpha1.KVMConfig) bool {
