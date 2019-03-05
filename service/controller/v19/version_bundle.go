@@ -12,6 +12,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Changed iSCSI initiator name to use assigned node index instead of node ID.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "containerlinux",
+				Description: "Update to 2023.4.0. Fixes CVE-2019-8912",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -20,7 +25,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1967.5.0",
+				Version: "2023.4.0",
 			},
 			{
 				Name:    "docker",
