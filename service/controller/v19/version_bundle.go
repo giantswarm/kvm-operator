@@ -14,7 +14,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "containerlinux",
-				Description: "Update to 2023.4.0.",
+				Description: "Update to 2023.4.0. Fixes CVE-2019-8912",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
