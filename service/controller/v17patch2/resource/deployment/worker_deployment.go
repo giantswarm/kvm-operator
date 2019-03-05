@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/key"
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/core/v1"
 	extensionsv1 "k8s.io/api/extensions/v1beta1"

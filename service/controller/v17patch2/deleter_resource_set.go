@@ -1,9 +1,9 @@
-package v17patch1
+package v17patch2
 
 import (
 	"github.com/giantswarm/certs"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/node"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/node"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"

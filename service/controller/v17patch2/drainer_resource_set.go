@@ -1,10 +1,10 @@
-package v17patch1
+package v17patch2
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/endpoint"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/pod"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/endpoint"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/pod"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
