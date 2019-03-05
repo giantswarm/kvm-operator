@@ -19,7 +19,6 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v16/key"
 	v17 "github.com/giantswarm/kvm-operator/service/controller/v17"
 	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
-	v17patch2 "github.com/giantswarm/kvm-operator/service/controller/v17patch2"
 	v18 "github.com/giantswarm/kvm-operator/service/controller/v18"
 	v18patch1 "github.com/giantswarm/kvm-operator/service/controller/v18patch1"
 	v19 "github.com/giantswarm/kvm-operator/service/controller/v19"
@@ -201,22 +200,6 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 		}
 
 		resourceSetV17patch1, err = v17patch1.NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV17patch2 *controller.ResourceSet
-	{
-		c := v17patch2.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV17patch2, err = v17patch2.NewDrainerResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

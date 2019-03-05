@@ -19,7 +19,6 @@ import (
 	v16 "github.com/giantswarm/kvm-operator/service/controller/v16"
 	v17 "github.com/giantswarm/kvm-operator/service/controller/v17"
 	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
-	v17patch2 "github.com/giantswarm/kvm-operator/service/controller/v17patch2"
 	v18 "github.com/giantswarm/kvm-operator/service/controller/v18"
 	v18patch1 "github.com/giantswarm/kvm-operator/service/controller/v18patch1"
 	v19 "github.com/giantswarm/kvm-operator/service/controller/v19"
@@ -199,22 +198,6 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		}
 
 		resourceSetV17patch1, err = v17patch1.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV17patch2 *controller.ResourceSet
-	{
-		c := v17patch2.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV17patch2, err = v17patch2.NewDeleterResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
