@@ -9,8 +9,8 @@ func VersionBundle() versionbundle.Bundle {
 		Changelogs: []versionbundle.Changelog{
 			{
 				Component:   "kvm-operator",
-				Description: "TODO",
-				Kind:        versionbundle.KindAdded,
+				Description: "Changed iSCSI initiator name to use assigned node index instead of node ID.",
+				Kind:        versionbundle.KindChanged,
 			},
 		},
 		Components: []versionbundle.Component{
