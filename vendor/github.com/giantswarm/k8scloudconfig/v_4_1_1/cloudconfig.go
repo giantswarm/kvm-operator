@@ -1,4 +1,4 @@
-package v_3_8_0
+package v_4_1_1
 
 import (
 	"bytes"
@@ -6,15 +6,15 @@ import (
 	"encoding/base64"
 	"text/template"
 
-	"strings"
-
+	ignition "github.com/giantswarm/k8scloudconfig/ignition/v_2_2_0"
 	"github.com/giantswarm/microerror"
 )
 
 const (
 	defaultRegistryDomain = "quay.io"
-	kubernetesImage       = "giantswarm/hyperkube:v1.12.6"
-	etcdImage             = "giantswarm/etcd:v3.3.9"
+	kubernetesImage       = "giantswarm/hyperkube:v1.13.4"
+	etcdImage             = "giantswarm/etcd:v3.3.12"
+	etcdPort              = 443
 )
 
 type CloudConfigConfig struct {
@@ -26,6 +26,17 @@ func DefaultCloudConfigConfig() CloudConfigConfig {
 	return CloudConfigConfig{
 		Params:   Params{},
 		Template: "",
+	}
+}
+
+func DefaultParams() Params {
+	return Params{
+		EtcdPort:       etcdPort,
+		RegistryDomain: defaultRegistryDomain,
+		Images: Images{
+			Kubernetes: kubernetesImage,
+			Etcd:       etcdImage,
+		},
 	}
 }
 
@@ -43,23 +54,6 @@ func NewCloudConfig(config CloudConfigConfig) (*CloudConfig, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.Template must not be empty")
 	}
 
-	// Default to 443 for non AWS providers.
-	if config.Params.EtcdPort == 0 {
-		config.Params.EtcdPort = 443
-	}
-	// Set default registry to quay.io
-	if config.Params.RegistryDomain == "" {
-		config.Params.RegistryDomain = defaultRegistryDomain
-	}
-	// Set the kubernetes/etcd images since they are used multiple times
-	config.Params.Images = Images{
-		Kubernetes: kubernetesImage,
-		Etcd:       etcdImage,
-	}
-
-	// extract cluster base domain
-	config.Params.BaseDomain = strings.TrimPrefix(config.Params.Cluster.Kubernetes.API.Domain, "api.")
-
 	c := &CloudConfig{
 		config:   "",
 		params:   config.Params,
@@ -72,15 +66,21 @@ func NewCloudConfig(config CloudConfigConfig) (*CloudConfig, error) {
 func (c *CloudConfig) ExecuteTemplate() error {
 	tmpl, err := template.New("cloudconfig").Parse(c.template)
 	if err != nil {
-		return err
+		return microerror.Mask(err)
 	}
 
 	buf := new(bytes.Buffer)
 	err = tmpl.Execute(buf, c.params)
 	if err != nil {
-		return err
+		return microerror.Mask(err)
 	}
-	c.config = buf.String()
+
+	ignitionJSON, err := ignition.ConvertTemplatetoJSON(buf.Bytes())
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	c.config = string(ignitionJSON)
 
 	return nil
 }
