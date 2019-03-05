@@ -1,20 +1,20 @@
-package v17patch1
+package v17patch2
 
 import (
 	"context"
 
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/clusterrolebinding"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/configmap"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/deployment"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/ingress"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/namespace"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/pvc"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/service"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/resource/serviceaccount"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/clusterrolebinding"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/deployment"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/ingress"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/namespace"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/pvc"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/service"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/resource/serviceaccount"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"

@@ -9,7 +9,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "pvcv17patch1"
+	Name = "pvcv17patch2"
 	// StorageClass is the storage class annotation persistent volume claims are
 	// configured with.
 	StorageClass = "g8s-storage"

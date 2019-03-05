@@ -14,7 +14,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v17patch2/key"
 )
 
 func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
