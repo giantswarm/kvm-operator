@@ -2,7 +2,7 @@ package endpoint
 
 import (
 	"context"
-	"github.com/giantswarm/kvm-operator/service/controller/v18/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v18patch1/key"
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
