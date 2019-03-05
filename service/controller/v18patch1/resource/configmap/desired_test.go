@@ -17,66 +17,156 @@ import (
 
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	testCases := []struct {
+		Name                string
 		Obj                 interface{}
 		ExpectedMasterCount int
 		ExpectedWorkerCount int
+		ErrorMatcher        func(error) bool
 	}{
 		{
+			Name: "single master, single worker",
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []v1alpha1.ClusterNode{
-							{},
+							{ID: "a"},
 						},
 						Workers: []v1alpha1.ClusterNode{
-							{},
+							{ID: "b"},
+						},
+					},
+				},
+				Status: v1alpha1.KVMConfigStatus{
+					KVM: v1alpha1.KVMConfigStatusKVM{
+						NodeIndexes: map[string]int{
+							"a": 1,
+							"b": 2,
 						},
 					},
 				},
 			},
 			ExpectedMasterCount: 1,
 			ExpectedWorkerCount: 1,
+			ErrorMatcher:        nil,
 		},
 		{
+			Name: "single master, three workers",
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []v1alpha1.ClusterNode{
-							{},
+							{ID: "a"},
 						},
 						Workers: []v1alpha1.ClusterNode{
-							{},
-							{},
-							{},
+							{ID: "b"},
+							{ID: "c"},
+							{ID: "d"},
+						},
+					},
+				},
+				Status: v1alpha1.KVMConfigStatus{
+					KVM: v1alpha1.KVMConfigStatusKVM{
+						NodeIndexes: map[string]int{
+							"a": 1,
+							"b": 2,
+							"c": 3,
+							"d": 4,
 						},
 					},
 				},
 			},
 			ExpectedMasterCount: 1,
 			ExpectedWorkerCount: 3,
+			ErrorMatcher:        nil,
 		},
 		{
+			Name: "three masters, three workers",
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []v1alpha1.ClusterNode{
-							{},
-							{},
-							{},
+							{ID: "a"},
+							{ID: "b"},
+							{ID: "c"},
 						},
 						Workers: []v1alpha1.ClusterNode{
-							{},
-							{},
-							{},
+							{ID: "d"},
+							{ID: "e"},
+							{ID: "f"},
+						},
+					},
+				},
+				Status: v1alpha1.KVMConfigStatus{
+					KVM: v1alpha1.KVMConfigStatusKVM{
+						NodeIndexes: map[string]int{
+							"a": 1,
+							"b": 2,
+							"c": 3,
+							"d": 4,
+							"e": 5,
+							"f": 6,
 						},
 					},
 				},
 			},
 			ExpectedMasterCount: 3,
 			ExpectedWorkerCount: 3,
+			ErrorMatcher:        nil,
+		},
+		{
+			Name: "missing node index for worker",
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
+							{ID: "a"},
+						},
+						Workers: []v1alpha1.ClusterNode{
+							{ID: "b"},
+						},
+					},
+				},
+				Status: v1alpha1.KVMConfigStatus{
+					KVM: v1alpha1.KVMConfigStatusKVM{
+						NodeIndexes: map[string]int{
+							"a": 1,
+						},
+					},
+				},
+			},
+			ExpectedMasterCount: 0,
+			ExpectedWorkerCount: 0,
+			ErrorMatcher:        IsNotFound,
+		},
+		{
+			Name: "missing node index for master",
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
+							{ID: "a"},
+						},
+						Workers: []v1alpha1.ClusterNode{
+							{ID: "b"},
+						},
+					},
+				},
+				Status: v1alpha1.KVMConfigStatus{
+					KVM: v1alpha1.KVMConfigStatusKVM{
+						NodeIndexes: map[string]int{
+							"b": 1,
+						},
+					},
+				},
+			},
+			ExpectedMasterCount: 0,
+			ExpectedWorkerCount: 0,
+			ErrorMatcher:        IsNotFound,
 		},
 	}
 
@@ -95,28 +185,40 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		}
 	}
 
-	for i, tc := range testCases {
-		result, err := newResource.GetDesiredState(context.TODO(), tc.Obj)
-		if err != nil {
-			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
-		}
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			result, err := newResource.GetDesiredState(context.Background(), tc.Obj)
 
-		configMaps, ok := result.([]*apiv1.ConfigMap)
-		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, result)
-		}
+			switch {
+			case err == nil && tc.ErrorMatcher == nil:
+				// correct; carry on
+			case err != nil && tc.ErrorMatcher == nil:
+				t.Fatalf("error == %#v, want nil", err)
+			case err == nil && tc.ErrorMatcher != nil:
+				t.Fatalf("error == nil, want non-nil")
+			case !tc.ErrorMatcher(err):
+				t.Fatalf("error == %#v, want matching", err)
+			case tc.ErrorMatcher(err):
+				return
+			}
 
-		if testGetMasterCount(configMaps) != tc.ExpectedMasterCount {
-			t.Fatalf("case %d expected %d master nodes got %d", i+1, tc.ExpectedMasterCount, testGetMasterCount(configMaps))
-		}
+			configMaps, ok := result.([]*apiv1.ConfigMap)
+			if !ok {
+				t.Fatalf("expected %T got %T", []*apiv1.ConfigMap{}, result)
+			}
 
-		if testGetWorkerCount(configMaps) != tc.ExpectedWorkerCount {
-			t.Fatalf("case %d expected %d worker nodes got %d", i+1, tc.ExpectedWorkerCount, testGetWorkerCount(configMaps))
-		}
+			if testGetMasterCount(configMaps) != tc.ExpectedMasterCount {
+				t.Fatalf("expected %d master nodes got %d", tc.ExpectedMasterCount, testGetMasterCount(configMaps))
+			}
 
-		if len(configMaps) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount {
-			t.Fatalf("case %d expected %d nodes got %d", i+1, tc.ExpectedMasterCount+tc.ExpectedWorkerCount, len(configMaps))
-		}
+			if testGetWorkerCount(configMaps) != tc.ExpectedWorkerCount {
+				t.Fatalf("expected %d worker nodes got %d", tc.ExpectedWorkerCount, testGetWorkerCount(configMaps))
+			}
+
+			if len(configMaps) != tc.ExpectedMasterCount+tc.ExpectedWorkerCount {
+				t.Fatalf("expected %d nodes got %d", tc.ExpectedMasterCount+tc.ExpectedWorkerCount, len(configMaps))
+			}
+		})
 	}
 }
 
