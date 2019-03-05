@@ -17,6 +17,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update to 1.13.4 (CVE-2019-1002100).",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "containerlinux",
+				Description: "Update to 2023.4.0. Fixes CVE-2019-8912",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -25,7 +30,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "1967.5.0",
+				Version: "2023.4.0",
 			},
 			{
 				Name:    "docker",
