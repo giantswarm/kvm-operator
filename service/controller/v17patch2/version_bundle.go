@@ -8,8 +8,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "containerlinux",
-				Description: "Update to 1967.5.0 (CVE-2019-5736).",
+				Component:   "kubernetes",
+				Description: "Update to 1.12.6 (CVE-2019-1002100).",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -32,10 +32,10 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.12.3",
+				Version: "1.12.6",
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.1.2",
+		Version: "3.1.3",
 	}
 }
