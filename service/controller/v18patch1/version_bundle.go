@@ -12,6 +12,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Changed iSCSI initiator name to use assigned node index instead of node ID.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kubernetes",
+				Description: "Update to 1.13.4 (CVE-2019-1002100).",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -32,7 +37,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.13.3",
+				Version: "1.13.4",
 			},
 		},
 		Name:    "kvm-operator",

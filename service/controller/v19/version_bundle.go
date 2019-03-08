@@ -13,6 +13,11 @@ func VersionBundle() versionbundle.Bundle {
 				Kind:        versionbundle.KindChanged,
 			},
 			{
+				Component:   "kubernetes",
+				Description: "Update to 1.13.4 (CVE-2019-1002100).",
+				Kind:        versionbundle.KindChanged,
+			},
+			{
 				Component:   "containerlinux",
 				Description: "Update to 2023.4.0. Fixes CVE-2019-8912",
 				Kind:        versionbundle.KindChanged,
@@ -37,7 +42,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.13.3",
+				Version: "1.13.4",
 			},
 		},
 		Name:    "kvm-operator",
