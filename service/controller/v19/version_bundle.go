@@ -22,6 +22,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update to 2023.4.0. Fixes CVE-2019-8912",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Fixed closing http idle connection in kvm health check.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
