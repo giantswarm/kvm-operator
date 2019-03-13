@@ -1,9 +1,10 @@
 package service
 
 import (
+	"github.com/giantswarm/operatorkit/flag/service/kubernetes"
+
 	"github.com/giantswarm/kvm-operator/flag/service/crd"
 	"github.com/giantswarm/kvm-operator/flag/service/installation"
-	"github.com/giantswarm/kvm-operator/flag/service/kubernetes"
 	"github.com/giantswarm/kvm-operator/flag/service/tenant"
 )
 
