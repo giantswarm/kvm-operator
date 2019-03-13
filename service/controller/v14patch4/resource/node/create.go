@@ -37,7 +37,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 			Address:   key.ClusterAPIEndpoint(customObject),
 			InCluster: false,
-			TLS: k8srestconfig.TLSClientConfig{
+			TLS: k8srestconfig.ConfigTLS{
 				CAData:  certs.APIServer.CA,
 				CrtData: certs.APIServer.Crt,
 				KeyData: certs.APIServer.Key,
