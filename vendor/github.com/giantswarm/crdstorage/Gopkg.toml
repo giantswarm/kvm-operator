@@ -42,7 +42,7 @@
   name = "github.com/giantswarm/microstorage"
 
 [[constraint]]
-  branch = "kubeconfig"
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
 
 [[constraint]]

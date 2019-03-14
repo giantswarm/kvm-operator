@@ -45,7 +45,7 @@ required = [
   name = "github.com/giantswarm/certs"
 
 [[constraint]]
-  branch = "kubeconfig"
+  branch = "master"
   name = "github.com/giantswarm/crdstorage"
 
 [[constraint]]
@@ -81,7 +81,7 @@ required = [
   name = "github.com/giantswarm/micrologger"
 
 [[constraint]]
-  branch = "kubeconfig"
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
 
 [[constraint]]
@@ -89,11 +89,11 @@ required = [
   name = "github.com/giantswarm/randomkeys"
 
 [[constraint]]
-  branch = "kubeconfig"
+  branch = "master"
   name = "github.com/giantswarm/statusresource"
 
 [[constraint]]
-  branch = "kubeconfig"
+  branch = "master"
   name = "github.com/giantswarm/tenantcluster"
 
 [[constraint]]
