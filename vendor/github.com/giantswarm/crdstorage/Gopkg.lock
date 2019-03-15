@@ -68,7 +68,7 @@
     "client/k8scrdclient",
     "client/k8srestconfig"
   ]
-  revision = "43dd8d30de6553f21effdd2d11c363613a9997bb"
+  revision = "67aba158b01a7eb22405c4a5ad643853f29cb5f3"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -141,6 +141,12 @@
   revision = "c63ab54fda8f77302f8d414e19933f2b6026a089"
 
 [[projects]]
+  name = "github.com/imdario/mergo"
+  packages = ["."]
+  revision = "7c29201646fa3de8506f701213473dd407f19646"
+  version = "v0.3.7"
+
+[[projects]]
   name = "github.com/json-iterator/go"
   packages = ["."]
   revision = "1624edc4454b8682399def8740d46db5e4362ba4"
@@ -187,6 +193,12 @@
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/spf13/pflag"
+  packages = ["."]
+  revision = "298182f68c66c05229eb03ac171abe6e309ee79a"
+  version = "v1.0.3"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -425,13 +437,18 @@
     "plugin/pkg/client/auth/exec",
     "rest",
     "rest/watch",
+    "tools/auth",
+    "tools/clientcmd",
     "tools/clientcmd/api",
+    "tools/clientcmd/api/latest",
+    "tools/clientcmd/api/v1",
     "tools/metrics",
     "tools/reference",
     "transport",
     "util/cert",
     "util/connrotation",
     "util/flowcontrol",
+    "util/homedir",
     "util/integer"
   ]
   revision = "6bf63545bd0257ed9e701ad95307ffa51b4407c0"
