@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"github.com/giantswarm/kvm-operator/service/controller/v20"
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
@@ -22,6 +21,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
 	"github.com/giantswarm/kvm-operator/service/controller/v18"
 	"github.com/giantswarm/kvm-operator/service/controller/v19"
+	"github.com/giantswarm/kvm-operator/service/controller/v20"
 )
 
 type DeleterConfig struct {
