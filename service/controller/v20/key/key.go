@@ -63,7 +63,7 @@ const (
 	baseWorkerMemoryOverheadMB   = 512
 	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
-	workerIOOverhead             = "512M"
+	qemuMemoryIOOverhead         = "512M"
 
 	// DefaultDockerDiskSize defines the space used to partition the docker FS
 	// within k8s-kvm. Note we use this only for masters, since the value for the
@@ -318,10 +318,11 @@ func MemoryQuantityMaster(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 	}
 	additionalMemory := resource.MustParse(baseMasterMemoryOverhead)
-	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from addtional memory")
-	}
 	q.Add(additionalMemory)
+
+	// IO overhead for qemu is around 512M memory
+	ioOverhead := resource.MustParse(qemuMemoryIOOverhead)
+	q.Add(ioOverhead)
 
 	return q, nil
 }
@@ -340,7 +341,7 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
 	}
 	// IO overhead for qemu is around 512M memory
-	ioOverhead := resource.MustParse(workerIOOverhead)
+	ioOverhead := resource.MustParse(qemuMemoryIOOverhead)
 	q.Add(ioOverhead)
 
 	// memory overhead is more complex as it increases with the size of the memory
