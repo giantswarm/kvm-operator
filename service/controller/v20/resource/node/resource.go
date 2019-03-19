@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Name = "nodev19"
+	Name = "nodev20"
 )
 
 type Config struct {
