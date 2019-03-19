@@ -1,4 +1,4 @@
-package v19
+package v20
 
 import (
 	"github.com/giantswarm/microerror"
@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v19/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v19/resource/node"
+	"github.com/giantswarm/kvm-operator/service/controller/v20/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v20/resource/node"
 )
 
 type DeleterResourceSetConfig struct {
