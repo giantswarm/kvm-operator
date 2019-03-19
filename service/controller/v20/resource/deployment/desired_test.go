@@ -54,11 +54,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 					Limits: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 			},
@@ -113,11 +113,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 					Limits: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 			},
@@ -196,31 +196,31 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 					Limits: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 					Limits: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 				{
 					Requests: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 					Limits: apiv1.ResourceList{
 						apiv1.ResourceCPU:    resource.MustParse("1"),
-						apiv1.ResourceMemory: resource.MustParse("2G"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 			},

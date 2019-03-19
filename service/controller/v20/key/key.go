@@ -59,7 +59,7 @@ const (
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:4e7d2b73859ea7dac1a2138e04e07fa5870d109b"
 
 	// constants for calculation qemu memory overhead.
-	baseMasterMemoryOverhead     = "1G"
+	baseMasterMemoryOverhead     = "1024M"
 	baseWorkerMemoryOverheadMB   = 512
 	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
