@@ -8,8 +8,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "TODO",
-				Description: "todo",
+				Component:   "kvm-operator",
+				Description: "Adjust master memory limit.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
