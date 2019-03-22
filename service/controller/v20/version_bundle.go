@@ -12,6 +12,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Adjust master memory limit.",
 				Kind:        versionbundle.KindChanged,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Use ext4 for docker and kubelet volumes.",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
