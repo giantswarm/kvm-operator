@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	Name = "nodeindexstatusv20"
+	Name = "nodeindexstatusv21"
 )
 
 type Config struct {

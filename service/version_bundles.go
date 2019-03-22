@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/giantswarm/kvm-operator/service/controller/v20"
 	"github.com/giantswarm/versionbundle"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
@@ -12,6 +11,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
 	"github.com/giantswarm/kvm-operator/service/controller/v18"
 	"github.com/giantswarm/kvm-operator/service/controller/v19"
+	"github.com/giantswarm/kvm-operator/service/controller/v20"
+	"github.com/giantswarm/kvm-operator/service/controller/v21"
 )
 
 func NewVersionBundles() []versionbundle.Bundle {
@@ -26,6 +27,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 	versionBundles = append(versionBundles, v18.VersionBundle())
 	versionBundles = append(versionBundles, v19.VersionBundle())
 	versionBundles = append(versionBundles, v20.VersionBundle())
+	versionBundles = append(versionBundles, v21.VersionBundle())
 
 	return versionBundles
 }

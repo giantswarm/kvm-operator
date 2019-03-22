@@ -1,4 +1,4 @@
-package v20
+package v21
 
 import (
 	"github.com/giantswarm/versionbundle"
@@ -9,7 +9,7 @@ func VersionBundle() versionbundle.Bundle {
 		Changelogs: []versionbundle.Changelog{
 			{
 				Component:   "kvm-operator",
-				Description: "Adjust master memory limit.",
+				Description: "TODO Your changes here.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
@@ -36,6 +36,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-		Version: "3.4.0",
+		Version: "3.5.0",
 	}
 }
