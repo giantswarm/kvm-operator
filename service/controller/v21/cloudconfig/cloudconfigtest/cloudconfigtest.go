@@ -4,7 +4,7 @@ import (
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_1_1"
 	"github.com/giantswarm/micrologger/microloggertest"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v20/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v21/cloudconfig"
 )
 
 func New() *cloudconfig.CloudConfig {

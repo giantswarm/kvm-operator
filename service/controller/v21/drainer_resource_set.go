@@ -9,9 +9,9 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v20/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v20/resource/endpoint"
-	"github.com/giantswarm/kvm-operator/service/controller/v20/resource/pod"
+	"github.com/giantswarm/kvm-operator/service/controller/v21/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v21/resource/endpoint"
+	"github.com/giantswarm/kvm-operator/service/controller/v21/resource/pod"
 )
 
 type DrainerResourceSetConfig struct {
