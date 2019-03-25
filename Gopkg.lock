@@ -242,7 +242,7 @@
   revision = "5ac1ece392f97e08ad0797a549702e3eba9dcd8d"
 
 [[projects]]
-  branch = "pin-calico-kube-controllers-to-master"
+  branch = "master"
   digest = "1:0700d9071223ed4a4914f713f05d2ced100a6c8f6a0452240694b1bb93c97dfc"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
@@ -257,7 +257,7 @@
     "v_4_1_2",
   ]
   pruneopts = "T"
-  revision = "6bf525a141507372738824446594932368a0790a"
+  revision = "fe21dc89ac52fab4e13df4ffa0f9b31a90aab1ab"
 
 [[projects]]
   branch = "master"

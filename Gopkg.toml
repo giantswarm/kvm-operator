@@ -57,7 +57,7 @@ required = [
   name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
-  branch = "pin-calico-kube-controllers-to-master"
+  branch = "master"
   name = "github.com/giantswarm/k8scloudconfig"
 
 [[constraint]]
