@@ -174,7 +174,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{}
-		resourceConfig.CertsSearcher = certstest.NewSearcher()
+		resourceConfig.CertsSearcher = certstest.NewSearcher(certstest.Config{})
 		resourceConfig.CloudConfig = cloudconfigtest.New()
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
