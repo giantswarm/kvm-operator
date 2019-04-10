@@ -84,15 +84,13 @@ systemd:
     contents: |
       [Unit]
       Description=k8s-setup-network-env Service
-      Wants=network.target docker.service
-      After=network.target docker.service
+      Wants=network.target docker.service wait-for-domains.service
+      After=network.target docker.service wait-for-domains.service
       [Service]
       Type=oneshot
-      RemainAfterExit=yes
       TimeoutStartSec=0
       Environment="IMAGE={{.Cluster.Kubernetes.NetworkSetup.Docker.Image}}"
       Environment="NAME=%p.service"
-      Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/mkdir -p /opt/bin/
       ExecStartPre=/usr/bin/docker pull $IMAGE
       ExecStartPre=-/usr/bin/docker stop -t 10 $NAME
@@ -142,14 +140,15 @@ systemd:
           --peer-cert-file /etc/etcd/server-crt.pem \
           --peer-key-file /etc/etcd/server-key.pem \
           --peer-client-cert-auth=true \
-          --advertise-client-urls=https://127.0.0.1:2379 \
+          --advertise-client-urls=https://{{ .Cluster.Etcd.Domain }}:{{ .EtcdPort }} \
           --initial-advertise-peer-urls=https://127.0.0.1:2380 \
-          --listen-client-urls=https://127.0.0.1:2379 \
+          --listen-client-urls=https://0.0.0.0:2379 \
           --listen-peer-urls=https://${DEFAULT_IPV4}:2380 \
           --initial-cluster-token k8s-etcd-cluster \
           --initial-cluster etcd0=https://127.0.0.1:2380 \
           --initial-cluster-state new \
-          --data-dir=/var/lib/etcd
+          --data-dir=/var/lib/etcd \
+          --enable-v2
       [Install]
       WantedBy=multi-user.target
   - name: etcd3-defragmentation.service
@@ -263,13 +262,6 @@ systemd:
       --register-node=true \
       --register-with-taints=node-role.kubernetes.io/master=:NoSchedule \
       --kubeconfig=/etc/kubernetes/kubeconfig/kubelet.yaml \
-      --kube-reserved="cpu=200m,memory=250Mi" \
-      --system-reserved="cpu=150m,memory=250Mi" \
-      --eviction-soft='memory.available<500Mi' \
-      --eviction-hard='memory.available<350Mi' \
-      --eviction-soft-grace-period='memory.available=5s' \
-      --eviction-max-pod-grace-period=60 \
-      --enforce-node-allocatable=pods \
       --node-labels="node-role.kubernetes.io/master,role=master,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
       --v=2"
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
@@ -302,11 +294,10 @@ systemd:
     contents: |
       [Unit]
       Description=Kubernetes Addons
-      Wants=k8s-kubelet.service
-      After=k8s-kubelet.service
+      Wants=k8s-kubelet.service k8s-setup-network-env.service
+      After=k8s-kubelet.service k8s-setup-network-env.service 
       [Service]
       Type=oneshot
-      EnvironmentFile=/etc/network-environment
       ExecStart=/opt/k8s-addons
       # https://github.com/kubernetes/kubernetes/issues/71078
       ExecStartPost=/usr/bin/systemctl restart k8s-kubelet.service
@@ -443,7 +434,7 @@ storage:
       filesystem: root
       mode: 0644
       contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet.yaml.tmpl" }}"
+        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet-master.yaml.tmpl" }}"
 
     - path: /etc/kubernetes/kubeconfig/kubelet.yaml
       filesystem: root

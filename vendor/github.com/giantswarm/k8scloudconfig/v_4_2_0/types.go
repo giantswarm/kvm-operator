@@ -9,7 +9,6 @@ type Params struct {
 	// etcd data.
 	APIServerEncryptionKey string
 	BaseDomain             string
-	Calico                 Calico
 	Cluster                v1alpha1.Cluster
 	// DisableCalico flag. When set removes all calico related Kubernetes
 	// manifests from the cloud config together with their initialization.
@@ -25,6 +24,10 @@ type Params struct {
 	// to hyperkube image commands. This allows to e.g. add cloud provider
 	// extensions.
 	Hyperkube Hyperkube
+	// EtcdPort allows the Etcd port to be specified.
+	// aws-operator sets this to the Etcd listening port so Calico on the
+	// worker nodes can access via a CNAME record to the master.
+	EtcdPort  int
 	Extension Extension
 	// ExtraManifests allows to specify extra Kubernetes manifests in
 	// /opt/k8s-addons script. The manifests are applied after calico is
@@ -49,12 +52,6 @@ func (p *Params) Validate() error {
 type Images struct {
 	Kubernetes string
 	Etcd       string
-}
-
-type Calico struct {
-	TyphaEnabled  bool
-	TyphaReplicas int
-	Version       string
 }
 
 type Hyperkube struct {

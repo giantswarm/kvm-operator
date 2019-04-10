@@ -11,11 +11,10 @@ import (
 )
 
 const (
-	calicoVersion         = "v3.5.2"
-	calicoTyphaReplicas   = 3
 	defaultRegistryDomain = "quay.io"
-	kubernetesImage       = "giantswarm/hyperkube:v1.13.3"
+	kubernetesImage       = "giantswarm/hyperkube:v1.13.4"
 	etcdImage             = "giantswarm/etcd:v3.3.12"
+	etcdPort              = 443
 )
 
 type CloudConfigConfig struct {
@@ -32,11 +31,7 @@ func DefaultCloudConfigConfig() CloudConfigConfig {
 
 func DefaultParams() Params {
 	return Params{
-		Calico: Calico{
-			TyphaEnabled:  true,
-			TyphaReplicas: calicoTyphaReplicas,
-			Version:       calicoVersion,
-		},
+		EtcdPort:       etcdPort,
 		RegistryDomain: defaultRegistryDomain,
 		Images: Images{
 			Kubernetes: kubernetesImage,
@@ -71,18 +66,18 @@ func NewCloudConfig(config CloudConfigConfig) (*CloudConfig, error) {
 func (c *CloudConfig) ExecuteTemplate() error {
 	tmpl, err := template.New("cloudconfig").Parse(c.template)
 	if err != nil {
-		return err
+		return microerror.Mask(err)
 	}
 
 	buf := new(bytes.Buffer)
 	err = tmpl.Execute(buf, c.params)
 	if err != nil {
-		return err
+		return microerror.Mask(err)
 	}
 
 	ignitionJSON, err := ignition.ConvertTemplatetoJSON(buf.Bytes())
 	if err != nil {
-		return err
+		return microerror.Mask(err)
 	}
 
 	c.config = string(ignitionJSON)

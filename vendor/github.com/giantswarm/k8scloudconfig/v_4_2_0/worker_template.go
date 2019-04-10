@@ -77,15 +77,13 @@ systemd:
     contents: |
       [Unit]
       Description=k8s-setup-network-env Service
-      Wants=network.target docker.service
-      After=network.target docker.service
+      Wants=network.target docker.service wait-for-domains.service
+      After=network.target docker.service wait-for-domains.service
       [Service]
       Type=oneshot
-      RemainAfterExit=yes
       TimeoutStartSec=0
       Environment="IMAGE={{.Cluster.Kubernetes.NetworkSetup.Docker.Image}}"
       Environment="NAME=%p.service"
-      Environment="NETWORK_CONFIG_CONTAINER="
       ExecStartPre=/usr/bin/mkdir -p /opt/bin/
       ExecStartPre=/usr/bin/docker pull $IMAGE
       ExecStartPre=-/usr/bin/docker stop -t 10 $NAME
@@ -164,13 +162,6 @@ systemd:
       --network-plugin=cni \
       --register-node=true \
       --kubeconfig=/etc/kubernetes/kubeconfig/kubelet.yaml \
-      --kube-reserved="cpu=200m,memory=250Mi" \
-      --system-reserved="cpu=150m,memory=250Mi" \
-      --eviction-soft='memory.available<500Mi' \
-      --eviction-hard='memory.available<350Mi' \
-      --eviction-soft-grace-period='memory.available=5s' \
-      --eviction-max-pod-grace-period=60 \
-      --enforce-node-allocatable=pods \
       --node-labels="node-role.kubernetes.io/worker,role=worker,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
       --v=2"
       ExecStop=-/usr/bin/docker stop -t 10 $NAME
@@ -211,7 +202,7 @@ storage:
       filesystem: root
       mode: 0644
       contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet.yaml.tmpl" }}"
+        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet-worker.yaml.tmpl" }}"
 
     - path: /etc/kubernetes/kubeconfig/kubelet.yaml
       filesystem: root
