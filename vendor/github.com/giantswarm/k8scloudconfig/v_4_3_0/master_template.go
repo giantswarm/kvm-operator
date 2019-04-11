@@ -1,4 +1,4 @@
-package v_4_1_1
+package v_4_3_0
 
 const MasterTemplate = `---
 ignition:
@@ -303,7 +303,7 @@ systemd:
       ExecStartPost=/usr/bin/systemctl restart k8s-kubelet.service
       [Install]
       WantedBy=multi-user.target
-   
+
   - name: debug-tools.service
     enabled: true
     contents: |
@@ -315,7 +315,7 @@ systemd:
       ExecStart=/opt/install-debug-tools
       [Install]
       WantedBy=multi-user.target
-  
+
 storage:
   files:
     - path: /etc/ssh/trusted-user-ca-keys.pem
@@ -434,7 +434,7 @@ storage:
       filesystem: root
       mode: 0644
       contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet.yaml.tmpl" }}"
+        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet-master.yaml.tmpl" }}"
 
     - path: /etc/kubernetes/kubeconfig/kubelet.yaml
       filesystem: root
@@ -515,7 +515,7 @@ storage:
       mode: 0600
       contents:
         source: "data:text/plain;charset=utf-8;base64,{{  index .Files "conf/ip_vs.conf" }}"
-            
+
     - path: /opt/install-debug-tools
       filesystem: root
       mode: 0544
@@ -526,7 +526,7 @@ storage:
       filesystem: root
       mode: 0644
       contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "conf/calicoctl.cfg" }}" 
+        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "conf/calicoctl.cfg" }}"
 
     - path: /etc/crictl.yaml
       filesystem: root

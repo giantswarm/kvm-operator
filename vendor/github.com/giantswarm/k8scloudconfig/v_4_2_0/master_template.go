@@ -1,4 +1,4 @@
-package v_4_1_1
+package v_4_2_0
 
 const MasterTemplate = `---
 ignition:
@@ -295,7 +295,7 @@ systemd:
       [Unit]
       Description=Kubernetes Addons
       Wants=k8s-kubelet.service k8s-setup-network-env.service
-      After=k8s-kubelet.service k8s-setup-network-env.service
+      After=k8s-kubelet.service k8s-setup-network-env.service 
       [Service]
       Type=oneshot
       ExecStart=/opt/k8s-addons
@@ -434,7 +434,7 @@ storage:
       filesystem: root
       mode: 0644
       contents:
-        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet.yaml.tmpl" }}"
+        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "config/kubelet-master.yaml.tmpl" }}"
 
     - path: /etc/kubernetes/kubeconfig/kubelet.yaml
       filesystem: root
