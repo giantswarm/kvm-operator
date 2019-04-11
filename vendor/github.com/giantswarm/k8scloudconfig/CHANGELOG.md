@@ -9,15 +9,29 @@ The latest version is considered WIP and it is a subject of change. All other
 versions are frozen. To freeze current version all files are copied to a new
 version directory, and  then changes are introduced.
 
+## [v4.3.0] WIP
+
+## [v4.2.0]
+
+### Changed
+- Fix race condition issue with systemd units.
+
+### Removed
+
+- Remove `UsePrivilegeSeparation` option from sshd configuration.
+
 ## [v4.1.2]
 ### Changed
 - Pin calico-kube-controllers to master.
+- Fix calico-node felix severity log level.
+- Enable `serviceaccount` controller in calico-kube-controller.
+- Remove 'staticPodPath' from worker kubelet configuration.
 
-## [v4.1.1] 
+## [v4.1.1]
 ### Changed
 - Update kubernetes to 1.13.4 CVE-2019-1002100
 
-## [v4.1.0] 
+## [v4.1.0]
 ### Changed
 - Intall calicoctl, crictl and configure etcctl tooling in masters.
 - Update kubernetes to 1.13.3.
@@ -25,7 +39,7 @@ version directory, and  then changes are introduced.
 - Update calico to 3.5.1.
 - Add fine-grained Audit Policy
 
-## [v4.0.1] 
+## [v4.0.1]
 ### Changed
 - Update kubernetes to 1.12.6 CVE-2019-1002100
 
