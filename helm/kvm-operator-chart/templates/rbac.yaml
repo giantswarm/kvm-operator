@@ -49,6 +49,14 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - clusterrolebindings
+    verbs:
+      - get
+      - create
+      - delete
+  - apiGroups:
+      - ""
+    resources:
       - namespaces
       - clusterrolebindings
       - serviceaccounts
@@ -73,13 +81,17 @@ rules:
       - list
       - watch
       - create
+      - update
   - apiGroups:
       - ""
     resources:
       - pods
     verbs:
-      - watch
+      - get
+      - list
+      - patch
       - update
+      - watch
   - apiGroups:
       - ""
     resources:
