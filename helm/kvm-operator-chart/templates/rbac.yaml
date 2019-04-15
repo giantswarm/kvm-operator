@@ -29,6 +29,14 @@ rules:
     verbs:
       - "*"
   - apiGroups:
+      - core.giantswarm.io
+    resources:
+      - drainerconfigs
+    verbs:
+      - create
+      - get
+      - delete
+  - apiGroups:
       - provider.giantswarm.io
     resources:
       - kvmconfigs
@@ -77,21 +85,13 @@ rules:
       - endpoints
       - services
     verbs:
-      - get
-      - list
-      - watch
-      - create
-      - update
+      - "*"
   - apiGroups:
       - ""
     resources:
       - pods
     verbs:
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      - "*"
   - apiGroups:
       - ""
     resources:
