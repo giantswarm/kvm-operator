@@ -51,7 +51,7 @@ const (
 
 	FlannelEnvPathPrefix = "/run/flannel"
 	CoreosImageDir       = "/var/lib/coreos-kvm-images"
-	CoreosVersion        = "2023.4.0"
+	CoreosVersion        = "2023.5.0"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:6fbba190dbdab2a24dd4022f49510575ad482aaa"
