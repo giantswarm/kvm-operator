@@ -58,15 +58,6 @@ func IsReleaseVersionNotMatching(err error) bool {
 	return microerror.Cause(err) == releaseVersionNotMatchingError
 }
 
-var stillExistsError = &microerror.Error{
-	Kind: "stillExistsError",
-}
-
-// IsStillExists asserts stillExistsError.
-func IsStillExists(err error) bool {
-	return microerror.Cause(err) == stillExistsError
-}
-
 var tarballNotFoundError = &microerror.Error{
 	Kind: "tarballNotFoundError",
 }
@@ -85,20 +76,11 @@ func IsTillerNotFound(err error) bool {
 	return microerror.Cause(err) == tillerNotFoundError
 }
 
-var tooManyResultsError = &microerror.Error{
-	Kind: "tooManyResultsError",
+var waitError = &microerror.Error{
+	Kind: "waitError",
 }
 
-// IsTooManyResults asserts invalidConfigError.
-func IsTooManyResults(err error) bool {
-	return microerror.Cause(err) == tooManyResultsError
-}
-
-var unexpectedStatusPhaseError = &microerror.Error{
-	Kind: "unexpectedStatusPhaseError",
-}
-
-// IsUnexpectedStatusPhase asserts notFoundError.
-func IsUnexpectedStatusPhase(err error) bool {
-	return microerror.Cause(err) == unexpectedStatusPhaseError
+// IsWait asserts waitError.
+func IsWait(err error) bool {
+	return microerror.Cause(err) == waitError
 }
