@@ -20,28 +20,28 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
 	v14patch4cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch4/cloudconfig"
 
-	v15 "github.com/giantswarm/kvm-operator/service/controller/v15"
+	"github.com/giantswarm/kvm-operator/service/controller/v15"
 	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
-	v16 "github.com/giantswarm/kvm-operator/service/controller/v16"
+	"github.com/giantswarm/kvm-operator/service/controller/v16"
 	v16cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v16/cloudconfig"
-	v17 "github.com/giantswarm/kvm-operator/service/controller/v17"
+	"github.com/giantswarm/kvm-operator/service/controller/v17"
 	v17cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
 	v17patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17patch1/cloudconfig"
 
-	v18 "github.com/giantswarm/kvm-operator/service/controller/v18"
+	"github.com/giantswarm/kvm-operator/service/controller/v18"
 	v18cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
 
-	v19 "github.com/giantswarm/kvm-operator/service/controller/v19"
+	"github.com/giantswarm/kvm-operator/service/controller/v19"
 	v19cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v19/cloudconfig"
 
-	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
+	"github.com/giantswarm/kvm-operator/service/controller/v20"
 	v20cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v20/cloudconfig"
 
-	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
+	"github.com/giantswarm/kvm-operator/service/controller/v21"
 	v21cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v21/cloudconfig"
 
-	v22 "github.com/giantswarm/kvm-operator/service/controller/v22"
+	"github.com/giantswarm/kvm-operator/service/controller/v22"
 	v22cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v22/cloudconfig"
 )
 
