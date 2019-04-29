@@ -20,26 +20,29 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
 	v14patch4cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch4/cloudconfig"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v15"
+	v15 "github.com/giantswarm/kvm-operator/service/controller/v15"
 	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v16"
+	v16 "github.com/giantswarm/kvm-operator/service/controller/v16"
 	v16cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v16/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v17"
+	v17 "github.com/giantswarm/kvm-operator/service/controller/v17"
 	v17cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
 	v17patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17patch1/cloudconfig"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v18"
+	v18 "github.com/giantswarm/kvm-operator/service/controller/v18"
 	v18cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v19"
+	v19 "github.com/giantswarm/kvm-operator/service/controller/v19"
 	v19cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v19/cloudconfig"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v20"
+	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	v20cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v20/cloudconfig"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v21"
+	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
 	v21cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v21/cloudconfig"
+
+	v22 "github.com/giantswarm/kvm-operator/service/controller/v22"
+	v22cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v22/cloudconfig"
 )
 
 type ClusterConfig struct {
@@ -400,6 +403,35 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
+	var resourceSetV22 *controller.ResourceSet
+	{
+		c := v22.ClusterResourceSetConfig{
+			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.G8sClient,
+			K8sClient:          config.K8sClient,
+			Logger:             config.Logger,
+			RandomkeysSearcher: randomkeysSearcher,
+			TenantCluster:      config.TenantCluster,
+
+			DNSServers:         config.DNSServers,
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			IgnitionPath:       config.IgnitionPath,
+			ProjectName:        config.ProjectName,
+			OIDC: v22cloudconfig.OIDCConfig{
+				ClientID:      config.OIDC.ClientID,
+				IssuerURL:     config.OIDC.IssuerURL,
+				UsernameClaim: config.OIDC.UsernameClaim,
+				GroupsClaim:   config.OIDC.GroupsClaim,
+			},
+			SSOPublicKey: config.SSOPublicKey,
+		}
+
+		resourceSetV22, err = v22.NewClusterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
@@ -418,6 +450,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				resourceSetV19,
 				resourceSetV20,
 				resourceSetV21,
+				resourceSetV22,
 			},
 			RESTClient: config.G8sClient.ProviderV1alpha1().RESTClient(),
 
