@@ -129,7 +129,7 @@ Description=Mount for docker volume
 [Mount]
 What=/dev/disk/by-id/virtio-dockerfs
 Where=/var/lib/docker
-Type=xfs
+Type=ext4
 [Install]
 WantedBy=multi-user.target
 `,
