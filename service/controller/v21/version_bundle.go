@@ -34,7 +34,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "kvm-operator",
-				Description: "Go back to XFS for docker and kubelet volumes.",
+				Description: "Use XFS for docker and kubelet volumes.",
 				Kind:        versionbundle.KindFixed,
 			},
 		},
