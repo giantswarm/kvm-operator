@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
+	"github.com/giantswarm/statusresource"
 	"github.com/giantswarm/tenantcluster"
 	"github.com/spf13/viper"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -35,10 +36,11 @@ type Config struct {
 type Service struct {
 	Version *version.Service
 
-	bootOnce          sync.Once
-	clusterController *controller.Cluster
-	deleterController *controller.Deleter
-	drainerController *controller.Drainer
+	bootOnce                sync.Once
+	clusterController       *controller.Cluster
+	deleterController       *controller.Deleter
+	drainerController       *controller.Drainer
+	statusResourceCollector *statusresource.CollectorSet
 }
 
 func New(config Config) (*Service, error) {
@@ -184,6 +186,19 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var statusResourceCollector *statusresource.CollectorSet
+	{
+		c := statusresource.CollectorSetConfig{
+			Logger:  config.Logger,
+			Watcher: g8sClient.ProviderV1alpha1().KVMConfigs("").Watch,
+		}
+
+		statusResourceCollector, err = statusresource.NewCollectorSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var versionService *version.Service
 	{
 		versionConfig := version.DefaultConfig()
@@ -203,10 +218,11 @@ func New(config Config) (*Service, error) {
 	newService := &Service{
 		Version: versionService,
 
-		bootOnce:          sync.Once{},
-		clusterController: clusterController,
-		deleterController: deleterController,
-		drainerController: drainerController,
+		bootOnce:                sync.Once{},
+		clusterController:       clusterController,
+		deleterController:       deleterController,
+		drainerController:       drainerController,
+		statusResourceCollector: statusResourceCollector,
 	}
 
 	return newService, nil
@@ -214,6 +230,8 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
+		go s.statusResourceCollector.Boot(context.Background())
+
 		go s.clusterController.Boot(context.Background())
 		go s.deleterController.Boot(context.Background())
 		go s.drainerController.Boot(context.Background())
