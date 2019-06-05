@@ -8,8 +8,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "TODO",
-				Description: "TODO",
+				Component:   "kvm-operator",
+				Description: "Improved memory overhead formula with new qemu version.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
