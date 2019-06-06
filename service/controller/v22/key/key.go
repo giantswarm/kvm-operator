@@ -60,7 +60,7 @@ const (
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
-	baseWorkerMemoryOverheadMB   = 512
+	baseWorkerMemoryOverheadMB   = 768
 	baseWorkerOverheadMultiplier = 2
 	baseWorkerOverheadModulator  = 12
 	qemuMemoryIOOverhead         = "512M"
@@ -345,11 +345,20 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	q.Add(ioOverhead)
 
 	// memory overhead is more complex as it increases with the size of the memory
-	// basic calculation is (2 + (memory / 12))*512M
+	// basic calculation is (2 + (memory / 12))*768M
 	// examples:
-	// Memory under 15G >> overhead 1024M
-	// memory between 15 - 30G >> overhead 1536M
-	// memory between 30 - 45G >> overhead 2048M
+	// Memory under 12G >> overhead 1536M
+	// memory between 12 - 24G >> overhead 2048M
+	// memory between 24 - 36G >> overhead 2816M
+	// memory between 24 - 36G >> overhead 3584M
+	// memory between 36 - 48G >> overhead 4352M
+	// memory between 48 - 60G >> overhead 5120M
+	// memory between 60 - 72G >> overhead 5888M
+	// memory between 72 - 84G >> overhead 6656M
+	// memory between 84 - 96G >> overhead 7424M
+	// memory between 96 - 108G >> overhead 8192M
+	// memory between 108 - 120G >> overhead 8960M
+
 	overheadMultiplier := int(baseWorkerOverheadMultiplier + mQuantity.ScaledValue(resource.Giga)/baseWorkerOverheadModulator)
 	workerMemoryOverhead := strconv.Itoa(baseWorkerMemoryOverheadMB*overheadMultiplier) + "M"
 
