@@ -1,0 +1,41 @@
+package v22
+
+import (
+	"github.com/giantswarm/versionbundle"
+)
+
+func VersionBundle() versionbundle.Bundle {
+	return versionbundle.Bundle{
+		Changelogs: []versionbundle.Changelog{
+			{
+				Component:   "kvm-operator",
+				Description: "Improved memory overhead formula with new qemu version.",
+				Kind:        versionbundle.KindChanged,
+			},
+		},
+		Components: []versionbundle.Component{
+			{
+				Name:    "calico",
+				Version: "3.6.1",
+			},
+			{
+				Name:    "containerlinux",
+				Version: "2023.5.0",
+			},
+			{
+				Name:    "docker",
+				Version: "18.06.1",
+			},
+			{
+				Name:    "etcd",
+				Version: "3.3.12",
+			},
+			{
+				Name:    "kubernetes",
+				Version: "1.14.1",
+			},
+		},
+		Name:    "kvm-operator",
+		Version: "3.6.0",
+	}
+}
