@@ -86,8 +86,12 @@ func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.nodeIndex, key.WorkerID)),
 		Path:         IscsiInitiatorNameFilePath,
 		Owner: k8scloudconfig.Owner{
-			User:  FileOwnerUser,
-			Group: FileOwnerGroup,
+			User: k8scloudconfig.User{
+				Name: FileOwnerUserName,
+			},
+			Group: k8scloudconfig.Group{
+				Name: FileOwnerGroupName,
+			},
 		},
 		Permissions: IscsiInitiatorFilePermissions,
 	}
