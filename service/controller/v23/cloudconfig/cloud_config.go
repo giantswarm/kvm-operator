@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	FileOwnerUser  = "root"
-	FileOwnerGroup = "root"
-	FilePermission = 0700
+	FileOwnerUserName  = "root"
+	FileOwnerGroupName = "root"
+	FilePermission     = 0700
 
 	IscsiInitiatorNameFilePath    = "/etc/iscsi/initiatorname.iscsi"
 	IscsiInitiatorFilePermissions = 0644

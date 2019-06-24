@@ -5,7 +5,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_3_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_4_0"
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/randomkeys"
@@ -76,8 +76,12 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 			AssetContent: string(f.Data),
 			Path:         f.AbsolutePath,
 			Owner: k8scloudconfig.Owner{
-				User:  FileOwnerUser,
-				Group: FileOwnerGroup,
+				User: k8scloudconfig.User{
+					Name: FileOwnerUserName,
+				},
+				Group: k8scloudconfig.Group{
+					Name: FileOwnerGroupName,
+				},
 			},
 			Permissions: FilePermission,
 		}
@@ -88,8 +92,12 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.nodeIndex, key.MasterID)),
 		Path:         IscsiInitiatorNameFilePath,
 		Owner: k8scloudconfig.Owner{
-			User:  FileOwnerUser,
-			Group: FileOwnerGroup,
+			User: k8scloudconfig.User{
+				Name: FileOwnerUserName,
+			},
+			Group: k8scloudconfig.Group{
+				Name: FileOwnerGroupName,
+			},
 		},
 		Permissions: IscsiInitiatorFilePermissions,
 	}
@@ -100,8 +108,12 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		AssetContent: IscsiConfigFileContent,
 		Path:         IscsiConfigFilePath,
 		Owner: k8scloudconfig.Owner{
-			User:  FileOwnerUser,
-			Group: FileOwnerGroup,
+			User: k8scloudconfig.User{
+				Name: FileOwnerUserName,
+			},
+			Group: k8scloudconfig.Group{
+				Name: FileOwnerGroupName,
+			},
 		},
 		Permissions: IscsiConfigFilePermissions,
 	}
