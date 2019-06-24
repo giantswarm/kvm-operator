@@ -44,7 +44,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v22"
 	v22cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v22/cloudconfig"
 
-	v23 "github.com/giantswarm/kvm-operator/service/controller/v23"
+	"github.com/giantswarm/kvm-operator/service/controller/v23"
 	v23cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v23/cloudconfig"
 )
 
