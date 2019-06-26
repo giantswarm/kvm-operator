@@ -11,7 +11,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "servicev23"
+	Name = "servicev24"
 )
 
 // Config represents the configuration used to create a new service resource.
