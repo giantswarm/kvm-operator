@@ -32,6 +32,7 @@ func NewVersionBundles() []versionbundle.Bundle {
 	versionBundles = append(versionBundles, v21.VersionBundle())
 	versionBundles = append(versionBundles, v22.VersionBundle())
 	versionBundles = append(versionBundles, v23.VersionBundle())
+	versionBundles = append(versionBundles, v24.VersionBundle())
 
 	return versionBundles
 }
