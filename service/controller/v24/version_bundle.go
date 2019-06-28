@@ -8,8 +8,8 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "TODO",
-				Description: "TODO",
+				Component:   "k8scloudconfig",
+				Description: "Added configuration necessary for generic rbd storage support.",
 				Kind:        versionbundle.KindChanged,
 			},
 		},
