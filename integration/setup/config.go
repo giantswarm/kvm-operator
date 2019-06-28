@@ -86,7 +86,6 @@ func NewConfig() (Config, error) {
 
 			ClusterID:       env.ClusterID(),
 			TargetNamespace: env.TargetNamespace(),
-			VaultToken:      env.VaultToken(),
 		}
 
 		host, err = framework.NewHost(c)
