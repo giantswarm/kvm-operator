@@ -136,7 +136,7 @@
     "pkg/clientset/versioned/typed/release/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "4a361d7c9ad50551895b20a4945c6083171ecf66"
+  revision = "49bc8cba4c8e4eee46d81f3d9aa92d133c09e656"
 
 [[projects]]
   branch = "master"
@@ -243,7 +243,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:eb7777563039f000b50bcd73edb53c72882b47d262879cf830c70d76f5fafa29"
+  digest = "1:752708b1242d6dca553f10d8753f8365a69dd1950a8e9fb8812a2dbbf71aaa64"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -258,7 +258,7 @@
     "v_4_4_0",
   ]
   pruneopts = "T"
-  revision = "90c6758d59dd77b33ed28cfd9677eb393ae41ae4"
+  revision = "f5aebcd5d6b7ae93af8e10a082092008638b119d"
 
 [[projects]]
   branch = "master"
@@ -337,7 +337,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:06d85b7a32fefc8d774db32228e925c01fc7d95b209486d135cb51ccddcaf6c1"
+  digest = "1:ea12c5546fcade954db5ca2f724c92c5b3003554ef7f1314174ec203568b7591"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -347,17 +347,17 @@
     "controller/context/reconciliationcanceledcontext",
     "controller/context/resourcecanceledcontext",
     "controller/context/updateallowedcontext",
-    "controller/resource/internal",
-    "controller/resource/metricsresource",
-    "controller/resource/retryresource",
     "flag/service/kubernetes",
     "flag/service/kubernetes/tls",
     "flag/service/kubernetes/watch",
     "informer",
     "informer/collector",
+    "resource/wrapper/internal",
+    "resource/wrapper/metricsresource",
+    "resource/wrapper/retryresource",
   ]
   pruneopts = "UT"
-  revision = "b1bed61beabc7cfff87fcbe8177fb5621e2c2784"
+  revision = "e5d2b8071b3678d427e342e6ae500b5059de778a"
 
 [[projects]]
   branch = "master"
@@ -1357,10 +1357,10 @@
     "github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext",
     "github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext",
     "github.com/giantswarm/operatorkit/controller/context/updateallowedcontext",
-    "github.com/giantswarm/operatorkit/controller/resource/metricsresource",
-    "github.com/giantswarm/operatorkit/controller/resource/retryresource",
     "github.com/giantswarm/operatorkit/flag/service/kubernetes",
     "github.com/giantswarm/operatorkit/informer",
+    "github.com/giantswarm/operatorkit/resource/wrapper/metricsresource",
+    "github.com/giantswarm/operatorkit/resource/wrapper/retryresource",
     "github.com/giantswarm/randomkeys",
     "github.com/giantswarm/randomkeys/randomkeystest",
     "github.com/giantswarm/rangepool",
