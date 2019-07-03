@@ -5,16 +5,24 @@ metadata:
 spec:
   privileged: false
   fsGroup:
-    rule: RunAsAny
+    rule: MustRunAs
+    ranges:
+      - min: 1
+        max: 65535 
   runAsUser:
-    rule: RunAsAny
+    rule: MustRunAsNonRoot
+  runAsGroup:
+    rule: MustRunAs
+    ranges:
+      - min: 1
+        max: 65535
   seLinux:
     rule: RunAsAny
   supplementalGroups:
     rule: RunAsAny
   volumes:
-    - 'secret'
     - 'configMap'
+  allowPrivilegeEscalation: false
   hostNetwork: false
   hostIPC: false
   hostPID: false
