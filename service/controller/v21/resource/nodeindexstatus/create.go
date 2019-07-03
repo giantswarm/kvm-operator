@@ -29,7 +29,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		// Remove node indexes for non-existent nodes.
-		for nodeID, _ := range nodeIndexes {
+		for nodeID := range nodeIndexes {
 			found := false
 
 			for _, n := range nodes {
