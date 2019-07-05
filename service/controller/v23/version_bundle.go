@@ -29,7 +29,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Component:   "ignition",
-				Description: "Added name label for default, giantswarm and kube-system namespaces.",
+				Description: "Add name label for default, giantswarm and kube-system namespaces.",
 				Kind:        versionbundle.KindAdded,
 			},
 		},
