@@ -242,8 +242,8 @@
   revision = "17e0d6767825b658900acec1fb7001059980ee3c"
 
 [[projects]]
-  branch = "master"
-  digest = "1:34cefd588c7a4b33258b4e7d087a77a4d4c2e0a6db7bc1041d327751a7a36a38"
+  branch = "kubelet-image-pulls"
+  digest = "1:9368cd97cf62362b65d0d49b0d0a41b2e52cd1a239527f07df5c273a96206497"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -260,7 +260,7 @@
     "v_4_6_0",
   ]
   pruneopts = "T"
-  revision = "f417c02df18bdfadb485905499b7872657fdeef2"
+  revision = "d2352f3ddae7cb44bf53782460a2d3df4f56c448"
 
 [[projects]]
   branch = "master"
