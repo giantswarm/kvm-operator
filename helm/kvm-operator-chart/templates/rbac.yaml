@@ -79,6 +79,8 @@ rules:
       - persistentvolumeclaims
     verbs:
       - get
+      - create
+      - delete
   - apiGroups:
       - ""
     resources:
