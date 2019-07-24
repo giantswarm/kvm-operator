@@ -201,13 +201,13 @@ func New(config Config) (*Service, error) {
 
 	var versionService *version.Service
 	{
-		versionConfig := version.DefaultConfig()
-
-		versionConfig.Description = config.Description
-		versionConfig.GitCommit = config.GitCommit
-		versionConfig.Name = config.Name
-		versionConfig.Source = config.Source
-		versionConfig.VersionBundles = NewVersionBundles()
+		versionConfig := version.Config{
+			Description:    config.Description,
+			GitCommit:      config.GitCommit,
+			Name:           config.Name,
+			Source:         config.Source,
+			VersionBundles: NewVersionBundles(),
+		}
 
 		versionService, err = version.New(versionConfig)
 		if err != nil {
