@@ -40,29 +40,7 @@ func Test_Resource_Endpoint_newUpdateChange(t *testing.T) {
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
 			},
-			updateChange: &corev1.Endpoints{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: "v1",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "TestService",
-					Namespace: "TestNamespace",
-				},
-				Subsets: []corev1.EndpointSubset{
-					{
-						Ports: []corev1.EndpointPort{
-							{
-								Port: 1234,
-							},
-						},
-						Addresses: []corev1.EndpointAddress{
-							{
-								IP: "1.1.1.1",
-							},
-						},
-					},
-				},
-			},
+			updateChange: nil,
 		},
 		{
 			currentState: &Endpoint{
