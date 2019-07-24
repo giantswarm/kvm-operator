@@ -60,7 +60,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	var updateChange *corev1.Endpoints
-	{
+	if !ipsAreEqual(currentEndpoint.IPs, desiredEndpoint.IPs) {
 		ips := ipsForUpdateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
 
 		e := &Endpoint{
@@ -75,6 +75,27 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	return updateChange, nil
+}
+
+func ipsAreEqual(currentIPs []string, desiredIPs []string) bool {
+	// In case one slice is nil and the other is not, it is not equal anymore.
+	if (currentIPs == nil) != (desiredIPs == nil) {
+		return false
+	}
+
+	// In case one slice has more or less items in it, it is not equal anymore.
+	if len(currentIPs) != len(desiredIPs) {
+		return false
+	}
+
+	// In case one slice is missing some item, it is not equal anymore.
+	for i := range currentIPs {
+		if currentIPs[i] != desiredIPs[i] {
+			return false
+		}
+	}
+
+	return true
 }
 
 func ipsForUpdateChange(currentIPs []string, desiredIPs []string) []string {
