@@ -85,7 +85,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		r.logger.LogCtx(ctx, "level", "debug", "message", "found endpoint")
 	}
 
-	// Remove master endpoint ip only after pod is fully terminated because we still need to drain master before we remove it.
+	// Remove master endpoint ip only after pod is fully terminated because we
+	// still need to drain the master before we remove it.
 	if serviceName == key.MasterID && key.IsPodDeleted(pod) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current version of the reconciled pod in the Kubernetes API")
 
