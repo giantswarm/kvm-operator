@@ -15,6 +15,16 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 		return microerror.Mask(err)
 	}
 
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("%#v\n", endpointToUpdate.Name)
+	fmt.Printf("%#v\n", endpointToUpdate.Subsets)
+	for _, s := range endpointToUpdate.Subsets {
+		fmt.Printf("%#v\n", s.Addresses)
+		fmt.Printf("%#v\n", s.Ports)
+	}
+
 	if !isEmptyEndpoint(endpointToUpdate) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating endpoint '%s'", endpointToUpdate.GetName()))
 
@@ -27,6 +37,9 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 	} else {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not updating endpoint '%s'", endpointToUpdate.GetName()))
 	}
+	fmt.Printf("\n")
+	fmt.Printf("\n")
+	fmt.Printf("\n")
 
 	return nil
 }
