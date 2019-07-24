@@ -60,15 +60,18 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	var updateChange *corev1.Endpoints
-	if !ipsAreEqual(currentEndpoint.IPs, desiredEndpoint.IPs) {
+	{
 		ips := ipsForUpdateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
 
 		e := &Endpoint{
-			Addresses:        ipsToAddresses(ips),
-			IPs:              ips,
-			Ports:            currentEndpoint.Ports,
 			ServiceName:      currentEndpoint.ServiceName,
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
+		}
+
+		if !ipsAreEqual(currentEndpoint.IPs, desiredEndpoint.IPs) {
+			e.Addresses = ipsToAddresses(ips)
+			e.IPs = ips
+			e.Ports = currentEndpoint.Ports
 		}
 
 		updateChange = r.newK8sEndpoint(e)

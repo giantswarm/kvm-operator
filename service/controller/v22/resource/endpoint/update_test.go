@@ -40,7 +40,15 @@ func Test_Resource_Endpoint_newUpdateChange(t *testing.T) {
 				ServiceName:      "TestService",
 				ServiceNamespace: "TestNamespace",
 			},
-			ExpectedCreateState: nil,
+			ExpectedCreateState: &corev1.Endpoints{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "v1",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "TestService",
+					Namespace: "TestNamespace",
+				},
+			},
 		},
 		{
 			CurrentState: &Endpoint{
