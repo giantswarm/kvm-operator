@@ -68,7 +68,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
 		}
 
-		if containsStrings(currentEndpoint.IPs, desiredEndpoint.IPs) {
+		if !containsStrings(currentEndpoint.IPs, desiredEndpoint.IPs) {
 			e.Addresses = ipsToAddresses(ips)
 			e.IPs = ips
 			e.Ports = currentEndpoint.Ports

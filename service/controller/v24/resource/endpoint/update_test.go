@@ -201,23 +201,6 @@ func Test_Resource_Endpoint_newUpdateChange(t *testing.T) {
 					Name:      "TestService",
 					Namespace: "TestNamespace",
 				},
-				Subsets: []corev1.EndpointSubset{
-					{
-						Ports: []corev1.EndpointPort{
-							{
-								Port: 1234,
-							},
-						},
-						Addresses: []corev1.EndpointAddress{
-							{
-								IP: "1.1.1.1",
-							},
-							{
-								IP: "1.2.3.4",
-							},
-						},
-					},
-				},
 			},
 		},
 		{
