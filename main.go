@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command"
 	microserver "github.com/giantswarm/microkit/server"
@@ -15,11 +16,7 @@ import (
 )
 
 var (
-	description string     = "The kvm-operator handles Kubernetes clusters running on a Kubernetes cluster."
-	f           *flag.Flag = flag.New()
-	gitCommit   string     = "n/a"
-	name        string     = "kvm-operator"
-	source      string     = "https://github.com/giantswarm/kvm-operator"
+	f *flag.Flag = flag.New()
 )
 
 func main() {
@@ -52,11 +49,12 @@ func mainError() error {
 			c := service.Config{
 				Logger: newLogger,
 
-				Description: description,
+				Description: project.Description(),
 				Flag:        f,
-				GitCommit:   gitCommit,
-				Name:        name,
-				Source:      source,
+				GitCommit:   project.GitSHA(),
+				Name:        project.Name(),
+				Source:      project.Source(),
+				Version:     project.Version(),
 				Viper:       v,
 			}
 
@@ -75,7 +73,7 @@ func mainError() error {
 				Service: newService,
 				Viper:   v,
 
-				ProjectName: name,
+				ProjectName: project.Name(),
 			}
 
 			newServer, err = server.New(c)
@@ -94,10 +92,11 @@ func mainError() error {
 			Logger:        newLogger,
 			ServerFactory: newServerFactory,
 
-			Description:    description,
-			GitCommit:      gitCommit,
-			Name:           name,
-			Source:         source,
+			Description:    project.Description(),
+			GitCommit:      project.GitSHA(),
+			Name:           project.Name(),
+			Source:         project.Source(),
+			Version:        project.Version(),
 			VersionBundles: service.NewVersionBundles(),
 		}
 
