@@ -10,8 +10,12 @@ import (
 //     https://github.com/giantswarm/giantswarm/issues/5154
 //
 type Endpoint struct {
-	Addresses        []corev1.EndpointAddress
-	Ports            []corev1.EndpointPort
+	Addresses []corev1.EndpointAddress
+	Ports     []corev1.EndpointPort
+	// IPs contains string representations of IP addresses. When the current state
+	// is computed the list contains all IPs of the endpoint belonging to the
+	// reconciled pod. When the desired state is computed the list contains only a
+	// single IP, which is the IP of the reconciled pod.
 	IPs              []string
 	ServiceName      string
 	ServiceNamespace string

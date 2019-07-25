@@ -81,7 +81,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
 		}
 
-		if !ipsAreEqual(currentEndpoint.IPs, desiredEndpoint.IPs) {
+		if containsStrings(currentEndpoint.IPs, desiredEndpoint.IPs) {
 			e.Addresses = ipsToAddresses(ips)
 			e.IPs = ips
 			e.Ports = currentEndpoint.Ports
@@ -93,25 +93,29 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	return updateChange, nil
 }
 
-func ipsAreEqual(currentIPs []string, desiredIPs []string) bool {
-	// In case one slice is nil and the other is not, it is not equal anymore.
-	if (currentIPs == nil) != (desiredIPs == nil) {
-		return false
-	}
-
-	// In case one slice has more or less items in it, it is not equal anymore.
-	if len(currentIPs) != len(desiredIPs) {
-		return false
-	}
-
-	// In case one slice is missing some item, it is not equal anymore.
-	for i := range currentIPs {
-		if currentIPs[i] != desiredIPs[i] {
+// containsStrings returns true when all items in b are present in a. We use
+// this to determine if all of the desired IPs are already present in the
+// current IPs, which are the IPs from the k8s endpoint. In case all desired IPs
+// are already in the endpoint, we do not need to update the endpoint against
+// the Kubernetes API.
+func containsStrings(a []string, b []string) bool {
+	for _, s := range b {
+		if !containsString(a, s) {
 			return false
 		}
 	}
 
 	return true
+}
+
+func containsString(list []string, s string) bool {
+	for _, item := range list {
+		if item == s {
+			return true
+		}
+	}
+
+	return false
 }
 
 func ipsForUpdateChange(currentIPs []string, desiredIPs []string) []string {
