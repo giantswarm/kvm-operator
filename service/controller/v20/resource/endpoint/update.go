@@ -64,17 +64,45 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		ips := ipsForUpdateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
 
 		e := &Endpoint{
-			Addresses:        ipsToAddresses(ips),
-			IPs:              ips,
-			Ports:            currentEndpoint.Ports,
 			ServiceName:      currentEndpoint.ServiceName,
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
+		}
+
+		if !containsStrings(currentEndpoint.IPs, desiredEndpoint.IPs) {
+			e.Addresses = ipsToAddresses(ips)
+			e.IPs = ips
+			e.Ports = currentEndpoint.Ports
 		}
 
 		updateChange = r.newK8sEndpoint(e)
 	}
 
 	return updateChange, nil
+}
+
+// containsStrings returns true when all items in b are present in a. We use
+// this to determine if all of the desired IPs are already present in the
+// current IPs, which are the IPs from the k8s endpoint. In case all desired IPs
+// are already in the endpoint, we do not need to update the endpoint against
+// the Kubernetes API.
+func containsStrings(a []string, b []string) bool {
+	for _, s := range b {
+		if !containsString(a, s) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func containsString(list []string, s string) bool {
+	for _, item := range list {
+		if item == s {
+			return true
+		}
+	}
+
+	return false
 }
 
 func ipsForUpdateChange(currentIPs []string, desiredIPs []string) []string {

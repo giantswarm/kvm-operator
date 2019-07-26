@@ -60,12 +60,15 @@ func (r *Resource) newK8sEndpoint(endpoint *Endpoint) *corev1.Endpoints {
 			Name:      endpoint.ServiceName,
 			Namespace: endpoint.ServiceNamespace,
 		},
-		Subsets: []corev1.EndpointSubset{
+	}
+
+	if len(endpoint.Addresses) != 0 || len(endpoint.Ports) != 0 {
+		k8sEndpoint.Subsets = []corev1.EndpointSubset{
 			{
 				Addresses: endpoint.Addresses,
 				Ports:     endpoint.Ports,
 			},
-		},
+		}
 	}
 
 	return k8sEndpoint
