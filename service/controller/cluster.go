@@ -15,41 +15,16 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
-	v14patch3cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch3/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
-	v14patch4cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v14patch4/cloudconfig"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v15"
-	v15cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v15/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v16"
-	v16cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v16/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v17"
-	v17cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
-	v17patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v17patch1/cloudconfig"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v18"
-	v18cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v18/cloudconfig"
-
-	"github.com/giantswarm/kvm-operator/service/controller/v19"
-	v19cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v19/cloudconfig"
-
 	"github.com/giantswarm/kvm-operator/service/controller/v20"
 	v20cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v20/cloudconfig"
-
 	"github.com/giantswarm/kvm-operator/service/controller/v21"
 	v21cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v21/cloudconfig"
-
 	"github.com/giantswarm/kvm-operator/service/controller/v22"
 	v22cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v22/cloudconfig"
-
 	"github.com/giantswarm/kvm-operator/service/controller/v23"
 	v23cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v23/cloudconfig"
-
 	"github.com/giantswarm/kvm-operator/service/controller/v23patch1"
 	v23patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v23patch1/cloudconfig"
-
 	"github.com/giantswarm/kvm-operator/service/controller/v24"
 	v24cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
 )
@@ -114,10 +89,12 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 
 	var randomkeysSearcher randomkeys.Interface
 	{
-		keyConfig := randomkeys.DefaultConfig()
-		keyConfig.K8sClient = config.K8sClient
-		keyConfig.Logger = config.Logger
-		randomkeysSearcher, err = randomkeys.NewSearcher(keyConfig)
+		c := randomkeys.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		randomkeysSearcher, err = randomkeys.NewSearcher(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -135,220 +112,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 
 		newInformer, err = informer.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV14Patch3 *controller.ResourceSet
-	{
-		c := v14patch3.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-			OIDC: v14patch3cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV14Patch3, err = v14patch3.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV14Patch4 *controller.ResourceSet
-	{
-		c := v14patch4.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-			OIDC: v14patch4cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV14Patch4, err = v14patch4.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV15 *controller.ResourceSet
-	{
-		c := v15.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-			OIDC: v15cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV15, err = v15.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV16 *controller.ResourceSet
-	{
-		c := v16.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-			OIDC: v16cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV16, err = v16.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV17 *controller.ResourceSet
-	{
-		c := v17.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-			OIDC: v17cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV17, err = v17.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV17patch1 *controller.ResourceSet
-	{
-		c := v17patch1.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			ProjectName:        config.ProjectName,
-			OIDC: v17patch1cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV17patch1, err = v17patch1.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV18 *controller.ResourceSet
-	{
-		c := v18.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-			TenantCluster:      config.TenantCluster,
-
-			DNSServers:         config.DNSServers,
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			IgnitionPath:       config.IgnitionPath,
-			ProjectName:        config.ProjectName,
-			OIDC: v18cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV18, err = v18.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV19 *controller.ResourceSet
-	{
-		c := v19.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-			TenantCluster:      config.TenantCluster,
-
-			DNSServers:         config.DNSServers,
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			IgnitionPath:       config.IgnitionPath,
-			ProjectName:        config.ProjectName,
-			OIDC: v19cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV19, err = v19.NewClusterResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -536,14 +299,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Informer:  newInformer,
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{
-				resourceSetV14Patch3,
-				resourceSetV14Patch4,
-				resourceSetV15,
-				resourceSetV16,
-				resourceSetV17,
-				resourceSetV17patch1,
-				resourceSetV18,
-				resourceSetV19,
 				resourceSetV20,
 				resourceSetV21,
 				resourceSetV22,
