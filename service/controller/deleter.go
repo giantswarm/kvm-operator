@@ -13,14 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch3"
-	"github.com/giantswarm/kvm-operator/service/controller/v14patch4"
-	"github.com/giantswarm/kvm-operator/service/controller/v15"
-	"github.com/giantswarm/kvm-operator/service/controller/v16"
-	"github.com/giantswarm/kvm-operator/service/controller/v17"
-	"github.com/giantswarm/kvm-operator/service/controller/v17patch1"
-	"github.com/giantswarm/kvm-operator/service/controller/v18"
-	"github.com/giantswarm/kvm-operator/service/controller/v19"
 	"github.com/giantswarm/kvm-operator/service/controller/v20"
 	"github.com/giantswarm/kvm-operator/service/controller/v21"
 	"github.com/giantswarm/kvm-operator/service/controller/v22"
@@ -111,134 +103,6 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 
 func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, error) {
 	var err error
-
-	var resourceSetV14Patch3 *controller.ResourceSet
-	{
-		c := v14patch3.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV14Patch3, err = v14patch3.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV14Patch4 *controller.ResourceSet
-	{
-		c := v14patch4.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV14Patch4, err = v14patch4.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV15 *controller.ResourceSet
-	{
-		c := v15.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV15, err = v15.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV16 *controller.ResourceSet
-	{
-		c := v16.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV16, err = v16.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV17 *controller.ResourceSet
-	{
-		c := v17.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV17, err = v17.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV17patch1 *controller.ResourceSet
-	{
-		c := v17patch1.DeleterResourceSetConfig{
-			CertsSearcher: config.CertsSearcher,
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV17patch1, err = v17patch1.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV18 *controller.ResourceSet
-	{
-		c := v18.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV18, err = v18.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV19 *controller.ResourceSet
-	{
-		c := v19.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV19, err = v19.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	var resourceSetV20 *controller.ResourceSet
 	{
@@ -337,14 +201,6 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	}
 
 	resourceSets := []*controller.ResourceSet{
-		resourceSetV14Patch3,
-		resourceSetV14Patch4,
-		resourceSetV15,
-		resourceSetV16,
-		resourceSetV17,
-		resourceSetV17patch1,
-		resourceSetV18,
-		resourceSetV19,
 		resourceSetV20,
 		resourceSetV21,
 		resourceSetV22,
