@@ -38,23 +38,7 @@ required = [
 
 [[constraint]]
   branch = "master"
-  name = "github.com/giantswarm/backoff"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/certs"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/giantswarm/crdstorage"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/giantswarm/e2e-harness"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
   branch = "master"
@@ -71,10 +55,6 @@ required = [
 [[constraint]]
   branch = "master"
   name = "github.com/giantswarm/microkit"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/giantswarm/microstorage"
 
 [[constraint]]
   branch = "master"
