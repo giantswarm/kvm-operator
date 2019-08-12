@@ -37,7 +37,7 @@ required = [
   name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]
-  branch = "master"
+  branch = "kubernetes-1.14.5"
   name = "github.com/giantswarm/certs"
 
 [[constraint]]
