@@ -114,10 +114,12 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 
 	var randomkeysSearcher randomkeys.Interface
 	{
-		keyConfig := randomkeys.DefaultConfig()
-		keyConfig.K8sClient = config.K8sClient
-		keyConfig.Logger = config.Logger
-		randomkeysSearcher, err = randomkeys.NewSearcher(keyConfig)
+		c := randomkeys.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		randomkeysSearcher, err = randomkeys.NewSearcher(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
