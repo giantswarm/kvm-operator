@@ -545,5 +545,7 @@ func setLoggerCtxValue(ctx context.Context, key, value string) context.Context {
 	}
 	m.KeyVals[key] = value
 
+	fmt.Println("HERE", ctx, key, value, m)
+
 	return loggermeta.NewContext(ctx, m)
 }
