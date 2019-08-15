@@ -175,15 +175,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:dd59aa16cc8a12ac31e47fe9a171607eaef03a31931b8757616a434098fe7f1e"
+  digest = "1:2cd674c429a514b951af9d61fb638ec1c431ce1a660f145bf6b6d467b7f903c2"
   name = "github.com/giantswarm/helmclient"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a09427f555371ae004e22401af6ed55c43fe4851"
+  revision = "c17ff0598a86814a5d103c84b8efafd1a5339a1d"
 
 [[projects]]
   branch = "master"
-  digest = "1:d276882f2e4eecd1c2a7e12b89cd97637bfcc4795fd70cae6478e903bccef607"
+  digest = "1:2a70b7ff09a80ae30376f5049deffd3658c0d5774ea5d15846d3ebe544ad7626"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -195,7 +195,7 @@
     "v_4_6_0",
   ]
   pruneopts = "T"
-  revision = "54edef3afe915cce66125eac2062a573c1ed2b93"
+  revision = "9ef1576e72bfdb9226b8bb372c020f8fa7c27e9a"
 
 [[projects]]
   branch = "master"
@@ -262,8 +262,8 @@
   revision = "0926d9b7c5419173936b4556411a103bdf8d5966"
 
 [[projects]]
-  branch = "master"
-  digest = "1:066265dbe77ecb780a092bcfa5d43cc825f65dc1a8a1498195acfa5ade6854d2"
+  branch = "remove-growing-context"
+  digest = "1:353291cd12526e72ca04f19665c387f98fc67cd252aa7fd23111c721d4251176"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -283,7 +283,7 @@
     "resource/wrapper/retryresource",
   ]
   pruneopts = "UT"
-  revision = "a2a6a2f14115f32c611ee0373bc4e637c3a6da63"
+  revision = "67551ff9ab698790704725bb7f4ddeee5d5c30a6"
 
 [[projects]]
   branch = "master"
@@ -297,20 +297,20 @@
   revision = "ade67414406dbdf333012fe7f67ebbb747615fa9"
 
 [[projects]]
-  branch = "master"
-  digest = "1:44163a18cde7a016b352943eaebf2b9209572af98f61983e06005e58c28979a9"
+  branch = "JosephSalisbury-patch-1"
+  digest = "1:1ca1357959703edb00665e382ce7645a5320a955fbe3259b94c02996c98f191e"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7b12281c36d3b6673a2c5f55a38d3cd1b80d4c81"
+  revision = "ac9656260505ed729b687df9aad85d00d89923fa"
 
 [[projects]]
-  branch = "master"
-  digest = "1:5efd37900322164c4a072f978a677e2b51d1d5e69b0385b40787335371e35294"
+  branch = "JosephSalisbury-patch-1"
+  digest = "1:383a5e33ba1fd44cdec4eb3979cc2b3008c5715c7ed7e76db969399dc16d267a"
   name = "github.com/giantswarm/tenantcluster"
   packages = ["."]
   pruneopts = "UT"
-  revision = "782e6be8a7290df9bcd38eacb77f637b26a262e4"
+  revision = "7d6fa178e8ce68690e0050f7fd3d5b94970272ae"
 
 [[projects]]
   branch = "master"
@@ -650,7 +650,7 @@
   name = "github.com/prometheus/client_model"
   packages = ["go"]
   pruneopts = "UT"
-  revision = "fd36f4220a901265f90734c3183c5f0c91daa0b8"
+  revision = "14fe0d1b01d4d5fc031dd4bec1823bd3ebbe8016"
 
 [[projects]]
   digest = "1:8dcedf2e8f06c7f94e48267dea0bc0be261fa97b377f3ae3e87843a92a549481"
@@ -740,7 +740,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4b328c4cbf5b489f22e16190e5405249e663bbbf73b3cf06facd4fec64bccdef"
+  digest = "1:aaf0e2dff97843ef27b50e31434302b65e50897495f0725f8f2c19b2e428d3f2"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -754,7 +754,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "ca1201d0de80cfde86cb01aea620983605dfe99b"
+  revision = "74dc4d7220e7acc4e100824340f3e66577424772"
 
 [[projects]]
   branch = "master"
@@ -777,14 +777,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:689d11c3e6d3df8a1e2d2ad5a494ea99659d09faf706472bdd64cac7ac5f6887"
+  digest = "1:d52ccbb025caf0a2166e0204ed934567b8d0dfdd23a09d947f1f040708888a0a"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "9eafafc0a87e0fd0aeeba439a4573537970c44c7"
+  revision = "fde4db37ae7ad8191b03d30d27f258b5291ae4e3"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -844,7 +844,7 @@
   revision = "fa694d86fc64c7654a660f8908de4e879866748d"
 
 [[projects]]
-  digest = "1:947ff528f3399903d07eb33f09cd6e8d423a147798023dcecc1ec2066c15afbb"
+  digest = "1:48eafc052e46b4ebbc7882553873cf6198203e528627cefc94dcaf8553addd19"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -883,8 +883,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "045159ad57f3781d409358e3ade910a018c16b30"
-  version = "v1.22.1"
+  revision = "6eaf6f47437a6b4e2153a190160ef39a92c7eceb"
+  version = "v1.23.0"
 
 [[projects]]
   digest = "1:2d1fbdc6777e5408cabeb02bf336305e724b925ff4546ded0fa8715a7267922a"
