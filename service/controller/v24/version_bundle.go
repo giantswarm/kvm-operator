@@ -22,6 +22,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Introduce explicit resource reservation for OS resources and container runtime.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "kubernetes",
+				Description: "Update kubernetes to 1.14.6 (CVE-2019-9512, CVE-2019-9514) https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.14.md#v1146",
+				Kind:        versionbundle.KindChanged,
+			},
 		},
 		Components: []versionbundle.Component{
 			{
@@ -42,7 +47,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.14.3",
+				Version: "1.14.6",
 			},
 		},
 		Name:    "kvm-operator",
