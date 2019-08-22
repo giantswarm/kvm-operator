@@ -24,6 +24,8 @@ data:
       installation:
         dns:
           servers: {{ .Values.Installation.V1.Provider.KVM.DNS.Servers }}
+        ntp:
+          servers: {{ .Values.Installation.V1.Provider.KVM.NTP.Servers }}
         {{- if .Values.Installation.V1.Guest }}
         tenant:
           kubernetes:

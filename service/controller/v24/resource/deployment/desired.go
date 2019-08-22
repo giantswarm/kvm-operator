@@ -21,13 +21,13 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	var deployments []*v1beta1.Deployment
 
 	{
-		masterDeployments, err := newMasterDeployments(customResource, r.dnsServers)
+		masterDeployments, err := newMasterDeployments(customResource, r.dnsServers, r.ntpServers)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		deployments = append(deployments, masterDeployments...)
 
-		workerDeployments, err := newWorkerDeployments(customResource, r.dnsServers)
+		workerDeployments, err := newWorkerDeployments(customResource, r.dnsServers, r.ntpServers)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -16,49 +16,37 @@ const (
 
 // Config represents the configuration used to create a new deployment resource.
 type Config struct {
-	// Dependencies.
 	DNSServers string
 	K8sClient  kubernetes.Interface
 	Logger     micrologger.Logger
-}
-
-// DefaultConfig provides a default configuration to create a new deployment
-// resource by best effort.
-func DefaultConfig() Config {
-	return Config{
-		// Dependencies.
-		DNSServers: "",
-		K8sClient:  nil,
-		Logger:     nil,
-	}
+	NTPServers string
 }
 
 // Resource implements the deployment resource.
 type Resource struct {
-	// Dependencies.
 	dnsServers string
 	k8sClient  kubernetes.Interface
 	logger     micrologger.Logger
+	ntpServers string
 }
 
 // New creates a new configured deployment resource.
 func New(config Config) (*Resource, error) {
-	// Dependencies.
 	if config.DNSServers == "" {
-		return nil, microerror.Maskf(invalidConfigError, "config.DNSServers must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.DNSServers must not be empty", config)
 	}
 	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
 	newResource := &Resource{
-		// Dependencies.
 		dnsServers: config.DNSServers,
 		k8sClient:  config.K8sClient,
 		logger:     config.Logger,
+		ntpServers: config.NTPServers,
 	}
 
 	return newResource, nil

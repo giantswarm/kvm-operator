@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) ([]*extensionsv1.Deployment, error) {
+func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServers string) ([]*extensionsv1.Deployment, error) {
 	var deployments []*extensionsv1.Deployment
 
 	privileged := true
@@ -232,6 +232,11 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 										},
 									},
 									{
+										Name: "MEMORY",
+										// TODO provide memory like disk as float64 and format here.
+										Value: capabilities.Memory,
+									},
+									{
 										Name:  "NETWORK_BRIDGE_NAME",
 										Value: key.NetworkBridgeName(customResource),
 									},
@@ -240,9 +245,8 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 										Value: key.NetworkTapName(customResource),
 									},
 									{
-										Name: "MEMORY",
-										// TODO provide memory like disk as float64 and format here.
-										Value: capabilities.Memory,
+										Name:  "NTP_SERVERS",
+										Value: ntpServers,
 									},
 									{
 										Name:  "ROLE",

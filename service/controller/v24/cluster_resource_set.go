@@ -38,9 +38,10 @@ type ClusterResourceSetConfig struct {
 	TenantCluster      tenantcluster.Interface
 
 	DNSServers         string
-	IgnitionPath       string
-	OIDC               cloudconfig.OIDCConfig
 	GuestUpdateEnabled bool
+	IgnitionPath       string
+	NTPServers         string
+	OIDC               cloudconfig.OIDCConfig
 	ProjectName        string
 	SSOPublicKey       string
 }
@@ -141,11 +142,12 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var deploymentResource controller.Resource
 	{
-		c := deployment.DefaultConfig()
-
-		c.DNSServers = config.DNSServers
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := deployment.Config{
+			DNSServers: config.DNSServers,
+			K8sClient:  config.K8sClient,
+			Logger:     config.Logger,
+			NTPServers: config.NTPServers,
+		}
 
 		ops, err := deployment.New(c)
 		if err != nil {

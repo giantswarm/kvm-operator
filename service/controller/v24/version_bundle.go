@@ -22,6 +22,11 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Introduce explicit resource reservation for OS resources and container runtime.",
 				Kind:        versionbundle.KindAdded,
 			},
+			{
+				Component:   "kvm-operator",
+				Description: "Fix NTP server configuration on tenant nodes.",
+				Kind:        versionbundle.KindFixed,
+			},
 		},
 		Components: []versionbundle.Component{
 			{

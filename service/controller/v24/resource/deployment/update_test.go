@@ -1208,10 +1208,11 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 	var err error
 	var newResource *Resource
 	{
-		resourceConfig := DefaultConfig()
-		resourceConfig.DNSServers = "dnsserver1,dnsserver2"
-		resourceConfig.K8sClient = fake.NewSimpleClientset()
-		resourceConfig.Logger = microloggertest.New()
+		resourceConfig := Config{
+			DNSServers: "dnsserver1,dnsserver2",
+			K8sClient:  fake.NewSimpleClientset(),
+			Logger:     microloggertest.New(),
+		}
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
