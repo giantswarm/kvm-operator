@@ -109,6 +109,7 @@ func mainError() error {
 	daemonCommand := newCommand.DaemonCommand().CobraCommand()
 
 	daemonCommand.PersistentFlags().String(f.Service.Installation.DNS.Servers, "", "Comma separated list of DNS servers.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.NTP.Servers, "", "Comma separated list of NTPservers.")
 
 	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID, "", "OIDC authorization provider ClientID.")
 	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL, "", "OIDC authorization provider IssuerURL.")
