@@ -15,17 +15,17 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v20"
+	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	v20cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v20/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v21"
+	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
 	v21cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v21/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v22"
+	v22 "github.com/giantswarm/kvm-operator/service/controller/v22"
 	v22cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v22/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v23"
+	v23 "github.com/giantswarm/kvm-operator/service/controller/v23"
 	v23cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v23/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v23patch1"
 	v23patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v23patch1/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v24"
+	v24 "github.com/giantswarm/kvm-operator/service/controller/v24"
 	v24cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
 )
 
@@ -41,6 +41,7 @@ type ClusterConfig struct {
 	DNSServers         string
 	GuestUpdateEnabled bool
 	IgnitionPath       string
+	NTPServers         string
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
 	SSOPublicKey       string
@@ -275,6 +276,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			DNSServers:         config.DNSServers,
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			IgnitionPath:       config.IgnitionPath,
+			NTPServers:         config.NTPServers,
 			ProjectName:        config.ProjectName,
 			OIDC: v24cloudconfig.OIDCConfig{
 				ClientID:      config.OIDC.ClientID,

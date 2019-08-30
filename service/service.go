@@ -136,6 +136,7 @@ func New(config Config) (*Service, error) {
 
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
+			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
 			OIDC: controller.ClusterConfigOIDC{
 				ClientID:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
 				IssuerURL:     config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),

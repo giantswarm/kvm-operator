@@ -23,6 +23,11 @@ func VersionBundle() versionbundle.Bundle {
 				Kind:        versionbundle.KindAdded,
 			},
 			{
+				Component:   "kvm-operator",
+				Description: "Fix NTP server configuration on tenant nodes.",
+				Kind:        versionbundle.KindFixed,
+			},
+			{
 				Component:   "kubernetes",
 				Description: "Update kubernetes to 1.14.6 (CVE-2019-9512, CVE-2019-9514) https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.14.md#v1146",
 				Kind:        versionbundle.KindChanged,
