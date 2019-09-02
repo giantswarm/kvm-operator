@@ -13,12 +13,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v20"
-	"github.com/giantswarm/kvm-operator/service/controller/v21"
-	"github.com/giantswarm/kvm-operator/service/controller/v22"
-	"github.com/giantswarm/kvm-operator/service/controller/v23"
+	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
+	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
+	v22 "github.com/giantswarm/kvm-operator/service/controller/v22"
+	v23 "github.com/giantswarm/kvm-operator/service/controller/v23"
 	"github.com/giantswarm/kvm-operator/service/controller/v23patch1"
-	"github.com/giantswarm/kvm-operator/service/controller/v24"
+	v24 "github.com/giantswarm/kvm-operator/service/controller/v24"
+	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
 )
 
 type DeleterConfig struct {
@@ -200,6 +201,22 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV25 *controller.ResourceSet
+	{
+		c := v25.DeleterResourceSetConfig{
+			K8sClient:     config.K8sClient,
+			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV25, err = v25.NewDeleterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV20,
 		resourceSetV21,
@@ -207,6 +224,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		resourceSetV23,
 		resourceSetV23patch1,
 		resourceSetV24,
+		resourceSetV25,
 	}
 
 	return resourceSets, nil
