@@ -5,9 +5,10 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_6_0"
-	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_7_0"
 	"github.com/giantswarm/microerror"
+
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
 )
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
