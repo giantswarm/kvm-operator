@@ -319,7 +319,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			SSOPublicKey: config.SSOPublicKey,
 		}
 
-		resourceSetV24, err = v25.NewClusterResourceSet(c)
+		resourceSetV25, err = v25.NewClusterResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
