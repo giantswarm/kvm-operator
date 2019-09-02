@@ -13,7 +13,7 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/service/controller/v25/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
