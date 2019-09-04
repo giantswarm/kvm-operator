@@ -187,6 +187,14 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										Value: dnsServers,
 									},
 									{
+										Name:  "NETWORK_BRIDGE_NAME",
+										Value: key.NetworkBridgeName(customResource),
+									},
+									{
+										Name:  "NETWORK_TAP_NAME",
+										Value: key.NetworkTapName(customResource),
+									},
+									{
 										Name: "HOSTNAME",
 										ValueFrom: &apiv1.EnvVarSource{
 											FieldRef: &apiv1.ObjectFieldSelector{
