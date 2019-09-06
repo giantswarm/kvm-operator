@@ -5,6 +5,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/resource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"k8s.io/client-go/kubernetes"
@@ -42,7 +43,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		return false
 	}
 
-	var podResource controller.Resource
+	var podResource resource.Interface
 	{
 		c := pod.Config{
 			G8sClient: config.G8sClient,
@@ -56,7 +57,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var endpointResource controller.Resource
+	var endpointResource resource.Interface
 	{
 		c := endpoint.Config{
 			G8sClient: config.G8sClient,
@@ -75,7 +76,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	resources := []controller.Resource{
+	resources := []resource.Interface{
 		endpointResource,
 		podResource,
 	}

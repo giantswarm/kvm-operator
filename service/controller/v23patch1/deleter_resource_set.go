@@ -4,6 +4,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/resource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"github.com/giantswarm/tenantcluster"
@@ -37,7 +38,7 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 		return false
 	}
 
-	var nodeResource controller.Resource
+	var nodeResource resource.Interface
 	{
 		c := node.Config{
 			K8sClient:     config.K8sClient,
@@ -51,7 +52,7 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	resources := []controller.Resource{
+	resources := []resource.Interface{
 		nodeResource,
 	}
 
