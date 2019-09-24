@@ -10,7 +10,6 @@ import (
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServers string) ([]*extensionsv1.Deployment, error) {
@@ -287,20 +286,6 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
 											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(customResource)},
-										},
-									},
-								},
-								LivenessProbe: &apiv1.Probe{
-									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
-									TimeoutSeconds:      key.TimeoutSeconds,
-									PeriodSeconds:       key.PeriodSeconds,
-									FailureThreshold:    key.FailureThreshold,
-									SuccessThreshold:    key.SuccessThreshold,
-									Handler: apiv1.Handler{
-										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(customResource))},
-											Host: key.ProbeHost,
 										},
 									},
 								},
