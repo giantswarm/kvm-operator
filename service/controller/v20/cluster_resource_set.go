@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
+	"github.com/giantswarm/operatorkit/resource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"github.com/giantswarm/randomkeys"
@@ -64,7 +65,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var clusterRoleBindingResource controller.Resource
+	var clusterRoleBindingResource resource.Interface
 	{
 		c := clusterrolebinding.Config{
 			K8sClient: config.K8sClient,
@@ -82,7 +83,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var namespaceResource controller.Resource
+	var namespaceResource resource.Interface
 	{
 		c := namespace.DefaultConfig()
 
@@ -100,7 +101,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var serviceAccountResource controller.Resource
+	var serviceAccountResource resource.Interface
 	{
 		c := serviceaccount.DefaultConfig()
 
@@ -118,7 +119,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var configMapResource controller.Resource
+	var configMapResource resource.Interface
 	{
 		c := configmap.Config{
 			CertsSearcher: config.CertsSearcher,
@@ -139,7 +140,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var deploymentResource controller.Resource
+	var deploymentResource resource.Interface
 	{
 		c := deployment.DefaultConfig()
 
@@ -158,7 +159,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var ingressResource controller.Resource
+	var ingressResource resource.Interface
 	{
 		c := ingress.DefaultConfig()
 
@@ -176,7 +177,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var nodeIndexStatusResource controller.Resource
+	var nodeIndexStatusResource resource.Interface
 	{
 		c := nodeindexstatus.Config{
 			G8sClient: config.G8sClient,
@@ -189,7 +190,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var pvcResource controller.Resource
+	var pvcResource resource.Interface
 	{
 		c := pvc.DefaultConfig()
 
@@ -207,7 +208,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var serviceResource controller.Resource
+	var serviceResource resource.Interface
 	{
 		c := service.DefaultConfig()
 
@@ -225,7 +226,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var statusResource controller.Resource
+	var statusResource resource.Interface
 	{
 		c := statusresource.ResourceConfig{
 			ClusterEndpointFunc:      key.ToClusterEndpoint,
@@ -244,7 +245,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	resources := []controller.Resource{
+	resources := []resource.Interface{
 		statusResource,
 		nodeIndexStatusResource,
 		clusterRoleBindingResource,
