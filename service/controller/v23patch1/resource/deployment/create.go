@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	"k8s.io/api/extensions/v1beta1"
+	v1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23patch1/key"
@@ -26,7 +26,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 		namespace := key.ClusterNamespace(customResource)
 		for _, deployment := range deploymentsToCreate {
-			_, err := r.k8sClient.Extensions().Deployments(namespace).Create(deployment)
+			_, err := r.k8sClient.AppsV1().Deployments(namespace).Create(deployment)
 			if apierrors.IsAlreadyExists(err) {
 				// fall through
 			} else if err != nil {
@@ -54,7 +54,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be created")
 
-	var deploymentsToCreate []*v1beta1.Deployment
+	var deploymentsToCreate []*v1.Deployment
 
 	for _, desiredDeployment := range desiredDeployments {
 		if !containsDeployment(currentDeployments, desiredDeployment) {

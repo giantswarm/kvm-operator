@@ -6,15 +6,15 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
 	"github.com/giantswarm/microerror"
+	v1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
-	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) ([]*extensionsv1.Deployment, error) {
-	var deployments []*extensionsv1.Deployment
+func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) ([]*v1.Deployment, error) {
+	var deployments []*v1.Deployment
 
 	privileged := true
 	replicas := int32(1)
@@ -64,10 +64,10 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 		} else {
 			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.StorageType(customResource))
 		}
-		deployment := &extensionsv1.Deployment{
+		deployment := &v1.Deployment{
 			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
-				APIVersion: "extensions/v1beta",
+				APIVersion: "apps/v1",
 			},
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.DeploymentName(key.MasterID, masterNode.ID),
@@ -84,7 +84,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 					"node":                masterNode.ID,
 				},
 			},
-			Spec: extensionsv1.DeploymentSpec{
+			Spec: v1.DeploymentSpec{
 				Selector: &apismetav1.LabelSelector{
 					MatchLabels: map[string]string{
 						key.LabelApp: key.MasterID,
@@ -92,8 +92,8 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers string) 
 						"node":       masterNode.ID,
 					},
 				},
-				Strategy: extensionsv1.DeploymentStrategy{
-					Type: extensionsv1.RecreateDeploymentStrategyType,
+				Strategy: v1.DeploymentStrategy{
+					Type: v1.RecreateDeploymentStrategyType,
 				},
 				Replicas: &replicas,
 				Template: apiv1.PodTemplateSpec{
