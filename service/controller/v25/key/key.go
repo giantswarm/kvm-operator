@@ -24,8 +24,10 @@ const (
 	HealthEndpoint = "/healthz"
 	// ShutdownDerefererPath is http path for shutdownFerefer endpoint
 	ShutdownDerefererPath = "v1/defer/"
-	// MasterProbePort is port for worker liveness probe.
-	MasterProbePort = 8089
+	// MasterLivenessProbePort is port for worker liveness probe.
+	MasterLivenessProbePort = 8089
+	// MasterLivenessProbePort is port for worker liveness probe.
+	MasterReadinessProbePort = 2379
 	// WorkerProbePort is port for worker liveness probe.
 	WorkerProbePort = 10250
 	ProbeLocalhost  = "127.0.0.1"

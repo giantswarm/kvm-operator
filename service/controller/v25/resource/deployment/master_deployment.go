@@ -235,7 +235,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.MasterProbePort},
+											Port: intstr.IntOrString{IntVal: key.MasterLivenessProbePort},
 										},
 									},
 								},
@@ -246,9 +246,8 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.MasterProbePort},
+										TCPSocket: &apiv1.TCPSocketAction{
+											Port: intstr.IntOrString{IntVal: key.MasterReadinessProbePort},
 										},
 									},
 								},
