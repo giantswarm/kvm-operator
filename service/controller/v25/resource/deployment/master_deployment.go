@@ -100,8 +100,6 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 					ObjectMeta: apismetav1.ObjectMeta{
 						Annotations: map[string]string{
 							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customResource),
-							key.AnnotationIp:            "",
-							key.AnnotationService:       key.MasterID,
 							key.AnnotationPodDrained:    "False",
 							key.AnnotationVersionBundle: key.VersionBundleVersion(customResource),
 						},
