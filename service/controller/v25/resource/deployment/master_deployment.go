@@ -210,6 +210,14 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										Name:  "CLOUD_CONFIG_PATH",
 										Value: "/cloudconfig/user_data",
 									},
+									{
+										Name: key.EnvKeyMyPodIP,
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
+												FieldPath: "status.podIP",
+											},
+										},
+									},
 								},
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{

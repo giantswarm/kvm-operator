@@ -47,6 +47,7 @@ const (
 	// Environment variable names for Downward API use (shutdown-deferrer).
 	EnvKeyMyPodName      = "MY_POD_NAME"
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
+	EnvKeyMyPodIP        = "MY_POD_IP"
 
 	CoreosImageDir = "/var/lib/coreos-kvm-images"
 	CoreosVersion  = "2191.5.0"
