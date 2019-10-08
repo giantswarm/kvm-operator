@@ -104,6 +104,21 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 	filesMeta = append(filesMeta, iscsiInitiatorFile)
 
+	udevIgnoreCdrom := k8scloudconfig.FileMetadata{
+		AssetContent: UdevIgnoreCdromContent,
+		Path:         UdevIgnoreCdromFilePath,
+		Owner: k8scloudconfig.Owner{
+			User: k8scloudconfig.User{
+				Name: FileOwnerUserName,
+			},
+			Group: k8scloudconfig.Group{
+				Name: FileOwnerGroupName,
+			},
+		},
+		Permissions: IscsiInitiatorFilePermissions,
+	}
+	filesMeta = append(filesMeta, udevIgnoreCdrom)
+
 	// iscsi config as workaround for this bug https://github.com/kubernetes/kubernetes/issues/73181
 	iscsiConfigFile := k8scloudconfig.FileMetadata{
 		AssetContent: IscsiConfigFileContent,

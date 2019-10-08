@@ -21,6 +21,10 @@ const (
 # Check for active mounts on devices reachable through a session
 # and refuse to logout if there are any.  Defaults to "No".
 iscsid.safe_logout = Yes`
+
+	UdevIgnoreCdromContent         = `SUBSYSTEM=="block", DEVNAME="/dev/sr0", OPTIONS=="ignore_device"`
+	UdevIgnoreCdromFilePath        = "/etc/udev/rules.d/00-ignore-cdrom.rules"
+	UdevIgnoreCdromFilePermissions = 0644
 )
 
 // Config represents the configuration used to create a cloud config service.

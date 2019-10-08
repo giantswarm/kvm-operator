@@ -23,7 +23,7 @@ const (
 	// HealthEndpoint is http path for liveness probe.
 	HealthEndpoint = "/healthz"
 	// ShutdownDerefererPath is http path for shutdownFerefer endpoint
-	ShutdownDerefererPath = "/v1/defer/"
+	ShutdownDerefererPath = "v1/defer/"
 	// MasterProbePort is port for worker liveness probe.
 	MasterProbePort = 8089
 	// WorkerProbePort is port for worker liveness probe.
@@ -52,7 +52,7 @@ const (
 	CoreosImageDir = "/var/lib/coreos-kvm-images"
 	CoreosVersion  = "2191.5.0"
 
-	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:3cc9934c283e2fe791ccd3bd850f0c35acdb1add"
+	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:5bff71bfa75ac720f4752792fe2f73d1b1b0b96d"
 	ShutdownDeferrerDocker = "quay.io/giantswarm/shutdown-deferrer:4e7d2b73859ea7dac1a2138e04e07fa5870d109b"
 
 	// constants for calculation qemu memory overhead.
