@@ -318,6 +318,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
 											Port: intstr.IntOrString{IntVal: key.ShutdownDerferListenPort},
+											Host: key.ProbeLocalhost,
 										},
 									},
 								},

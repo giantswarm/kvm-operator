@@ -195,8 +195,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
+										TCPSocket: &apiv1.TCPSocketAction{
 											Port: intstr.IntOrString{IntVal: key.WorkerProbePort},
 										},
 									},
@@ -208,8 +207,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
+										TCPSocket: &apiv1.TCPSocketAction{
 											Port: intstr.IntOrString{IntVal: key.WorkerProbePort},
 										},
 									},
