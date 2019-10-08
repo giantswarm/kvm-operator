@@ -86,8 +86,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 						},
 					},
 					Spec: apiv1.PodSpec{
-						Affinity:    newWorkerPodAfinity(customResource),
-						HostNetwork: true,
+						Affinity: newWorkerPodAfinity(customResource),
 						NodeSelector: map[string]string{
 							"role": key.WorkerID,
 						},
@@ -118,43 +117,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
-							{
-								Name: "flannel",
-								VolumeSource: apiv1.VolumeSource{
-									HostPath: &apiv1.HostPathVolumeSource{
-										Path: key.FlannelEnvPathPrefix,
-									},
-								},
-							},
 						},
 						Containers: []apiv1.Container{
-							{
-								Name:            "k8s-endpoint-updater",
-								Image:           key.K8SEndpointUpdaterDocker,
-								ImagePullPolicy: apiv1.PullIfNotPresent,
-								Command: []string{
-									"/opt/k8s-endpoint-updater",
-									"update",
-									"--provider.bridge.name=" + key.NetworkBridgeName(customResource),
-									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customResource),
-									"--service.kubernetes.cluster.service=" + key.WorkerID,
-									"--service.kubernetes.inCluster=true",
-								},
-								SecurityContext: &apiv1.SecurityContext{
-									Privileged: &privileged,
-								},
-								Env: []apiv1.EnvVar{
-									{
-										Name: "POD_NAME",
-										ValueFrom: &apiv1.EnvVarSource{
-											FieldRef: &apiv1.ObjectFieldSelector{
-												APIVersion: "v1",
-												FieldPath:  "metadata.name",
-											},
-										},
-									},
-								},
-							},
 							{
 								Name:            "k8s-kvm",
 								Image:           key.K8SKVMDockerImage,
@@ -205,14 +169,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										Value: capabilities.Memory,
 									},
 									{
-										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(customResource),
-									},
-									{
-										Name:  "NETWORK_TAP_NAME",
-										Value: key.NetworkTapName(customResource),
-									},
-									{
 										Name:  "NTP_SERVERS",
 										Value: ntpServers,
 									},
@@ -228,7 +184,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
-											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerPollPath(customResource)},
+											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerPollPath()},
 										},
 									},
 								},
@@ -241,8 +197,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
-											Host: key.ProbeHost,
+											Port: intstr.IntOrString{IntVal: key.WorkerProbePort},
 										},
 									},
 								},
@@ -255,8 +210,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
-											Host: key.ProbeHost,
+											Port: intstr.IntOrString{IntVal: key.WorkerProbePort},
 										},
 									},
 								},
@@ -286,36 +240,12 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 								},
 							},
 							{
-								Name:            "k8s-kvm-health",
-								Image:           key.K8SKVMHealthDocker,
-								ImagePullPolicy: apiv1.PullAlways,
-								Env: []apiv1.EnvVar{
-									{
-										Name:  "LISTEN_ADDRESS",
-										Value: key.HealthListenAddress(customResource),
-									},
-									{
-										Name:  "NETWORK_ENV_FILE_PATH",
-										Value: key.NetworkEnvFilePath(customResource),
-									},
-								},
-								SecurityContext: &apiv1.SecurityContext{
-									Privileged: &privileged,
-								},
-								VolumeMounts: []apiv1.VolumeMount{
-									{
-										Name:      "flannel",
-										MountPath: key.FlannelEnvPathPrefix,
-									},
-								},
-							},
-							{
 								Name:            "shutdown-deferrer",
 								Image:           key.ShutdownDeferrerDocker,
 								ImagePullPolicy: apiv1.PullAlways,
 								Args: []string{
 									"daemon",
-									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customResource),
+									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(),
 								},
 								Env: []apiv1.EnvVar{
 									{
@@ -338,7 +268,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 								Lifecycle: &apiv1.Lifecycle{
 									PreStop: &apiv1.Handler{
 										Exec: &apiv1.ExecAction{
-											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(customResource)},
+											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath()},
 										},
 									},
 								},
@@ -351,8 +281,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									Handler: apiv1.Handler{
 										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(customResource))},
-											Host: key.ProbeHost,
+											Port: intstr.IntOrString{IntVal: key.ShutdownDerferListenPort},
+											Host: key.ProbeLocalhost,
 										},
 									},
 								},

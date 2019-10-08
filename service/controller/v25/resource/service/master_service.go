@@ -48,8 +48,10 @@ func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 					Protocol: "TCP",
 				},
 			},
-			// Note that we do not use a selector definition on purpose to be able to
-			// manually set the IP address of the actual VM.
+			Selector: map[string]string{
+				key.LabelApp:     key.MasterID,
+				key.LabelCluster: key.ClusterID(customObject),
+			},
 		},
 	}
 

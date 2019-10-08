@@ -20,15 +20,17 @@ const (
 	MasterID = "master"
 	WorkerID = "worker"
 	EtcdPort = 443
-	// livenessPortBase is a baseline for computing the port for liveness probes.
-	livenessPortBase = 23000
-	// shutdownDeferrerPortBase is a baseline for computing the port for
-	// shutdown-deferrer.
-	shutdownDeferrerPortBase = 47000
 	// HealthEndpoint is http path for liveness probe.
 	HealthEndpoint = "/healthz"
-	// ProbeHost host for liveness probe.
-	ProbeHost = "127.0.0.1"
+	// ShutdownDerefererPath is http path for shutdownFerefer endpoint
+	ShutdownDerefererPath = "/v1/defer/"
+	// MasterProbePort is port for worker liveness probe.
+	MasterProbePort = 8089
+	// WorkerProbePort is port for worker liveness probe.
+	WorkerProbePort = 10250
+	ProbeLocalhost  = "127.0.0.1"
+	// ShutdownDerferListenPort
+	ShutdownDerferListenPort = 9099
 	// LivenessProbeInitialDelaySeconds is LivenessProbeInitialDelaySeconds param in liveness probe config.
 	LivenessProbeInitialDelaySeconds = 360
 	// ReadinessProbeInitialDelaySeconds is ReadinessProbeInitialDelaySeconds param in readiness probe config.
@@ -42,21 +44,15 @@ const (
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
-	// Enable k8s-kvm-health check for k8s api.
-	CheckK8sApi = "true"
-
 	// Environment variable names for Downward API use (shutdown-deferrer).
 	EnvKeyMyPodName      = "MY_POD_NAME"
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
-	FlannelEnvPathPrefix = "/run/flannel"
-	CoreosImageDir       = "/var/lib/coreos-kvm-images"
-	CoreosVersion        = "2135.4.0"
+	CoreosImageDir = "/var/lib/coreos-kvm-images"
+	CoreosVersion  = "2191.5.0"
 
-	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:e9989b8667070b8a10a030e2f1f6078d2ffb803e"
-	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:20517098a762a0d7ca2b0902316ddff487dbc7f5"
-	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:4e7d2b73859ea7dac1a2138e04e07fa5870d109b"
+	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:3ad5025ef125cc5895a8c83ca3ebdca6ba9572fd"
+	ShutdownDeferrerDocker = "quay.io/giantswarm/shutdown-deferrer:4e7d2b73859ea7dac1a2138e04e07fa5870d109b"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
@@ -225,14 +221,6 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
-func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
-}
-
-func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
-	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
-}
-
 func IscsiInitiatorName(customObject v1alpha1.KVMConfig, nodeIndex int, nodeRole string) string {
 	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(customObject), nodeRole, nodeIndex)
 }
@@ -296,10 +284,6 @@ func ArePodContainersTerminated(pod *corev1.Pod) bool {
 	}
 
 	return true
-}
-
-func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
-	return int32(livenessPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
 
 func MasterCount(customObject v1alpha1.KVMConfig) int {
@@ -369,14 +353,6 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	q.Add(memOverhead)
 
 	return q, nil
-}
-
-func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("br-%s", ClusterID(customObject))
-}
-
-func NetworkTapName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("tap-%s", ClusterID(customObject))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {
@@ -454,17 +430,11 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
-
-func ShutdownDeferrerListenPort(customObject v1alpha1.KVMConfig) int {
-	return int(shutdownDeferrerPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
+func ShutdownDeferrerListenAddress() string {
+	return fmt.Sprintf("http://%s:%d", ProbeLocalhost, ShutdownDerferListenPort)
 }
-
-func ShutdownDeferrerListenAddress(customObject v1alpha1.KVMConfig) string {
-	return "http://" + ProbeHost + ":" + strconv.Itoa(ShutdownDeferrerListenPort(customObject))
-}
-
-func ShutdownDeferrerPollPath(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s/v1/defer/", ShutdownDeferrerListenAddress(customObject))
+func ShutdownDeferrerPollPath() string {
+	return fmt.Sprintf("http://%s:%d/%s", ProbeLocalhost, ShutdownDerferListenPort, ShutdownDerefererPath)
 }
 
 func StorageType(customObject v1alpha1.KVMConfig) string {

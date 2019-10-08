@@ -35,8 +35,10 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *apiv1.Service {
 		Spec: apiv1.ServiceSpec{
 			Type:  apiv1.ServiceTypeNodePort,
 			Ports: key.PortMappings(customObject),
-			// Note that we do not use a selector definition on purpose to be able to
-			// manually set the IP address of the actual VM.
+			Selector: map[string]string{
+				key.LabelApp:     key.WorkerID,
+				key.LabelCluster: key.ClusterID(customObject),
+			},
 		},
 	}
 
