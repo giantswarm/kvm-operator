@@ -10,7 +10,6 @@ import (
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServers string) ([]*extensionsv1.Deployment, error) {
@@ -233,9 +232,12 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.MasterLivenessProbePort},
+										Exec: &apiv1.ExecAction{
+											Command: []string{
+												"/bin/bash",
+												"-c",
+												key.ProbeExecCommandMasterKVM(),
+											},
 										},
 									},
 								},
@@ -246,8 +248,12 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										TCPSocket: &apiv1.TCPSocketAction{
-											Port: intstr.IntOrString{IntVal: key.MasterReadinessProbePort},
+										Exec: &apiv1.ExecAction{
+											Command: []string{
+												"/bin/bash",
+												"-c",
+												key.ProbeExecCommandMasterKVM(),
+											},
 										},
 									},
 								},
@@ -320,10 +326,12 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.ShutdownDerferListenPort},
-											Host: key.ProbeLocalhost,
+										Exec: &apiv1.ExecAction{
+											Command: []string{
+												"/bin/bash",
+												"-c",
+												key.ProbeExecCommandDeferrer(),
+											},
 										},
 									},
 								},

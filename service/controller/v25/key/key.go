@@ -25,9 +25,7 @@ const (
 	// ShutdownDerefererPath is http path for shutdownFerefer endpoint
 	ShutdownDerefererPath = "v1/defer/"
 	// MasterLivenessProbePort is port for worker liveness probe.
-	MasterLivenessProbePort = 8089
-	// MasterLivenessProbePort is port for worker liveness probe.
-	MasterReadinessProbePort = 2379
+	MasterProbePort = 8089
 	// WorkerProbePort is port for worker liveness probe.
 	WorkerProbePort = 10250
 	ProbeLocalhost  = "127.0.0.1"
@@ -54,7 +52,7 @@ const (
 	CoreosImageDir = "/var/lib/coreos-kvm-images"
 	CoreosVersion  = "2191.5.0"
 
-	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:5bff71bfa75ac720f4752792fe2f73d1b1b0b96d"
+	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:8804717a5eb46af2cb84f58dd364e306705a9273 "
 	ShutdownDeferrerDocker = "quay.io/giantswarm/shutdown-deferrer:4e7d2b73859ea7dac1a2138e04e07fa5870d109b"
 
 	// constants for calculation qemu memory overhead.
@@ -418,6 +416,17 @@ func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	}
 
 	return ports
+}
+func ProbeExecCommandDeferrer() string {
+	return fmt.Sprintf("curl -qsS --connect-timeout 5 http://127.0.0.1:%d/healthz", ShutdownDerferListenPort)
+}
+
+func ProbeExecCommandMasterKVM() string {
+	return fmt.Sprintf("curl -qsS --connect-timeout 5 http://${MY_POD_IP}:%d/healthz", MasterProbePort)
+}
+
+func ProbeExecCommandWorkerKVM() string {
+	return fmt.Sprintf("curl -qksS --connect-timeout 5 https://${MY_POD_IP}:%d/healthz", WorkerProbePort)
 }
 
 func PVCNames(customObject v1alpha1.KVMConfig) []string {

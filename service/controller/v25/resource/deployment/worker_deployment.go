@@ -10,7 +10,6 @@ import (
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServers string) ([]*extensionsv1.Deployment, error) {
@@ -201,8 +200,12 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										TCPSocket: &apiv1.TCPSocketAction{
-											Port: intstr.IntOrString{IntVal: key.WorkerProbePort},
+										Exec: &apiv1.ExecAction{
+											Command: []string{
+												"/bin/bash",
+												"-c",
+												key.ProbeExecCommandWorkerKVM(),
+											},
 										},
 									},
 								},
@@ -213,8 +216,12 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										TCPSocket: &apiv1.TCPSocketAction{
-											Port: intstr.IntOrString{IntVal: key.WorkerProbePort},
+										Exec: &apiv1.ExecAction{
+											Command: []string{
+												"/bin/bash",
+												"-c",
+												key.ProbeExecCommandWorkerKVM(),
+											},
 										},
 									},
 								},
@@ -283,10 +290,12 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
 									Handler: apiv1.Handler{
-										HTTPGet: &apiv1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.ShutdownDerferListenPort},
-											Host: key.ProbeLocalhost,
+										Exec: &apiv1.ExecAction{
+											Command: []string{
+												"/bin/bash",
+												"-c",
+												key.ProbeExecCommandDeferrer(),
+											},
 										},
 									},
 								},
