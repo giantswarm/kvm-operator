@@ -114,22 +114,6 @@ func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 	filesMeta = append(filesMeta, iscsiConfigFile)
 
-	// ignore cdrom block device, we dont need it and it slow boot phase
-	udevIgnoreCdrom := k8scloudconfig.FileMetadata{
-		AssetContent: UdevIgnoreCdromContent,
-		Path:         UdevIgnoreCdromFilePath,
-		Owner: k8scloudconfig.Owner{
-			User: k8scloudconfig.User{
-				Name: FileOwnerUserName,
-			},
-			Group: k8scloudconfig.Group{
-				Name: FileOwnerGroupName,
-			},
-		},
-		Permissions: UdevIgnoreCdromFilePermissions,
-	}
-	filesMeta = append(filesMeta, udevIgnoreCdrom)
-
 	var newFiles []k8scloudconfig.FileAsset
 
 	for _, fm := range filesMeta {
