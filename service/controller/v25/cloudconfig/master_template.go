@@ -160,10 +160,12 @@ WantedBy=multi-user.target
 			AssetContent: `[Unit]
 Description=Mount for etcd volume
 [Mount]
-What=etcdshare
+#What=etcdshare
+What=/dev/disk/by-id/virtio-etcdfs
 Where=/var/lib/etcd
-Options=trans=virtio,version=9p2000.L,cache=mmap
-Type=9p
+#Options=trans=virtio,version=9p2000.L,cache=mmap
+#Type=9p
+Type=xfs
 [Install]
 WantedBy=multi-user.target
 `,
