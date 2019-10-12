@@ -10,7 +10,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/kubernetes/pkg/api/v1/node"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v21/key"
 )
@@ -80,7 +79,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// associated control plane pod, we delete it from the tenant cluster's
 	// Kubernetes API.
 	for _, n := range nodes {
-		if node.IsNodeReady(&n) {
+		if isNodeReady(&n) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because it is in state 'Ready'", n.GetName()))
 			continue
 		}
@@ -106,6 +105,17 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	return nil
+}
+
+// taken from https://github.com/kubernetes/kubernetes/pull/73656/files
+// isNodeReady returns true if a node is ready; false otherwise.
+func isNodeReady(node *corev1.Node) bool {
+	for _, c := range node.Status.Conditions {
+		if c.Type == corev1.NodeReady {
+			return c.Status == corev1.ConditionTrue
+		}
+	}
+	return false
 }
 
 func doesNodeExistAsPod(pods []corev1.Pod, n corev1.Node) bool {

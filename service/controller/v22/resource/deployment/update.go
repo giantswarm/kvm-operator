@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
-	"k8s.io/api/extensions/v1beta1"
+	v1 "k8s.io/api/apps/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v22/key"
 )
@@ -27,7 +27,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 
 		namespace := key.ClusterNamespace(customResource)
 		for _, deployment := range deploymentsToUpdate {
-			_, err := r.k8sClient.Extensions().Deployments(namespace).Update(deployment)
+			_, err := r.k8sClient.AppsV1().Deployments(namespace).Update(deployment)
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -112,7 +112,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
 
-			return []*v1beta1.Deployment{desiredDeployment}, nil
+			return []*v1.Deployment{desiredDeployment}, nil
 		}
 	} else {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "not computing update state because deployments are not allowed to be updated")

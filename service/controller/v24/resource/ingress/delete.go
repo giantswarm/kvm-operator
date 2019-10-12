@@ -28,7 +28,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToDelete {
-			err := r.k8sClient.Extensions().Ingresses(namespace).Delete(ingress.Name, &apismetav1.DeleteOptions{})
+			err := r.k8sClient.ExtensionsV1beta1().Ingresses(namespace).Delete(ingress.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {

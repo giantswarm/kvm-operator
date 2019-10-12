@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
-	"k8s.io/api/extensions/v1beta1"
+	v1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -28,7 +28,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		for _, deployment := range deploymentsToDelete {
 			n := key.ClusterNamespace(customResource)
-			err := r.k8sClient.Extensions().Deployments(n).Delete(deployment.Name, newDeleteOptions())
+			err := r.k8sClient.AppsV1().Deployments(n).Delete(deployment.Name, newDeleteOptions())
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -70,7 +70,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be deleted")
 
-	var deploymentsToDelete []*v1beta1.Deployment
+	var deploymentsToDelete []*v1.Deployment
 
 	for _, currentDeployment := range currentDeployments {
 		if containsDeployment(desiredDeployments, currentDeployment) {
@@ -97,7 +97,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be deleted")
 
-	var deploymentsToDelete []*v1beta1.Deployment
+	var deploymentsToDelete []*v1.Deployment
 
 	for _, currentDeployment := range currentDeployments {
 		if !containsDeployment(desiredDeployments, currentDeployment) {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"k8s.io/api/extensions/v1beta1"
+	v1 "k8s.io/api/apps/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
@@ -28,8 +28,8 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:            []*v1beta1.Deployment{},
-			DesiredState:            []*v1beta1.Deployment{},
+			CurrentState:            []*v1.Deployment{},
+			DesiredState:            []*v1.Deployment{},
 			ExpectedDeploymentNames: []string{},
 		},
 
@@ -43,14 +43,14 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -72,8 +72,8 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{},
-			DesiredState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{},
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -93,8 +93,8 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{},
-			DesiredState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{},
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -119,14 +119,14 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
 			},
-			DesiredState:            []*v1beta1.Deployment{},
+			DesiredState:            []*v1.Deployment{},
 			ExpectedDeploymentNames: []string{},
 		},
 
@@ -140,7 +140,7 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -152,7 +152,7 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState:            []*v1beta1.Deployment{},
+			DesiredState:            []*v1.Deployment{},
 			ExpectedDeploymentNames: []string{},
 		},
 
@@ -167,7 +167,7 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -179,7 +179,7 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -218,7 +218,7 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -240,7 +240,7 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -279,9 +279,9 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		deployments, ok := result.([]*v1beta1.Deployment)
+		deployments, ok := result.([]*v1.Deployment)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*v1beta1.Deployment{}, result)
+			t.Fatalf("case %d expected %T got %T", i+1, []*v1.Deployment{}, result)
 		}
 
 		if len(deployments) != len(tc.ExpectedDeploymentNames) {

@@ -26,7 +26,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToCreate {
-			_, err := r.k8sClient.Extensions().Ingresses(namespace).Create(ingress)
+			_, err := r.k8sClient.ExtensionsV1beta1().Ingresses(namespace).Create(ingress)
 			if apierrors.IsAlreadyExists(err) {
 				// fall through
 			} else if err != nil {

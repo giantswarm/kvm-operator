@@ -28,7 +28,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, PVC := range pvcsToDelete {
-			err := r.k8sClient.Core().PersistentVolumeClaims(namespace).Delete(PVC.Name, &apismetav1.DeleteOptions{})
+			err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Delete(PVC.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {

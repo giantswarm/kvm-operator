@@ -3,7 +3,7 @@ package deployment
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/api/extensions/v1beta1"
+	v1 "k8s.io/api/apps/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
@@ -84,7 +84,7 @@ func allNumbersEqual(numbers ...int32) bool {
 	return true
 }
 
-func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bool {
+func containsDeployment(list []*v1.Deployment, item *v1.Deployment) bool {
 	for _, l := range list {
 		if l.Name == item.Name {
 			return true
@@ -94,7 +94,7 @@ func containsDeployment(list []*v1beta1.Deployment, item *v1beta1.Deployment) bo
 	return false
 }
 
-func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Deployment, error) {
+func getDeploymentByName(list []*v1.Deployment, name string) (*v1.Deployment, error) {
 	for _, l := range list {
 		if l.Name == name {
 			return l, nil
@@ -104,7 +104,7 @@ func getDeploymentByName(list []*v1beta1.Deployment, name string) (*v1beta1.Depl
 	return nil, microerror.Mask(notFoundError)
 }
 
-func isDeploymentModified(a, b *v1beta1.Deployment) bool {
+func isDeploymentModified(a, b *v1.Deployment) bool {
 	aVersion, ok := a.GetAnnotations()[key.VersionBundleVersionAnnotation]
 	if !ok {
 		return true
@@ -128,14 +128,14 @@ func isDeploymentModified(a, b *v1beta1.Deployment) bool {
 	return false
 }
 
-func toDeployments(v interface{}) ([]*v1beta1.Deployment, error) {
+func toDeployments(v interface{}) ([]*v1.Deployment, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	deployments, ok := v.([]*v1beta1.Deployment)
+	deployments, ok := v.([]*v1.Deployment)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*v1beta1.Deployment{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*v1.Deployment{}, v)
 	}
 
 	return deployments, nil

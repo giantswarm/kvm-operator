@@ -7,8 +7,8 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
+	v1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
-	"k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes/fake"
 )
@@ -278,9 +278,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
 		}
 
-		deployments, ok := result.([]*v1beta1.Deployment)
+		deployments, ok := result.([]*v1.Deployment)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i, []*v1beta1.Deployment{}, result)
+			t.Fatalf("case %d expected %T got %T", i, []*v1.Deployment{}, result)
 		}
 
 		if testGetMasterCount(deployments) != tc.ExpectedMasterCount {
@@ -319,15 +319,15 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	}
 }
 
-func testGetMasterCount(deployments []*v1beta1.Deployment) int {
+func testGetMasterCount(deployments []*v1.Deployment) int {
 	return testGetCountPrefix(deployments, "master-")
 }
 
-func testGetWorkerCount(deployments []*v1beta1.Deployment) int {
+func testGetWorkerCount(deployments []*v1.Deployment) int {
 	return testGetCountPrefix(deployments, "worker-")
 }
 
-func testGetCountPrefix(deployments []*v1beta1.Deployment, prefix string) int {
+func testGetCountPrefix(deployments []*v1.Deployment, prefix string) int {
 	var count int
 
 	for _, d := range deployments {
@@ -339,15 +339,15 @@ func testGetCountPrefix(deployments []*v1beta1.Deployment, prefix string) int {
 	return count
 }
 
-func testGetK8sMasterKVMResources(deployments []*v1beta1.Deployment) []apiv1.ResourceRequirements {
+func testGetK8sMasterKVMResources(deployments []*v1.Deployment) []apiv1.ResourceRequirements {
 	return testGetK8sKVMResourcesPrefix(deployments, "master-")
 }
 
-func testGetK8sWorkerKVMResources(deployments []*v1beta1.Deployment) []apiv1.ResourceRequirements {
+func testGetK8sWorkerKVMResources(deployments []*v1.Deployment) []apiv1.ResourceRequirements {
 	return testGetK8sKVMResourcesPrefix(deployments, "worker-")
 }
 
-func testGetK8sKVMResourcesPrefix(deployments []*v1beta1.Deployment, prefix string) []apiv1.ResourceRequirements {
+func testGetK8sKVMResourcesPrefix(deployments []*v1.Deployment, prefix string) []apiv1.ResourceRequirements {
 	var rs []apiv1.ResourceRequirements
 
 	for _, d := range deployments {
