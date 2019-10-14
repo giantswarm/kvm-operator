@@ -8,9 +8,8 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
+	v1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
-	"k8s.io/api/extensions/v1beta1"
-	extensionsv1 "k8s.io/api/extensions/v1beta1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
@@ -23,7 +22,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		Obj                         interface{}
 		CurrentState                interface{}
 		DesiredState                interface{}
-		ExpectedDeploymentsToUpdate []*v1beta1.Deployment
+		ExpectedDeploymentsToUpdate []*v1.Deployment
 	}{
 		// Test 0, in case current state and desired state are empty the update
 		// state should be empty.
@@ -36,8 +35,8 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:                []*v1beta1.Deployment{},
-			DesiredState:                []*v1beta1.Deployment{},
+			CurrentState:                []*v1.Deployment{},
+			DesiredState:                []*v1.Deployment{},
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
@@ -52,7 +51,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -60,7 +59,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -73,7 +72,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -81,7 +80,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -108,7 +107,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -116,7 +115,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -135,7 +134,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -148,7 +147,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -156,7 +155,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -175,7 +174,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -211,7 +210,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -219,7 +218,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -238,7 +237,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.1.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -251,7 +250,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -259,7 +258,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -278,7 +277,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -291,7 +290,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
@@ -299,7 +298,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -334,7 +333,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -342,7 +341,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -361,7 +360,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -374,7 +373,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -382,7 +381,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -401,7 +400,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -414,7 +413,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
@@ -422,7 +421,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -457,7 +456,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -465,7 +464,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -476,7 +475,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 1,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -490,7 +489,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -501,7 +500,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 1,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -509,7 +508,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -517,7 +516,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -536,7 +535,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -571,7 +570,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -579,7 +578,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -590,7 +589,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 1,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -604,7 +603,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -615,7 +614,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -623,7 +622,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -631,7 +630,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -650,7 +649,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -687,7 +686,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -695,7 +694,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -706,7 +705,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -720,7 +719,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -731,7 +730,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -739,7 +738,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -747,7 +746,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -766,7 +765,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -779,7 +778,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -787,7 +786,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -821,7 +820,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -829,7 +828,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -840,7 +839,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -854,7 +853,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -865,7 +864,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -873,7 +872,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -881,7 +880,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -900,7 +899,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -913,7 +912,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
@@ -921,7 +920,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -957,7 +956,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -965,7 +964,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -976,7 +975,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -987,7 +986,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -998,7 +997,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -1006,7 +1005,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -1014,7 +1013,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1033,7 +1032,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1046,7 +1045,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
@@ -1054,7 +1053,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1089,7 +1088,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*v1beta1.Deployment{
+			CurrentState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -1097,7 +1096,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1108,7 +1107,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -1122,7 +1121,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1133,7 +1132,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							},
 						},
 					},
-					Status: extensionsv1.DeploymentStatus{
+					Status: v1.DeploymentStatus{
 						AvailableReplicas: 2,
 						ReadyReplicas:     2,
 						Replicas:          2,
@@ -1141,7 +1140,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*v1beta1.Deployment{
+			DesiredState: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
@@ -1149,7 +1148,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1168,7 +1167,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1181,7 +1180,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedDeploymentsToUpdate: []*v1beta1.Deployment{
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
@@ -1189,7 +1188,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
-					Spec: extensionsv1.DeploymentSpec{
+					Spec: v1.DeploymentSpec{
 						Template: apiv1.PodTemplateSpec{
 							Spec: apiv1.PodSpec{
 								Containers: []apiv1.Container{
@@ -1230,9 +1229,9 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					t.Fatalf("expected %#v got %#v", nil, updateState)
 				}
 			} else {
-				deploymentsToUpdate, ok := updateState.([]*v1beta1.Deployment)
+				deploymentsToUpdate, ok := updateState.([]*v1.Deployment)
 				if !ok {
-					t.Fatalf("expected %T got %T", []*v1beta1.Deployment{}, updateState)
+					t.Fatalf("expected %T got %T", []*v1.Deployment{}, updateState)
 				}
 				if !reflect.DeepEqual(deploymentsToUpdate, tc.ExpectedDeploymentsToUpdate) {
 					t.Fatalf("expected %#v got %#v", tc.ExpectedDeploymentsToUpdate, deploymentsToUpdate)

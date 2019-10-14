@@ -53,10 +53,10 @@ const (
 	CoreosImageDir       = "/var/lib/coreos-kvm-images"
 	CoreosVersion        = "2191.5.0"
 
-	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:590479a6228c2c143695a268bda5382b52f7ffe1"
+	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:9172ffbc4838cf0c813d8e6d141e994d56dcc750"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:e9989b8667070b8a10a030e2f1f6078d2ffb803e"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:20517098a762a0d7ca2b0902316ddff487dbc7f5"
-	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:4e7d2b73859ea7dac1a2138e04e07fa5870d109b"
+	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:022df58313aab9a185f2a78d9bd107d6f7db13c9"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"

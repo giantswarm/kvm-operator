@@ -29,56 +29,56 @@ required = [
 
 
 [[constraint]]
-  branch = "master"
   name = "github.com/docker/distribution"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/apiextensions"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/certs"
+  branch = "master"
 
 [[constraint]]
-  branch = "k8s-1_15_4-release"
   name = "github.com/giantswarm/k8scloudconfig"
+  branch = "k8s-1_15_4-release"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/microendpoint"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/microerror"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/microkit"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/micrologger"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/operatorkit"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/randomkeys"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/statusresource"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/tenantcluster"
+  branch = "master"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/versionbundle"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/prometheus/client_golang"
@@ -90,27 +90,47 @@ required = [
 
 [[constraint]]
   name = "k8s.io/api"
-  version = "kubernetes-1.13.2"
+  version = "kubernetes-1.15.4"
 
 [[constraint]]
   name = "k8s.io/apiextensions-apiserver"
-  version = "kubernetes-1.13.2"
+  version = "kubernetes-1.15.4"
 
 [[constraint]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.13.2"
+  version = "kubernetes-1.15.4"
 
 [[constraint]]
   name = "k8s.io/apiserver"
-  version = "kubernetes-1.13.2"
+  version = "kubernetes-1.15.4"
 
 [[constraint]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.13.2"
+  version = "kubernetes-1.15.4"
 
-[[constraint]]
+[[override]]
+  name = "k8s.io/client-go"
+  version = "kubernetes-1.15.4"
+
+[[override]]
   name = "k8s.io/kubernetes"
-  version = "v1.13.2"
+  version = "v1.15.4"
+
+[[override]]
+  name = "k8s.io/cli-runtime"
+  version = "kubernetes-1.15.4"
+
+[[override]]
+  name = "k8s.io/component-base"
+  version = "kubernetes-1.15.4"
+
+[[override]]
+  name = "github.com/ghodss/yaml"
+  branch = "master"
+
+[[override]]
+  name = "github.com/russross/blackfriday"
+  version = "v1.5.2"
 
 
 
