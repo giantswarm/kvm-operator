@@ -276,8 +276,8 @@
   revision = "1acdb17ed51fb2d0a641efbb1b570453cd145ee0"
 
 [[projects]]
-  branch = "k8s-1_15_4-release"
-  digest = "1:495693b1b460803c4020be440769fa6012cb13f3a36d144450a623068abb028c"
+  branch = "systemd-kubelet"
+  digest = "1:34ce9976f713616e3afd09382de1e6c17634fe8c4e2ea3947ac6781302994f77"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -290,7 +290,7 @@
     "v_4_9_0",
   ]
   pruneopts = "T"
-  revision = "635abc908d7e388a502f792bb7474e7fe672c15c"
+  revision = "69dc89d4dc9843e01846bb1696f52d186f2e8747"
 
 [[projects]]
   branch = "master"
