@@ -277,7 +277,7 @@
 
 [[projects]]
   branch = "systemd-kubelet"
-  digest = "1:873ae6b9c737b9709571778c047e7966ba53abad6254eabdfd2973af031a81e4"
+  digest = "1:61c0702dc76be900e52fdf974f9afbb47982272fa44ee0c852206df151cc21f8"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -290,7 +290,7 @@
     "v_4_9_0",
   ]
   pruneopts = "T"
-  revision = "7e80365e14275c43be101deba8bc88fc39d17756"
+  revision = "cd8accf06410aa67bcb2f66246353141d9f4fa28"
 
 [[projects]]
   branch = "master"
