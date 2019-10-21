@@ -151,9 +151,9 @@ systemd:
       TimeoutStartSec=0
       Environment="IMAGE={{ .RegistryDomain }}/{{ .Images.Kubernetes }}"
       Environment="NAME=%p.service"
-      ExecStart=/bin/bash -c "/usr/bin/docker create --name $NAME $IMAGE && \
-        /usr/bin/docker cp $NAME:/hyperkube /opt/bin/hyperkube && \
-        /usr/bin/docker rm $NAME"
+      ExecPreStart=/usr/bin/docker create --name $NAME $IMAGE
+      ExecStart=/usr/bin/docker cp $NAME:/hyperkube /opt/bin/hyperkube
+      ExecStop=/usr/bin/docker rm $NAME
       [Install]
       WantedBy=multi-user.target
   - name: k8s-kubelet.service
