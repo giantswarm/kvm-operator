@@ -4,7 +4,7 @@ set -eu
 mkdir -p /opt/bin
 
 # download calicoctl
-CALICOCTL_VERSION=v3.9.1
+CALICOCTL_VERSION=v3.10.0
 wget https://github.com/projectcalico/calicoctl/releases/download/${CALICOCTL_VERSION}/calicoctl-linux-amd64
 mv calicoctl-linux-amd64 /opt/bin/calicoctl
 chmod +x /opt/bin/calicoctl
