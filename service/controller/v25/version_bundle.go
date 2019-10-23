@@ -47,7 +47,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.15.4",
+				Version: "1.15.5",
 			},
 		},
 		Name:    "kvm-operator",
