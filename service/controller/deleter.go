@@ -20,6 +20,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v23patch1"
 	v24 "github.com/giantswarm/kvm-operator/service/controller/v24"
 	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
+	v26 "github.com/giantswarm/kvm-operator/service/controller/v26"
 )
 
 type DeleterConfig struct {
@@ -217,6 +218,22 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		}
 	}
 
+	var resourceSetV26 *controller.ResourceSet
+	{
+		c := v26.DeleterResourceSetConfig{
+			K8sClient:     config.K8sClient,
+			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
+
+			ProjectName: config.ProjectName,
+		}
+
+		resourceSetV26, err = v26.NewDeleterResourceSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resourceSets := []*controller.ResourceSet{
 		resourceSetV20,
 		resourceSetV21,
@@ -225,6 +242,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 		resourceSetV23patch1,
 		resourceSetV24,
 		resourceSetV25,
+		resourceSetV26,
 	}
 
 	return resourceSets, nil
