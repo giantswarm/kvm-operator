@@ -10,7 +10,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v23patch1"
 	v24 "github.com/giantswarm/kvm-operator/service/controller/v24"
 	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
-	v25 "github.com/giantswarm/kvm-operator/service/controller/v26"
+	v26 "github.com/giantswarm/kvm-operator/service/controller/v26"
 )
 
 func NewVersionBundles() []versionbundle.Bundle {
