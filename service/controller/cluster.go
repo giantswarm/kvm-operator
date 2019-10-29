@@ -28,7 +28,7 @@ import (
 	v24 "github.com/giantswarm/kvm-operator/service/controller/v24"
 	v24cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
 	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
-	v26 "github.com/giantswarm/kvm-operator/service/controller/v25"
+	v26 "github.com/giantswarm/kvm-operator/service/controller/v26"
 	v25cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v25/cloudconfig"
 	v26cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v26/cloudconfig"
 )
