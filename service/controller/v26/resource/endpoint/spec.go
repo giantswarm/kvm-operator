@@ -17,7 +17,7 @@ type Endpoint struct {
 	// reconciled pod. When the desired state is computed the list contains only a
 	// single IP, which is the IP of the reconciled pod.
 	IPs              []string
+	ResourceVersion  string
 	ServiceName      string
 	ServiceNamespace string
-	ResourceVersion  string
 }
