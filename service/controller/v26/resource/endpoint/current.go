@@ -113,6 +113,20 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 				return nil, nil
 			}
 		}
+	} else if key.IsPodDeleted(pod) {
+		_, err := r.k8sClient.CoreV1().Pods(pod.GetNamespace()).Get(pod.GetName(), metav1.GetOptions{})
+		if errors.IsNotFound(err) {
+			// In case we reconcile a pod we cannot find anymore this means the
+			// informer's watch event is outdated and the pod got already deleted in
+			// the Kubernetes API. We want to cancel reconciliation to prevent anymore
+			// endpoint IPs of deleted pods being added to services.
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find current version of the reconciled pod in the Kubernetes API")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			resourcecanceledcontext.SetCanceled(ctx)
+			return nil, nil
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	return endpoint, nil
