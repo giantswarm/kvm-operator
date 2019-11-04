@@ -57,8 +57,9 @@ func (r *Resource) newK8sEndpoint(endpoint *Endpoint) *corev1.Endpoints {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      endpoint.ServiceName,
-			Namespace: endpoint.ServiceNamespace,
+			Name:            endpoint.ServiceName,
+			Namespace:       endpoint.ServiceNamespace,
+			ResourceVersion: endpoint.ResourceVersion,
 		},
 	}
 

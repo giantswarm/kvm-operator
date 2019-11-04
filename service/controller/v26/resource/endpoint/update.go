@@ -64,6 +64,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		ips := ipsForUpdateChange(currentEndpoint.IPs, desiredEndpoint.IPs)
 
 		e := &Endpoint{
+			ResourceVersion:  currentEndpoint.ResourceVersion,
 			ServiceName:      currentEndpoint.ServiceName,
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
 		}
