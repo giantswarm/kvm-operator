@@ -51,6 +51,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 			Addresses:        ipsToAddresses(ips),
 			IPs:              ips,
 			Ports:            currentEndpoint.Ports,
+			ResourceVersion:  currentEndpoint.ResourceVersion,
 			ServiceName:      currentEndpoint.ServiceName,
 			ServiceNamespace: currentEndpoint.ServiceNamespace,
 		}

@@ -72,6 +72,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		}
 
+		// If we found a k8s endpoint then we set this resource version here.
+		// We do this to later guarantee that the endpoint did not change
+		// between gathering information and submitting our update.
+		endpoint.ResourceVersion = k8sEndpoints.ResourceVersion
+
 		for _, endpointSubset := range k8sEndpoints.Subsets {
 			for _, endpointAddress := range endpointSubset.Addresses {
 				if !containsIP(endpoint.IPs, endpointAddress.IP) {
