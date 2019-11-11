@@ -8,9 +8,12 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "TODO",
-				Description: "TODO",
+				Component:   "kvm-operator",
+				Description: "Check resource version of control plane endpoint before updating IPs.",
 				Kind:        versionbundle.KindChanged,
+				URLs: []string{
+					"https://github.com/giantswarm/kvm-operator/pull/770",
+				},
 			},
 		},
 		Components: []versionbundle.Component{
