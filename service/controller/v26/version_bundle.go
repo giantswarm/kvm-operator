@@ -15,6 +15,14 @@ func VersionBundle() versionbundle.Bundle {
 					"https://github.com/giantswarm/kvm-operator/pull/770",
 				},
 			},
+			{
+				Component:   "kube-proxy",
+				Description: "Switch from iptables to IPVS mode and tune kernel params accordingly.",
+				Kind:        versionbundle.KindChanged,
+				URLs: []string{
+					"https://github.com/giantswarm/k8scloudconfig/pull/604",
+				},
+			},
 		},
 		Components: []versionbundle.Component{
 			{
