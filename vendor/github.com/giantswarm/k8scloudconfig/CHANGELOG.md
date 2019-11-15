@@ -9,7 +9,11 @@ The latest version is considered WIP and it is a subject of change. All other
 versions are frozen. To freeze current version all files are copied to a new
 version directory, and  then changes are introduced.
 
-## [v5.0.0] WIP
+## [v5.0.0] - 2019-11-12
+
+### Changed
+
+- Moved kubelet from container to host process (`--containerized` flag is removed in Kubernetes 1.16).
 
 ## [v4.9.0] - 2019-10-17
 
