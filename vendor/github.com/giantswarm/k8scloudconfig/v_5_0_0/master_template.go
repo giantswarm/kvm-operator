@@ -273,7 +273,6 @@ systemd:
       TimeoutStopSec=10
       CPUAccounting=true
       MemoryAccounting=true
-      Slice=kubereserved.slice
       EnvironmentFile=/etc/network-environment
       ExecStart=/opt/bin/hyperkube kubelet \
         {{ range .Hyperkube.Kubelet.Docker.CommandExtraArgs -}}
