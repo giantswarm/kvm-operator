@@ -214,7 +214,7 @@ After=k8s-kubelet.service
 
 [Service]
 Environment="KUBECONFIG=/etc/kubernetes/config/addons-kubeconfig.yml"
-Environment="KUBECTL=quay.io/giantswarm/docker-kubectl:e777d4eaf369d4dabc393c5da42121c2a725ea6a"
+Environment="KUBECTL=quay.io/giantswarm/docker-kubectl:0df981ec7d2bd3c1191f75a0890f1089762febfb"
 ExecStart=/bin/sh -c '\
 	while [ "$(/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get cs | grep Healthy | wc -l)" -ne "3" ]; do sleep 1 && echo "Waiting for healthy k8s";done;sleep 30s; \
 	RETRY=5;result="";\
