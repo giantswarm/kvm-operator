@@ -225,7 +225,6 @@ ExecStart=/bin/sh -c '\
 		sleep 1m && \
 		/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy && \
 		/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-kube-controllers && \
-		/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=coredns &&\
 		result="ok" || echo "failed";\
 	done;\
 	[ "$result" != "ok" ] && echo "Failed to restart k8s services." && exit 1 || echo "Successfully restarted k8s services.";'

@@ -169,8 +169,12 @@ systemd:
       Restart=always
       RestartSec=0
       TimeoutStopSec=10
+      Slice=kubereserved.slice
       CPUAccounting=true
       MemoryAccounting=true
+      Environment="ETCD_CA_CERT_FILE=/etc/kubernetes/ssl/etcd/client-ca.pem"
+      Environment="ETCD_CERT_FILE=/etc/kubernetes/ssl/etcd/client-crt.pem"
+      Environment="ETCD_KEY_FILE=/etc/kubernetes/ssl/etcd/client-key.pem"
       EnvironmentFile=/etc/network-environment
       ExecStart=/opt/bin/hyperkube kubelet \
         {{ range .Hyperkube.Kubelet.Docker.CommandExtraArgs -}}
