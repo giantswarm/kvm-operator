@@ -9,11 +9,16 @@ The latest version is considered WIP and it is a subject of change. All other
 versions are frozen. To freeze current version all files are copied to a new
 version directory, and  then changes are introduced.
 
-## [v5.0.0] - 2019-11-12
+## [v5.0.0] WIP
 
 ### Changed
 
-- Moved kubelet from container to host process (`--containerized` flag is removed in Kubernetes 1.16).
+- Switch from `iptables` to `ipvs` mode in kube-proxy and tune kernel params accordingly.
+- Changed `restricted` PodSecurityPolicy to restrict the allowed range of user IDs for PODs.
+
+### Added
+
+- Add eviction hard setting for image file system in kubelet.
 
 ## [v4.9.0] - 2019-10-17
 

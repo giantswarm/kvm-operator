@@ -240,30 +240,12 @@ systemd:
       OnCalendar=*-*-* 03:30:00 UTC
       [Install]
       WantedBy=multi-user.target
-  - name: k8s-setup-download-hyperkube.service
-    enabled: true
-    contents: |
-      [Unit]
-      Description=Pulls hyperkube binary from image to local FS
-      After=docker.service
-      Requires=docker.service
-      [Service]
-      Type=oneshot
-      RemainAfterExit=yes
-      TimeoutStartSec=0
-      Environment="IMAGE={{ .RegistryDomain }}/{{ .Images.Kubernetes }}"
-      Environment="NAME=%p.service"
-      ExecStartPre=/bin/bash -c "/usr/bin/docker create --name $NAME $IMAGE"
-      ExecStart=/bin/bash -c "/usr/bin/docker cp $NAME:/hyperkube /opt/bin/hyperkube"
-      ExecStartPost=/bin/bash -c "/usr/bin/docker rm $NAME"
-      [Install]
-      WantedBy=multi-user.target
   - name: k8s-kubelet.service
     enabled: true
     contents: |
       [Unit]
-      Wants=k8s-setup-network-env.service k8s-setup-kubelet-config.service k8s-setup-download-hyperkube.service
-      After=k8s-setup-network-env.service k8s-setup-kubelet-config.service k8s-setup-download-hyperkube.service
+      Wants=k8s-setup-network-env.service k8s-setup-kubelet-config.service
+      After=k8s-setup-network-env.service k8s-setup-kubelet-config.service
       Description=k8s-kubelet
       StartLimitIntervalSec=0
       [Service]
@@ -271,29 +253,77 @@ systemd:
       Restart=always
       RestartSec=0
       TimeoutStopSec=10
-      Slice=kubereserved.slice
       CPUAccounting=true
       MemoryAccounting=true
-      Environment="ETCD_CA_CERT_FILE=/etc/kubernetes/ssl/etcd/server-ca.pem"
-      Environment="ETCD_CERT_FILE=/etc/kubernetes/ssl/etcd/server-crt.pem"
-      Environment="ETCD_KEY_FILE=/etc/kubernetes/ssl/etcd/server-key.pem"
+      Slice=kubereserved.slice
       EnvironmentFile=/etc/network-environment
-      ExecStart=/opt/bin/hyperkube kubelet \
-        {{ range .Hyperkube.Kubelet.Docker.CommandExtraArgs -}}
-        {{ . }} \
-        {{ end -}}
-        --node-ip=${DEFAULT_IPV4} \
-        --config=/etc/kubernetes/config/kubelet.yaml \
-        --enable-server \
-        --logtostderr=true \
-        --cloud-provider={{.Cluster.Kubernetes.CloudProvider}} \
-        --image-pull-progress-deadline={{.ImagePullProgressDeadline}} \
-        --network-plugin=cni \
-        --register-node=true \
-        --register-with-taints=node-role.kubernetes.io/master=:NoSchedule \
-        --kubeconfig=/etc/kubernetes/kubeconfig/kubelet.yaml \
-        --node-labels="node.kubernetes.io/master,node-role.kubernetes.io/master,kubernetes.io/role=master,role=master,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
-        --v=2
+      Environment="IMAGE={{ .RegistryDomain }}/{{ .Images.Kubernetes }}"
+      Environment="NAME=%p.service"
+      Environment="PATH=/opt/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      ExecStartPre=/usr/bin/docker pull $IMAGE
+      ExecStartPre=-/usr/bin/docker stop -t 10 $NAME
+      ExecStartPre=-/usr/bin/docker rm -f $NAME
+      ExecStart=/bin/sh -c "/usr/bin/docker run --rm --pid=host --net=host --privileged=true \
+      {{ range .Hyperkube.Kubelet.Docker.RunExtraArgs -}}
+      {{ . }} \
+      {{ end -}}
+      -v /:/rootfs:ro,rshared \
+      -v /sys:/sys:ro \
+      -v /dev:/dev:rw \
+      -v /var/log:/var/log:rw \
+      -v /run/calico/:/run/calico/:rw \
+      -v /run/docker/:/run/docker/:rw \
+      -v /run/docker.sock:/run/docker.sock:rw \
+      -v /usr/bin/docker:/usr/bin/docker \
+      -v /run/metadata/torcx:/run/metadata/torcx \
+      -v /run/torcx/:/run/torcx/ \
+      -v /usr/lib/os-release:/etc/os-release \
+      -v /usr/share/ca-certificates/:/etc/ssl/certs \
+      -v /var/lib/calico/:/var/lib/calico \
+      -v /var/lib/docker/:/var/lib/docker:rw,rshared \
+      -v /var/lib/kubelet/:/var/lib/kubelet:rw,rshared \
+      -v /etc/kubernetes/ssl/:/etc/kubernetes/ssl/ \
+      -v /etc/kubernetes/config/:/etc/kubernetes/config/ \
+      -v /etc/kubernetes/kubeconfig/:/etc/kubernetes/kubeconfig/ \
+      -v /etc/kubernetes/manifests/:/etc/kubernetes/manifests/ \
+      -v /etc/cni/net.d/:/etc/cni/net.d/ \
+      -v /opt/cni/bin/:/opt/cni/bin/ \
+      -v /opt/bin:/opt/bin \
+      -v /usr/sbin/iscsiadm:/usr/sbin/iscsiadm \
+      -v /etc/iscsi/:/etc/iscsi/ \
+      -v /dev/disk/by-path/:/dev/disk/by-path/ \
+      -v /dev/mapper/:/dev/mapper/ \
+      -v /lib/modules:/lib/modules \
+      -v /usr/sbin/mkfs.xfs:/usr/sbin/mkfs.xfs \
+      -v /usr/lib64/libxfs.so.0:/usr/lib/libxfs.so.0 \
+      -v /usr/lib64/libxcmd.so.0:/usr/lib/libxcmd.so.0 \
+      -v /usr/lib64/libreadline.so.7:/usr/lib/libreadline.so.7 \
+      -e ETCD_CA_CERT_FILE=/etc/kubernetes/ssl/etcd/server-ca.pem \
+      -e ETCD_CERT_FILE=/etc/kubernetes/ssl/etcd/server-crt.pem \
+      -e ETCD_KEY_FILE=/etc/kubernetes/ssl/etcd/server-key.pem \
+      -e PATH \
+      --name $NAME \
+      $IMAGE \
+      /hyperkube kubelet \
+      {{ range .Hyperkube.Kubelet.Docker.CommandExtraArgs -}}
+      {{ . }} \
+      {{ end -}}
+      --node-ip=${DEFAULT_IPV4} \
+      --config=/etc/kubernetes/config/kubelet.yaml \
+      --containerized \
+      --enable-server \
+      --logtostderr=true \
+      --cloud-provider={{.Cluster.Kubernetes.CloudProvider}} \
+      --image-pull-progress-deadline={{.ImagePullProgressDeadline}} \
+      --network-plugin=cni \
+      --register-node=true \
+      --register-with-taints=node-role.kubernetes.io/master=:NoSchedule \
+      --feature-gates=TTLAfterFinished=true \
+      --kubeconfig=/etc/kubernetes/kubeconfig/kubelet.yaml \
+      --node-labels="node.kubernetes.io/master,node-role.kubernetes.io/master,kubernetes.io/role=master,role=master,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
+      --v=2"
+      ExecStop=-/usr/bin/docker stop -t 10 $NAME
+      ExecStopPost=-/usr/bin/docker rm -f $NAME
       [Install]
       WantedBy=multi-user.target
   - name: etcd2.service
