@@ -35,7 +35,10 @@ spec:
   privileged: false
   allowPrivilegeEscalation: false
   runAsUser:
-    rule: MustRunAsNonRoot
+    ranges:
+      - max: 65535
+        min: 1000
+    rule: MustRunAs
   seLinux:
     rule: RunAsAny
   supplementalGroups:

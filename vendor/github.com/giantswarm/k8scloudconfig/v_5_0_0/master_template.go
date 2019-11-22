@@ -458,6 +458,12 @@ storage:
       contents:
         source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/psp_bindings.yaml" }}"
 
+    - path: /srv/network_policies.yaml
+      filesystem: root
+      mode: 0644
+      contents:
+        source: "data:text/plain;charset=utf-8;base64,{{  index .Files "k8s-resource/network_policies.yaml" }}"
+
     - path: /opt/wait-for-domains
       filesystem: root
       mode: 0544
