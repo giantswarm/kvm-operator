@@ -99,6 +99,7 @@ func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template stri
 				Name: key.ConfigMapName(customResource, node, prefix),
 				Labels: map[string]string{
 					// TODO: Delete two legacy labels from next release
+					// issues: https://github.com/giantswarm/giantswarm/issues/7771
 					"cluster":          key.ClusterID(customResource),
 					"customer":         key.ClusterCustomer(customResource),
 					label.ManagedBy:    project.Name(),
