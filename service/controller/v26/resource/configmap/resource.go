@@ -92,9 +92,6 @@ func equals(a, b *apiv1.ConfigMap) bool {
 	if a.Namespace != b.Namespace {
 		return false
 	}
-	if !reflect.DeepEqual(a.Annotations, b.Annotations) {
-		return false
-	}
 	if !reflect.DeepEqual(a.Data, b.Data) {
 		return false
 	}
