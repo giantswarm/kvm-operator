@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v26/cloudconfig/cloudconfigtest"
@@ -203,9 +203,9 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 				return
 			}
 
-			configMaps, ok := result.([]*corev1.ConfigMap)
+			configMaps, ok := result.([]*apiv1.ConfigMap)
 			if !ok {
-				t.Fatalf("expected %T got %T", []*corev1.ConfigMap{}, result)
+				t.Fatalf("expected %T got %T", []*apiv1.ConfigMap{}, result)
 			}
 
 			if testGetMasterCount(configMaps) != tc.ExpectedMasterCount {
@@ -223,7 +223,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	}
 }
 
-func testGetMasterCount(configMaps []*corev1.ConfigMap) int {
+func testGetMasterCount(configMaps []*apiv1.ConfigMap) int {
 	var count int
 
 	for _, c := range configMaps {
@@ -235,7 +235,7 @@ func testGetMasterCount(configMaps []*corev1.ConfigMap) int {
 	return count
 }
 
-func testGetWorkerCount(configMaps []*corev1.ConfigMap) int {
+func testGetWorkerCount(configMaps []*apiv1.ConfigMap) int {
 	var count int
 
 	for _, c := range configMaps {

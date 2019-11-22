@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
@@ -32,8 +32,8 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:           []*corev1.ConfigMap{},
-			DesiredState:           []*corev1.ConfigMap{},
+			CurrentState:           []*apiv1.ConfigMap{},
+			DesiredState:           []*apiv1.ConfigMap{},
 			ExpectedConfigMapNames: []string{},
 		},
 
@@ -47,14 +47,14 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.ConfigMap{
+			CurrentState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 			},
-			DesiredState: []*corev1.ConfigMap{
+			DesiredState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -74,8 +74,8 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.ConfigMap{},
-			DesiredState: []*corev1.ConfigMap{
+			CurrentState: []*apiv1.ConfigMap{},
+			DesiredState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -97,8 +97,8 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.ConfigMap{},
-			DesiredState: []*corev1.ConfigMap{
+			CurrentState: []*apiv1.ConfigMap{},
+			DesiredState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -127,14 +127,14 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.ConfigMap{
+			CurrentState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 			},
-			DesiredState:           []*corev1.ConfigMap{},
+			DesiredState:           []*apiv1.ConfigMap{},
 			ExpectedConfigMapNames: []string{},
 		},
 
@@ -149,7 +149,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.ConfigMap{
+			CurrentState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -161,7 +161,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState:           []*corev1.ConfigMap{},
+			DesiredState:           []*apiv1.ConfigMap{},
 			ExpectedConfigMapNames: []string{},
 		},
 
@@ -176,7 +176,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.ConfigMap{
+			CurrentState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -188,7 +188,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*corev1.ConfigMap{
+			DesiredState: []*apiv1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -239,9 +239,9 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		configMaps, ok := result.([]*corev1.ConfigMap)
+		configMaps, ok := result.([]*apiv1.ConfigMap)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*corev1.ConfigMap{}, result)
+			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, result)
 		}
 
 		if len(configMaps) != len(tc.ExpectedConfigMapNames) {
