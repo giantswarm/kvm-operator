@@ -3,11 +3,11 @@
 package label
 
 const (
-	// Cluster label is a new style label for ClusterID
+	// Cluster label is a new style label for ClusterID.
 	Cluster = "giantswarm.io/cluster"
 	// ManagedBy is set for Kubernetes resources managed by the operator.
 	ManagedBy = "giantswarm.io/managed-by"
-	// Organization label denotes guest cluster's organization ID as displayed
+	// Organization label denotes tenant cluster's organization ID as displayed
 	// in the front-end.
 	Organization = "giantswarm.io/organization"
 )

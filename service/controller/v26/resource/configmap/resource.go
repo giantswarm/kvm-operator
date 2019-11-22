@@ -27,9 +27,6 @@ type Config struct {
 	K8sClient     kubernetes.Interface
 	KeyWatcher    randomkeys.Interface
 	Logger        micrologger.Logger
-
-	// Settings.
-	ProjectName string
 }
 
 // Resource implements the config map resource.
@@ -40,9 +37,6 @@ type Resource struct {
 	k8sClient     kubernetes.Interface
 	keyWatcher    randomkeys.Interface
 	logger        micrologger.Logger
-
-	// Settings.
-	projectName string
 }
 
 // New creates a new configured config map resource.
@@ -64,10 +58,6 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
-	}
-
 	newService := &Resource{
 		// Dependencies.
 		certsSearcher: config.CertsSearcher,
@@ -75,9 +65,6 @@ func New(config Config) (*Resource, error) {
 		k8sClient:     config.K8sClient,
 		keyWatcher:    config.KeyWatcher,
 		logger:        config.Logger,
-
-		// Settings.
-		projectName: config.ProjectName,
 	}
 
 	return newService, nil
