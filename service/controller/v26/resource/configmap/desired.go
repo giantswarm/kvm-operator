@@ -98,6 +98,9 @@ func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template stri
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.ConfigMapName(customResource, node, prefix),
 				Labels: map[string]string{
+					// TODO: Delete two legacy labels from next release
+					"cluster":          key.ClusterID(customResource),
+					"customer":         key.ClusterCustomer(customResource),
 					label.ManagedBy:    project.Name(),
 					label.Cluster:      key.ClusterID(customResource),
 					label.Organization: key.ClusterCustomer(customResource),
