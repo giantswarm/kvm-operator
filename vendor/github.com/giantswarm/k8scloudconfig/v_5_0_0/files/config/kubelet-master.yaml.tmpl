@@ -21,7 +21,6 @@ kubeReserved:
   memory: 1280Mi
   ephemeral-storage: 1024Mi
 kubeReservedCgroup: /kubereserved.slice
-kubeletCgroups: /kubereserved.slice
 runtimeCgroups: /kubereserved.slice
 systemReserved:
   cpu: 250m
@@ -34,3 +33,5 @@ authentication:
     enabled: false # Deafults to true as of 1.10
 authorization:
   mode: AlwaysAllow # Deafults to webhook as of 1.10
+featureGates:
+  TTLAfterFinished: true
