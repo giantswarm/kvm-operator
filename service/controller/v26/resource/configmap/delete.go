@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -69,7 +69,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be deleted")
 
-	var configMapsToDelete []*apiv1.ConfigMap
+	var configMapsToDelete []*corev1.ConfigMap
 
 	for _, currentConfigMap := range currentConfigMaps {
 		if containsConfigMap(desiredConfigMaps, currentConfigMap) {
@@ -94,7 +94,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be deleted")
 
-	var configMapsToDelete []*apiv1.ConfigMap
+	var configMapsToDelete []*corev1.ConfigMap
 
 	for _, currentConfigMap := range currentConfigMaps {
 		if !containsConfigMap(desiredConfigMaps, currentConfigMap) {

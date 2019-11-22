@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/randomkeys"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v26/cloudconfig"
@@ -27,6 +27,9 @@ type Config struct {
 	K8sClient     kubernetes.Interface
 	KeyWatcher    randomkeys.Interface
 	Logger        micrologger.Logger
+
+	// Settings.
+	ProjectName string
 }
 
 // Resource implements the config map resource.
@@ -37,6 +40,9 @@ type Resource struct {
 	k8sClient     kubernetes.Interface
 	keyWatcher    randomkeys.Interface
 	logger        micrologger.Logger
+
+	// Settings.
+	projectName string
 }
 
 // New creates a new configured config map resource.
@@ -58,6 +64,10 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 
+	if config.ProjectName == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
+	}
+
 	newService := &Resource{
 		// Dependencies.
 		certsSearcher: config.CertsSearcher,
@@ -65,6 +75,9 @@ func New(config Config) (*Resource, error) {
 		k8sClient:     config.K8sClient,
 		keyWatcher:    config.KeyWatcher,
 		logger:        config.Logger,
+
+		// Settings.
+		projectName: config.ProjectName,
 	}
 
 	return newService, nil
@@ -74,7 +87,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func containsConfigMap(list []*apiv1.ConfigMap, item *apiv1.ConfigMap) bool {
+func containsConfigMap(list []*corev1.ConfigMap, item *corev1.ConfigMap) bool {
 	_, err := getConfigMapByName(list, item.Name)
 	if err != nil {
 		return false
@@ -83,7 +96,29 @@ func containsConfigMap(list []*apiv1.ConfigMap, item *apiv1.ConfigMap) bool {
 	return true
 }
 
-func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap, error) {
+// equals asseses the equality of ConfigMaps with regards to distinguishing
+// fields.
+func equals(a, b *corev1.ConfigMap) bool {
+	if a.Name != b.Name {
+		return false
+	}
+	if a.Namespace != b.Namespace {
+		return false
+	}
+	if !reflect.DeepEqual(a.Annotations, b.Annotations) {
+		return false
+	}
+	if !reflect.DeepEqual(a.Data, b.Data) {
+		return false
+	}
+	if !reflect.DeepEqual(a.Labels, b.Labels) {
+		return false
+	}
+
+	return true
+}
+
+func getConfigMapByName(list []*corev1.ConfigMap, name string) (*corev1.ConfigMap, error) {
 	for _, l := range list {
 		if l.Name == name {
 			return l, nil
@@ -93,18 +128,23 @@ func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap,
 	return nil, microerror.Mask(notFoundError)
 }
 
-func isConfigMapModified(a, b *apiv1.ConfigMap) bool {
-	return !reflect.DeepEqual(a.Data, b.Data)
+// isEmpty checks if a ConfigMap is empty.
+func isEmpty(c *corev1.ConfigMap) bool {
+	if c == nil {
+		return true
+	}
+
+	return equals(c, &corev1.ConfigMap{})
 }
 
-func toConfigMaps(v interface{}) ([]*apiv1.ConfigMap, error) {
+func toConfigMaps(v interface{}) ([]*corev1.ConfigMap, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	configMaps, ok := v.([]*apiv1.ConfigMap)
+	configMaps, ok := v.([]*corev1.ConfigMap)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*apiv1.ConfigMap{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*corev1.ConfigMap{}, v)
 	}
 
 	return configMaps, nil

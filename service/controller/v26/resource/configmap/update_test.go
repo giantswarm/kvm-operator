@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
@@ -22,7 +22,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		Obj                                  interface{}
 		CurrentState                         interface{}
 		DesiredState                         interface{}
-		ExpectedConfigMapsToUpdate           []*apiv1.ConfigMap
+		ExpectedConfigMapsToUpdate           []*corev1.ConfigMap
 		ExpectedMessageContextConfigMapNames []string
 	}{
 		// Test 0, in case current state and desired state are empty the update
@@ -36,8 +36,8 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:                         []*apiv1.ConfigMap{},
-			DesiredState:                         []*apiv1.ConfigMap{},
+			CurrentState:                         []*corev1.ConfigMap{},
+			DesiredState:                         []*corev1.ConfigMap{},
 			ExpectedConfigMapsToUpdate:           nil,
 			ExpectedMessageContextConfigMapNames: nil,
 		},
@@ -53,7 +53,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -63,7 +63,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*apiv1.ConfigMap{
+			DesiredState: []*corev1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -89,7 +89,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -107,7 +107,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*apiv1.ConfigMap{
+			DesiredState: []*corev1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-1",
@@ -125,7 +125,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
+			ExpectedConfigMapsToUpdate: []*corev1.ConfigMap{
 				{
 					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "config-map-2",
@@ -148,6 +148,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
+		resourceConfig.ProjectName = "kvm-operator"
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
@@ -160,9 +161,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
 		}
 
-		configMapsToUpdate, ok := updateState.([]*apiv1.ConfigMap)
+		configMapsToUpdate, ok := updateState.([]*corev1.ConfigMap)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i, []*apiv1.ConfigMap{}, updateState)
+			t.Fatalf("case %d expected %T got %T", i, []*corev1.ConfigMap{}, updateState)
 		}
 		if !reflect.DeepEqual(configMapsToUpdate, tc.ExpectedConfigMapsToUpdate) {
 			t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)

@@ -128,6 +128,8 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			K8sClient:     config.K8sClient,
 			KeyWatcher:    config.RandomkeysSearcher,
 			Logger:        config.Logger,
+
+			ProjectName: config.ProjectName,
 		}
 
 		ops, err := configmap.New(c)
