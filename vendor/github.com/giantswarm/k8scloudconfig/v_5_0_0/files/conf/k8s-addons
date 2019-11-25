@@ -141,6 +141,19 @@ do
     sleep 5s
 done
 
+# apply network policies:
+NETWORK_POLICIES_FILE="network_policies.yaml"
+NAMESPACES="kube-system giantswarm"
+for namespace in ${NAMESPACES}; do
+    while
+      /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/$NETWORK_POLICIES_FILE -n $namespace
+      [ "$?" -ne "0" ]
+    do
+      echo "failed to apply /srv/$NETWORK_POLICIES_FILE, retrying in 5 sec"
+      sleep 5s
+    done
+done
+
 # apply k8s addons
 MANIFESTS=""
 {{ range .ExtraManifests -}}
