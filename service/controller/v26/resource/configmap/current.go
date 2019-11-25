@@ -9,6 +9,8 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/v26/key"
 )
 
@@ -31,7 +33,12 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var currentConfigMaps []*apiv1.ConfigMap
 	{
 		namespace := key.ClusterNamespace(customResource)
-		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(apismetav1.ListOptions{})
+
+		listOptions := apismetav1.ListOptions{
+			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, project.Name()),
+		}
+
+		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(listOptions)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
