@@ -102,8 +102,8 @@ func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template stri
 					// issues: https://github.com/giantswarm/giantswarm/issues/7771
 					"cluster":          key.ClusterID(customResource),
 					"customer":         key.ClusterCustomer(customResource),
-					label.ManagedBy:    project.Name(),
 					label.Cluster:      key.ClusterID(customResource),
+					label.ManagedBy:    project.Name(),
 					label.Organization: key.ClusterCustomer(customResource),
 				},
 			},
