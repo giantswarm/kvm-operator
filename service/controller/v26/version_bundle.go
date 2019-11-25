@@ -23,6 +23,14 @@ func VersionBundle() versionbundle.Bundle {
 					"https://github.com/giantswarm/k8scloudconfig/pull/604",
 				},
 			},
+			{
+				Component:   "kubernetes",
+				Description: "Add Deny All as default Network Policy in kube-system and giantswarm namespaces.",
+				Kind:        versionbundle.KindChanged,
+				URLs: []string{
+					"https://github.com/giantswarm/k8scloudconfig/pull/609",
+				},
+			},
 		},
 		Components: []versionbundle.Component{
 			{
