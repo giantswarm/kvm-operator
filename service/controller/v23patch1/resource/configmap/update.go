@@ -85,8 +85,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 				return nil, microerror.Mask(err)
 			}
 
-			isModified := !isEmpty(currentConfigMap) && !equals(currentConfigMap, desiredConfigMap)
-			if isModified {
+			if isConfigMapModified(desiredConfigMap, currentConfigMap) {
 				configMapsToUpdate = append(configMapsToUpdate, desiredConfigMap)
 			}
 		}

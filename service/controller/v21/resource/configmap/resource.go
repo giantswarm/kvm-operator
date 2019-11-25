@@ -83,25 +83,6 @@ func containsConfigMap(list []*apiv1.ConfigMap, item *apiv1.ConfigMap) bool {
 	return true
 }
 
-// equals asseses the equality of ConfigMaps with regards to distinguishing
-// fields.
-func equals(a, b *apiv1.ConfigMap) bool {
-	if a.Name != b.Name {
-		return false
-	}
-	if a.Namespace != b.Namespace {
-		return false
-	}
-	if !reflect.DeepEqual(a.Data, b.Data) {
-		return false
-	}
-	if !reflect.DeepEqual(a.Labels, b.Labels) {
-		return false
-	}
-
-	return true
-}
-
 func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap, error) {
 	for _, l := range list {
 		if l.Name == name {
@@ -112,13 +93,8 @@ func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap,
 	return nil, microerror.Mask(notFoundError)
 }
 
-// isEmpty checks if a ConfigMap is empty.
-func isEmpty(c *apiv1.ConfigMap) bool {
-	if c == nil {
-		return true
-	}
-
-	return equals(c, &apiv1.ConfigMap{})
+func isConfigMapModified(a, b *apiv1.ConfigMap) bool {
+	return !reflect.DeepEqual(a.Data, b.Data)
 }
 
 func toConfigMaps(v interface{}) ([]*apiv1.ConfigMap, error) {
