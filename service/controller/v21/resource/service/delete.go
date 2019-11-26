@@ -6,9 +6,9 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v21/key"
 )
@@ -28,7 +28,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, service := range servicesToDelete {
-			err := r.k8sClient.CoreV1().Services(namespace).Delete(service.Name, &apismetav1.DeleteOptions{})
+			err := r.k8sClient.CoreV1().Services(namespace).Delete(service.Name, &metav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -68,7 +68,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which services have to be deleted")
 
-	var servicesToDelete []*apiv1.Service
+	var servicesToDelete []*corev1.Service
 
 	for _, currentService := range currentServices {
 		if containsService(desiredServices, currentService) {

@@ -6,9 +6,9 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
 )
@@ -29,7 +29,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		// Create the config maps in the Kubernetes API.
 		namespace := key.ClusterNamespace(customResource)
 		for _, configMap := range configMapsToDelete {
-			err := r.k8sClient.CoreV1().ConfigMaps(namespace).Delete(configMap.Name, &apismetav1.DeleteOptions{})
+			err := r.k8sClient.CoreV1().ConfigMaps(namespace).Delete(configMap.Name, &metav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -69,7 +69,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be deleted")
 
-	var configMapsToDelete []*apiv1.ConfigMap
+	var configMapsToDelete []*corev1.ConfigMap
 
 	for _, currentConfigMap := range currentConfigMaps {
 		if containsConfigMap(desiredConfigMaps, currentConfigMap) {
@@ -94,7 +94,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be deleted")
 
-	var configMapsToDelete []*apiv1.ConfigMap
+	var configMapsToDelete []*corev1.ConfigMap
 
 	for _, currentConfigMap := range currentConfigMaps {
 		if !containsConfigMap(desiredConfigMaps, currentConfigMap) {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
@@ -55,7 +55,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be created")
 
-	var configMapsToCreate []*apiv1.ConfigMap
+	var configMapsToCreate []*corev1.ConfigMap
 
 	for _, desiredConfigMap := range desiredConfigMaps {
 		if !containsConfigMap(currentConfigMaps, desiredConfigMap) {

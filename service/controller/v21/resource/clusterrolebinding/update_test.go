@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1beta1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -49,7 +49,7 @@ func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 					Subjects: []apiv1.Subject{
@@ -68,7 +68,7 @@ func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 					Subjects: []apiv1.Subject{
@@ -102,7 +102,7 @@ func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 					Subjects: []apiv1.Subject{
@@ -119,7 +119,7 @@ func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "cluster-role-binding-2",
 					},
 					Subjects: []apiv1.Subject{
@@ -138,7 +138,7 @@ func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 					Subjects: []apiv1.Subject{
@@ -157,7 +157,7 @@ func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 			},
 			ExpectedClusterRoleBindinsToUpdate: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 					Subjects: []apiv1.Subject{

@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/api/extensions/v1beta1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -45,14 +45,14 @@ func Test_Resource_Ingress_newDeleteChange(t *testing.T) {
 			},
 			CurrentState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
 			},
 			DesiredState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
@@ -75,7 +75,7 @@ func Test_Resource_Ingress_newDeleteChange(t *testing.T) {
 			CurrentState: []*v1beta1.Ingress{},
 			DesiredState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
@@ -96,12 +96,12 @@ func Test_Resource_Ingress_newDeleteChange(t *testing.T) {
 			CurrentState: []*v1beta1.Ingress{},
 			DesiredState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-2",
 					},
 				},
@@ -121,7 +121,7 @@ func Test_Resource_Ingress_newDeleteChange(t *testing.T) {
 			},
 			CurrentState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
@@ -142,12 +142,12 @@ func Test_Resource_Ingress_newDeleteChange(t *testing.T) {
 			},
 			CurrentState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-2",
 					},
 				},
@@ -169,34 +169,34 @@ func Test_Resource_Ingress_newDeleteChange(t *testing.T) {
 			},
 			CurrentState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-2",
 					},
 				},
 			},
 			DesiredState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-2",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-3",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-4",
 					},
 				},
@@ -220,34 +220,34 @@ func Test_Resource_Ingress_newDeleteChange(t *testing.T) {
 			},
 			CurrentState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-2",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-3",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-4",
 					},
 				},
 			},
 			DesiredState: []*v1beta1.Ingress{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "ingress-2",
 					},
 				},

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
@@ -22,7 +22,7 @@ func Test_toService(t *testing.T) {
 			name: "case 0: basic match",
 			input: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "master",
 						Namespace: "xy123",
 						Labels: map[string]string{
@@ -51,7 +51,7 @@ func Test_toService(t *testing.T) {
 			},
 			expectedState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "master",
 						Namespace: "xy123",
 						Labels: map[string]string{
@@ -83,7 +83,7 @@ func Test_toService(t *testing.T) {
 			name: "case 1: wrong type (v1.Service instead of *v1.Service)",
 			input: []corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "master",
 						Namespace: "xy123",
 						Labels: map[string]string{
@@ -143,7 +143,7 @@ func Test_isServiceModified(t *testing.T) {
 		{
 			name: "case 0: basic match",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -170,7 +170,7 @@ func Test_isServiceModified(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -201,7 +201,7 @@ func Test_isServiceModified(t *testing.T) {
 		{
 			name: "case 1: label mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -228,7 +228,7 @@ func Test_isServiceModified(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -259,7 +259,7 @@ func Test_isServiceModified(t *testing.T) {
 		{
 			name: "case 2: annotation mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -286,7 +286,7 @@ func Test_isServiceModified(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -317,7 +317,7 @@ func Test_isServiceModified(t *testing.T) {
 		{
 			name: "case 3: ports mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -344,7 +344,7 @@ func Test_isServiceModified(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -380,7 +380,7 @@ func Test_isServiceModified(t *testing.T) {
 		{
 			name: "case 4: service type mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -408,7 +408,7 @@ func Test_isServiceModified(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "master",
 					Namespace: "xy123",
 					Labels: map[string]string{
@@ -460,7 +460,7 @@ func Test_portsEqual(t *testing.T) {
 		{
 			name: "case 0: basic match",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -475,7 +475,7 @@ func Test_portsEqual(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -494,7 +494,7 @@ func Test_portsEqual(t *testing.T) {
 		{
 			name: "case 1: port count mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -509,7 +509,7 @@ func Test_portsEqual(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -533,7 +533,7 @@ func Test_portsEqual(t *testing.T) {
 		{
 			name: "case 2: port count mismatch 2",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -542,7 +542,7 @@ func Test_portsEqual(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -561,7 +561,7 @@ func Test_portsEqual(t *testing.T) {
 		{
 			name: "case 3: protocol mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -576,7 +576,7 @@ func Test_portsEqual(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -595,7 +595,7 @@ func Test_portsEqual(t *testing.T) {
 		{
 			name: "case 4: port number mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -610,7 +610,7 @@ func Test_portsEqual(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -629,7 +629,7 @@ func Test_portsEqual(t *testing.T) {
 		{
 			name: "case 5: targetPort number mismatch",
 			serviceA: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},
@@ -644,7 +644,7 @@ func Test_portsEqual(t *testing.T) {
 				},
 			},
 			serviceB: &corev1.Service{
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "service1",
 					Namespace: "xy123",
 				},

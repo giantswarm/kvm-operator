@@ -6,8 +6,8 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
-	apiv1 "k8s.io/api/core/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
@@ -30,11 +30,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for a list of config maps in the Kubernetes API")
 
-	var currentConfigMaps []*apiv1.ConfigMap
+	var currentConfigMaps []*corev1.ConfigMap
 	{
 		namespace := key.ClusterNamespace(customResource)
 
-		lo := apismetav1.ListOptions{
+		lo := metav1.ListOptions{
 			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, project.Name()),
 		}
 

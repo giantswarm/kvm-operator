@@ -7,7 +7,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -197,9 +197,9 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		PVCs, ok := result.([]*apiv1.PersistentVolumeClaim)
+		PVCs, ok := result.([]*corev1.PersistentVolumeClaim)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.PersistentVolumeClaim{}, result)
+			t.Fatalf("case %d expected %T got %T", i+1, []*corev1.PersistentVolumeClaim{}, result)
 		}
 
 		if testGetEtcdCount(PVCs) != tc.ExpectedEtcdCount {
@@ -208,7 +208,7 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 	}
 }
 
-func testGetEtcdCount(PVCs []*apiv1.PersistentVolumeClaim) int {
+func testGetEtcdCount(PVCs []*corev1.PersistentVolumeClaim) int {
 	var count int
 
 	for _, i := range PVCs {

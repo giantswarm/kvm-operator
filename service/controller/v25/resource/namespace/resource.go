@@ -3,7 +3,7 @@ package namespace
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -59,14 +59,14 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func toNamespace(v interface{}) (*apiv1.Namespace, error) {
+func toNamespace(v interface{}) (*corev1.Namespace, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	namespace, ok := v.(*apiv1.Namespace)
+	namespace, ok := v.(*corev1.Namespace)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &apiv1.Namespace{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &corev1.Namespace{}, v)
 	}
 
 	return namespace, nil

@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
 )
@@ -73,7 +73,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	var configMapsToUpdate []*apiv1.ConfigMap
+	var configMapsToUpdate []*corev1.ConfigMap
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be updated")
 

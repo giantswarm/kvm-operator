@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	v1 "k8s.io/api/apps/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -45,14 +45,14 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
@@ -73,7 +73,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 			CurrentState: []*v1.Deployment{},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
@@ -96,12 +96,12 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 			CurrentState: []*v1.Deployment{},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 					},
 				},
@@ -125,7 +125,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
@@ -147,12 +147,12 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 					},
 				},
@@ -174,34 +174,34 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 					},
 				},
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-3",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-4",
 					},
 				},

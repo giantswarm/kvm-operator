@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/rbac/v1beta1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v21/key"
 )
@@ -34,11 +34,11 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 	var clusterRoleBindings []*apiv1.ClusterRoleBinding
 
 	generalClusterRoleBinding := &apiv1.ClusterRoleBinding{
-		TypeMeta: apismetav1.TypeMeta{
+		TypeMeta: metav1.TypeMeta{
 			Kind:       "ClusterRoleBinding",
 			APIVersion: apiv1.GroupName,
 		},
-		ObjectMeta: apismetav1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: key.ClusterRoleBindingName(customObject),
 			Labels: map[string]string{
 				"app":                       "kvm-operator",
@@ -63,11 +63,11 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 	clusterRoleBindings = append(clusterRoleBindings, generalClusterRoleBinding)
 
 	pspClusterRoleBinding := &apiv1.ClusterRoleBinding{
-		TypeMeta: apismetav1.TypeMeta{
+		TypeMeta: metav1.TypeMeta{
 			Kind:       "ClusterRoleBinding",
 			APIVersion: apiv1.GroupName,
 		},
-		ObjectMeta: apismetav1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: key.ClusterRoleBindingPSPName(customObject),
 			Labels: map[string]string{
 				"app":                       "kvm-operator",

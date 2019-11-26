@@ -3,7 +3,7 @@ package pvc
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -62,7 +62,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func containsPVC(list []*apiv1.PersistentVolumeClaim, item *apiv1.PersistentVolumeClaim) bool {
+func containsPVC(list []*corev1.PersistentVolumeClaim, item *corev1.PersistentVolumeClaim) bool {
 	for _, l := range list {
 		if l.Name == item.Name {
 			return true
@@ -72,14 +72,14 @@ func containsPVC(list []*apiv1.PersistentVolumeClaim, item *apiv1.PersistentVolu
 	return false
 }
 
-func toPVCs(v interface{}) ([]*apiv1.PersistentVolumeClaim, error) {
+func toPVCs(v interface{}) ([]*corev1.PersistentVolumeClaim, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	PVCs, ok := v.([]*apiv1.PersistentVolumeClaim)
+	PVCs, ok := v.([]*corev1.PersistentVolumeClaim)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*apiv1.PersistentVolumeClaim{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*corev1.PersistentVolumeClaim{}, v)
 	}
 
 	return PVCs, nil

@@ -6,8 +6,8 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	apiv1 "k8s.io/api/core/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -16,7 +16,7 @@ func Test_Resource_ServiceAccount_newDeleteChange(t *testing.T) {
 		Obj                    interface{}
 		Cur                    interface{}
 		Des                    interface{}
-		ExpectedServiceAccount *apiv1.ServiceAccount
+		ExpectedServiceAccount *corev1.ServiceAccount
 	}{
 		{
 			Obj: &v1alpha1.KVMConfig{
@@ -26,12 +26,12 @@ func Test_Resource_ServiceAccount_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			Cur: &apiv1.ServiceAccount{
-				TypeMeta: apismetav1.TypeMeta{
+			Cur: &corev1.ServiceAccount{
+				TypeMeta: metav1.TypeMeta{
 					Kind:       "ServiceAccount",
 					APIVersion: "v1",
 				},
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -39,12 +39,12 @@ func Test_Resource_ServiceAccount_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			Des: &apiv1.ServiceAccount{
-				TypeMeta: apismetav1.TypeMeta{
+			Des: &corev1.ServiceAccount{
+				TypeMeta: metav1.TypeMeta{
 					Kind:       "ServiceAccount",
 					APIVersion: "v1",
 				},
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -52,12 +52,12 @@ func Test_Resource_ServiceAccount_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedServiceAccount: &apiv1.ServiceAccount{
-				TypeMeta: apismetav1.TypeMeta{
+			ExpectedServiceAccount: &corev1.ServiceAccount{
+				TypeMeta: metav1.TypeMeta{
 					Kind:       "ServiceAccount",
 					APIVersion: "v1",
 				},
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -76,12 +76,12 @@ func Test_Resource_ServiceAccount_newDeleteChange(t *testing.T) {
 				},
 			},
 			Cur: nil,
-			Des: &apiv1.ServiceAccount{
-				TypeMeta: apismetav1.TypeMeta{
+			Des: &corev1.ServiceAccount{
+				TypeMeta: metav1.TypeMeta{
 					Kind:       "ServiceAccount",
 					APIVersion: "v1",
 				},
-				ObjectMeta: apismetav1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -115,7 +115,7 @@ func Test_Resource_ServiceAccount_newDeleteChange(t *testing.T) {
 				t.Fatal("case", i+1, "expected", tc.ExpectedServiceAccount, "got", result)
 			}
 		} else {
-			name := result.(*apiv1.ServiceAccount).Name
+			name := result.(*corev1.ServiceAccount).Name
 			if tc.ExpectedServiceAccount.Name != name {
 				t.Fatal("case", i+1, "expected", tc.ExpectedServiceAccount.Name, "got", name)
 			}

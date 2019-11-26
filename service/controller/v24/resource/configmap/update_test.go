@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
-	apiv1 "k8s.io/api/core/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig/cloudconfigtest"
@@ -22,7 +22,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 		Obj                                  interface{}
 		CurrentState                         interface{}
 		DesiredState                         interface{}
-		ExpectedConfigMapsToUpdate           []*apiv1.ConfigMap
+		ExpectedConfigMapsToUpdate           []*corev1.ConfigMap
 		ExpectedMessageContextConfigMapNames []string
 	}{
 		// Test 0, in case current state and desired state are empty the update
@@ -36,8 +36,8 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:                         []*apiv1.ConfigMap{},
-			DesiredState:                         []*apiv1.ConfigMap{},
+			CurrentState:                         []*corev1.ConfigMap{},
+			DesiredState:                         []*corev1.ConfigMap{},
 			ExpectedConfigMapsToUpdate:           nil,
 			ExpectedMessageContextConfigMapNames: nil,
 		},
@@ -53,9 +53,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 					Data: map[string]string{
@@ -63,9 +63,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*apiv1.ConfigMap{
+			DesiredState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 					Data: map[string]string{
@@ -89,9 +89,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 					Data: map[string]string{
@@ -99,7 +99,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 					Data: map[string]string{
@@ -107,9 +107,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*apiv1.ConfigMap{
+			DesiredState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 					Data: map[string]string{
@@ -117,7 +117,7 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 					Data: map[string]string{
@@ -125,9 +125,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedConfigMapsToUpdate: []*apiv1.ConfigMap{
+			ExpectedConfigMapsToUpdate: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 					Data: map[string]string{
@@ -160,9 +160,9 @@ func Test_Resource_CloudConfig_newUpdateChange(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
 		}
 
-		configMapsToUpdate, ok := updateState.([]*apiv1.ConfigMap)
+		configMapsToUpdate, ok := updateState.([]*corev1.ConfigMap)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i, []*apiv1.ConfigMap{}, updateState)
+			t.Fatalf("case %d expected %T got %T", i, []*corev1.ConfigMap{}, updateState)
 		}
 		if !reflect.DeepEqual(configMapsToUpdate, tc.ExpectedConfigMapsToUpdate) {
 			t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedConfigMapsToUpdate, configMapsToUpdate)

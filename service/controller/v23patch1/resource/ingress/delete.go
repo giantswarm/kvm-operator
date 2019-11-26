@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	"k8s.io/api/extensions/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23patch1/key"
 )
@@ -28,7 +28,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToDelete {
-			err := r.k8sClient.ExtensionsV1beta1().Ingresses(namespace).Delete(ingress.Name, &apismetav1.DeleteOptions{})
+			err := r.k8sClient.ExtensionsV1beta1().Ingresses(namespace).Delete(ingress.Name, &metav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {

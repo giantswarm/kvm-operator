@@ -5,7 +5,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -61,7 +61,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func containsService(list []*apiv1.Service, item *apiv1.Service) bool {
+func containsService(list []*corev1.Service, item *corev1.Service) bool {
 	for _, l := range list {
 		if l.Name == item.Name {
 			return true
@@ -71,7 +71,7 @@ func containsService(list []*apiv1.Service, item *apiv1.Service) bool {
 	return false
 }
 
-func getServiceByName(list []*apiv1.Service, name string) (*apiv1.Service, error) {
+func getServiceByName(list []*corev1.Service, name string) (*corev1.Service, error) {
 	for _, l := range list {
 		if l.Name == name {
 			return l, nil
@@ -81,7 +81,7 @@ func getServiceByName(list []*apiv1.Service, name string) (*apiv1.Service, error
 	return nil, microerror.Mask(notFoundError)
 }
 
-func isServiceModified(a, b *apiv1.Service) bool {
+func isServiceModified(a, b *corev1.Service) bool {
 	if a == nil || b == nil {
 		return true
 	}
@@ -104,21 +104,21 @@ func isServiceModified(a, b *apiv1.Service) bool {
 	return false
 }
 
-func toServices(v interface{}) ([]*apiv1.Service, error) {
+func toServices(v interface{}) ([]*corev1.Service, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	services, ok := v.([]*apiv1.Service)
+	services, ok := v.([]*corev1.Service)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*apiv1.Service{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*corev1.Service{}, v)
 	}
 
 	return services, nil
 }
 
 // portsEqual is a function that is checking if ports in the service have same important values.
-func portsEqual(a, b *apiv1.Service) bool {
+func portsEqual(a, b *corev1.Service) bool {
 	if len(a.Spec.Ports) != len(b.Spec.Ports) {
 		return false
 	}

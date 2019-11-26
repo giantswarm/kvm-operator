@@ -6,8 +6,8 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	apiv1 "k8s.io/api/core/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -28,8 +28,8 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:         []*apiv1.Service{},
-			DesiredState:         []*apiv1.Service{},
+			CurrentState:         []*corev1.Service{},
+			DesiredState:         []*corev1.Service{},
 			ExpectedServiceNames: []string{},
 		},
 
@@ -43,16 +43,16 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.Service{
+			CurrentState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 			},
-			DesiredState: []*apiv1.Service{
+			DesiredState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
@@ -72,10 +72,10 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.Service{},
-			DesiredState: []*apiv1.Service{
+			CurrentState: []*corev1.Service{},
+			DesiredState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
@@ -93,15 +93,15 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.Service{},
-			DesiredState: []*apiv1.Service{
+			CurrentState: []*corev1.Service{},
+			DesiredState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-2",
 					},
 				},
@@ -119,14 +119,14 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.Service{
+			CurrentState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 			},
-			DesiredState:         []*apiv1.Service{},
+			DesiredState:         []*corev1.Service{},
 			ExpectedServiceNames: []string{},
 		},
 
@@ -140,19 +140,19 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.Service{
+			CurrentState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-2",
 					},
 				},
 			},
-			DesiredState:         []*apiv1.Service{},
+			DesiredState:         []*corev1.Service{},
 			ExpectedServiceNames: []string{},
 		},
 
@@ -167,36 +167,36 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.Service{
+			CurrentState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-2",
 					},
 				},
 			},
-			DesiredState: []*apiv1.Service{
+			DesiredState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-2",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-3",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-4",
 					},
 				},
@@ -218,36 +218,36 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.Service{
+			CurrentState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-2",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-3",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-4",
 					},
 				},
 			},
-			DesiredState: []*apiv1.Service{
+			DesiredState: []*corev1.Service{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "service-2",
 					},
 				},
@@ -277,9 +277,9 @@ func Test_Resource_Service_newDeleteChange(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		configMaps, ok := result.([]*apiv1.Service)
+		configMaps, ok := result.([]*corev1.Service)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.Service{}, result)
+			t.Fatalf("case %d expected %T got %T", i+1, []*corev1.Service{}, result)
 		}
 
 		if len(configMaps) != len(tc.ExpectedServiceNames) {

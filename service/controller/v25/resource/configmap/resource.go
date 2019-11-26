@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/randomkeys"
-	apiv1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v25/cloudconfig"
@@ -74,7 +74,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func containsConfigMap(list []*apiv1.ConfigMap, item *apiv1.ConfigMap) bool {
+func containsConfigMap(list []*corev1.ConfigMap, item *corev1.ConfigMap) bool {
 	_, err := getConfigMapByName(list, item.Name)
 	if err != nil {
 		return false
@@ -85,7 +85,7 @@ func containsConfigMap(list []*apiv1.ConfigMap, item *apiv1.ConfigMap) bool {
 
 // equals asseses the equality of ConfigMaps with regards to distinguishing
 // fields.
-func equals(a, b *apiv1.ConfigMap) bool {
+func equals(a, b *corev1.ConfigMap) bool {
 	if a.Name != b.Name {
 		return false
 	}
@@ -102,7 +102,7 @@ func equals(a, b *apiv1.ConfigMap) bool {
 	return true
 }
 
-func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap, error) {
+func getConfigMapByName(list []*corev1.ConfigMap, name string) (*corev1.ConfigMap, error) {
 	for _, l := range list {
 		if l.Name == name {
 			return l, nil
@@ -113,22 +113,22 @@ func getConfigMapByName(list []*apiv1.ConfigMap, name string) (*apiv1.ConfigMap,
 }
 
 // isEmpty checks if a ConfigMap is empty.
-func isEmpty(c *apiv1.ConfigMap) bool {
+func isEmpty(c *corev1.ConfigMap) bool {
 	if c == nil {
 		return true
 	}
 
-	return equals(c, &apiv1.ConfigMap{})
+	return equals(c, &corev1.ConfigMap{})
 }
 
-func toConfigMaps(v interface{}) ([]*apiv1.ConfigMap, error) {
+func toConfigMaps(v interface{}) ([]*corev1.ConfigMap, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	configMaps, ok := v.([]*apiv1.ConfigMap)
+	configMaps, ok := v.([]*corev1.ConfigMap)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*apiv1.ConfigMap{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*corev1.ConfigMap{}, v)
 	}
 
 	return configMaps, nil
