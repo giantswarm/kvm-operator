@@ -8,8 +8,8 @@ import (
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
-	apiv1 "k8s.io/api/core/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v26/cloudconfig/cloudconfigtest"
@@ -32,8 +32,8 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:           []*apiv1.ConfigMap{},
-			DesiredState:           []*apiv1.ConfigMap{},
+			CurrentState:           []*corev1.ConfigMap{},
+			DesiredState:           []*corev1.ConfigMap{},
 			ExpectedConfigMapNames: []string{},
 		},
 
@@ -47,16 +47,16 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 			},
-			DesiredState: []*apiv1.ConfigMap{
+			DesiredState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
@@ -76,10 +76,10 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{},
-			DesiredState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{},
+			DesiredState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
@@ -97,15 +97,15 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{},
-			DesiredState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{},
+			DesiredState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 				},
@@ -123,14 +123,14 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 			},
-			DesiredState:           []*apiv1.ConfigMap{},
+			DesiredState:           []*corev1.ConfigMap{},
 			ExpectedConfigMapNames: []string{},
 		},
 
@@ -144,19 +144,19 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 				},
 			},
-			DesiredState:           []*apiv1.ConfigMap{},
+			DesiredState:           []*corev1.ConfigMap{},
 			ExpectedConfigMapNames: []string{},
 		},
 
@@ -171,36 +171,36 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 				},
 			},
-			DesiredState: []*apiv1.ConfigMap{
+			DesiredState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-3",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-4",
 					},
 				},
@@ -222,36 +222,36 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*apiv1.ConfigMap{
+			CurrentState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-3",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-4",
 					},
 				},
 			},
-			DesiredState: []*apiv1.ConfigMap{
+			DesiredState: []*corev1.ConfigMap{
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-1",
 					},
 				},
 				{
-					ObjectMeta: apismetav1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name: "config-map-2",
 					},
 				},
@@ -284,9 +284,9 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		configMaps, ok := result.([]*apiv1.ConfigMap)
+		configMaps, ok := result.([]*corev1.ConfigMap)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.ConfigMap{}, result)
+			t.Fatalf("case %d expected %T got %T", i+1, []*corev1.ConfigMap{}, result)
 		}
 
 		if len(configMaps) != len(tc.ExpectedConfigMapNames) {
