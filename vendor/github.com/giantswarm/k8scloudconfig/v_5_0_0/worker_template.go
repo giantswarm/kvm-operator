@@ -189,7 +189,7 @@ systemd:
         --network-plugin=cni \
         --register-node=true \
         --kubeconfig=/etc/kubernetes/kubeconfig/kubelet.yaml \
-        --node-labels="node.kubernetes.io/worker,node-role.kubernetes.io/worker,kubernetes.io/role=worker,role=worker,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
+        --node-labels="node.kubernetes.io/worker,role=worker,ip=${DEFAULT_IPV4},{{.Cluster.Kubernetes.Kubelet.Labels}}" \
         --v=2
       [Install]
       WantedBy=multi-user.target
