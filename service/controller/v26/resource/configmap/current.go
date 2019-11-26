@@ -34,11 +34,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	{
 		namespace := key.ClusterNamespace(customResource)
 
-		listOptions := apismetav1.ListOptions{
+		lo := apismetav1.ListOptions{
 			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, project.Name()),
 		}
 
-		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(listOptions)
+		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(lo)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
