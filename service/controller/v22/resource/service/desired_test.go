@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -101,9 +101,9 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		services, ok := result.([]*corev1.Service)
+		services, ok := result.([]*apiv1.Service)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*corev1.Service{}, result)
+			t.Fatalf("case %d expected %T got %T", i+1, []*apiv1.Service{}, result)
 		}
 
 		if testGetMasterCount(services) != tc.ExpectedMasterCount {
@@ -120,7 +120,7 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 	}
 }
 
-func testGetMasterCount(services []*corev1.Service) int {
+func testGetMasterCount(services []*apiv1.Service) int {
 	var count int
 
 	for _, s := range services {
@@ -132,7 +132,7 @@ func testGetMasterCount(services []*corev1.Service) int {
 	return count
 }
 
-func testGetWorkerCount(services []*corev1.Service) int {
+func testGetWorkerCount(services []*apiv1.Service) int {
 	var count int
 
 	for _, s := range services {

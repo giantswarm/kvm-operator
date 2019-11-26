@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
 )
@@ -20,12 +20,12 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 	// Compute the desired state of the namespace to have a reference of data how
 	// it should be.
-	namespace := &corev1.Namespace{
-		TypeMeta: metav1.TypeMeta{
+	namespace := &apiv1.Namespace{
+		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "Namespace",
 			APIVersion: "v1",
 		},
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: apismetav1.ObjectMeta{
 			Name: key.ClusterNamespace(customObject),
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),

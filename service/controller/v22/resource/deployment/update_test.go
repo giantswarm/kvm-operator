@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
 	v1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v22/key"
@@ -53,16 +53,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -74,16 +74,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -109,16 +109,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -128,16 +128,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2-modified",
 									},
@@ -149,16 +149,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -168,16 +168,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -212,16 +212,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -231,16 +231,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.1.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -252,16 +252,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -271,16 +271,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -292,16 +292,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -335,16 +335,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -354,16 +354,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -375,16 +375,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -394,16 +394,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -415,16 +415,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -458,16 +458,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -483,16 +483,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -510,16 +510,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -529,16 +529,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -572,16 +572,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -597,16 +597,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -624,16 +624,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -643,16 +643,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -688,16 +688,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -713,16 +713,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -740,16 +740,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -759,16 +759,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -780,16 +780,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -822,16 +822,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -847,16 +847,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -874,16 +874,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -893,16 +893,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -914,16 +914,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -958,16 +958,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -983,13 +983,13 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -1007,16 +1007,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -1026,16 +1026,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -1047,16 +1047,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -1090,16 +1090,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			CurrentState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -1115,16 +1115,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -1142,16 +1142,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			DesiredState: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-1-container-1",
 									},
@@ -1161,16 +1161,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},
@@ -1182,16 +1182,16 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 			ExpectedDeploymentsToUpdate: []*v1.Deployment{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
-						Template: corev1.PodTemplateSpec{
-							Spec: corev1.PodSpec{
-								Containers: []corev1.Container{
+						Template: apiv1.PodTemplateSpec{
+							Spec: apiv1.PodSpec{
+								Containers: []apiv1.Container{
 									{
 										Name: "deployment-2-container-2",
 									},

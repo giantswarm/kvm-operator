@@ -6,8 +6,8 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
@@ -32,8 +32,8 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return configMaps, nil
 }
 
-func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.ConfigMap, error) {
-	var configMaps []*corev1.ConfigMap
+func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.ConfigMap, error) {
+	var configMaps []*apiv1.ConfigMap
 
 	certs, err := r.certsSearcher.SearchCluster(key.ClusterID(customResource))
 	if err != nil {
@@ -91,11 +91,11 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 // serves as structure being injected into the template execution to interpolate
 // variables. prefix can be either "master" or "worker" and is used to prefix
 // the configmap name.
-func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template string, node v1alpha1.ClusterNode, prefix string) (*corev1.ConfigMap, error) {
-	var newConfigMap *corev1.ConfigMap
+func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template string, node v1alpha1.ClusterNode, prefix string) (*apiv1.ConfigMap, error) {
+	var newConfigMap *apiv1.ConfigMap
 	{
-		newConfigMap = &corev1.ConfigMap{
-			ObjectMeta: metav1.ObjectMeta{
+		newConfigMap = &apiv1.ConfigMap{
+			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.ConfigMapName(customResource, node, prefix),
 				Labels: map[string]string{
 					// TODO: Delete two legacy labels from next release

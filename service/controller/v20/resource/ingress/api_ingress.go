@@ -3,7 +3,7 @@ package ingress
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v20/key"
@@ -11,11 +11,11 @@ import (
 
 func newAPIIngress(customObject v1alpha1.KVMConfig) *extensionsv1.Ingress {
 	ingress := &extensionsv1.Ingress{
-		TypeMeta: metav1.TypeMeta{
+		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "Ingress",
 			APIVersion: "extensions/v1beta",
 		},
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: apismetav1.ObjectMeta{
 			Name: APIID,
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),

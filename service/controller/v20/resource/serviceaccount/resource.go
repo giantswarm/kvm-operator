@@ -3,7 +3,7 @@ package serviceaccount
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -56,14 +56,14 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func toServiceAccount(v interface{}) (*corev1.ServiceAccount, error) {
+func toServiceAccount(v interface{}) (*apiv1.ServiceAccount, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	serviceAccount, ok := v.(*corev1.ServiceAccount)
+	serviceAccount, ok := v.(*apiv1.ServiceAccount)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", corev1.ServiceAccount{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", apiv1.ServiceAccount{}, v)
 	}
 
 	return serviceAccount, nil

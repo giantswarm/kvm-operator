@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v20/key"
 )
@@ -18,7 +18,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new services")
 
-	var services []*corev1.Service
+	var services []*apiv1.Service
 
 	services = append(services, newMasterService(customObject))
 	services = append(services, newWorkerService(customObject))

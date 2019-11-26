@@ -6,8 +6,8 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -16,7 +16,7 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 		Obj               interface{}
 		Cur               interface{}
 		Des               interface{}
-		ExpectedNamespace *corev1.Namespace
+		ExpectedNamespace *apiv1.Namespace
 	}{
 		{
 			Obj: &v1alpha1.KVMConfig{
@@ -26,12 +26,12 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			Cur: &corev1.Namespace{
-				TypeMeta: metav1.TypeMeta{
+			Cur: &apiv1.Namespace{
+				TypeMeta: apismetav1.TypeMeta{
 					Kind:       "Namespace",
 					APIVersion: "v1",
 				},
-				ObjectMeta: metav1.ObjectMeta{
+				ObjectMeta: apismetav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -39,12 +39,12 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			Des: &corev1.Namespace{
-				TypeMeta: metav1.TypeMeta{
+			Des: &apiv1.Namespace{
+				TypeMeta: apismetav1.TypeMeta{
 					Kind:       "Namespace",
 					APIVersion: "v1",
 				},
-				ObjectMeta: metav1.ObjectMeta{
+				ObjectMeta: apismetav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -52,12 +52,12 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			ExpectedNamespace: &corev1.Namespace{
-				TypeMeta: metav1.TypeMeta{
+			ExpectedNamespace: &apiv1.Namespace{
+				TypeMeta: apismetav1.TypeMeta{
 					Kind:       "Namespace",
 					APIVersion: "v1",
 				},
-				ObjectMeta: metav1.ObjectMeta{
+				ObjectMeta: apismetav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -76,12 +76,12 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 				},
 			},
 			Cur: nil,
-			Des: &corev1.Namespace{
-				TypeMeta: metav1.TypeMeta{
+			Des: &apiv1.Namespace{
+				TypeMeta: apismetav1.TypeMeta{
 					Kind:       "Namespace",
 					APIVersion: "v1",
 				},
-				ObjectMeta: metav1.ObjectMeta{
+				ObjectMeta: apismetav1.ObjectMeta{
 					Name: "al9qy",
 					Labels: map[string]string{
 						"cluster":  "al9qy",
@@ -115,7 +115,7 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 				t.Fatal("case", i+1, "expected", tc.ExpectedNamespace, "got", result)
 			}
 		} else {
-			name := result.(*corev1.Namespace).Name
+			name := result.(*apiv1.Namespace).Name
 			if tc.ExpectedNamespace.Name != name {
 				t.Fatal("case", i+1, "expected", tc.ExpectedNamespace.Name, "got", name)
 			}

@@ -7,9 +7,9 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -42,21 +42,21 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 			storageType = "hostPath"
 		}
 
-		var etcdVolume corev1.Volume
+		var etcdVolume apiv1.Volume
 		if storageType == "hostPath" {
-			etcdVolume = corev1.Volume{
+			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
-				VolumeSource: corev1.VolumeSource{
-					HostPath: &corev1.HostPathVolumeSource{
+				VolumeSource: apiv1.VolumeSource{
+					HostPath: &apiv1.HostPathVolumeSource{
 						Path: key.MasterHostPathVolumeDir(key.ClusterID(customResource), key.VMNumber(i)),
 					},
 				},
 			}
 		} else if storageType == "persistentVolume" {
-			etcdVolume = corev1.Volume{
+			etcdVolume = apiv1.Volume{
 				Name: "etcd-data",
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+				VolumeSource: apiv1.VolumeSource{
+					PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{
 						ClaimName: key.EtcdPVCName(key.ClusterID(customResource), key.VMNumber(i)),
 					},
 				},
@@ -65,11 +65,11 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.StorageType(customResource))
 		}
 		deployment := &v1.Deployment{
-			TypeMeta: metav1.TypeMeta{
+			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "deployment",
 				APIVersion: "apps/v1",
 			},
-			ObjectMeta: metav1.ObjectMeta{
+			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.DeploymentName(key.MasterID, masterNode.ID),
 				Annotations: map[string]string{
 					key.VersionBundleVersionAnnotation: key.VersionBundleVersion(customResource),
@@ -85,7 +85,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 				},
 			},
 			Spec: v1.DeploymentSpec{
-				Selector: &metav1.LabelSelector{
+				Selector: &apismetav1.LabelSelector{
 					MatchLabels: map[string]string{
 						key.LabelApp: key.MasterID,
 						"cluster":    key.ClusterID(customResource),
@@ -96,8 +96,8 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 					Type: v1.RecreateDeploymentStrategyType,
 				},
 				Replicas: &replicas,
-				Template: corev1.PodTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
+				Template: apiv1.PodTemplateSpec{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Annotations: map[string]string{
 							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customResource),
 							key.AnnotationIp:            "",
@@ -116,7 +116,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 							key.PodWatcherLabel:   key.OperatorName,
 						},
 					},
-					Spec: corev1.PodSpec{
+					Spec: apiv1.PodSpec{
 						Affinity:    newMasterPodAfinity(customResource),
 						HostNetwork: true,
 						NodeSelector: map[string]string{
@@ -124,12 +124,12 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 						},
 						ServiceAccountName:            key.ServiceAccountName(customResource),
 						TerminationGracePeriodSeconds: &podDeletionGracePeriod,
-						Volumes: []corev1.Volume{
+						Volumes: []apiv1.Volume{
 							{
 								Name: "cloud-config",
-								VolumeSource: corev1.VolumeSource{
-									ConfigMap: &corev1.ConfigMapVolumeSource{
-										LocalObjectReference: corev1.LocalObjectReference{
+								VolumeSource: apiv1.VolumeSource{
+									ConfigMap: &apiv1.ConfigMapVolumeSource{
+										LocalObjectReference: apiv1.LocalObjectReference{
 											Name: key.ConfigMapName(customResource, masterNode, key.MasterID),
 										},
 									},
@@ -138,32 +138,32 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 							etcdVolume,
 							{
 								Name: "images",
-								VolumeSource: corev1.VolumeSource{
-									HostPath: &corev1.HostPathVolumeSource{
+								VolumeSource: apiv1.VolumeSource{
+									HostPath: &apiv1.HostPathVolumeSource{
 										Path: key.CoreosImageDir,
 									},
 								},
 							},
 							{
 								Name: "rootfs",
-								VolumeSource: corev1.VolumeSource{
-									EmptyDir: &corev1.EmptyDirVolumeSource{},
+								VolumeSource: apiv1.VolumeSource{
+									EmptyDir: &apiv1.EmptyDirVolumeSource{},
 								},
 							},
 							{
 								Name: "flannel",
-								VolumeSource: corev1.VolumeSource{
-									HostPath: &corev1.HostPathVolumeSource{
+								VolumeSource: apiv1.VolumeSource{
+									HostPath: &apiv1.HostPathVolumeSource{
 										Path: key.FlannelEnvPathPrefix,
 									},
 								},
 							},
 						},
-						Containers: []corev1.Container{
+						Containers: []apiv1.Container{
 							{
 								Name:            "k8s-endpoint-updater",
 								Image:           key.K8SEndpointUpdaterDocker,
-								ImagePullPolicy: corev1.PullIfNotPresent,
+								ImagePullPolicy: apiv1.PullIfNotPresent,
 								Command: []string{
 									"/opt/k8s-endpoint-updater",
 									"update",
@@ -172,14 +172,14 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									"--service.kubernetes.cluster.service=" + key.MasterID,
 									"--service.kubernetes.inCluster=true",
 								},
-								SecurityContext: &corev1.SecurityContext{
+								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
 								},
-								Env: []corev1.EnvVar{
+								Env: []apiv1.EnvVar{
 									{
 										Name: "POD_NAME",
-										ValueFrom: &corev1.EnvVarSource{
-											FieldRef: &corev1.ObjectFieldSelector{
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
 												APIVersion: "v1",
 												FieldPath:  "metadata.name",
 											},
@@ -190,14 +190,14 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 							{
 								Name:            "k8s-kvm",
 								Image:           key.K8SKVMDockerImage,
-								ImagePullPolicy: corev1.PullIfNotPresent,
-								SecurityContext: &corev1.SecurityContext{
+								ImagePullPolicy: apiv1.PullIfNotPresent,
+								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
 								},
 								Args: []string{
 									key.MasterID,
 								},
-								Env: []corev1.EnvVar{
+								Env: []apiv1.EnvVar{
 									{
 										Name:  "CORES",
 										Value: fmt.Sprintf("%d", capabilities.CPUs),
@@ -224,8 +224,8 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									},
 									{
 										Name: "HOSTNAME",
-										ValueFrom: &corev1.EnvVarSource{
-											FieldRef: &corev1.ObjectFieldSelector{
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
 												APIVersion: "v1",
 												FieldPath:  "metadata.name",
 											},
@@ -257,52 +257,52 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										Value: "/cloudconfig/user_data",
 									},
 								},
-								Lifecycle: &corev1.Lifecycle{
-									PreStop: &corev1.Handler{
-										Exec: &corev1.ExecAction{
+								Lifecycle: &apiv1.Lifecycle{
+									PreStop: &apiv1.Handler{
+										Exec: &apiv1.ExecAction{
 											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerPollPath(customResource)},
 										},
 									},
 								},
-								LivenessProbe: &corev1.Probe{
+								LivenessProbe: &apiv1.Probe{
 									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
-									Handler: corev1.Handler{
-										HTTPGet: &corev1.HTTPGetAction{
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
 											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
 											Host: key.ProbeHost,
 										},
 									},
 								},
-								ReadinessProbe: &corev1.Probe{
+								ReadinessProbe: &apiv1.Probe{
 									InitialDelaySeconds: key.ReadinessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
-									Handler: corev1.Handler{
-										HTTPGet: &corev1.HTTPGetAction{
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
 											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
 											Host: key.ProbeHost,
 										},
 									},
 								},
-								Resources: corev1.ResourceRequirements{
-									Requests: corev1.ResourceList{
-										corev1.ResourceCPU:    cpuQuantity,
-										corev1.ResourceMemory: memoryQuantity,
+								Resources: apiv1.ResourceRequirements{
+									Requests: apiv1.ResourceList{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
-									Limits: map[corev1.ResourceName]resource.Quantity{
-										corev1.ResourceCPU:    cpuQuantity,
-										corev1.ResourceMemory: memoryQuantity,
+									Limits: map[apiv1.ResourceName]resource.Quantity{
+										apiv1.ResourceCPU:    cpuQuantity,
+										apiv1.ResourceMemory: memoryQuantity,
 									},
 								},
-								VolumeMounts: []corev1.VolumeMount{
+								VolumeMounts: []apiv1.VolumeMount{
 									{
 										Name:      "cloud-config",
 										MountPath: "/cloudconfig/",
@@ -324,8 +324,8 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 							{
 								Name:            "k8s-kvm-health",
 								Image:           key.K8SKVMHealthDocker,
-								ImagePullPolicy: corev1.PullAlways,
-								Env: []corev1.EnvVar{
+								ImagePullPolicy: apiv1.PullAlways,
+								Env: []apiv1.EnvVar{
 									{
 										Name:  "CHECK_K8S_API",
 										Value: key.CheckK8sApi,
@@ -339,10 +339,10 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										Value: key.NetworkEnvFilePath(customResource),
 									},
 								},
-								SecurityContext: &corev1.SecurityContext{
+								SecurityContext: &apiv1.SecurityContext{
 									Privileged: &privileged,
 								},
-								VolumeMounts: []corev1.VolumeMount{
+								VolumeMounts: []apiv1.VolumeMount{
 									{
 										Name:      "flannel",
 										MountPath: key.FlannelEnvPathPrefix,
@@ -352,44 +352,44 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 							{
 								Name:            "shutdown-deferrer",
 								Image:           key.ShutdownDeferrerDocker,
-								ImagePullPolicy: corev1.PullAlways,
+								ImagePullPolicy: apiv1.PullAlways,
 								Args: []string{
 									"daemon",
 									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customResource),
 								},
-								Env: []corev1.EnvVar{
+								Env: []apiv1.EnvVar{
 									{
 										Name: key.EnvKeyMyPodName,
-										ValueFrom: &corev1.EnvVarSource{
-											FieldRef: &corev1.ObjectFieldSelector{
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
 												FieldPath: "metadata.name",
 											},
 										},
 									},
 									{
 										Name: key.EnvKeyMyPodNamespace,
-										ValueFrom: &corev1.EnvVarSource{
-											FieldRef: &corev1.ObjectFieldSelector{
+										ValueFrom: &apiv1.EnvVarSource{
+											FieldRef: &apiv1.ObjectFieldSelector{
 												FieldPath: "metadata.namespace",
 											},
 										},
 									},
 								},
-								Lifecycle: &corev1.Lifecycle{
-									PreStop: &corev1.Handler{
-										Exec: &corev1.ExecAction{
+								Lifecycle: &apiv1.Lifecycle{
+									PreStop: &apiv1.Handler{
+										Exec: &apiv1.ExecAction{
 											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(customResource)},
 										},
 									},
 								},
-								LivenessProbe: &corev1.Probe{
+								LivenessProbe: &apiv1.Probe{
 									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
 									TimeoutSeconds:      key.TimeoutSeconds,
 									PeriodSeconds:       key.PeriodSeconds,
 									FailureThreshold:    key.FailureThreshold,
 									SuccessThreshold:    key.SuccessThreshold,
-									Handler: corev1.Handler{
-										HTTPGet: &corev1.HTTPGetAction{
+									Handler: apiv1.Handler{
+										HTTPGet: &apiv1.HTTPGetAction{
 											Path: key.HealthEndpoint,
 											Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(customResource))},
 											Host: key.ProbeHost,

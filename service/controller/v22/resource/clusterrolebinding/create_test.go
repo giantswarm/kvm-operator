@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -45,14 +45,14 @@ func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
 			},
 			DesiredState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
@@ -73,7 +73,7 @@ func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
 			CurrentState: []*apiv1.ClusterRoleBinding{},
 			DesiredState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
@@ -96,12 +96,12 @@ func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
 			CurrentState: []*apiv1.ClusterRoleBinding{},
 			DesiredState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-2",
 					},
 				},
@@ -125,7 +125,7 @@ func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
@@ -147,12 +147,12 @@ func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-2",
 					},
 				},
@@ -174,34 +174,34 @@ func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
 			},
 			CurrentState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-2",
 					},
 				},
 			},
 			DesiredState: []*apiv1.ClusterRoleBinding{
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-1",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-2",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-3",
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "cluster-role-binding-4",
 					},
 				},

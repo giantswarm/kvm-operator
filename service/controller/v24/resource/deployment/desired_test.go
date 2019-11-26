@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	v1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes/fake"
 )
@@ -18,8 +18,8 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		Obj                      interface{}
 		ExpectedMasterCount      int
 		ExpectedWorkerCount      int
-		ExpectedMastersResources []corev1.ResourceRequirements
-		ExpectedWorkersResources []corev1.ResourceRequirements
+		ExpectedMastersResources []apiv1.ResourceRequirements
+		ExpectedWorkersResources []apiv1.ResourceRequirements
 	}{
 		// Test 0 ensures there is one deployment for master and worker each when
 		// there is one master and one worker node in the custom object.
@@ -50,27 +50,27 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			},
 			ExpectedMasterCount: 1,
 			ExpectedWorkerCount: 1,
-			ExpectedMastersResources: []corev1.ResourceRequirements{
+			ExpectedMastersResources: []apiv1.ResourceRequirements{
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 			},
-			ExpectedWorkersResources: []corev1.ResourceRequirements{
+			ExpectedWorkersResources: []apiv1.ResourceRequirements{
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
 				},
 			},
@@ -109,47 +109,47 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			},
 			ExpectedMasterCount: 1,
 			ExpectedWorkerCount: 3,
-			ExpectedMastersResources: []corev1.ResourceRequirements{
+			ExpectedMastersResources: []apiv1.ResourceRequirements{
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 			},
-			ExpectedWorkersResources: []corev1.ResourceRequirements{
+			ExpectedWorkersResources: []apiv1.ResourceRequirements{
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
 				},
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
 				},
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
 				},
 			},
@@ -192,67 +192,67 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			},
 			ExpectedMasterCount: 3,
 			ExpectedWorkerCount: 3,
-			ExpectedMastersResources: []corev1.ResourceRequirements{
+			ExpectedMastersResources: []apiv1.ResourceRequirements{
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("1"),
-						corev1.ResourceMemory: resource.MustParse("2536M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("1"),
+						apiv1.ResourceMemory: resource.MustParse("2536M"),
 					},
 				},
 			},
-			ExpectedWorkersResources: []corev1.ResourceRequirements{
+			ExpectedWorkersResources: []apiv1.ResourceRequirements{
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
 				},
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
 				},
 				{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Requests: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("4"),
-						corev1.ResourceMemory: resource.MustParse("10240M"),
+					Limits: apiv1.ResourceList{
+						apiv1.ResourceCPU:    resource.MustParse("4"),
+						apiv1.ResourceMemory: resource.MustParse("10240M"),
 					},
 				},
 			},
@@ -340,16 +340,16 @@ func testGetCountPrefix(deployments []*v1.Deployment, prefix string) int {
 	return count
 }
 
-func testGetK8sMasterKVMResources(deployments []*v1.Deployment) []corev1.ResourceRequirements {
+func testGetK8sMasterKVMResources(deployments []*v1.Deployment) []apiv1.ResourceRequirements {
 	return testGetK8sKVMResourcesPrefix(deployments, "master-")
 }
 
-func testGetK8sWorkerKVMResources(deployments []*v1.Deployment) []corev1.ResourceRequirements {
+func testGetK8sWorkerKVMResources(deployments []*v1.Deployment) []apiv1.ResourceRequirements {
 	return testGetK8sKVMResourcesPrefix(deployments, "worker-")
 }
 
-func testGetK8sKVMResourcesPrefix(deployments []*v1.Deployment, prefix string) []corev1.ResourceRequirements {
-	var rs []corev1.ResourceRequirements
+func testGetK8sKVMResourcesPrefix(deployments []*v1.Deployment, prefix string) []apiv1.ResourceRequirements {
+	var rs []apiv1.ResourceRequirements
 
 	for _, d := range deployments {
 		if !strings.HasPrefix(d.Name, prefix) {

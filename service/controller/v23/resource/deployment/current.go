@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/prometheus/client_golang/prometheus"
 	v1 "k8s.io/api/apps/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
 	"github.com/giantswarm/kvm-operator/service/metric"
@@ -26,7 +26,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var currentDeployments []*v1.Deployment
 	{
 		namespace := key.ClusterNamespace(customResource)
-		deploymentList, err := r.k8sClient.AppsV1().Deployments(namespace).List(metav1.ListOptions{})
+		deploymentList, err := r.k8sClient.AppsV1().Deployments(namespace).List(apismetav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {

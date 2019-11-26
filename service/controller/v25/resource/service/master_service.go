@@ -2,19 +2,19 @@ package service
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v25/key"
 )
 
-func newMasterService(customObject v1alpha1.KVMConfig) *corev1.Service {
-	service := &corev1.Service{
-		TypeMeta: metav1.TypeMeta{
+func newMasterService(customObject v1alpha1.KVMConfig) *apiv1.Service {
+	service := &apiv1.Service{
+		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "service",
 			APIVersion: "v1",
 		},
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: apismetav1.ObjectMeta{
 			Name:      key.MasterID,
 			Namespace: key.ClusterID(customObject),
 			Labels: map[string]string{
@@ -34,9 +34,9 @@ func newMasterService(customObject v1alpha1.KVMConfig) *corev1.Service {
 				"prometheus.io/scrape":          "true",
 			},
 		},
-		Spec: corev1.ServiceSpec{
-			Type: corev1.ServiceTypeClusterIP,
-			Ports: []corev1.ServicePort{
+		Spec: apiv1.ServiceSpec{
+			Type: apiv1.ServiceTypeClusterIP,
+			Ports: []apiv1.ServicePort{
 				{
 					Name:     "etcd",
 					Port:     int32(2379),

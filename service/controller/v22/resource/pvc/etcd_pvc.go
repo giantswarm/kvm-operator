@@ -3,9 +3,9 @@ package pvc
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v22/key"
 )
@@ -15,8 +15,8 @@ const (
 	EtcdPVSize = "15Gi"
 )
 
-func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolumeClaim, error) {
-	var persistentVolumeClaims []*corev1.PersistentVolumeClaim
+func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*apiv1.PersistentVolumeClaim, error) {
+	var persistentVolumeClaims []*apiv1.PersistentVolumeClaim
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		quantity, err := resource.ParseQuantity(EtcdPVSize)
@@ -24,12 +24,12 @@ func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolumeCla
 			return nil, microerror.Mask(err)
 		}
 
-		persistentVolumeClaim := &corev1.PersistentVolumeClaim{
-			TypeMeta: metav1.TypeMeta{
+		persistentVolumeClaim := &apiv1.PersistentVolumeClaim{
+			TypeMeta: apismetav1.TypeMeta{
 				Kind:       "PersistentVolumeClaim",
 				APIVersion: "v1",
 			},
-			ObjectMeta: metav1.ObjectMeta{
+			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 				Labels: map[string]string{
 					"app":      key.MasterID,
@@ -41,13 +41,13 @@ func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolumeCla
 					"volume.beta.kubernetes.io/storage-class": StorageClass,
 				},
 			},
-			Spec: corev1.PersistentVolumeClaimSpec{
-				AccessModes: []corev1.PersistentVolumeAccessMode{
-					corev1.ReadWriteOnce,
+			Spec: apiv1.PersistentVolumeClaimSpec{
+				AccessModes: []apiv1.PersistentVolumeAccessMode{
+					apiv1.ReadWriteOnce,
 				},
-				Resources: corev1.ResourceRequirements{
-					Requests: map[corev1.ResourceName]resource.Quantity{
-						corev1.ResourceStorage: quantity,
+				Resources: apiv1.ResourceRequirements{
+					Requests: map[apiv1.ResourceName]resource.Quantity{
+						apiv1.ResourceStorage: quantity,
 					},
 				},
 			},

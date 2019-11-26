@@ -7,14 +7,14 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
 func Test_Resource_Namespace_GetCurrentState(t *testing.T) {
 	testCases := []struct {
 		Obj               interface{}
-		ExpectedNamespace *corev1.Namespace
+		ExpectedNamespace *apiv1.Namespace
 	}{
 		{
 			Obj: &v1alpha1.KVMConfig{

@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -27,20 +27,20 @@ func Test_Resource_ClusterRoleBinding_GetDesiredState(t *testing.T) {
 			},
 			ExpectedClusterRoleBindings: []*apiv1.ClusterRoleBinding{
 				{
-					TypeMeta: metav1.TypeMeta{
+					TypeMeta: apismetav1.TypeMeta{
 						Kind:       "ClusterRoleBinding",
 						APIVersion: apiv1.GroupName,
 					},
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "general-cluster-role-binding",
 					},
 				},
 				{
-					TypeMeta: metav1.TypeMeta{
+					TypeMeta: apismetav1.TypeMeta{
 						Kind:       "ClusterRoleBinding",
 						APIVersion: apiv1.GroupName,
 					},
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: apismetav1.ObjectMeta{
 						Name: "psp-cluster-role-binding",
 					},
 				},

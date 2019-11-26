@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	corev1 "k8s.io/api/core/v1"
+	apiv1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v23/key"
@@ -52,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which service account has to be created")
 
-	var serviceAccountToCreate *corev1.ServiceAccount
+	var serviceAccountToCreate *apiv1.ServiceAccount
 	if currentServiceAccount == nil {
 		serviceAccountToCreate = desiredServiceAccount
 	}
