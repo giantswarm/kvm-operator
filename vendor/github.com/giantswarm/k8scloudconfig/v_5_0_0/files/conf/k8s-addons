@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export KUBECONFIG=/etc/kubernetes/kubeconfig/addons.yaml
-# kubectl 1.12.2
-KUBECTL={{ .RegistryDomain }}/giantswarm/docker-kubectl:f5cae44c480bd797dc770dd5f62d40b74063c0d7
+# kubectl 1.15.5
+KUBECTL={{ .RegistryDomain }}/giantswarm/docker-kubectl:9ccdc9dc55a01b1fde2aea73901d0a699909c9cd
 
 /usr/bin/docker pull $KUBECTL
 
