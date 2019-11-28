@@ -9,6 +9,8 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
 )
 
@@ -96,8 +98,11 @@ func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template stri
 			ObjectMeta: apismetav1.ObjectMeta{
 				Name: key.ConfigMapName(customResource, node, prefix),
 				Labels: map[string]string{
-					"cluster":  key.ClusterID(customResource),
-					"customer": key.ClusterCustomer(customResource),
+					"cluster":          key.ClusterID(customResource),
+					"customer":         key.ClusterCustomer(customResource),
+					label.Cluster:      key.ClusterID(customResource),
+					label.ManagedBy:    project.Name(),
+					label.Organization: key.ClusterCustomer(customResource),
 				},
 			},
 			Data: map[string]string{
