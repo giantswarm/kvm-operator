@@ -143,13 +143,8 @@
   revision = "6cb127468cd6b30eaf8030b875f796e34b481938"
 
 [[projects]]
-<<<<<<< HEAD
   branch = "master"
   digest = "1:45e53ee539ed41987e91035eb77962303c19c6e85147c73a8031bc0ccf4ec706"
-=======
-  branch = "release-10-0-0"
-  digest = "1:002adfa2ea1ece2b4b972a5ea33f1185a51c5745e6e07c53bf456c2ff830e64c"
->>>>>>> 05bc3893... update kube-proxy and psps for 1.16 api deprecations, use kubectl 1.15.5 for k8s-addons
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -163,11 +158,7 @@
     "v_5_0_0",
   ]
   pruneopts = "T"
-<<<<<<< HEAD
   revision = "7e8a3601bfc0e7da0682eab3b1aca7c0b4ce6dfb"
-=======
-  revision = "7ac8f0adc57dd54872c7ce3a5bfb5a0be2494bbf"
->>>>>>> 05bc3893... update kube-proxy and psps for 1.16 api deprecations, use kubectl 1.15.5 for k8s-addons
 
 [[projects]]
   branch = "master"
