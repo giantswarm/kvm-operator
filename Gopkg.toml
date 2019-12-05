@@ -41,6 +41,10 @@ required = [
   branch = "master"
 
 [[constraint]]
+  name = "github.com/giantswarm/k8sclient"
+  branch = "master"
+
+[[constraint]]
   name = "github.com/giantswarm/k8scloudconfig"
   branch = "master"
 
