@@ -276,8 +276,8 @@
   revision = "1acdb17ed51fb2d0a641efbb1b570453cd145ee0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:9d8914b4eb063a63186f4b5ca893af001180f153f8f69e476c1923ffb3f5c6ea"
+  branch = "increase-max-user-instances"
+  digest = "1:6b68983d86028440109897ff56c510c46f1984ff23c562539cb1086a6d75f474"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -291,7 +291,7 @@
     "v_5_0_0",
   ]
   pruneopts = "T"
-  revision = "a88ea623cda22ec88e246933e0dcb512d3d5e89b"
+  revision = "19afd493562ea84011926172df859b883048ff89"
 
 [[projects]]
   branch = "master"

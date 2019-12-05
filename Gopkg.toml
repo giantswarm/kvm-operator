@@ -42,7 +42,7 @@ required = [
 
 [[constraint]]
   name = "github.com/giantswarm/k8scloudconfig"
-  branch = "master"
+  branch = "increase-max-user-instances"
 
 [[constraint]]
   name = "github.com/giantswarm/microendpoint"
