@@ -3,19 +3,19 @@ package v26
 import (
 	"context"
 
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
 	"github.com/giantswarm/operatorkit/resource"
+	"github.com/giantswarm/operatorkit/resource/crud"
 	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"github.com/giantswarm/randomkeys"
 	"github.com/giantswarm/statusresource"
 	"github.com/giantswarm/tenantcluster"
-	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v26/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v26/key"
@@ -32,8 +32,7 @@ import (
 
 type ClusterResourceSetConfig struct {
 	CertsSearcher      certs.Interface
-	G8sClient          versioned.Interface
-	K8sClient          kubernetes.Interface
+	K8sClient          k8sclient.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 	TenantCluster      tenantcluster.Interface
@@ -69,7 +68,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	var clusterRoleBindingResource resource.Interface
 	{
 		c := clusterrolebinding.Config{
-			K8sClient: config.K8sClient,
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 		}
 
@@ -86,10 +85,10 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var namespaceResource resource.Interface
 	{
-		c := namespace.DefaultConfig()
-
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := namespace.Config{
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
 
 		ops, err := namespace.New(c)
 		if err != nil {
@@ -104,10 +103,10 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var serviceAccountResource resource.Interface
 	{
-		c := serviceaccount.DefaultConfig()
-
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := serviceaccount.Config{
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
 
 		ops, err := serviceaccount.New(c)
 		if err != nil {
@@ -125,7 +124,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := configmap.Config{
 			CertsSearcher: config.CertsSearcher,
 			CloudConfig:   cloudConfig,
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			KeyWatcher:    config.RandomkeysSearcher,
 			Logger:        config.Logger,
 		}
@@ -145,7 +144,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	{
 		c := deployment.Config{
 			DNSServers: config.DNSServers,
-			K8sClient:  config.K8sClient,
+			K8sClient:  config.K8sClient.K8sClient(),
 			Logger:     config.Logger,
 			NTPServers: config.NTPServers,
 		}
@@ -163,10 +162,10 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var ingressResource resource.Interface
 	{
-		c := ingress.DefaultConfig()
-
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := ingress.Config{
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
 
 		ops, err := ingress.New(c)
 		if err != nil {
@@ -182,7 +181,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	var nodeIndexStatusResource resource.Interface
 	{
 		c := nodeindexstatus.Config{
-			G8sClient: config.G8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
 			Logger:    config.Logger,
 		}
 
@@ -194,10 +193,10 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var pvcResource resource.Interface
 	{
-		c := pvc.DefaultConfig()
-
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := pvc.Config{
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
 
 		ops, err := pvc.New(c)
 		if err != nil {
@@ -212,10 +211,10 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 
 	var serviceResource resource.Interface
 	{
-		c := service.DefaultConfig()
-
-		c.K8sClient = config.K8sClient
-		c.Logger = config.Logger
+		c := service.Config{
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
 
 		ops, err := service.New(c)
 		if err != nil {
@@ -236,7 +235,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			ClusterStatusFunc:        key.ToClusterStatus,
 			NodeCountFunc:            key.ToNodeCount,
 			Logger:                   config.Logger,
-			RESTClient:               config.G8sClient.ProviderV1alpha1().RESTClient(),
+			RESTClient:               config.K8sClient.G8sClient().ProviderV1alpha1().RESTClient(),
 			TenantCluster:            config.TenantCluster,
 			VersionBundleVersionFunc: key.ToVersionBundleVersion,
 		}
@@ -319,13 +318,13 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	return clusterResourceSet, nil
 }
 
-func toCRUDResource(logger micrologger.Logger, ops controller.CRUDResourceOps) (*controller.CRUDResource, error) {
-	c := controller.CRUDResourceConfig{
+func toCRUDResource(logger micrologger.Logger, ops crud.Interface) (resource.Interface, error) {
+	c := crud.ResourceConfig{
+		CRUD:   ops,
 		Logger: logger,
-		Ops:    ops,
 	}
 
-	r, err := controller.NewCRUDResource(c)
+	r, err := crud.NewResource(c)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

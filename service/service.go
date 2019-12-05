@@ -5,17 +5,17 @@ import (
 	"sync"
 	"time"
 
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/k8srestconfig"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/giantswarm/statusresource"
 	"github.com/giantswarm/tenantcluster"
 	"github.com/spf13/viper"
-	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/kvm-operator/flag"
@@ -80,20 +80,27 @@ func New(config Config) (*Service, error) {
 		return nil, microerror.Mask(err)
 	}
 
-	k8sClient, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
+	var k8sClient *k8sclient.Clients
+	{
+		c := k8sclient.ClientsConfig{
+			SchemeBuilder: k8sclient.SchemeBuilder{
+				v1alpha1.AddToScheme,
+			},
+			Logger: config.Logger,
 
-	k8sExtClient, err := apiextensionsclient.NewForConfig(restConfig)
-	if err != nil {
-		return nil, microerror.Mask(err)
+			RestConfig: restConfig,
+		}
+
+		k8sClient, err = k8sclient.NewClients(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	var certsSearcher certs.Interface
 	{
 		c := certs.Config{
-			K8sClient: k8sClient,
+			K8sClient: k8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			WatchTimeout: 5 * time.Second,
@@ -124,9 +131,8 @@ func New(config Config) (*Service, error) {
 	{
 		c := controller.ClusterConfig{
 			CertsSearcher: certsSearcher,
-			G8sClient:     g8sClient,
 			K8sClient:     k8sClient,
-			K8sExtClient:  k8sExtClient,
+			K8sExtClient:  k8sClient.ExtClient(),
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
@@ -156,7 +162,6 @@ func New(config Config) (*Service, error) {
 	{
 		c := controller.DeleterConfig{
 			CertsSearcher: certsSearcher,
-			G8sClient:     g8sClient,
 			K8sClient:     k8sClient,
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
@@ -174,7 +179,6 @@ func New(config Config) (*Service, error) {
 	var drainerController *controller.Drainer
 	{
 		c := controller.DrainerConfig{
-			G8sClient: g8sClient,
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 

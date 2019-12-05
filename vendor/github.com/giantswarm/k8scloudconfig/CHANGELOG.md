@@ -14,7 +14,7 @@ version directory, and  then changes are introduced.
 ### Changed
 
 - Moved kubelet from container to host process (`--containerized` flag is removed in Kubernetes 1.16).
-- Switch from `iptables` to `ipvs` mode in kube-proxy and tune kernel params accordingly.
+- Switch from `iptables` to `ipvs` mode in kube-proxy and tune kernel params accordingly (all providers but azure).
 - Changed `restricted` PodSecurityPolicy to restrict the allowed range of user IDs for PODs.
 
 ### Added

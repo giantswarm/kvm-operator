@@ -2,18 +2,17 @@ package controller
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/k8scrdclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/randomkeys"
 	"github.com/giantswarm/tenantcluster"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 
 	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	v20cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v20/cloudconfig"
@@ -35,8 +34,7 @@ import (
 
 type ClusterConfig struct {
 	CertsSearcher certs.Interface
-	G8sClient     versioned.Interface
-	K8sClient     kubernetes.Interface
+	K8sClient     k8sclient.Interface
 	K8sExtClient  apiextensionsclient.Interface
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
@@ -73,29 +71,16 @@ type Cluster struct {
 }
 
 func NewCluster(config ClusterConfig) (*Cluster, error) {
-	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
+	if config.K8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
 	var err error
 
-	var crdClient *k8scrdclient.CRDClient
-	{
-		c := k8scrdclient.Config{
-			K8sExtClient: config.K8sExtClient,
-			Logger:       config.Logger,
-		}
-
-		crdClient, err = k8scrdclient.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var randomkeysSearcher randomkeys.Interface
 	{
 		c := randomkeys.Config{
-			K8sClient: config.K8sClient,
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 		}
 
@@ -109,7 +94,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := informer.Config{
 			Logger:  config.Logger,
-			Watcher: config.G8sClient.ProviderV1alpha1().KVMConfigs(""),
+			Watcher: config.K8sClient.G8sClient().ProviderV1alpha1().KVMConfigs(""),
 
 			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
@@ -126,8 +111,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v20.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
+			G8sClient:          config.K8sClient.G8sClient(),
+			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
@@ -155,8 +140,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v21.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
+			G8sClient:          config.K8sClient.G8sClient(),
+			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
@@ -184,8 +169,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v22.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
+			G8sClient:          config.K8sClient.G8sClient(),
+			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
@@ -213,8 +198,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v23.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
+			G8sClient:          config.K8sClient.G8sClient(),
+			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
@@ -242,8 +227,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v23patch1.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
+			G8sClient:          config.K8sClient.G8sClient(),
+			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
@@ -271,8 +256,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v24.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
+			G8sClient:          config.K8sClient.G8sClient(),
+			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
@@ -301,8 +286,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v25.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
-			K8sClient:          config.K8sClient,
+			G8sClient:          config.K8sClient.G8sClient(),
+			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
@@ -331,7 +316,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := v26.ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.G8sClient,
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
@@ -361,7 +345,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	{
 		c := controller.Config{
 			CRD:       v1alpha1.NewKVMConfigCRD(),
-			CRDClient: crdClient,
+			CRDClient: config.K8sClient.CRDClient().(*k8scrdclient.CRDClient),
 			Informer:  newInformer,
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{
@@ -374,7 +358,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				resourceSetV25,
 				resourceSetV26,
 			},
-			RESTClient: config.G8sClient.ProviderV1alpha1().RESTClient(),
+			RESTClient: config.K8sClient.G8sClient().ProviderV1alpha1().RESTClient(),
 
 			Name: config.ProjectName,
 		}

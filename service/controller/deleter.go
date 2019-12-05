@@ -3,15 +3,14 @@ package controller
 import (
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/tenantcluster"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 
 	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
@@ -25,8 +24,7 @@ import (
 
 type DeleterConfig struct {
 	CertsSearcher certs.Interface
-	G8sClient     versioned.Interface
-	K8sClient     kubernetes.Interface
+	K8sClient     k8sclient.Interface
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 
@@ -47,8 +45,8 @@ type Deleter struct {
 }
 
 func NewDeleter(config DeleterConfig) (*Deleter, error) {
-	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
+	if config.K8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
 	if config.ProjectName == "" {
@@ -61,7 +59,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 	{
 		c := informer.Config{
 			Logger:  config.Logger,
-			Watcher: config.G8sClient.ProviderV1alpha1().KVMConfigs(""),
+			Watcher: config.K8sClient.G8sClient().ProviderV1alpha1().KVMConfigs(""),
 
 			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
@@ -85,7 +83,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 			Informer:     newInformer,
 			Logger:       config.Logger,
 			ResourceSets: resourceSets,
-			RESTClient:   config.G8sClient.ProviderV1alpha1().RESTClient(),
+			RESTClient:   config.K8sClient.G8sClient().ProviderV1alpha1().RESTClient(),
 
 			Name: config.ProjectName + "-deleter",
 		}
@@ -109,7 +107,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV20 *controller.ResourceSet
 	{
 		c := v20.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
@@ -125,7 +123,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV21 *controller.ResourceSet
 	{
 		c := v21.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
@@ -141,7 +139,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV22 *controller.ResourceSet
 	{
 		c := v22.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
@@ -157,7 +155,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV23 *controller.ResourceSet
 	{
 		c := v23.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
@@ -173,7 +171,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV23patch1 *controller.ResourceSet
 	{
 		c := v23patch1.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
@@ -189,7 +187,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV24 *controller.ResourceSet
 	{
 		c := v24.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
@@ -205,7 +203,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV25 *controller.ResourceSet
 	{
 		c := v25.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
@@ -221,7 +219,7 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 	var resourceSetV26 *controller.ResourceSet
 	{
 		c := v26.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 
