@@ -289,7 +289,7 @@
 
 [[projects]]
   branch = "increase-max-user-instances"
-  digest = "1:6b68983d86028440109897ff56c510c46f1984ff23c562539cb1086a6d75f474"
+  digest = "1:7b61c6323056728b4ed78581ff9cc13d0a743ec3c2b404971c89184703877cb4"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -303,7 +303,7 @@
     "v_5_0_0",
   ]
   pruneopts = "T"
-  revision = "19afd493562ea84011926172df859b883048ff89"
+  revision = "d8ccd3adb3d091024d12ae8d3addc18ef0967774"
 
 [[projects]]
   branch = "master"
@@ -1840,6 +1840,7 @@
     "github.com/giantswarm/certs/certstest",
     "github.com/giantswarm/errors/tenant",
     "github.com/giantswarm/k8sclient",
+    "github.com/giantswarm/k8sclient/k8scrdclient",
     "github.com/giantswarm/k8sclient/k8srestconfig",
     "github.com/giantswarm/k8scloudconfig/v_4_1_1",
     "github.com/giantswarm/k8scloudconfig/v_4_3_0",
@@ -1866,6 +1867,7 @@
     "github.com/giantswarm/operatorkit/flag/service/kubernetes",
     "github.com/giantswarm/operatorkit/informer",
     "github.com/giantswarm/operatorkit/resource",
+    "github.com/giantswarm/operatorkit/resource/crud",
     "github.com/giantswarm/operatorkit/resource/wrapper/metricsresource",
     "github.com/giantswarm/operatorkit/resource/wrapper/retryresource",
     "github.com/giantswarm/randomkeys",
