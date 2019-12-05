@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
+	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 
 	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	"github.com/giantswarm/kvm-operator/service/controller/v20/key"
@@ -24,8 +23,7 @@ import (
 )
 
 type DrainerConfig struct {
-	G8sClient versioned.Interface
-	K8sClient kubernetes.Interface
+	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
 
 	CRDLabelSelector string
@@ -63,7 +61,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	{
 		c := informer.Config{
 			Logger:  config.Logger,
-			Watcher: config.K8sClient.CoreV1().Pods(""),
+			Watcher: config.K8sClient.K8sClient().CoreV1().Pods(""),
 
 			ListOptions:  config.newInformerListOptions(),
 			RateWait:     informer.DefaultRateWait,
@@ -87,7 +85,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			Informer:     newInformer,
 			Logger:       config.Logger,
 			ResourceSets: resourceSets,
-			RESTClient:   config.K8sClient.CoreV1().RESTClient(),
+			RESTClient:   config.K8sClient.K8sClient().CoreV1().RESTClient(),
 
 			Name: config.ProjectName + "-drainer",
 		}
@@ -111,8 +109,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV20 *controller.ResourceSet
 	{
 		c := v20.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
@@ -127,8 +125,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV21 *controller.ResourceSet
 	{
 		c := v21.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
@@ -143,8 +141,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV22 *controller.ResourceSet
 	{
 		c := v22.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
@@ -159,8 +157,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV23 *controller.ResourceSet
 	{
 		c := v23.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
@@ -175,8 +173,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV23patch1 *controller.ResourceSet
 	{
 		c := v23patch1.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
@@ -191,8 +189,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV24 *controller.ResourceSet
 	{
 		c := v24.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
@@ -207,8 +205,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV25 *controller.ResourceSet
 	{
 		c := v25.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
@@ -223,8 +221,8 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV26 *controller.ResourceSet
 	{
 		c := v26.DrainerResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			ProjectName: config.ProjectName,
