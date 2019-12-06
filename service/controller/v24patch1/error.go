@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 package v24patch1
+=======
+package v24
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 
 import "github.com/giantswarm/microerror"
 

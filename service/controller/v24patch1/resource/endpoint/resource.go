@@ -11,7 +11,11 @@ import (
 
 const (
 	IPAnnotation      = "endpoint.kvm.giantswarm.io/ip"
+<<<<<<< HEAD
 	Name              = "endpointv24patch1"
+=======
+	Name              = "endpointv24"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 	ServiceAnnotation = "endpoint.kvm.giantswarm.io/service"
 )
 

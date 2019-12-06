@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 package v24patch1
+=======
+package v24
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
@@ -10,9 +14,15 @@ import (
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"k8s.io/client-go/kubernetes"
 
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/endpoint"
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/pod"
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/endpoint"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/pod"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 type DrainerResourceSetConfig struct {

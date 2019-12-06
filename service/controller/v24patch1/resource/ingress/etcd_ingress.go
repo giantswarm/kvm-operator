@@ -6,7 +6,11 @@ import (
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 func newEtcdIngress(customObject v1alpha1.KVMConfig) *extensionsv1.Ingress {

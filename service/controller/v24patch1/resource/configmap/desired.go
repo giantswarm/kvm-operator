@@ -11,7 +11,11 @@ import (
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {

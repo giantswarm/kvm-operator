@@ -6,7 +6,11 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {

@@ -9,7 +9,11 @@ import (
 
 const (
 	// Name is the identifier of the resource.
+<<<<<<< HEAD
 	Name = "namespacev24patch1"
+=======
+	Name = "namespacev24"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 // Config represents the configuration used to create a new cloud config resource.

@@ -8,7 +8,11 @@ import (
 )
 
 const (
+<<<<<<< HEAD
 	Name = "podv24patch1"
+=======
+	Name = "podv24"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 type Config struct {

@@ -10,13 +10,21 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig"
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 const (
 	KeyUserData = "user_data"
 	// Name is the identifier of the resource.
+<<<<<<< HEAD
 	Name = "configmapv24patch1"
+=======
+	Name = "configmapv24"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 // Config represents the configuration used to create a new config map resource.

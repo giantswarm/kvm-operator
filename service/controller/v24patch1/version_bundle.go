@@ -36,6 +36,10 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
+<<<<<<< HEAD
 		Version: "3.8.1",
+=======
+		Version: "3.8.0",
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 	}
 }

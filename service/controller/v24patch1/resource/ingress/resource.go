@@ -11,7 +11,11 @@ const (
 	APIID  = "api"
 	EtcdID = "etcd"
 	// Name is the identifier of the resource.
+<<<<<<< HEAD
 	Name = "ingressv24patch1"
+=======
+	Name = "ingressv24"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 // Config represents the configuration used to create a new ingress resource.

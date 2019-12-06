@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 package v24patch1
+=======
+package v24
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 
 import (
 	"github.com/giantswarm/microerror"
@@ -10,8 +14,13 @@ import (
 	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/node"
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/node"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 type DeleterResourceSetConfig struct {

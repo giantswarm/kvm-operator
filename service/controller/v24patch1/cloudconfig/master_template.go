@@ -9,7 +9,11 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/randomkeys"
 
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+>>>>>>> c4c6c79d... copy v24 to v24patch1
 )
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
