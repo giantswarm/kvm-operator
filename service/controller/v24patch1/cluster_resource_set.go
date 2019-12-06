@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 package v24patch1
 =======
 package v24
 >>>>>>> c4c6c79d... copy v24 to v24patch1
+=======
+package v24patch1
+>>>>>>> d6f149c2... wire v24patch1
 
 import (
 	"context"
@@ -23,6 +27,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d6f149c2... wire v24patch1
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/clusterrolebinding"
@@ -34,6 +41,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/pvc"
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/service"
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/serviceaccount"
+<<<<<<< HEAD
 =======
 	"github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
@@ -47,6 +55,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/service"
 	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/serviceaccount"
 >>>>>>> c4c6c79d... copy v24 to v24patch1
+=======
+>>>>>>> d6f149c2... wire v24patch1
 )
 
 type ClusterResourceSetConfig struct {

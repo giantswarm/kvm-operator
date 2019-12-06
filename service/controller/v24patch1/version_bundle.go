@@ -11,6 +11,9 @@ func VersionBundle() versionbundle.Bundle {
 				Component:   "TODO",
 				Description: "TODO",
 				Kind:        versionbundle.KindChanged,
+				URLs: []string{
+					"TODO",
+				},
 			},
 		},
 		Components: []versionbundle.Component{
@@ -32,14 +35,18 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.14.6",
+				Version: "1.14.9",
 			},
 		},
 		Name:    "kvm-operator",
+<<<<<<< HEAD
 <<<<<<< HEAD
 		Version: "3.8.1",
 =======
 		Version: "3.8.0",
 >>>>>>> c4c6c79d... copy v24 to v24patch1
+=======
+		Version: "3.8.1",
+>>>>>>> d6f149c2... wire v24patch1
 	}
 }

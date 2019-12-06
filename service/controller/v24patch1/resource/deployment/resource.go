@@ -7,19 +7,27 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
 =======
 	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
 >>>>>>> c4c6c79d... copy v24 to v24patch1
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
+>>>>>>> d6f149c2... wire v24patch1
 )
 
 const (
 	// Name is the identifier of the resource.
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Name = "deploymentv24patch1"
 =======
 	Name = "deploymentv24"
 >>>>>>> c4c6c79d... copy v24 to v24patch1
+=======
+	Name = "deploymentv24patch1"
+>>>>>>> d6f149c2... wire v24patch1
 )
 
 // Config represents the configuration used to create a new deployment resource.

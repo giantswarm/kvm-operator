@@ -13,10 +13,14 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig/cloudconfigtest"
 =======
 	"github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig/cloudconfigtest"
 >>>>>>> c4c6c79d... copy v24 to v24patch1
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig/cloudconfigtest"
+>>>>>>> d6f149c2... wire v24patch1
 )
 
 func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {

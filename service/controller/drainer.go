@@ -198,7 +198,11 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 			ProjectName: config.ProjectName,
 		}
 
+<<<<<<< HEAD
 		resourceSetV24patch1, err = v24patch1.NewDrainerResourceSet(c)
+=======
+		resourceSetV24, err = v24patch1.NewDrainerResourceSet(c)
+>>>>>>> d6f149c2... wire v24patch1
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

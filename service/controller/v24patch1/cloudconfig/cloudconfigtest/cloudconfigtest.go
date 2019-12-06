@@ -5,10 +5,14 @@ import (
 	"github.com/giantswarm/micrologger/microloggertest"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig"
 =======
 	"github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
 >>>>>>> c4c6c79d... copy v24 to v24patch1
+=======
+	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig"
+>>>>>>> d6f149c2... wire v24patch1
 )
 
 func New() *cloudconfig.CloudConfig {
