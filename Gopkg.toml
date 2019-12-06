@@ -136,6 +136,10 @@ required = [
   name = "github.com/russross/blackfriday"
   version = "v1.5.2"
 
+[[override]]
+  source = "gopkg.in/fsnotify/fsnotify.v1"
+  name = "gopkg.in/fsnotify.v1"
+
 
 
 [prune]
