@@ -1,4 +1,4 @@
-package v24patch1
+package v24
 
 import "github.com/giantswarm/microerror"
 

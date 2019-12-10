@@ -1,4 +1,4 @@
-package v24patch1
+package v24
 
 import (
 	"context"
@@ -18,17 +18,17 @@ import (
 	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/clusterrolebinding"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/configmap"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/deployment"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/ingress"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/namespace"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/nodeindexstatus"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/pvc"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/service"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/resource/serviceaccount"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/clusterrolebinding"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/deployment"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/ingress"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/namespace"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/nodeindexstatus"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/pvc"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/service"
+	"github.com/giantswarm/kvm-operator/service/controller/v24/resource/serviceaccount"
 )
 
 type ClusterResourceSetConfig struct {
