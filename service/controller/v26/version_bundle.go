@@ -16,6 +16,14 @@ func VersionBundle() versionbundle.Bundle {
 				},
 			},
 			{
+				Component:   "kube-proxy",
+				Description: "Switch from iptables to IPVS mode and tune kernel params accordingly.",
+				Kind:        versionbundle.KindChanged,
+				URLs: []string{
+					"https://github.com/giantswarm/k8scloudconfig/pull/604",
+				},
+			},
+			{
 				Component:   "kubernetes",
 				Description: "Add Deny All as default Network Policy in kube-system and giantswarm namespaces.",
 				Kind:        versionbundle.KindChanged,
