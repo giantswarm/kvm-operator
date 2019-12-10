@@ -194,7 +194,7 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 			ProjectName: config.ProjectName,
 		}
 
-		resourceSetV24, err = v24patch1.NewDrainerResourceSet(c)
+		resourceSetV24patch1, err = v24patch1.NewDrainerResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
