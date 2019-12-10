@@ -26,12 +26,12 @@
 
 
 [[constraint]]
-  name = "github.com/giantswarm/apiextensions"
   branch = "master"
+  name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]
-  name = "github.com/giantswarm/microerror"
   branch = "master"
+  name = "github.com/giantswarm/microerror"
 
 [[constraint]]
   name = "github.com/stretchr/testify"
