@@ -1,16 +1,15 @@
 package controller
 
 import (
-	"time"
-
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/operatorkit/informer"
 	"github.com/giantswarm/tenantcluster"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 
 	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
@@ -49,28 +48,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
-	}
-
 	var err error
-
-	var newInformer *informer.Informer
-	{
-		c := informer.Config{
-			Logger:  config.Logger,
-			Watcher: config.K8sClient.G8sClient().ProviderV1alpha1().KVMConfigs(""),
-
-			ListOptions:  config.newInformerListOptions(),
-			RateWait:     informer.DefaultRateWait,
-			ResyncPeriod: 30 * time.Second,
-		}
-
-		newInformer, err = informer.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	resourceSets, err := newDeleterResourceSets(config)
 	if err != nil {
@@ -80,10 +58,13 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			Informer:     newInformer,
+			CRD:          v1alpha1.NewKVMConfigCRD(),
+			K8sClient:    config.K8sClient,
 			Logger:       config.Logger,
 			ResourceSets: resourceSets,
-			RESTClient:   config.K8sClient.G8sClient().ProviderV1alpha1().RESTClient(),
+			NewRuntimeObjectFunc: func() runtime.Object {
+				return new(v1alpha1.KVMConfig)
+			},
 
 			Name: config.ProjectName + "-deleter",
 		}
