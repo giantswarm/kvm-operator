@@ -4,15 +4,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-<<<<<<< HEAD
-<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
-=======
-	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
->>>>>>> c4c6c79d... copy v24 to v24patch1
-=======
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
->>>>>>> d6f149c2... wire v24patch1
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"

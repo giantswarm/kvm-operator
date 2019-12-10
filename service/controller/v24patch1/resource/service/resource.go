@@ -11,15 +11,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-<<<<<<< HEAD
-<<<<<<< HEAD
 	Name = "servicev24patch1"
-=======
-	Name = "servicev24"
->>>>>>> c4c6c79d... copy v24 to v24patch1
-=======
-	Name = "servicev24patch1"
->>>>>>> d6f149c2... wire v24patch1
 )
 
 // Config represents the configuration used to create a new service resource.

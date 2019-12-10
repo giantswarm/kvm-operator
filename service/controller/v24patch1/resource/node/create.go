@@ -5,25 +5,14 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/errors/tenant"
-<<<<<<< HEAD
 	"github.com/giantswarm/k8sclient"
-=======
->>>>>>> c4c6c79d... copy v24 to v24patch1
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
-=======
-	"github.com/giantswarm/kvm-operator/service/controller/v24/key"
->>>>>>> c4c6c79d... copy v24 to v24patch1
-=======
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1/key"
->>>>>>> d6f149c2... wire v24patch1
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
@@ -41,11 +30,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		i := key.ClusterID(customObject)
 		e := key.ClusterAPIEndpoint(customObject)
 
-<<<<<<< HEAD
 		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
-=======
-		k8sClient, err = r.tenantCluster.NewK8sClient(ctx, i, e)
->>>>>>> c4c6c79d... copy v24 to v24patch1
 		if tenantcluster.IsTimeout(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
@@ -54,7 +39,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
-<<<<<<< HEAD
 		}
 		clientsConfig := k8sclient.ClientsConfig{
 			Logger:     r.logger,
@@ -72,11 +56,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		k8sClient = k8sClients.K8sClient()
 		r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
-=======
-		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
-		}
->>>>>>> c4c6c79d... copy v24 to v24patch1
 	}
 
 	// We need to fetch the nodes being registered within the tenant cluster's

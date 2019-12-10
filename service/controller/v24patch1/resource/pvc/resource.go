@@ -9,15 +9,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-<<<<<<< HEAD
-<<<<<<< HEAD
 	Name = "pvcv24patch1"
-=======
-	Name = "pvcv24"
->>>>>>> c4c6c79d... copy v24 to v24patch1
-=======
-	Name = "pvcv24patch1"
->>>>>>> d6f149c2... wire v24patch1
 	// StorageClass is the storage class annotation persistent volume claims are
 	// configured with.
 	StorageClass = "g8s-storage"

@@ -7,15 +7,7 @@ import (
 )
 
 const (
-<<<<<<< HEAD
-<<<<<<< HEAD
 	Name = "nodeindexstatusv24patch1"
-=======
-	Name = "nodeindexstatusv24"
->>>>>>> c4c6c79d... copy v24 to v24patch1
-=======
-	Name = "nodeindexstatusv24patch1"
->>>>>>> d6f149c2... wire v24patch1
 )
 
 type Config struct {

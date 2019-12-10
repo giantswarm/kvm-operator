@@ -143,13 +143,8 @@
   revision = "6cb127468cd6b30eaf8030b875f796e34b481938"
 
 [[projects]]
-<<<<<<< HEAD
   branch = "master"
-  digest = "1:45e53ee539ed41987e91035eb77962303c19c6e85147c73a8031bc0ccf4ec706"
-=======
-  branch = "release-8-6-0"
   digest = "1:49f20cf224b18a3a498b506d438969886a1b12e3481c6753425f57758d62b891"
->>>>>>> 34d7d072... vendor k8scc and use v_4_8_1 for v24patch1
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -159,14 +154,12 @@
     "v_4_5_0",
     "v_4_5_1",
     "v_4_7_0",
+    "v_4_8_1",
     "v_4_9_0",
     "v_5_0_0",
   ]
   pruneopts = "T"
-<<<<<<< HEAD
-  revision = "7e8a3601bfc0e7da0682eab3b1aca7c0b4ce6dfb"
-=======
-  revision = "6b2f007d6b1edb70f70acbe6e6270b1b39d69e37"
+  revision = "0d94f8c311ace01f0f9ac4a050b12ba67ec3d1c8"
 
 [[projects]]
   branch = "master"
@@ -1160,7 +1153,6 @@
     "github.com/giantswarm/certs/certstest",
     "github.com/giantswarm/errors/tenant",
     "github.com/giantswarm/k8sclient",
-    "github.com/giantswarm/k8sclient/k8scrdclient",
     "github.com/giantswarm/k8sclient/k8srestconfig",
     "github.com/giantswarm/k8scloudconfig/v_4_1_1",
     "github.com/giantswarm/k8scloudconfig/v_4_3_0",
@@ -1168,6 +1160,7 @@
     "github.com/giantswarm/k8scloudconfig/v_4_5_0",
     "github.com/giantswarm/k8scloudconfig/v_4_5_1",
     "github.com/giantswarm/k8scloudconfig/v_4_7_0",
+    "github.com/giantswarm/k8scloudconfig/v_4_8_1",
     "github.com/giantswarm/k8scloudconfig/v_4_9_0",
     "github.com/giantswarm/k8scloudconfig/v_5_0_0",
     "github.com/giantswarm/microendpoint/endpoint/healthz",

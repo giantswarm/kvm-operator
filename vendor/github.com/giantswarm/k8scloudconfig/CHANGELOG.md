@@ -42,7 +42,7 @@ version directory, and  then changes are introduced.
 
 ### Changed
 
-- Update kubernetes to 1.14.9, includes fixes for CVE-2019-11253
+- Update Kubernetes to 1.14.9, includes fixes for CVE-2019-11253.
 - Increase `fs.inotify.max_user_instances` to 8192.
 
 ## [v4.8.0] 

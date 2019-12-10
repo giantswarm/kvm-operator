@@ -8,11 +8,11 @@ func VersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "TODO",
-				Description: "TODO",
+				Component:   "kubernetes",
+				Description: "Updated from v1.14.6 to v1.14.9.",
 				Kind:        versionbundle.KindChanged,
 				URLs: []string{
-					"TODO",
+					"https://github.com/giantswarm/kvm-operator/pull/791",
 				},
 			},
 		},
@@ -39,14 +39,6 @@ func VersionBundle() versionbundle.Bundle {
 			},
 		},
 		Name:    "kvm-operator",
-<<<<<<< HEAD
-<<<<<<< HEAD
 		Version: "3.8.1",
-=======
-		Version: "3.8.0",
->>>>>>> c4c6c79d... copy v24 to v24patch1
-=======
-		Version: "3.8.1",
->>>>>>> d6f149c2... wire v24patch1
 	}
 }
