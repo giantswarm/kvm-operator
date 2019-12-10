@@ -1,4 +1,4 @@
-package v24
+package v24patch1
 
 import (
 	"github.com/giantswarm/versionbundle"
