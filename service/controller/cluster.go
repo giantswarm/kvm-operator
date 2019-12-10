@@ -25,8 +25,6 @@ import (
 	v23patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v23patch1/cloudconfig"
 	v24 "github.com/giantswarm/kvm-operator/service/controller/v24"
 	v24cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v24/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1"
-	v24patch1cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v24patch1/cloudconfig"
 	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
 	v25cloudconfig "github.com/giantswarm/kvm-operator/service/controller/v25/cloudconfig"
 	v26 "github.com/giantswarm/kvm-operator/service/controller/v26"
@@ -266,36 +264,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		}
 	}
 
-	var resourceSetV24patch1 *controller.ResourceSet
-	{
-		c := v24patch1.ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			G8sClient:          config.K8sClient.G8sClient(),
-			K8sClient:          config.K8sClient.K8sClient(),
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-			TenantCluster:      config.TenantCluster,
-
-			DNSServers:         config.DNSServers,
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			IgnitionPath:       config.IgnitionPath,
-			NTPServers:         config.NTPServers,
-			ProjectName:        config.ProjectName,
-			OIDC: v24patch1cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSetV24patch1, err = v24patch1.NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var resourceSetV25 *controller.ResourceSet
 	{
 		c := v25.ClusterResourceSetConfig{
@@ -368,7 +336,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				resourceSetV23,
 				resourceSetV23patch1,
 				resourceSetV24,
-				resourceSetV24patch1,
 				resourceSetV25,
 				resourceSetV26,
 			},
