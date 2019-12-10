@@ -41,6 +41,10 @@ required = [
   branch = "master"
 
 [[constraint]]
+  name = "github.com/giantswarm/errors"
+  branch = "master"
+
+[[constraint]]
   name = "github.com/giantswarm/k8sclient"
   branch = "master"
 
@@ -85,8 +89,12 @@ required = [
   branch = "master"
 
 [[constraint]]
+  name = "github.com/google/go-cmp"
+  version = "0.2.0"
+
+[[constraint]]
   name = "github.com/prometheus/client_golang"
-  version = "0.9.3"
+  version = "0.9.4"
 
 [[constraint]]
   name = "github.com/spf13/viper"
@@ -118,7 +126,7 @@ required = [
 
 [[override]]
   name = "k8s.io/kubernetes"
-  version = "v1.15.4"
+  version = "=v1.15.4"
 
 [[override]]
   name = "k8s.io/cli-runtime"
@@ -129,12 +137,25 @@ required = [
   version = "kubernetes-1.15.4"
 
 [[override]]
+  name = "sigs.k8s.io/kustomize"
+  version = "v2.0.3"
+
+[[override]]
+  name = "github.com/evanphx/json-patch"
+  version = "4.5.0"
+
+[[override]]
   name = "github.com/ghodss/yaml"
   branch = "master"
 
 [[override]]
   name = "github.com/russross/blackfriday"
   version = "v1.5.2"
+
+[[override]]
+  source = "gopkg.in/fsnotify/fsnotify.v1"
+  name = "gopkg.in/fsnotify.v1"
+  version = "v1.4.7"
 
 
 
@@ -145,7 +166,3 @@ required = [
 [[prune.project]]
   name = "github.com/giantswarm/k8scloudconfig"
   unused-packages = false
-
-[[constraint]]
-  name = "github.com/google/go-cmp"
-  version = "0.2.0"

@@ -2,14 +2,14 @@ package controller
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/operatorkit/informer"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 
 	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	"github.com/giantswarm/kvm-operator/service/controller/v20/key"
@@ -52,28 +52,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
-	}
-
 	var err error
-
-	var newInformer *informer.Informer
-	{
-		c := informer.Config{
-			Logger:  config.Logger,
-			Watcher: config.K8sClient.K8sClient().CoreV1().Pods(""),
-
-			ListOptions:  config.newInformerListOptions(),
-			RateWait:     informer.DefaultRateWait,
-			ResyncPeriod: 30 * time.Second,
-		}
-
-		newInformer, err = informer.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	resourceSets, err := newDrainerResourceSets(config)
 	if err != nil {
@@ -83,10 +62,12 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			Informer:     newInformer,
+			K8sClient:    config.K8sClient,
 			Logger:       config.Logger,
 			ResourceSets: resourceSets,
-			RESTClient:   config.K8sClient.K8sClient().CoreV1().RESTClient(),
+			NewRuntimeObjectFunc: func() runtime.Object {
+				return new(corev1.Pod)
+			},
 
 			Name: config.ProjectName + "-drainer",
 		}
