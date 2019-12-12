@@ -9,6 +9,7 @@ import (
 	providerv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/errors/tenant"
+	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext"
 	"github.com/giantswarm/tenantcluster"
@@ -231,7 +232,8 @@ func (r *Resource) computeCreateEventPatches(ctx context.Context, obj interface{
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
-			k8sClient, err = r.tenantCluster.NewK8sClient(ctx, i, e)
+
+			restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
 			if tenantcluster.IsTimeout(err) {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
 				r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
@@ -240,6 +242,17 @@ func (r *Resource) computeCreateEventPatches(ctx context.Context, obj interface{
 			} else {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 			}
+
+			clientsConfig := k8sclient.ClientsConfig{
+				Logger:     r.logger,
+				RestConfig: restConfig,
+			}
+			k8sClients, err := k8sclient.NewClients(clientsConfig)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+
+			k8sClient = k8sClients.K8sClient()
 		}
 
 		if k8sClient != nil {
