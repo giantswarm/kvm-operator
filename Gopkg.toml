@@ -78,7 +78,7 @@ required = [
 
 [[constraint]]
   name = "github.com/giantswarm/statusresource"
-  branch = "master"
+  branch = "fix-k8sclient-error"
 
 [[constraint]]
   name = "github.com/giantswarm/tenantcluster"

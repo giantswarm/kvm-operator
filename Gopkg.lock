@@ -250,12 +250,12 @@
   revision = "5e18457bd062f9a11d11fe5719ccf28101945ce0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:485ec783b412c13744c2c3b1506412b037b7b557fce7bf60580ddbb7c43bbd93"
+  branch = "fix-k8sclient-error"
+  digest = "1:2027a665f925a377532eda154685e646a301f6d813335359f5697a588dad7742"
   name = "github.com/giantswarm/statusresource"
   packages = ["."]
   pruneopts = "UT"
-  revision = "24c396634e26187168fc671fc5d5f88631f95199"
+  revision = "d32549b893edacc294ee2594654620d40fe9f6a3"
 
 [[projects]]
   branch = "master"

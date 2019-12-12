@@ -52,7 +52,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			}
 
 			patches, err := r.computeCreateEventPatches(ctx, newObj)
-			if err != nil {
+			if tenant.IsAPINotAvailable(err) {
+				r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
+				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+				return nil
+			} else if err != nil {
 				return microerror.Mask(err)
 			}
 
@@ -255,46 +260,41 @@ func (r *Resource) computeCreateEventPatches(ctx context.Context, obj interface{
 			k8sClient = k8sClients.K8sClient()
 		}
 
-		if k8sClient != nil {
-			o := metav1.ListOptions{}
-			list, err := k8sClient.CoreV1().Nodes().List(o)
-			if tenant.IsAPINotAvailable(err) {
-				// fall through
-			} else if err != nil {
-				return nil, microerror.Mask(err)
-			} else {
-				var nodes []providerv1alpha1.StatusClusterNode
+		o := metav1.ListOptions{}
+		list, err := k8sClient.CoreV1().Nodes().List(o)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		var nodes []providerv1alpha1.StatusClusterNode
 
-				for _, node := range list.Items {
-					l := node.GetLabels()
-					n := node.GetName()
+		for _, node := range list.Items {
+			l := node.GetLabels()
+			n := node.GetName()
 
-					labelProvider := "giantswarm.io/provider"
-					p, ok := l[labelProvider]
-					if !ok {
-						return nil, microerror.Maskf(missingLabelError, labelProvider)
-					}
-					labelVersion := p + "-operator.giantswarm.io/version"
-					v, ok := l[labelVersion]
-					if !ok {
-						return nil, microerror.Maskf(missingLabelError, labelVersion)
-					}
-
-					nodes = append(nodes, providerv1alpha1.NewStatusClusterNode(n, v, l))
-				}
-
-				nodesDiffer := nodes != nil && !allNodesEqual(clusterStatus.Nodes, nodes)
-
-				if nodesDiffer {
-					patches = append(patches, Patch{
-						Op:    "replace",
-						Path:  "/status/cluster/nodes",
-						Value: nodes,
-					})
-
-					r.logger.LogCtx(ctx, "level", "info", "message", "setting status nodes")
-				}
+			labelProvider := "giantswarm.io/provider"
+			p, ok := l[labelProvider]
+			if !ok {
+				return nil, microerror.Maskf(missingLabelError, labelProvider)
 			}
+			labelVersion := p + "-operator.giantswarm.io/version"
+			v, ok := l[labelVersion]
+			if !ok {
+				return nil, microerror.Maskf(missingLabelError, labelVersion)
+			}
+
+			nodes = append(nodes, providerv1alpha1.NewStatusClusterNode(n, v, l))
+		}
+
+		nodesDiffer := nodes != nil && !allNodesEqual(clusterStatus.Nodes, nodes)
+
+		if nodesDiffer {
+			patches = append(patches, Patch{
+				Op:    "replace",
+				Path:  "/status/cluster/nodes",
+				Value: nodes,
+			})
+
+			r.logger.LogCtx(ctx, "level", "info", "message", "setting status nodes")
 		}
 	}
 
