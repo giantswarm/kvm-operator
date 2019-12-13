@@ -18,19 +18,18 @@ import (
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller"
 )
 
+// Config represents the configuration used to create a new service.
 type Config struct {
+	// Dependencies.
 	Logger micrologger.Logger
 
-	Description string
-	Flag        *flag.Flag
-	GitCommit   string
-	Name        string
-	Source      string
-	Version     string
-	Viper       *viper.Viper
+	// Settings.
+	Flag  *flag.Flag
+	Viper *viper.Viper
 }
 
 type Service struct {
@@ -43,7 +42,14 @@ type Service struct {
 	statusResourceCollector *statusresource.CollectorSet
 }
 
+// New creates a new service with given configuration.
 func New(config Config) (*Service, error) {
+	// Dependencies.
+	if config.Logger == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+	}
+
+	// Settings.
 	if config.Flag == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Flag must not be empty", config)
 	}
@@ -131,7 +137,7 @@ func New(config Config) (*Service, error) {
 
 			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
-			ProjectName:        config.Name,
+			ProjectName:        project.Name(),
 
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
@@ -160,7 +166,7 @@ func New(config Config) (*Service, error) {
 			TenantCluster: tenantCluster,
 
 			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      config.Name,
+			ProjectName:      project.Name(),
 		}
 
 		deleterController, err = controller.NewDeleter(c)
@@ -176,7 +182,7 @@ func New(config Config) (*Service, error) {
 			Logger:    config.Logger,
 
 			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      config.Name,
+			ProjectName:      project.Name(),
 		}
 
 		drainerController, err = controller.NewDrainer(c)
@@ -201,11 +207,11 @@ func New(config Config) (*Service, error) {
 	var versionService *version.Service
 	{
 		versionConfig := version.Config{
-			Description:    config.Description,
-			GitCommit:      config.GitCommit,
-			Name:           config.Name,
-			Source:         config.Source,
-			Version:        config.Version,
+			Description:    project.Description(),
+			GitCommit:      project.GitSHA(),
+			Name:           project.Name(),
+			Source:         project.Source(),
+			Version:        project.Version(),
 			VersionBundles: NewVersionBundles(),
 		}
 
