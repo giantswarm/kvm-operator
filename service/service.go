@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/k8sclient/k8srestconfig"
@@ -75,11 +74,6 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	g8sClient, err := versioned.NewForConfig(restConfig)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
 	var k8sClient *k8sclient.Clients
 	{
 		c := k8sclient.ClientsConfig{
@@ -132,7 +126,6 @@ func New(config Config) (*Service, error) {
 		c := controller.ClusterConfig{
 			CertsSearcher: certsSearcher,
 			K8sClient:     k8sClient,
-			K8sExtClient:  k8sClient.ExtClient(),
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
@@ -196,7 +189,7 @@ func New(config Config) (*Service, error) {
 	{
 		c := statusresource.CollectorSetConfig{
 			Logger:  config.Logger,
-			Watcher: g8sClient.ProviderV1alpha1().KVMConfigs("").Watch,
+			Watcher: k8sClient.G8sClient().ProviderV1alpha1().KVMConfigs("").Watch,
 		}
 
 		statusResourceCollector, err = statusresource.NewCollectorSet(c)

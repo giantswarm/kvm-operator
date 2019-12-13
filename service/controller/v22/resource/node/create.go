@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/errors/tenant"
+	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
@@ -29,7 +30,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		i := key.ClusterID(customObject)
 		e := key.ClusterAPIEndpoint(customObject)
 
-		k8sClient, err = r.tenantCluster.NewK8sClient(ctx, i, e)
+		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
 		if tenantcluster.IsTimeout(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
@@ -41,6 +42,16 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		} else {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 		}
+		clientsConfig := k8sclient.ClientsConfig{
+			Logger:     r.logger,
+			RestConfig: restConfig,
+		}
+		k8sClients, err := k8sclient.NewClients(clientsConfig)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		k8sClient = k8sClients.K8sClient()
 	}
 
 	// We need to fetch the nodes being registered within the tenant cluster's
