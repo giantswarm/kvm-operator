@@ -244,8 +244,6 @@ func (r *Resource) computeCreateEventPatches(ctx context.Context, obj interface{
 				r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
 			} else if err != nil {
 				return nil, microerror.Mask(err)
-			} else {
-				r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 			}
 
 			clientsConfig := k8sclient.ClientsConfig{
@@ -259,6 +257,7 @@ func (r *Resource) computeCreateEventPatches(ctx context.Context, obj interface{
 
 			k8sClient = k8sClients.K8sClient()
 		}
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 
 		o := metav1.ListOptions{}
 		list, err := k8sClient.CoreV1().Nodes().List(o)
