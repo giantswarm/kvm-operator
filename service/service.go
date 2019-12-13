@@ -126,7 +126,6 @@ func New(config Config) (*Service, error) {
 		c := controller.ClusterConfig{
 			CertsSearcher: certsSearcher,
 			K8sClient:     k8sClient,
-			K8sExtClient:  k8sClient.ExtClient(),
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 

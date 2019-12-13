@@ -9,7 +9,6 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/randomkeys"
 	"github.com/giantswarm/tenantcluster"
-	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -36,7 +35,6 @@ import (
 type ClusterConfig struct {
 	CertsSearcher certs.Interface
 	K8sClient     k8sclient.Interface
-	K8sExtClient  apiextensionsclient.Interface
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 
