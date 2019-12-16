@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
@@ -65,6 +66,9 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			K8sClient:    config.K8sClient,
 			Logger:       config.Logger,
 			ResourceSets: resourceSets,
+			MatchLabels: map[string]string{
+				key.PodWatcherLabel: project.Name(),
+			},
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(corev1.Pod)
 			},
