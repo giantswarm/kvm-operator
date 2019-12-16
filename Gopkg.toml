@@ -68,9 +68,9 @@ required = [
   name = "github.com/giantswarm/micrologger"
   branch = "master"
 
-[[override]]
+[[constraint]]
   name = "github.com/giantswarm/operatorkit"
-  branch = "predicate_labels"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/giantswarm/randomkeys"
