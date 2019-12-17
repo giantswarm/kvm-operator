@@ -39,19 +39,23 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
-		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 		}
 		clientsConfig := k8sclient.ClientsConfig{
 			Logger:     r.logger,
 			RestConfig: restConfig,
 		}
 		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if err != nil {
+		if tenant.IsAPINotAvailable(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+			return nil
+		} else if err != nil {
 			return microerror.Mask(err)
 		}
 
 		k8sClient = k8sClients.K8sClient()
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 	}
 
 	// We need to fetch the nodes being registered within the tenant cluster's
