@@ -32,7 +32,3 @@
 [[constraint]]
   name = "github.com/go-stack/stack"
   version = "1.7.0"
-
-[[constraint]]
-  name = "github.com/google/go-cmp"
-  version = "0.3.1"

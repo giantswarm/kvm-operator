@@ -4,13 +4,10 @@ language: go
 
 env:
   global:
-    - GO111MODULE="on"
-    - GOFLAGS="-mod=readonly"
+  - GO111MODULE="on"
 
 go:
   - 1.11.x
-  - 1.12.x
-  - 1.13.x
   - tip
 
 os:
@@ -30,3 +27,5 @@ script:
 after_success:
   - go get -u -d github.com/spf13/hugo
   - cd $GOPATH/src/github.com/spf13/hugo && make && ./hugo -s docs && cd -
+
+sudo: false

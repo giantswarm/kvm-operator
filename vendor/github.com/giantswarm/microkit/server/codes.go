@@ -7,8 +7,6 @@ var (
 	CodeFailure = "FAILURE"
 	// CodeInvalidCredentials indicates the provided credentials are not valid.
 	CodeInvalidCredentials = "INVALID_CREDENTIALS"
-	// CodeNotSupported indicates that the resource is not supported.
-	CodeNotSupported = "NOT_SUPPORTED"
 	// CodePermissionDenied indicates the provided credentials are valid, but the
 	// requested resource requires other permissions.
 	CodePermissionDenied = "PERMISSION_DENIED"
