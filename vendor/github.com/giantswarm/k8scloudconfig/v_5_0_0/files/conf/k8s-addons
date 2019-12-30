@@ -4,7 +4,7 @@ export KUBECONFIG=/etc/kubernetes/kubeconfig/addons.yaml
 export KUBECTL="/opt/bin/hyperkube kubectl"
 
 # wait for healthy master
-while [ "$KUBECTL get cs | grep Healthy | wc -l)" -ne "3" ]; do sleep 1 && echo 'Waiting for healthy k8s'; done
+while [ "$($KUBECTL get nodes $(hostname) -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')" != "True" ]; do sleep 1 && echo 'Waiting for healthy k8s'; done
 
 # label namespaces (required for network egress policies)
 NAMESPACES="default kube-system" 
@@ -101,9 +101,9 @@ done
 # wait for healthy calico - we check for pods - desired vs ready
 while
     # result of this is 'eval [ "$DESIRED_POD_COUNT" -eq "$READY_POD_COUNT" ]'
-    /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system  get ds calico-node 2>/dev/null >/dev/null
+    $KUBECTL -n kube-system  get ds calico-node 2>/dev/null >/dev/null
     RET_CODE_1=$?
-    eval $(/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system get ds calico-node | tail -1 | awk '{print "[ \"" $2"\" -eq \""$4"\" ] "}')
+    eval $($KUBECTL -n kube-system get ds calico-node | tail -1 | awk '{print "[ \"" $2"\" -eq \""$4"\" ] "}')
     RET_CODE_2=$?
     [ "$RET_CODE_1" -ne "0" ] || [ "$RET_CODE_2" -ne "0" ]
 do
@@ -116,7 +116,7 @@ done
 # apply default storage class
 if [ -f /srv/default-storage-class.yaml ]; then
     while
-        /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/default-storage-class.yaml
+        $KUBECTL apply -f /srv/default-storage-class.yaml
         [ "$?" -ne "0" ]
     do
         echo "failed to apply /srv/default-storage-class.yaml, retrying in 5 sec"
@@ -130,7 +130,7 @@ fi
 PRIORITY_CLASSES_FILE="priority_classes.yaml"
 
 while
-    /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/$PRIORITY_CLASSES_FILE
+    $KUBECTL apply -f /srv/$PRIORITY_CLASSES_FILE
     [ "$?" -ne "0" ]
 do
     echo "failed to apply /srv/$PRIORITY_CLASSES_FILE, retrying in 5 sec"
@@ -142,7 +142,7 @@ NETWORK_POLICIES_FILE="network_policies.yaml"
 NAMESPACES="kube-system giantswarm"
 for namespace in ${NAMESPACES}; do
     while
-      /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/$NETWORK_POLICIES_FILE -n $namespace
+      $KUBECTL apply -f /srv/$NETWORK_POLICIES_FILE -n $namespace
       [ "$?" -ne "0" ]
     do
       echo "failed to apply /srv/$NETWORK_POLICIES_FILE, retrying in 5 sec"
@@ -162,7 +162,7 @@ MANIFESTS="${MANIFESTS} ingress-controller-svc.yaml"
 for manifest in $MANIFESTS
 do
     while
-        /usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /srv:/srv -v /etc/kubernetes:/etc/kubernetes $KUBECTL apply -f /srv/$manifest
+        $KUBECTL apply -f /srv/$manifest
         [ "$?" -ne "0" ]
     do
         echo "failed to apply /srv/$manifest, retrying in 5 sec"
