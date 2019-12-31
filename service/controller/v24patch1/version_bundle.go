@@ -9,11 +9,11 @@ func VersionBundle() versionbundle.Bundle {
 		Changelogs: []versionbundle.Changelog{
 			{
 				Component:   "kubernetes",
-				Description: "Update from v1.14.6 to v1.14.9.",
+				Description: "Update from v1.14.6 to v1.14.10.",
 				Kind:        versionbundle.KindChanged,
 				URLs: []string{
 					"https://github.com/giantswarm/kvm-operator/pull/791",
-					"https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.14.md#changelog-since-v1149",
+					"https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.14.md#changelog-since-v11410",
 				},
 			},
 			{
@@ -44,7 +44,7 @@ func VersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "kubernetes",
-				Version: "1.14.9",
+				Version: "1.14.10",
 			},
 		},
 		Name:    "kvm-operator",

@@ -144,7 +144,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:49f20cf224b18a3a498b506d438969886a1b12e3481c6753425f57758d62b891"
+  digest = "1:6a676db3c44436908060d5931b2ab8cebadcbc0b1ba0867dfc87e70693a62e40"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -159,16 +159,7 @@
     "v_5_0_0",
   ]
   pruneopts = "T"
-  revision = "0d94f8c311ace01f0f9ac4a050b12ba67ec3d1c8"
-
-[[projects]]
-  branch = "master"
-  digest = "1:db53386648949b2e867e9214f70fce7c9f3ac561cb2b2ad6efa8787f14cd6199"
-  name = "github.com/giantswarm/k8sportforward"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "235c94280e5ec868b0d2f16148ff8b6594154bf5"
->>>>>>> 34d7d072... vendor k8scc and use v_4_8_1 for v24patch1
+  revision = "9f452e481c2ba255c8352ceccc58ac25b4f0f7d7"
 
 [[projects]]
   branch = "master"

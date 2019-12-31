@@ -50,7 +50,7 @@ required = [
 
 [[constraint]]
   name = "github.com/giantswarm/k8scloudconfig"
-  branch = "release-8-6-0"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/giantswarm/microendpoint"
