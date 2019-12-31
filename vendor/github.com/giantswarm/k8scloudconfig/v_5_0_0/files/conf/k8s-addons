@@ -4,7 +4,7 @@ export KUBECONFIG=/etc/kubernetes/kubeconfig/addons.yaml
 export KUBECTL="/opt/bin/hyperkube kubectl"
 
 # wait for healthy master
-while [ "$($KUBECTL get nodes $(hostname) -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')" != "True" ]; do sleep 1 && echo 'Waiting for healthy k8s'; done
+while [ "$($KUBECTL get nodes $(hostname) -o jsonpath='{.metadata.name}')" != "$(hostname)" ]; do sleep 1 && echo 'Waiting for healthy k8s'; done
 
 # label namespaces (required for network egress policies)
 NAMESPACES="default kube-system" 
