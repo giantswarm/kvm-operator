@@ -49,13 +49,8 @@ func mainError() error {
 			c := service.Config{
 				Logger: newLogger,
 
-				Description: project.Description(),
-				Flag:        f,
-				GitCommit:   project.GitSHA(),
-				Name:        project.Name(),
-				Source:      project.Source(),
-				Version:     project.Version(),
-				Viper:       v,
+				Flag:  f,
+				Viper: v,
 			}
 
 			newService, err = service.New(c)

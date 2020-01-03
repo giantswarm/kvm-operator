@@ -218,7 +218,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e3dcfca96177f8b713e76e0f15660b33afc5de3110b2cf6c0a801dbaac904a9f"
+  digest = "1:277354c3c5bc503873e5acc97e44c8f226a88c5d97d2074216c7b8c41feff049"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "controller",
@@ -236,7 +236,7 @@
     "resource/wrapper/retryresource",
   ]
   pruneopts = "UT"
-  revision = "5d098618662e74384f52bf064fe3588436873eb2"
+  revision = "5066c92d0b69ff66e15d44b2b2249bb344099a50"
 
 [[projects]]
   branch = "master"
