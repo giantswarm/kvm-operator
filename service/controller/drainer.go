@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
 	"github.com/giantswarm/kvm-operator/service/controller/v20/key"
 	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
@@ -62,8 +63,11 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			K8sClient:    config.K8sClient,
-			Logger:       config.Logger,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+			MatchLabels: map[string]string{
+				key.PodWatcherLabel: project.Name(),
+			},
 			ResourceSets: resourceSets,
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(corev1.Pod)
