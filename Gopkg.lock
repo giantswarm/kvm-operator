@@ -143,8 +143,8 @@
   revision = "6cb127468cd6b30eaf8030b875f796e34b481938"
 
 [[projects]]
-  branch = "release-11-0-0"
-  digest = "1:cb815e01597da8a2086e3b101b8222b89e0d2a5aea887f6c6cf65da35b96c0eb"
+  branch = "master"
+  digest = "1:34f4559474d1b3d0fd14f3fe235bd624a9d737106cca6ec9fb9406c99d5b0762"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
@@ -158,7 +158,7 @@
     "v_5_0_0",
   ]
   pruneopts = "T"
-  revision = "a696bd79807c644168e354ac8dfd55558da41b28"
+  revision = "c43b36807bdd4c5ba4ac96f50b434b57ae348213"
 
 [[projects]]
   branch = "master"
@@ -743,17 +743,6 @@
   revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
-  branch = "master"
-  digest = "1:918a46e4a2fb83df33f668f5a6bd51b2996775d073fce1800d3ec01b0a5ddd2b"
-  name = "golang.org/x/xerrors"
-  packages = [
-    ".",
-    "internal",
-  ]
-  pruneopts = "UT"
-  revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
-
-[[projects]]
   digest = "1:7d4fd782f2a710d08834b2c01742b3bba7fb0248383f9cc6c3dc95b3025689d7"
   name = "gomodules.xyz/jsonpatch"
   packages = ["v2"]
@@ -793,6 +782,14 @@
   pruneopts = "UT"
   revision = "d2d2541c53f18d2a059457998ce2876cc8e67cbf"
   version = "v0.9.1"
+
+[[projects]]
+  digest = "1:c4b5592c342f273e18de68e16957f536f6648f2e90c9d7ece653ac90c22079a9"
+  name = "gopkg.in/ini.v1"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "94291fffe2b14f4632ec0e67c1bfecfc1287a168"
+  version = "v1.51.1"
 
 [[projects]]
   digest = "1:41206f4d0410803e64cfb203f665330c3183988408cb532b56305a816a87bd99"
