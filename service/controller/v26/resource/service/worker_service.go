@@ -20,7 +20,7 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *corev1.Service {
 			Labels: map[string]string{
 				key.LegacyLabelCluster: key.ClusterID(customObject),
 				key.LabelCustomer:      key.ClusterCustomer(customObject),
-				key.LabelApp:           key.MasterID,
+				key.LabelApp:           key.WorkerID,
 				key.LabelCluster:       key.ClusterID(customObject),
 				key.LabelOrganization:  key.ClusterCustomer(customObject),
 				key.LabelVersionBundle: key.VersionBundleVersion(customObject),
