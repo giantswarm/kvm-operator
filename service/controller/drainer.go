@@ -70,9 +70,9 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			},
 			Logger:       config.Logger,
 			ResourceSets: resourceSets,
-			Selector: labels.SelectorFromSet(labels.Set(map[string]string{
+			Selector: labels.SelectorFromSet(map[string]string{
 				key.PodWatcherLabel: project.Name(),
-			})),
+			}),
 
 			Name: config.ProjectName + "-drainer",
 		}
