@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/giantswarm/kvm-operator/pkg/project"
@@ -64,14 +65,14 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	{
 		c := controller.Config{
 			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-			MatchLabels: map[string]string{
-				key.PodWatcherLabel: project.Name(),
-			},
-			ResourceSets: resourceSets,
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(corev1.Pod)
 			},
+			Logger:       config.Logger,
+			ResourceSets: resourceSets,
+			Selector: labels.SelectorFromSet(labels.Set(map[string]string{
+				key.PodWatcherLabel: project.Name(),
+			})),
 
 			Name: config.ProjectName + "-drainer",
 		}
