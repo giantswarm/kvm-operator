@@ -11,7 +11,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/v26/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v27/key"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
