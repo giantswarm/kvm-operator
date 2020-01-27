@@ -28,7 +28,7 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update from v3.9.1 to v3.10.1.",
 				Kind:        versionbundle.KindChanged,
 				URLs: []string{
-					"https://github.com/giantswarm/aws-operator/pull/2084",
+					"https://github.com/giantswarm/kvm-operator/pull/785",
 				},
 			},
 			{
@@ -36,7 +36,7 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update from v2191.5.0 to v2247.6.0.",
 				Kind:        versionbundle.KindChanged,
 				URLs: []string{
-					"https://github.com/giantswarm/aws-operator/pull/2084",
+					"https://github.com/giantswarm/kvm-operator/pull/785",
 				},
 			},
 			{
@@ -44,7 +44,7 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update from v3.3.15 to v3.3.17.",
 				Kind:        versionbundle.KindChanged,
 				URLs: []string{
-					"https://github.com/giantswarm/aws-operator/pull/2084",
+					"https://github.com/giantswarm/kvm-operator/pull/785",
 				},
 			},
 			{
@@ -52,7 +52,7 @@ func VersionBundle() versionbundle.Bundle {
 				Description: "Update from v1.15.5 to v1.16.3.",
 				Kind:        versionbundle.KindAdded,
 				URLs: []string{
-					"https://github.com/giantswarm/aws-operator/pull/2084",
+					"https://github.com/giantswarm/kvm-operator/pull/785",
 				},
 			},
 		},
