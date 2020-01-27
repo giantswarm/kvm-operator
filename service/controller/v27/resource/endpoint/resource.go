@@ -11,7 +11,7 @@ import (
 
 const (
 	IPAnnotation      = "endpoint.kvm.giantswarm.io/ip"
-	Name              = "endpointv26"
+	Name              = "endpointv27"
 	ServiceAnnotation = "endpoint.kvm.giantswarm.io/service"
 )
 

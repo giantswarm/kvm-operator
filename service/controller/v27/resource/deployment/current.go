@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v26/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v27/key"
 	"github.com/giantswarm/kvm-operator/service/metric"
 )
 
