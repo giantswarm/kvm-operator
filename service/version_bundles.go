@@ -12,7 +12,6 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/v24patch1"
 	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
 	v26 "github.com/giantswarm/kvm-operator/service/controller/v26"
-	v27 "github.com/giantswarm/kvm-operator/service/controller/v27"
 )
 
 func NewVersionBundles() []versionbundle.Bundle {
@@ -27,7 +26,6 @@ func NewVersionBundles() []versionbundle.Bundle {
 	versionBundles = append(versionBundles, v24patch1.VersionBundle())
 	versionBundles = append(versionBundles, v25.VersionBundle())
 	versionBundles = append(versionBundles, v26.VersionBundle())
-	versionBundles = append(versionBundles, v27.VersionBundle())
 
 	return versionBundles
 }
