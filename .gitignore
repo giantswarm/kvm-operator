@@ -1,6 +1,7 @@
 kvm-operator
+!helm/kvm-operator
 TODO
 !vendor/**
-.e2e-harness
 
+.e2e-harness
 integration/test/**/*-e2e
