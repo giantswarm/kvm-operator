@@ -1,2 +1,2 @@
 name: kvm-operator
-version: 1.0.0-[[ .SHA ]]
+version: [[ .Version ]]

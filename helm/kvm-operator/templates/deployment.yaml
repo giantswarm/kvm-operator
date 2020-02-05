@@ -1,43 +1,49 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kvm-operator
-  namespace: {{ .Values.namespace }}
+  name: {{ tpl .Values.resource.default.name  . }}
+  namespace: {{ tpl .Values.resource.default.namespace  . }}
   labels:
-    app: kvm-operator
+    app: {{ .Values.project.name }}
+    version: {{ .Values.project.version }}
 spec:
   replicas: 1
   revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: {{ .Values.project.name }}
+      version: {{ .Values.project.version }}
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       annotations:
         releasetime: {{ $.Release.Time }}
       labels:
-        app: kvm-operator
+        app: {{ .Values.project.name }}
+        version: {{ .Values.project.version }}
     spec:
       volumes:
-      - name: kvm-operator-configmap
+      - name: {{ .Values.project.name }}-configmap
         configMap:
-          name: kvm-operator-configmap
+          name: {{ tpl .Values.resource.default.name  . }}
           items:
           - key: config.yml
             path: config.yml
-      serviceAccountName: kvm-operator
+      serviceAccountName: {{ tpl .Values.resource.default.name  . }}
       securityContext:
-        runAsUser: {{ .Values.userID }}
-        runAsGroup: {{ .Values.groupID }}
+        runAsUser: {{ .Values.pod.user.id }}
+        runAsGroup: {{ .Values.pod.group.id }}
       containers:
-      - name: kvm-operator
-        image: quay.io/giantswarm/kvm-operator:[[ .SHA ]]
+      - name: {{ .Values.project.name }}
+        image: "{{ .Values.Installation.V1.Registry.Domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
         args:
         - daemon
-        - --config.dirs=/var/run/kvm-operator/configmap/
+        - --config.dirs=/var/run/{{ .Values.project.name }}/configmap/
         - --config.files=config
         volumeMounts:
-        - name: kvm-operator-configmap
-          mountPath: /var/run/kvm-operator/configmap/
+        - name: {{ .Values.project.name }}-configmap
+          mountPath: /var/run/{{ .Values.project.name }}/configmap/
         livenessProbe:
           httpGet:
             path: /healthz
@@ -52,4 +58,4 @@ spec:
             cpu: 250m
             memory: 250Mi
       imagePullSecrets:
-      - name: kvm-operator-pull-secret
+      - name: {{ tpl .Values.resource.pullSecret.name . }}
