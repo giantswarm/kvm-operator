@@ -49,7 +49,7 @@ require (
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 	k8s.io/api v0.16.6
-	k8s.io/apiextensions-apiserver v0.16.6
+	k8s.io/apiextensions-apiserver v0.16.6 // indirect
 	k8s.io/apimachinery v0.16.6
 	k8s.io/client-go v0.16.6
 	k8s.io/kube-openapi v0.0.0-20191107075043-30be4d16710a // indirect
