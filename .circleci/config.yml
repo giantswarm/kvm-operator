@@ -10,5 +10,6 @@ jobs:
         chmod +x ./architect
         ./architect version
     - run: ./architect build
+    - run: cp -R $(go list -m -f '{{.Dir}}' github.com/giantswarm/k8scloudconfig) ./k8scloudconfig
     - store_test_results:
         path: /tmp/results
