@@ -1,7 +1,7 @@
 package project
 
 import (
-"github.com/giantswarm/versionbundle"
+	"github.com/giantswarm/versionbundle"
 )
 
 func NewVersionBundle() versionbundle.Bundle {
