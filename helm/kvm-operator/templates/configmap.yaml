@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ tpl .Values.resource.default.name  . }}
+  namespace: {{ tpl .Values.resource.default.namespace  . }}
+data:
+  config.yml: |
+    server:
+      enable:
+        debug:
+          server: true
+      listen:
+        address: 'http://0.0.0.0:8000'
+    service:
+      crd:
+        labelSelector: '{{ .Values.Installation.V1.GiantSwarm.KVMOperator.CRD.LabelSelector }}'
+      kubernetes:
+        address: ''
+        inCluster: true
+        tls:
+          caFile: ''
+          crtFile: ''
+          keyFile: ''
+      installation:
+        dns:
+          servers: {{ .Values.Installation.V1.Provider.KVM.DNS.Servers }}
+        ntp:
+          servers: {{ .Values.Installation.V1.Provider.KVM.NTP.Servers }}
+        {{- if .Values.Installation.V1.Guest }}
+        tenant:
+          kubernetes:
+            api:
+              auth:
+                provider:
+                  oidc:
+                    clientID: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.ClientID }}'
+                    issuerURL: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.IssuerURL }}'
+                    usernameClaim: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim }}'
+                    groupsClaim: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim }}'
+        {{- end }}
+      tenant:
+        ssh:
+          ssoPublicKey: '{{ .Values.Installation.V1.Guest.SSH.SSOPublicKey }}'
+        update:
+          enabled: {{ .Values.Installation.V1.Guest.Update.Enabled }}
