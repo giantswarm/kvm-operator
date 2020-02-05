@@ -10,17 +10,6 @@ import (
 	"github.com/giantswarm/tenantcluster"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-
-	v20 "github.com/giantswarm/kvm-operator/service/controller/v20"
-	v21 "github.com/giantswarm/kvm-operator/service/controller/v21"
-	v22 "github.com/giantswarm/kvm-operator/service/controller/v22"
-	v23 "github.com/giantswarm/kvm-operator/service/controller/v23"
-	"github.com/giantswarm/kvm-operator/service/controller/v23patch1"
-	v24 "github.com/giantswarm/kvm-operator/service/controller/v24"
-	"github.com/giantswarm/kvm-operator/service/controller/v24patch1"
-	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
-	v26 "github.com/giantswarm/kvm-operator/service/controller/v26"
-	v27 "github.com/giantswarm/kvm-operator/service/controller/v27"
 )
 
 type DeleterConfig struct {
@@ -87,9 +76,9 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, error) {
 	var err error
 
-	var resourceSetV20 *controller.ResourceSet
+	var resourceSet *controller.ResourceSet
 	{
-		c := v20.DeleterResourceSetConfig{
+		c := DeleterResourceSetConfig{
 			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
@@ -97,167 +86,14 @@ func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, er
 			ProjectName: config.ProjectName,
 		}
 
-		resourceSetV20, err = v20.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV21 *controller.ResourceSet
-	{
-		c := v21.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV21, err = v21.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV22 *controller.ResourceSet
-	{
-		c := v22.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV22, err = v22.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV23 *controller.ResourceSet
-	{
-		c := v23.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV23, err = v23.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV23patch1 *controller.ResourceSet
-	{
-		c := v23patch1.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV23patch1, err = v23patch1.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV24 *controller.ResourceSet
-	{
-		c := v24.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV24, err = v24.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV24patch1 *controller.ResourceSet
-	{
-		c := v24patch1.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV24patch1, err = v24patch1.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV25 *controller.ResourceSet
-	{
-		c := v25.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV25, err = v25.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV26 *controller.ResourceSet
-	{
-		c := v26.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV26, err = v26.NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSetV27 *controller.ResourceSet
-	{
-		c := v27.DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSetV27, err = v27.NewDeleterResourceSet(c)
+		resourceSet, err = NewDeleterResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	resourceSets := []*controller.ResourceSet{
-		resourceSetV20,
-		resourceSetV21,
-		resourceSetV22,
-		resourceSetV23,
-		resourceSetV23patch1,
-		resourceSetV24,
-		resourceSetV24patch1,
-		resourceSetV25,
-		resourceSetV26,
-		resourceSetV27,
+		resourceSet,
 	}
 
 	return resourceSets, nil
