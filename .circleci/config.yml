@@ -14,6 +14,6 @@ jobs:
         path: /tmp/results
     - deploy:
         command: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          if [ "${CIRCLE_BRANCH}" == "thiccc" ]; then
             ./architect deploy
           fi
