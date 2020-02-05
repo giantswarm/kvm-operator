@@ -23,7 +23,7 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *corev1.Service {
 				key.LabelApp:           key.WorkerID,
 				key.LabelCluster:       key.ClusterID(customObject),
 				key.LabelOrganization:  key.ClusterCustomer(customObject),
-				key.LabelVersionBundle: key.VersionBundleVersion(customObject),
+				key.LabelVersionBundle: key.OperatorVersion(customObject),
 			},
 			Annotations: map[string]string{
 				"prometheus.io/path":   "/healthz",
