@@ -5,7 +5,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	apiv1 "k8s.io/api/rbac/v1beta1"
+	apiv1 "k8s.io/api/rbac/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
