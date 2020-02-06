@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	apiv1 "k8s.io/api/rbac/v1beta1"
+	apiv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -21,7 +21,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentClusterRoleBinding []*apiv1.ClusterRoleBinding
 	{
-		clusterRoleBinding, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Get(key.ClusterRoleBindingName(customObject), metav1.GetOptions{})
+		clusterRoleBinding, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(key.ClusterRoleBindingName(customObject), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find cluster role binding in the Kubernetes API")
 			// fall through
@@ -33,7 +33,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBinding)
 		}
 
-		clusterRoleBindingPSP, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Get(key.ClusterRoleBindingPSPName(customObject), metav1.GetOptions{})
+		clusterRoleBindingPSP, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(key.ClusterRoleBindingPSPName(customObject), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find cluster role binding psp in the Kubernetes API")
 			// fall through

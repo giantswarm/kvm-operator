@@ -10,15 +10,8 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - extensions
+      - networking
     resources:
-      - thirdpartyresources
-    verbs:
-      - "*"
-  - apiGroups:
-      - extensions
-    resources:
-      - deployments
       - ingresses
     verbs:
       - "*"
@@ -138,7 +131,7 @@ metadata:
   name: {{ tpl .Values.resource.psp.name . }}
 rules:
   - apiGroups:
-      - extensions
+      - policy
     resources:
       - podsecuritypolicies
     verbs:

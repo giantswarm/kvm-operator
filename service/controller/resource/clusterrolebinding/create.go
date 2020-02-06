@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	apiv1 "k8s.io/api/rbac/v1beta1"
+	apiv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -20,7 +20,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the cluster role bindings in the Kubernetes API")
 
 		for _, clusterRoleBinding := range clusterRoleBindingsToCreate {
-			_, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Create(clusterRoleBinding)
+			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Create(clusterRoleBinding)
 			if apierrors.IsAlreadyExists(err) {
 			} else if err != nil {
 				return microerror.Mask(err)
