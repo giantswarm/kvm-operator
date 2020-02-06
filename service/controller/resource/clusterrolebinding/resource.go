@@ -43,9 +43,9 @@ func New(config Config) (*Resource, error) {
 	}
 
 	newService := &Resource{
-		k8sClient:             config.K8sClient,
-		logger:                config.Logger,
-		
+		k8sClient: config.K8sClient,
+		logger:    config.Logger,
+
 		podSecurityPolicyName: config.PodSecurityPolicyName,
 	}
 
