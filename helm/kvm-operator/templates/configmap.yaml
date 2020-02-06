@@ -14,8 +14,10 @@ data:
     service:
       crd:
         labelSelector: '{{ .Values.Installation.V1.GiantSwarm.KVMOperator.CRD.LabelSelector }}'
-      podSecurityPolicy:
-        name: {{ tpl .Values.resource.psp.name . }}
+      rbac:
+        clusterRole:
+          general: {{ tpl .Values.resource.default.name . }}
+          psp: {{ tpl .Values.resource.psp.name . }}
       kubernetes:
         address: ''
         inCluster: true
