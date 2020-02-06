@@ -61,11 +61,11 @@ rules:
       - get
       - create
       - delete
+      - update
   - apiGroups:
       - ""
     resources:
       - namespaces
-      - clusterrolebindings
       - serviceaccounts
     verbs:
       - get
