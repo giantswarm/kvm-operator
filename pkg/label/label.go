@@ -11,3 +11,7 @@ const (
 	// in the front-end.
 	Organization = "giantswarm.io/organization"
 )
+
+const (
+	OperatorVersion = "kvm-operator.giantswarm.io/version"
+)
