@@ -18,26 +18,34 @@ const (
 type Config struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
+
+	PodSecurityPolicyName string
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
+
+	podSecurityPolicyName string
 }
 
 // New creates a new configured config map resource.
 func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+	}
+	if config.PodSecurityPolicyName == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.PodSecurityPolicyName must not be empty", config)
 	}
 
 	newService := &Resource{
-		k8sClient: config.K8sClient,
-		logger:    config.Logger,
+		k8sClient:             config.K8sClient,
+		logger:                config.Logger,
+		podSecurityPolicyName: config.PodSecurityPolicyName,
 	}
 
 	return newService, nil

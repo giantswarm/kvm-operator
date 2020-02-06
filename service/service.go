@@ -136,9 +136,10 @@ func New(config Config) (*Service, error) {
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
-			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
-			ProjectName:        project.Name(),
+			CRDLabelSelector:      config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
+			GuestUpdateEnabled:    config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
+			PodSecurityPolicyName: config.Viper.GetString(config.Flag.Service.PodSecurityPolicy.Name),
+			ProjectName:           project.Name(),
 
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
