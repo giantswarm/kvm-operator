@@ -265,6 +265,8 @@ func Test_Resource_ClusterRoleBinding_newDeleteChange(t *testing.T) {
 		resourceConfig := Config{
 			K8sClient: fake.NewSimpleClientset(),
 			Logger:    microloggertest.New(),
+
+			PodSecurityPolicyName: "test-psp",
 		}
 
 		newResource, err = New(resourceConfig)
