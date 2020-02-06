@@ -38,6 +38,8 @@ type ClusterResourceSetConfig struct {
 	RandomkeysSearcher randomkeys.Interface
 	TenantCluster      tenantcluster.Interface
 
+	ClusterRoleGeneral string
+	ClusterRolePSP     string
 	DNSServers         string
 	GuestUpdateEnabled bool
 	IgnitionPath       string
@@ -71,6 +73,9 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := clusterrolebinding.Config{
 			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
+
+			ClusterRoleGeneral: config.ClusterRoleGeneral,
+			ClusterRolePSP:     config.ClusterRolePSP,
 		}
 
 		ops, err := clusterrolebinding.New(c)
@@ -238,7 +243,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			Logger:                   config.Logger,
 			RESTClient:               config.K8sClient.G8sClient().ProviderV1alpha1().RESTClient(),
 			TenantCluster:            config.TenantCluster,
-			VersionBundleVersionFunc: key.ToVersionBundleVersion,
+			VersionBundleVersionFunc: key.ToOperatorVersion,
 		}
 
 		statusResource, err = statusresource.NewResource(c)
@@ -281,12 +286,12 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	}
 
 	handlesFunc := func(obj interface{}) bool {
-		kvmConfig, err := key.ToCustomObject(obj)
+		cr, err := key.ToCustomObject(obj)
 		if err != nil {
 			return false
 		}
 
-		if key.VersionBundleVersion(kvmConfig) == project.BundleVersion() {
+		if key.OperatorVersion(cr) == project.BundleVersion() {
 			return true
 		}
 

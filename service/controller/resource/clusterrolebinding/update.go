@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/resource/crud"
-	apiv1 "k8s.io/api/rbac/v1beta1"
+	apiv1 "k8s.io/api/rbac/v1"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
@@ -20,7 +20,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 
 		// Create the cluster role bindings in the Kubernetes API.
 		for _, clusterRoleBinding := range clusterRoleBindingsToUpdate {
-			_, err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Update(clusterRoleBinding)
+			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
 			if err != nil {
 				return microerror.Mask(err)
 			}

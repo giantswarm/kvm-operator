@@ -10,15 +10,8 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - extensions
+      - networking.k8s.io
     resources:
-      - thirdpartyresources
-    verbs:
-      - "*"
-  - apiGroups:
-      - extensions
-    resources:
-      - deployments
       - ingresses
     verbs:
       - "*"
@@ -68,11 +61,11 @@ rules:
       - get
       - create
       - delete
+      - update
   - apiGroups:
       - ""
     resources:
       - namespaces
-      - clusterrolebindings
       - serviceaccounts
     verbs:
       - get
@@ -138,7 +131,7 @@ metadata:
   name: {{ tpl .Values.resource.psp.name . }}
 rules:
   - apiGroups:
-      - extensions
+      - policy
     resources:
       - podsecuritypolicies
     verbs:

@@ -14,6 +14,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/giantswarm/kvm-operator/pkg/label"
 )
 
 const (
@@ -408,6 +410,10 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	return idx, present
 }
 
+func OperatorVersion(cr v1alpha1.KVMConfig) string {
+	return cr.GetLabels()[label.OperatorVersion]
+}
+
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	var ports []corev1.ServicePort
 
@@ -519,6 +525,15 @@ func ToNodeCount(v interface{}) (int, error) {
 	return nodeCount, nil
 }
 
+func ToOperatorVersion(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return OperatorVersion(customObject), nil
+}
+
 func ToPod(v interface{}) (*corev1.Pod, error) {
 	if v == nil {
 		return nil, nil
@@ -530,19 +545,6 @@ func ToPod(v interface{}) (*corev1.Pod, error) {
 	}
 
 	return pod, nil
-}
-
-func ToVersionBundleVersion(v interface{}) (string, error) {
-	customObject, err := ToCustomObject(v)
-	if err != nil {
-		return "", microerror.Mask(err)
-	}
-
-	return VersionBundleVersion(customObject), nil
-}
-
-func VersionBundleVersion(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.VersionBundle.Version
 }
 
 func VersionBundleVersionFromPod(pod *corev1.Pod) (string, error) {

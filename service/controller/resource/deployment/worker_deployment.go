@@ -42,7 +42,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
 				Annotations: map[string]string{
-					key.VersionBundleVersionAnnotation: key.VersionBundleVersion(customResource),
+					key.VersionBundleVersionAnnotation: key.OperatorVersion(customResource),
 				},
 				Labels: map[string]string{
 					key.LabelApp:          key.WorkerID,
@@ -73,7 +73,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 							key.AnnotationIp:            "",
 							key.AnnotationService:       key.WorkerID,
 							key.AnnotationPodDrained:    "False",
-							key.AnnotationVersionBundle: key.VersionBundleVersion(customResource),
+							key.AnnotationVersionBundle: key.OperatorVersion(customResource),
 						},
 						Name: key.WorkerID,
 						Labels: map[string]string{
