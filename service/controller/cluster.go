@@ -21,15 +21,16 @@ type ClusterConfig struct {
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 
-	CRDLabelSelector      string
-	DNSServers            string
-	GuestUpdateEnabled    bool
-	IgnitionPath          string
-	NTPServers            string
-	OIDC                  ClusterConfigOIDC
-	PodSecurityPolicyName string
-	ProjectName           string
-	SSOPublicKey          string
+	ClusterRoleGeneral string
+	ClusterRolePSP     string
+	CRDLabelSelector   string
+	DNSServers         string
+	GuestUpdateEnabled bool
+	IgnitionPath       string
+	NTPServers         string
+	OIDC               ClusterConfigOIDC
+	ProjectName        string
+	SSOPublicKey       string
 }
 
 // ClusterConfigOIDC represents the configuration of the OIDC authorization
@@ -117,12 +118,13 @@ func newClusterResourceSets(config ClusterConfig) ([]*controller.ResourceSet, er
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
 
-			DNSServers:            config.DNSServers,
-			GuestUpdateEnabled:    config.GuestUpdateEnabled,
-			IgnitionPath:          config.IgnitionPath,
-			NTPServers:            config.NTPServers,
-			PodSecurityPolicyName: config.PodSecurityPolicyName,
-			ProjectName:           config.ProjectName,
+			ClusterRoleGeneral: config.ClusterRoleGeneral,
+			ClusterRolePSP:     config.ClusterRolePSP,
+			DNSServers:         config.DNSServers,
+			GuestUpdateEnabled: config.GuestUpdateEnabled,
+			IgnitionPath:       config.IgnitionPath,
+			NTPServers:         config.NTPServers,
+			ProjectName:        config.ProjectName,
 			OIDC: cloudconfig.OIDCConfig{
 				ClientID:      config.OIDC.ClientID,
 				IssuerURL:     config.OIDC.IssuerURL,

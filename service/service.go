@@ -136,10 +136,11 @@ func New(config Config) (*Service, error) {
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
-			CRDLabelSelector:      config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			GuestUpdateEnabled:    config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
-			PodSecurityPolicyName: config.Viper.GetString(config.Flag.Service.PodSecurityPolicy.Name),
-			ProjectName:           project.Name(),
+			ClusterRoleGeneral: config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.General),
+			ClusterRolePSP:     config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.PSP),
+			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
+			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
+			ProjectName:        project.Name(),
 
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),

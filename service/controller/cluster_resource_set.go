@@ -38,14 +38,15 @@ type ClusterResourceSetConfig struct {
 	RandomkeysSearcher randomkeys.Interface
 	TenantCluster      tenantcluster.Interface
 
-	DNSServers            string
-	GuestUpdateEnabled    bool
-	IgnitionPath          string
-	NTPServers            string
-	OIDC                  cloudconfig.OIDCConfig
-	PodSecurityPolicyName string
-	ProjectName           string
-	SSOPublicKey          string
+	ClusterRoleGeneral string
+	ClusterRolePSP     string
+	DNSServers         string
+	GuestUpdateEnabled bool
+	IgnitionPath       string
+	NTPServers         string
+	OIDC               cloudconfig.OIDCConfig
+	ProjectName        string
+	SSOPublicKey       string
 }
 
 func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.ResourceSet, error) {
@@ -73,7 +74,8 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 
-			PodSecurityPolicyName: config.PodSecurityPolicyName,
+			ClusterRoleGeneral: config.ClusterRoleGeneral,
+			ClusterRolePSP:     config.ClusterRolePSP,
 		}
 
 		ops, err := clusterrolebinding.New(c)

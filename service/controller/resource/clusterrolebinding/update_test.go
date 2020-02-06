@@ -184,7 +184,8 @@ func Test_Resource_ClusterRoleBinding_newUpdateChange(t *testing.T) {
 			K8sClient: fake.NewSimpleClientset(),
 			Logger:    microloggertest.New(),
 
-			PodSecurityPolicyName: "test-psp",
+			ClusterRoleGeneral: "test-role",
+			ClusterRolePSP:     "test-role-psp",
 		}
 		newResource, err = New(resourceConfig)
 		if err != nil {
