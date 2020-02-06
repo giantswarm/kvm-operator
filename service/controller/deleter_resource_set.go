@@ -27,12 +27,12 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 	var err error
 
 	handlesFunc := func(obj interface{}) bool {
-		kvmConfig, err := key.ToCustomObject(obj)
+		cr, err := key.ToCustomObject(obj)
 		if err != nil {
 			return false
 		}
 
-		if key.VersionBundleVersion(kvmConfig) == project.BundleVersion() {
+		if key.OperatorVersion(cr) == project.BundleVersion() {
 			return true
 		}
 

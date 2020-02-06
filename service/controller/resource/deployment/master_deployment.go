@@ -73,7 +73,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.DeploymentName(key.MasterID, masterNode.ID),
 				Annotations: map[string]string{
-					key.VersionBundleVersionAnnotation: key.VersionBundleVersion(customResource),
+					key.VersionBundleVersionAnnotation: key.OperatorVersion(customResource),
 				},
 				Labels: map[string]string{
 					key.LabelApp:          key.MasterID,
@@ -104,7 +104,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 							key.AnnotationIp:            "",
 							key.AnnotationService:       key.MasterID,
 							key.AnnotationPodDrained:    "False",
-							key.AnnotationVersionBundle: key.VersionBundleVersion(customResource),
+							key.AnnotationVersionBundle: key.OperatorVersion(customResource),
 						},
 						GenerateName: key.MasterID,
 						Labels: map[string]string{
