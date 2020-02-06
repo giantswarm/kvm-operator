@@ -136,6 +136,8 @@ func New(config Config) (*Service, error) {
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
+			ClusterRoleGeneral: config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.General),
+			ClusterRolePSP:     config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.PSP),
 			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
 			ProjectName:        project.Name(),
