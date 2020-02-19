@@ -132,6 +132,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 			epRemoved, masterEndpoint := r.removeDeadIPFromEndpoints(masterEndpoint, nodes)
 			if epRemoved > 0 {
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
+
 				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(masterEndpoint)
 				if err != nil {
 					return microerror.Mask(err)
@@ -147,6 +149,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 			epRemoved, workerEndpoint := r.removeDeadIPFromEndpoints(workerEndpoint, nodes)
 			if epRemoved > 0 {
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
+
 				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(workerEndpoint)
 				if err != nil {
 					return microerror.Mask(err)
