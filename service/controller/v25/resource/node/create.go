@@ -12,7 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v25/key"
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
@@ -119,6 +119,41 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted node '%s' in the tenant cluster's Kubernetes API", n.GetName()))
 	}
 
+	// Clear dead endpoint IPs only when the cluster is not in transitioning state.
+	// The amount of nodes should be equal to amount of pods.
+	if len(nodes) == len(pods) {
+		n := key.ClusterID(customObject)
+
+		{
+			masterEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(key.MasterID, metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			epRemoved, masterEndpoint := r.removeDeadIPFromEndpoints(masterEndpoint, nodes)
+			if epRemoved > 0 {
+				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(masterEndpoint)
+				if err != nil {
+					return microerror.Mask(err)
+				}
+			}
+		}
+
+		{
+			workerEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(key.WorkerID, metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			epRemoved, workerEndpoint := r.removeDeadIPFromEndpoints(workerEndpoint, nodes)
+			if epRemoved > 0 {
+				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(workerEndpoint)
+				if err != nil {
+					return microerror.Mask(err)
+				}
+			}
+		}
+	}
 	return nil
 }
 
@@ -153,4 +188,47 @@ func isPodOfNodeRunning(pods []corev1.Pod, n corev1.Node) bool {
 	}
 
 	return false
+}
+
+// removeFromEndpointAddressList is removing slice elements from `addresses` defined by `indexesToRemove`.
+func removeFromEndpointAddressList(addresses []corev1.EndpointAddress, indexesToRemove []int) []corev1.EndpointAddress {
+	var newAddresses []corev1.EndpointAddress
+	for i, ip := range addresses {
+		remove := false
+		for _, j := range indexesToRemove {
+			if i == j {
+				remove = true
+			}
+		}
+		if !remove {
+			newAddresses = append(newAddresses, ip)
+		}
+	}
+	return newAddresses
+}
+
+// removeDeadIPFromEndpoints compares endpoint IPs with current state of nodes and
+// removes any IP addresses that does not belong to any node.
+func (r *Resource) removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node) (int, *corev1.Endpoints) {
+	endpointAddresses := endpoints.Subsets[0].Addresses
+
+	var indexesToDelete []int
+	for i, ip := range endpointAddresses {
+		found := false
+		// check if the ip belongs to any k8s node
+		for _, node := range nodes {
+			if node.Labels["ip"] == ip.IP {
+				found = true
+				break
+			}
+		}
+		// endpoint ip does not belong to any node, lets remove it
+		if !found {
+			indexesToDelete = append(indexesToDelete, i)
+		}
+	}
+	if len(indexesToDelete) > 0 {
+		endpoints.Subsets[0].Addresses = removeFromEndpointAddressList(endpointAddresses, indexesToDelete)
+	}
+	return len(indexesToDelete), endpoints
 }
