@@ -3,16 +3,16 @@ package endpoint
 import (
 	"context"
 	"fmt"
+
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/kvm-operator/service/controller/v26/key"
-	"github.com/giantswarm/tenantcluster"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState interface{}) error {
