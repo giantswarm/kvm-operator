@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"github.com/giantswarm/tenantcluster"
 
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
@@ -26,8 +27,9 @@ import (
 )
 
 type DrainerConfig struct {
-	K8sClient k8sclient.Interface
-	Logger    micrologger.Logger
+	K8sClient     k8sclient.Interface
+	Logger        micrologger.Logger
+	TenantCluster tenantcluster.Interface
 
 	CRDLabelSelector string
 	ProjectName      string
@@ -224,9 +226,10 @@ func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, er
 	var resourceSetV26 *controller.ResourceSet
 	{
 		c := v26.DrainerResourceSetConfig{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			G8sClient:     config.K8sClient.G8sClient(),
+			K8sClient:     config.K8sClient.K8sClient(),
+			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
 
 			ProjectName: config.ProjectName,
 		}

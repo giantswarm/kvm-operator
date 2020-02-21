@@ -8,6 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/resource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
+	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v26/key"
@@ -16,9 +17,10 @@ import (
 )
 
 type DrainerResourceSetConfig struct {
-	G8sClient versioned.Interface
-	K8sClient kubernetes.Interface
-	Logger    micrologger.Logger
+	G8sClient     versioned.Interface
+	K8sClient     kubernetes.Interface
+	Logger        micrologger.Logger
+	TenantCluster tenantcluster.Interface
 
 	ProjectName string
 }
@@ -60,9 +62,10 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 	var endpointResource resource.Interface
 	{
 		c := endpoint.Config{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
+			G8sClient:     config.G8sClient,
+			K8sClient:     config.K8sClient,
+			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
 		}
 
 		ops, err := endpoint.New(c)

@@ -178,8 +178,9 @@ func New(config Config) (*Service, error) {
 	var drainerController *controller.Drainer
 	{
 		c := controller.DrainerConfig{
-			K8sClient: k8sClient,
-			Logger:    config.Logger,
+			K8sClient:     k8sClient,
+			Logger:        config.Logger,
+			TenantCluster: tenantCluster,
 
 			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			ProjectName:      project.Name(),
