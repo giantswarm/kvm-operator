@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+	"github.com/giantswarm/tenantcluster"
 	"reflect"
 	"strconv"
 	"testing"
@@ -299,9 +300,10 @@ func Test_Resource_Endpoint_newUpdateChange(t *testing.T) {
 			var r *Resource
 			{
 				c := Config{
-					G8sClient: g8sfake.NewSimpleClientset(),
-					K8sClient: k8sfake.NewSimpleClientset(),
-					Logger:    microloggertest.New(),
+					G8sClient:     g8sfake.NewSimpleClientset(),
+					K8sClient:     k8sfake.NewSimpleClientset(),
+					Logger:        microloggertest.New(),
+					TenantCluster: &tenantcluster.TenantCluster{},
 				}
 
 				r, err = New(c)

@@ -8,6 +8,7 @@ import (
 	g8sfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
+	"github.com/giantswarm/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -71,13 +72,13 @@ func Test_Resource_Endpoint_ApplyCreateChange(t *testing.T) {
 	for i, tc := range testCases {
 		fakeG8sClient := g8sfake.NewSimpleClientset()
 		fakeK8sClient := fake.NewSimpleClientset()
-
 		var newResource *Resource
 		{
 			c := Config{
-				G8sClient: fakeG8sClient,
-				K8sClient: fakeK8sClient,
-				Logger:    microloggertest.New(),
+				G8sClient:     fakeG8sClient,
+				K8sClient:     fakeK8sClient,
+				Logger:        microloggertest.New(),
+				TenantCluster: &tenantcluster.TenantCluster{},
 			}
 			newResource, err = New(c)
 			if err != nil {
@@ -197,9 +198,10 @@ func Test_Resource_Endpoint_newCreateChange(t *testing.T) {
 		var newResource *Resource
 		{
 			c := Config{
-				G8sClient: g8sfake.NewSimpleClientset(),
-				K8sClient: fake.NewSimpleClientset(),
-				Logger:    microloggertest.New(),
+				G8sClient:     g8sfake.NewSimpleClientset(),
+				K8sClient:     fake.NewSimpleClientset(),
+				Logger:        microloggertest.New(),
+				TenantCluster: &tenantcluster.TenantCluster{},
 			}
 			newResource, err = New(c)
 			if err != nil {
