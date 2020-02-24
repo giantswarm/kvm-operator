@@ -1,6 +1,7 @@
 package v26
 
 import (
+	"github.com/giantswarm/kvm-operator/service/controller/v26/resource/cleanupendpointips"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -38,6 +39,20 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 		return false
 	}
 
+	var cleanupendpointipsResource resource.Interface
+	{
+		c := cleanupendpointips.Config{
+			K8sClient:     config.K8sClient,
+			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
+		}
+
+		cleanupendpointipsResource, err = cleanupendpointips.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var nodeResource resource.Interface
 	{
 		c := node.Config{
@@ -53,6 +68,7 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 	}
 
 	resources := []resource.Interface{
+		cleanupendpointipsResource,
 		nodeResource,
 	}
 
