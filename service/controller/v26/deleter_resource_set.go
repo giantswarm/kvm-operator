@@ -1,7 +1,6 @@
 package v26
 
 import (
-	"github.com/giantswarm/kvm-operator/service/controller/v26/resource/cleanupendpointips"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -12,6 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/v26/key"
+	"github.com/giantswarm/kvm-operator/service/controller/v26/resource/cleanupendpointips"
 	"github.com/giantswarm/kvm-operator/service/controller/v26/resource/node"
 )
 

@@ -94,7 +94,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 
-			epRemoved, masterEndpoint := r.removeDeadIPFromEndpoints(masterEndpoint, nodes)
+			epRemoved, masterEndpoint := removeDeadIPFromEndpoints(masterEndpoint, nodes)
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
 
@@ -111,7 +111,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 
-			epRemoved, workerEndpoint := r.removeDeadIPFromEndpoints(workerEndpoint, nodes)
+			epRemoved, workerEndpoint := removeDeadIPFromEndpoints(workerEndpoint, nodes)
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
 
@@ -144,7 +144,7 @@ func removeFromEndpointAddressList(addresses []corev1.EndpointAddress, indexesTo
 
 // removeDeadIPFromEndpoints compares endpoint IPs with current state of nodes and
 // removes any IP addresses that does not belong to any node.
-func (r *Resource) removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node) (int, *corev1.Endpoints) {
+func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node) (int, *corev1.Endpoints) {
 	endpointAddresses := endpoints.Subsets[0].Addresses
 
 	var indexesToDelete []int
