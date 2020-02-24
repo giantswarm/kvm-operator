@@ -37,7 +37,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if v == project.BundleVersion() {
+		if v == project.Version() {
 			return true
 		}
 
