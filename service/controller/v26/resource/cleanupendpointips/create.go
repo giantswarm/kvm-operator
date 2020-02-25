@@ -83,9 +83,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 		pods = list.Items
 	}
-	// Clear dead endpoint IPs only when the cluster is not in transitioning state.
-	// The amount of nodes should be equal to amount of pods.
-	if len(nodes) == len(pods) {
+	// Check if all k8s-kvm pods in CP are registered as nodes in the TC.
+	if podsEqualNodes(pods, nodes) {
 		n := key.ClusterID(customObject)
 
 		{
@@ -123,6 +122,20 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 	}
 	return nil
+}
+
+// podsEqualNodes check if all k8s-kvm pods in CP are registered as nodes in the TC.
+func podsEqualNodes(pods []corev1.Pod, nodes []corev1.Node) bool {
+	if len(pods) != len(nodes) {
+		return false
+	}
+	for i := 0; i < len(pods); i++ {
+		// k8s api return result alphabetically sorted by name so we can simply compare indexes
+		if pods[i].Name != nodes[i].Name {
+			return false
+		}
+	}
+	return true
 }
 
 // removeFromEndpointAddressList is removing slice elements from `addresses` defined by `indexesToRemove`.

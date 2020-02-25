@@ -353,3 +353,163 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 		}
 	}
 }
+func Test_Resource_CleanupEndpointIPs_podsEqualNodes(t *testing.T) {
+	testCases := []struct {
+		Pods           []corev1.Pod
+		Nodes          []corev1.Node
+		ExpectedResult bool
+	}{
+		// case 1 pods equal nodes
+		{
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+			},
+			Nodes: []corev1.Node{
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+			},
+			ExpectedResult: true,
+		},
+		// case 2 pods equal nodes
+		{
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-2",
+					},
+				},
+			},
+			Nodes: []corev1.Node{
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-2",
+					},
+				},
+			},
+			ExpectedResult: true,
+		},
+		// case 3 pods not equal nodes - missing node
+		{
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-2",
+					},
+				},
+			},
+			Nodes: []corev1.Node{
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+			},
+			ExpectedResult: false,
+		},
+		// case 4 pods not equal nodes - old node in TC API
+		{
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-2",
+					},
+				},
+			},
+			Nodes: []corev1.Node{
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-1",
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "worker-xxxx-test-OLD",
+					},
+				},
+			},
+			ExpectedResult: false,
+		},
+	}
+
+	for i, tc := range testCases {
+		result := podsEqualNodes(tc.Pods, tc.Nodes)
+
+		if result != tc.ExpectedResult {
+			t.Fatalf("case %d expected %t result got %t", i, tc.ExpectedResult, result)
+		}
+	}
+}
