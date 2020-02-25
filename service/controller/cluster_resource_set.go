@@ -291,7 +291,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if key.OperatorVersion(cr) == project.BundleVersion() {
+		if key.OperatorVersion(cr) == project.Version() {
 			return true
 		}
 
