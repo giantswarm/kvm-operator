@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Name = "cleanupendpointipsv26"
+	Name = "cleanupendpointipsv23"
 )
 
 type Config struct {
