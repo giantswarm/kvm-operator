@@ -3,6 +3,7 @@ package cleanupendpointips
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient"
@@ -129,8 +130,16 @@ func podsEqualNodes(pods []corev1.Pod, nodes []corev1.Node) bool {
 	if len(pods) != len(nodes) {
 		return false
 	}
+
+	// sort pods and nodes by name
+	sort.Slice(pods, func(i, j int) bool {
+		return pods[i].Name < pods[j].Name
+	})
+	sort.Slice(nodes, func(i, j int) bool {
+		return pods[i].Name < pods[j].Name
+	})
+
 	for i := 0; i < len(pods); i++ {
-		// k8s api return result alphabetically sorted by name so we can simply compare indexes
 		if pods[i].Name != nodes[i].Name {
 			return false
 		}
