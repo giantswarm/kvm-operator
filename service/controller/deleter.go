@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/k8sclient"
@@ -21,6 +23,8 @@ import (
 	v25 "github.com/giantswarm/kvm-operator/service/controller/v25"
 	v26 "github.com/giantswarm/kvm-operator/service/controller/v26"
 )
+
+const deleterResyncPeriod = time.Minute * 2
 
 type DeleterConfig struct {
 	CertsSearcher certs.Interface
@@ -63,6 +67,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 			K8sClient:    config.K8sClient,
 			Logger:       config.Logger,
 			ResourceSets: resourceSets,
+			ResyncPeriod: deleterResyncPeriod,
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(v1alpha1.KVMConfig)
 			},
