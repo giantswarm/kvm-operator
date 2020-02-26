@@ -109,7 +109,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 								Name: "images",
 								VolumeSource: corev1.VolumeSource{
 									HostPath: &corev1.HostPathVolumeSource{
-										Path: key.CoreosImageDir,
+										Path: key.FlatcarImageDir,
 									},
 								},
 							},
@@ -172,8 +172,12 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										Value: fmt.Sprintf("%d", capabilities.CPUs),
 									},
 									{
-										Name:  "COREOS_VERSION",
-										Value: key.CoreosVersion,
+										Name:  "FLATCAR_VERSION",
+										Value: key.FlatcarVersion,
+									},
+									{
+										Name:  "FLATCAR_CHANNEL",
+										Value: key.FlatcarChannel,
 									},
 									{
 										Name:  "DISK_DOCKER",
