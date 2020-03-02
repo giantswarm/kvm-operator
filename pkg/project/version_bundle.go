@@ -8,11 +8,12 @@ func NewVersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{
-				Component:   "TODO",
-				Description: "TODO",
+				Component:   "containerlinux",
+				Description: "Deprecate CoreOS and move to Flatcar Linux.",
 				Kind:        versionbundle.KindChanged,
 				URLs: []string{
-					"",
+					"https://github.com/giantswarm/kvm-operator/pull/825",
+					"https://github.com/giantswarm/k8s-kvm/pull/40",
 				},
 			},
 		},
@@ -23,7 +24,7 @@ func NewVersionBundle() versionbundle.Bundle {
 			},
 			{
 				Name:    "containerlinux",
-				Version: "2247.6.0",
+				Version: "2303.4.0",
 			},
 			{
 				Name:    "docker",
