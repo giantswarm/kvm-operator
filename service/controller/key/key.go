@@ -53,7 +53,7 @@ const (
 
 	FlannelEnvPathPrefix = "/run/flannel"
 	FlatcarImageDir      = "/var/lib/flatcar-kvm-images"
-	FlatcarVersion       = "2303.4.0"
+	FlatcarVersion       = "2345.3.0"
 	FlatcarChannel       = "stable"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:416097011707a2d0991964081167b7e883c57476"
