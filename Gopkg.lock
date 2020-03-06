@@ -148,13 +148,6 @@
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
-    "v_4_1_1",
-    "v_4_3_0",
-    "v_4_4_0",
-    "v_4_5_0",
-    "v_4_5_1",
-    "v_4_7_0",
-    "v_4_9_0",
     "v_5_0_0",
   ]
   pruneopts = "T"
@@ -162,7 +155,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:568716a2e87ca3f4fb9bce7f65b8491a2ab92c97adee4b2b750b1d76c709b183"
+  digest = "1:a4aed1ecd42d811ea6ab995570be14a7e1d1fb7eaae45d76f6f2841d6124f7b8"
   name = "github.com/giantswarm/microendpoint"
   packages = [
     "endpoint/healthz",
@@ -171,15 +164,15 @@
     "service/version",
   ]
   pruneopts = "UT"
-  revision = "e991deac265373d9347b96ecc56b13f228be144f"
+  revision = "f65c434d637c8e4f2388ccfdbe3098237685a065"
 
 [[projects]]
-  branch = "master"
-  digest = "1:d80347cb345b2986422040821735ae0efba8b8093b765b146b90796d926b85b4"
+  digest = "1:701a5f5a7297ced0c7b9aeeba6a40ef47663b956d56e7acd09fe0d1c31eb1e4b"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e0ebc4ecf5a515b8f2a33257d08962e387120a77"
+  revision = "e8fe0fa9c0097ca80d8b773e1d728843447f9233"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
@@ -205,8 +198,7 @@
   revision = "429e22e73d3e1ccfbc9311baa3ea9526423debdf"
 
 [[projects]]
-  branch = "master"
-  digest = "1:c313924ca7110c452a83502384552f4dd2ed25dd0f3ab8aa8a34707315243561"
+  digest = "1:4e616fe01d486048e77342e2c5e638f8744ec6da802335633740aafb057f50d8"
   name = "github.com/giantswarm/micrologger"
   packages = [
     ".",
@@ -214,7 +206,8 @@
     "microloggertest",
   ]
   pruneopts = "UT"
-  revision = "d866337f739365a54de5924b8a7b29df17693ef8"
+  revision = "c4d217562e3d493e3ff571707346a5a2653475cb"
+  version = "v0.1.1"
 
 [[projects]]
   branch = "master"
@@ -1148,13 +1141,6 @@
     "github.com/giantswarm/errors/tenant",
     "github.com/giantswarm/k8sclient",
     "github.com/giantswarm/k8sclient/k8srestconfig",
-    "github.com/giantswarm/k8scloudconfig/v_4_1_1",
-    "github.com/giantswarm/k8scloudconfig/v_4_3_0",
-    "github.com/giantswarm/k8scloudconfig/v_4_4_0",
-    "github.com/giantswarm/k8scloudconfig/v_4_5_0",
-    "github.com/giantswarm/k8scloudconfig/v_4_5_1",
-    "github.com/giantswarm/k8scloudconfig/v_4_7_0",
-    "github.com/giantswarm/k8scloudconfig/v_4_9_0",
     "github.com/giantswarm/k8scloudconfig/v_5_0_0",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
     "github.com/giantswarm/microendpoint/endpoint/version",
@@ -1185,8 +1171,8 @@
     "github.com/spf13/viper",
     "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
-    "k8s.io/api/extensions/v1beta1",
-    "k8s.io/api/rbac/v1beta1",
+    "k8s.io/api/networking/v1beta1",
+    "k8s.io/api/rbac/v1",
     "k8s.io/apimachinery/pkg/api/errors",
     "k8s.io/apimachinery/pkg/api/resource",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
