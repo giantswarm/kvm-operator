@@ -36,6 +36,12 @@ rules:
       - get
       - delete
   - apiGroups:
+      - releases.giantswarm.io
+    resources:
+      - release
+    verbs:
+      - get
+  - apiGroups:
       - provider.giantswarm.io
     resources:
       - kvmconfigs
