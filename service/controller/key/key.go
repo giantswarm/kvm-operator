@@ -52,11 +52,12 @@ const (
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
 	FlannelEnvPathPrefix = "/run/flannel"
-	CoreosImageDir       = "/var/lib/coreos-kvm-images"
-	CoreosVersion        = "2191.5.0"
+	FlatcarImageDir      = "/var/lib/flatcar-kvm-images"
+	FlatcarVersion       = "2345.3.0"
+	FlatcarChannel       = "stable"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:416097011707a2d0991964081167b7e883c57476"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:e9989b8667070b8a10a030e2f1f6078d2ffb803e"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:38e35d7f84a9f24e4bf16614f4ea6ca23dc7f73b"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:20517098a762a0d7ca2b0902316ddff487dbc7f5"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:ca610b410c34ab7209c6393aab8fb5453c6fa2d7"
 

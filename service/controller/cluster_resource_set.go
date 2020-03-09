@@ -38,6 +38,8 @@ type ClusterResourceSetConfig struct {
 	RandomkeysSearcher randomkeys.Interface
 	TenantCluster      tenantcluster.Interface
 
+	ClusterRoleGeneral string
+	ClusterRolePSP     string
 	DNSServers         string
 	GuestUpdateEnabled bool
 	IgnitionPath       string
@@ -71,6 +73,9 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := clusterrolebinding.Config{
 			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
+
+			ClusterRoleGeneral: config.ClusterRoleGeneral,
+			ClusterRolePSP:     config.ClusterRolePSP,
 		}
 
 		ops, err := clusterrolebinding.New(c)
@@ -286,7 +291,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if key.OperatorVersion(cr) == project.BundleVersion() {
+		if key.OperatorVersion(cr) == project.Version() {
 			return true
 		}
 

@@ -53,25 +53,29 @@
   revision = "25d852aebe32c875e9c044af3eef9c7dc6bc777f"
 
 [[projects]]
-  branch = "master"
-  digest = "1:2f9b3a4dc1447d6b0143e2416125989df27d522989afc22031740ff4782befc1"
+  digest = "1:2e5292ca7e290a14dac63dd9456678796cbfc0a9b2c393f727e817f8166972c2"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
+    "pkg/apis/backup/v1alpha1",
     "pkg/apis/core/v1alpha1",
     "pkg/apis/example/v1alpha1",
+    "pkg/apis/infrastructure/v1alpha2",
     "pkg/apis/provider/v1alpha1",
     "pkg/apis/release/v1alpha1",
     "pkg/clientset/versioned",
     "pkg/clientset/versioned/scheme",
     "pkg/clientset/versioned/typed/application/v1alpha1",
+    "pkg/clientset/versioned/typed/backup/v1alpha1",
     "pkg/clientset/versioned/typed/core/v1alpha1",
     "pkg/clientset/versioned/typed/example/v1alpha1",
+    "pkg/clientset/versioned/typed/infrastructure/v1alpha2",
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/release/v1alpha1",
   ]
   pruneopts = "NUT"
-  revision = "a4fd7939e26e7e2cd681af032963a1597ffae781"
+  revision = "4fafaaae7e2eb887a8a268213f28a518a1618c3d"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
@@ -91,11 +95,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:91c99bd60da349380e5912ca7a44de1ad3dc5540b6469685cd88fd6779c7ff2e"
+  digest = "1:2673e930820371280627226d65918e45097a145a656fc1d7a92505f26610d3cf"
   name = "github.com/giantswarm/errors"
   packages = ["tenant"]
   pruneopts = "NUT"
-  revision = "e5b9af3cd373291dff7fc430e3f76bfd2b06b98b"
+  revision = "924f9ee3873810de9f288da9bbab5246de195f41"
 
 [[projects]]
   branch = "master"
@@ -103,30 +107,30 @@
   name = "github.com/giantswarm/exporterkit"
   packages = ["collector"]
   pruneopts = "NUT"
-  revision = "9749deade60f7624620aa7158a4f38c87ea23795"
+  revision = "f0bfcc3891312fd674c9bdfb6ebeb744abca6cdc"
 
 [[projects]]
   branch = "master"
-  digest = "1:192024336fb15f559cf02be585979b047bc21cbe4adb013bddc1cb4400d05e9b"
+  digest = "1:24ee48340ce292867c3668af8c35d84f8dd059a66f666174ff6fee82bdb5bcdd"
   name = "github.com/giantswarm/k8sclient"
   packages = [
     ".",
     "k8scrdclient",
     "k8srestconfig",
+    "k8sversion",
   ]
   pruneopts = "NUT"
-  revision = "6cb127468cd6b30eaf8030b875f796e34b481938"
+  revision = "cf4472eea4ab86c5ef99c309da519c3c377812d6"
 
 [[projects]]
-  branch = "master"
   digest = "1:13a2f490ed6247f05c7c6e8fd43067830468cdb834d8967020c5428b67abb9b8"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "e0ebc4ecf5a515b8f2a33257d08962e387120a77"
+  revision = "e8fe0fa9c0097ca80d8b773e1d728843447f9233"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
   digest = "1:e3cc69fc27efd2da93ffb4e0493c0f1f398193b1a8e236450d740e9b0f02cae3"
   name = "github.com/giantswarm/micrologger"
   packages = [
@@ -134,7 +138,8 @@
     "loggermeta",
   ]
   pruneopts = "NUT"
-  revision = "d866337f739365a54de5924b8a7b29df17693ef8"
+  revision = "c4d217562e3d493e3ff571707346a5a2653475cb"
+  version = "v0.1.1"
 
 [[projects]]
   branch = "master"
@@ -153,7 +158,7 @@
   name = "github.com/giantswarm/tenantcluster"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "800974a4d4bffd6f8f521b30f5fd353d1072e518"
+  revision = "995dd6182932ec283ea8b1dd0906edfdea265dca"
 
 [[projects]]
   digest = "1:cbaf38b2bee7034fdcc5ce2b479d21b6b6a3eac57c9a9aee0d0e5d73b68742b8"
