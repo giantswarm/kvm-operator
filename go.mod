@@ -13,9 +13,9 @@ require (
 	github.com/giantswarm/k8sclient v0.0.0-20191209120459-6cb127468cd6
 	github.com/giantswarm/k8scloudconfig v0.0.0-20200205190026-d3b7a47828ab
 	github.com/giantswarm/microendpoint v0.0.0-20191121160659-e991deac2653
-	github.com/giantswarm/microerror v0.1.1-0.20200205143715-01b76f66cae6
+	github.com/giantswarm/microerror v0.2.0
 	github.com/giantswarm/microkit v0.0.0-20191023091504-429e22e73d3e
-	github.com/giantswarm/micrologger v0.0.0-20191014091141-d866337f7393
+	github.com/giantswarm/micrologger v0.2.0
 	github.com/giantswarm/operatorkit v0.0.0-20200116124438-aa7ed9599161
 	github.com/giantswarm/randomkeys v0.0.0-20191209104518-5e18457bd062
 	github.com/giantswarm/statusresource v0.0.0-20200103225110-1c017ce979b3

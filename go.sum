@@ -90,10 +90,14 @@ github.com/giantswarm/microendpoint v0.0.0-20191121160659-e991deac2653 h1:Waqhlm
 github.com/giantswarm/microendpoint v0.0.0-20191121160659-e991deac2653/go.mod h1:iQTWvzCDJlxL73OkcnpdKX38ilb5jsc7v+v8xaC8UoA=
 github.com/giantswarm/microerror v0.1.1-0.20200205143715-01b76f66cae6 h1:lJr756ZiXB9+n9pCUjMMNKKf+Lli3qQsybugFxx7Gjo=
 github.com/giantswarm/microerror v0.1.1-0.20200205143715-01b76f66cae6/go.mod h1://Lo9dKJ8P2TBciuky5fDHEItccyvZOWE+B/0JiJT8A=
+github.com/giantswarm/microerror v0.2.0 h1:SaE7S34mp/wEiQkgtPiq8wQbNUTCj1gjiCWPjO3wgJo=
+github.com/giantswarm/microerror v0.2.0/go.mod h1:1YtJq/m7Vlq1Y6NP7B+SODOKCGlG7e5wctV2OoE9n34=
 github.com/giantswarm/microkit v0.0.0-20191023091504-429e22e73d3e h1:c+kUsCmMVj5P9agp0LRVkm5hw6ah1ehkfIKMQ7B3olU=
 github.com/giantswarm/microkit v0.0.0-20191023091504-429e22e73d3e/go.mod h1:y/zU2Vjkl4j0giDU9DzGDdn6xI1GvK6bOftcGZUQpT8=
 github.com/giantswarm/micrologger v0.0.0-20191014091141-d866337f7393 h1:iwdDYJLDPkWo71fPO57Q40qNsjpXlH/KNznqgByo0xA=
 github.com/giantswarm/micrologger v0.0.0-20191014091141-d866337f7393/go.mod h1:2O9GG1AfKI8px8oseWx+TTD6A6aEdUo16ZjAKv2wOVk=
+github.com/giantswarm/micrologger v0.2.0 h1:i7Es9bPIEvhbQReBDMu5tGFHqWhKn+zm1GWSs6hRqcs=
+github.com/giantswarm/micrologger v0.2.0/go.mod h1:o1/RnIxubY0IMIc1KUBg3V5R9WA5ZoC/6AkE4nghvfM=
 github.com/giantswarm/operatorkit v0.0.0-20200116124438-aa7ed9599161 h1:QVbYJD+3662bUbBUsXx3n7yF+G+Pg9Ws7cPVV66IX8A=
 github.com/giantswarm/operatorkit v0.0.0-20200116124438-aa7ed9599161/go.mod h1:DICRKEMaDdOkKQ8udFogj698gJBBAYSj3eZM1PoZzeQ=
 github.com/giantswarm/randomkeys v0.0.0-20191209104518-5e18457bd062 h1:4n9wk7YeT+htVGiB0l0oW4cOJ7bNYlmtnkYa+YfGCP0=
@@ -154,6 +158,7 @@ github.com/go-openapi/swag v0.19.2/go.mod h1:POnQmlKehdgb5mhVOsnJFsivZCEZ/vjK9gh
 github.com/go-openapi/swag v0.19.5/go.mod h1:POnQmlKehdgb5mhVOsnJFsivZCEZ/vjK9gh66Z9tfKk=
 github.com/go-openapi/validate v0.18.0/go.mod h1:Uh4HdOzKt19xGIGm1qHf/ofbX1YQ4Y+MYsct2VUrAJ4=
 github.com/go-openapi/validate v0.19.2/go.mod h1:1tRCw7m3jtI8eNWEEliiAqUIcBztB2KDnRCRMUi7GTA=
+github.com/go-stack/stack v1.7.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/go-stack/stack v1.8.0 h1:5SgMzNM5HxrEjV0ww2lTmX6E2Izsfxas4+YHWRs3Lsk=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/gogo/protobuf v1.1.1/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
@@ -493,8 +498,8 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 h1:YR8cESwS4TdDjEe65xsg0ogRM/Nc3DYOhEAlW+xobZo=
 gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
-gopkg.in/fsnotify/fsnotify.v1 v1.4.7 h1:XNNYLJHt73EyYiCZi6+xjupS9CpvmiDgjPTAjrBlQbo=
-gopkg.in/fsnotify/fsnotify.v1 v1.4.7/go.mod h1:Fyux9zXlo4rWoMSIzpn9fDAYjalPqJ/K1qJ27s+7ltE=
+gopkg.in/fsnotify.v1 v1.4.7 h1:xOHLXZwVvI9hhs+cLKq5+I5onOuwQLhQwiu63xxlHs4=
+gopkg.in/fsnotify.v1 v1.4.7/go.mod h1:Tz8NjZHkW78fSQdbUxIjBTcgA1z1m8ZHf0WmKUhAMys=
 gopkg.in/inf.v0 v0.9.0/go.mod h1:cWUDdTG/fYaXco+Dcufb5Vnc6Gp2YChqWtbxRZE0mXw=
 gopkg.in/inf.v0 v0.9.1 h1:73M5CoZyi3ZLMOyDlQh031Cx6N9NDJ2Vvfl76EDAgDc=
 gopkg.in/inf.v0 v0.9.1/go.mod h1:cWUDdTG/fYaXco+Dcufb5Vnc6Gp2YChqWtbxRZE0mXw=
