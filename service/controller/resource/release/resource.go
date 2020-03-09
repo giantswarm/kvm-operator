@@ -11,13 +11,13 @@ const (
 )
 
 type Config struct {
-	G8sClient     versioned.Interface
-	Logger        micrologger.Logger
+	G8sClient versioned.Interface
+	Logger    micrologger.Logger
 }
 
 type Resource struct {
-	g8sClient     versioned.Interface
-	logger        micrologger.Logger
+	g8sClient versioned.Interface
+	logger    micrologger.Logger
 }
 
 func New(config Config) (*Resource, error) {
@@ -29,8 +29,8 @@ func New(config Config) (*Resource, error) {
 	}
 
 	r := &Resource{
-		g8sClient:     config.G8sClient,
-		logger:        config.Logger,
+		g8sClient: config.G8sClient,
+		logger:    config.Logger,
 	}
 
 	return r, nil
