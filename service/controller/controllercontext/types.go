@@ -1,9 +1,9 @@
 package controllercontext
 
 type ComponentVersions struct {
-	Calico string
+	Calico         string
 	Containerlinux string
-	CoreDNS string
-	Etcd string
-	Kubernetes string
+	CoreDNS        string
+	Etcd           string
+	Kubernetes     string
 }

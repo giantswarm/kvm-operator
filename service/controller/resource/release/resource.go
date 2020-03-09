@@ -1,10 +1,9 @@
 package node
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster"
-	"k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -12,32 +11,26 @@ const (
 )
 
 type Config struct {
-	K8sClient     kubernetes.Interface
+	G8sClient     versioned.Interface
 	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
 }
 
 type Resource struct {
-	k8sClient     kubernetes.Interface
+	g8sClient     versioned.Interface
 	logger        micrologger.Logger
-	tenantCluster tenantcluster.Interface
 }
 
 func New(config Config) (*Resource, error) {
-	if config.K8sClient == nil {
+	if config.G8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-	if config.TenantCluster == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
-	}
 
 	r := &Resource{
-		k8sClient:     config.K8sClient,
+		g8sClient:     config.G8sClient,
 		logger:        config.Logger,
-		tenantCluster: config.TenantCluster,
 	}
 
 	return r, nil
