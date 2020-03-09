@@ -10,6 +10,8 @@ type Params struct {
 	APIServerEncryptionKey string
 	BaseDomain             string
 	Cluster                v1alpha1.Cluster
+	// Debug options
+	Debug Debug
 	// DisableCalico flag. When set removes all calico related Kubernetes
 	// manifests from the cloud config together with their initialization.
 	DisableCalico bool
@@ -50,6 +52,12 @@ type Params struct {
 
 func (p *Params) Validate() error {
 	return nil
+}
+
+type Debug struct {
+	Enabled    bool
+	LogsPrefix string
+	LogsToken  string
 }
 
 type Images struct {

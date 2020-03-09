@@ -42,7 +42,7 @@ required = [
   name = "github.com/giantswarm/operatorkit"
 
 [[constraint]]
-  branch = "master"
+  version = "~0.1.0"
   name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]
@@ -58,11 +58,11 @@ required = [
   name = "github.com/giantswarm/tenantcluster"
 
 [[constraint]]
-  branch = "master"
+  version = "~0.1.0"
   name = "github.com/giantswarm/microerror"
 
 [[constraint]]
-  branch = "master"
+  version = "~v0.1.0"
   name = "github.com/giantswarm/micrologger"
 
 [[constraint]]
@@ -84,11 +84,6 @@ required = [
 [[constraint]]
   name = "k8s.io/client-go"
   version = "kubernetes-1.16.3"
-
-
-[[override]]
-  name = "k8s.io/kubernetes"
-  version = "v1.16.3"
 
 [[override]]
   name = "k8s.io/cli-runtime"
