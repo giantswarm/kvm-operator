@@ -6,23 +6,31 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/randomkeys"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
+	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
+	"github.com/giantswarm/kvm-operator/service/controller/controllercontext"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customResource, err := key.ToCustomObject(obj)
+	cr, err := key.ToCustomObject(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	cc, err := controllercontext.FromContext(ctx)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new config maps")
 
-	configMaps, err := r.newConfigMaps(customResource)
+	configMaps, err := r.newConfigMaps(cr, cc.Spec.Versions)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -32,31 +40,39 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return configMaps, nil
 }
 
-func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.ConfigMap, error) {
+func (r *Resource) newConfigMaps(cr v1alpha1.KVMConfig, versions controllercontext.ComponentVersions) ([]*corev1.ConfigMap, error) {
 	var configMaps []*corev1.ConfigMap
 
-	certs, err := r.certsSearcher.SearchCluster(key.ClusterID(customResource))
+	certs, err := r.certsSearcher.SearchCluster(key.ClusterID(cr))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	keys, err := r.keyWatcher.SearchCluster(key.ClusterID(customResource))
+	keys, err := r.keyWatcher.SearchCluster(key.ClusterID(cr))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	for _, node := range customResource.Spec.Cluster.Masters {
-		nodeIdx, exists := key.NodeIndex(customResource, node.ID)
+	for _, node := range cr.Spec.Cluster.Masters {
+		nodeIdx, exists := key.NodeIndex(cr, node.ID)
 		if !exists {
 			return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for master (%q) is not available", node.ID))
 		}
 
-		template, err := r.cloudConfig.NewMasterTemplate(customResource, certs, node, keys, nodeIdx)
+		params := cloudconfig.MasterTemplateParams{
+			CR:         cr,
+			Certs:      certs,
+			Node:       node,
+			RandomKeys: keys,
+			NodeIndex:  nodeIdx,
+			Versions:   nil,
+		}
+		template, err := r.cloudConfig.NewMasterTemplate(params)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		configMap, err := r.newConfigMap(customResource, template, node, key.MasterID)
+		configMap, err := r.newConfigMap(cr, template, node, key.MasterID)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -9,58 +9,70 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/randomkeys"
 
+	"github.com/giantswarm/kvm-operator/service/controller/controllercontext"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
+type MasterTemplateParams struct {
+	CR v1alpha1.KVMConfig
+	Certs certs.Cluster
+	Node v1alpha1.ClusterNode
+	RandomKeys randomkeys.Cluster
+	NodeIndex int
+	Versions controllercontext.ComponentVersions
+}
+
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, randomKeys randomkeys.Cluster, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(controllerParams MasterTemplateParams) (string, error) {
 	var err error
 
-	var params k8scloudconfig.Params
+	var ignitionParams k8scloudconfig.Params
 	{
-		params = k8scloudconfig.DefaultParams()
+		ignitionParams = k8scloudconfig.DefaultParams()
 
-		params.APIServerEncryptionKey = string(randomKeys.APIServerEncryptionKey)
-		params.BaseDomain = key.BaseDomain(customObject)
-		params.Cluster = customObject.Spec.Cluster
+		ignitionParams.APIServerEncryptionKey = string(controllerParams.RandomKeys.APIServerEncryptionKey)
+		ignitionParams.BaseDomain = key.BaseDomain(controllerParams.CR)
+		ignitionParams.Cluster = controllerParams.CR.Spec.Cluster
 		// Ingress controller service remains in k8scloudconfig and will be
 		// removed in a later migration.
-		params.DisableIngressControllerService = false
-		params.Extension = &masterExtension{
-			certs:        certs,
-			customObject: customObject,
-			nodeIndex:    nodeIndex,
+		ignitionParams.DisableIngressControllerService = false
+		ignitionParams.Extension = &masterExtension{
+			certs:        controllerParams.Certs,
+			customObject: controllerParams.CR,
+			nodeIndex:    controllerParams.NodeIndex,
 		}
-		params.Node = node
-		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
-		params.SSOPublicKey = c.ssoPublicKey
+		ignitionParams.Node = controllerParams.Node
+		ignitionParams.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
+		ignitionParams.SSOPublicKey = c.ssoPublicKey
+		ignitionParams.Images.Kubernetes = fmt.Sprintf(ignitionParams.Images.Kubernetes, controllerParams.Versions.Kubernetes)
+		ignitionParams.Images.Etcd = fmt.Sprintf(ignitionParams.Images.Etcd, controllerParams.Versions.Etcd)
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
-		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
+		ignitionParams.Files, err = k8scloudconfig.RenderFiles(ignitionPath, ignitionParams)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
 	}
 
-	var newCloudConfig *k8scloudconfig.CloudConfig
+	var renderedIgnition *k8scloudconfig.CloudConfig
 	{
-		cloudConfigConfig := k8scloudconfig.DefaultCloudConfigConfig()
-		cloudConfigConfig.Params = params
-		cloudConfigConfig.Template = k8scloudconfig.MasterTemplate
+		ignitionConfig := k8scloudconfig.DefaultCloudConfigConfig()
+		ignitionConfig.Params = ignitionParams
+		ignitionConfig.Template = k8scloudconfig.MasterTemplate
 
-		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
+		renderedIgnition, err = k8scloudconfig.NewCloudConfig(ignitionConfig)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
 
-		err = newCloudConfig.ExecuteTemplate()
+		err = renderedIgnition.ExecuteTemplate()
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
 	}
 
-	return newCloudConfig.Base64(), nil
+	return renderedIgnition.Base64(), nil
 }
 
 type masterExtension struct {
