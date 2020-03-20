@@ -1,4 +1,7 @@
-version: 2
+orbs:
+  architect: giantswarm/architect@0.5.2
+
+version: 2.1
 jobs:
   build:
     machine: true
@@ -9,11 +12,74 @@ jobs:
         wget -q $(curl -sS -H "Authorization: token $RELEASE_TOKEN" https://api.github.com/repos/giantswarm/architect/releases/latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
         chmod +x ./architect
         ./architect version
+    - run: |
+        date +"%Y" > /tmp/year
+        date +"%m" > /tmp/month
+        date +"%d" > /tmp/day
+    - restore_cache:
+        keys:
+        - go-cache-v1-{{ checksum "/tmp/year" }}-{{ checksum "/tmp/month" }}-{{ checksum "/tmp/day" }}
+        - go-cache-v1-{{ checksum "/tmp/year" }}-{{ checksum "/tmp/month" }}
+        - go-cache-v1-{{ checksum "/tmp/year" }}
+
     - run: ./architect build
+
     - store_test_results:
         path: /tmp/results
-    - deploy:
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "thiccc" ]; then
-            ./architect deploy
-          fi
+
+    - save_cache:
+        key: go-cache-v1-{{ checksum "/tmp/year" }}-{{ checksum "/tmp/month" }}-{{ checksum "/tmp/day" }}
+        paths:
+        - /tmp/go/cache
+
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ./kvm-operator
+
+workflows:
+  build:
+    jobs:
+      - build:
+          filters:
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-docker:
+          name: push-kvm-operator-to-quay
+          image: "quay.io/giantswarm/kvm-operator"
+          username_envar: "QUAY_USERNAME"
+          password_envar: "QUAY_PASSWORD"
+          requires:
+            - build
+          filters:
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-catalog:
+          name: push-kvm-operator-to-control-plane-app-catalog
+          app_catalog: "control-plane-catalog"
+          app_catalog_test: "control-plane-test-catalog"
+          chart: "kvm-operator"
+          requires:
+            - push-kvm-operator-to-quay
+          filters:
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-collection:
+          name: push-kvm-operator-to-kvm-app-collection
+          app_name: "kvm-operator"
+          app_collection_repo: "kvm-app-collection"
+          requires:
+            - push-kvm-operator-to-control-plane-app-catalog
+          filters:
+            # Do not trigger the job on commit.
+            branches:
+              ignore: /.*/
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
