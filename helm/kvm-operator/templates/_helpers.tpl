@@ -18,6 +18,7 @@ Common labels
 */}}
 {{- define "kvm-operator.labels" -}}
 helm.sh/chart: {{ include "kvm-operator.chart" . | quote }}
+app: {{ include "kvm-operator.name" . | quote }}
 {{ include "kvm-operator.selectorLabels" . | quote }}
 app.giantswarm.io/branch: {{ .Values.project.branch | quote }}
 app.giantswarm.io/commit: {{ .Values.project.commit | quote }}
