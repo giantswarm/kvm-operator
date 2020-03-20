@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/resource/crud"
 	apiv1 "k8s.io/api/core/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v25/key"
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {

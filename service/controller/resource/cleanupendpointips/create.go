@@ -7,7 +7,7 @@ import (
 
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient"
-	"github.com/giantswarm/kvm-operator/service/controller/v25/key"
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/tenantcluster"
 	corev1 "k8s.io/api/core/v1"

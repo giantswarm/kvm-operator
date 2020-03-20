@@ -1,4 +1,4 @@
-package v25
+package controller
 
 import (
 	"github.com/giantswarm/microerror"
@@ -10,9 +10,9 @@ import (
 	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/kvm-operator/service/controller/v25/key"
-	"github.com/giantswarm/kvm-operator/service/controller/v25/resource/cleanupendpointips"
-	"github.com/giantswarm/kvm-operator/service/controller/v25/resource/node"
+	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/cleanupendpointips"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/node"
 )
 
 type DeleterResourceSetConfig struct {
