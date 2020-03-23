@@ -5,7 +5,7 @@ metadata:
   namespace: {{ tpl .Values.resource.default.namespace }}
   labels:
     app: {{ tpl .Values.resource.default.name }}
-    version: {{ tpl .Values.project.version }}
+    version: {{ .Values.project.version }}
 spec:
   replicas: 1
   revisionHistoryLimit: 3
@@ -20,10 +20,10 @@ spec:
         releasetime: {{ $.Release.Time }}
       labels:
         app: {{ tpl .Values.resource.default.name }}
-        version: {{ tpl .Values.project.version }}
+        version: {{ .Values.project.version }}
     spec:
       volumes:
-      - name: {{ tpl .Values.project.name }}-configmap
+      - name: {{ .Values.project.name }}-configmap
         configMap:
           name: {{ tpl .Values.resource.default.name  . }}
           items:
@@ -31,10 +31,10 @@ spec:
             path: config.yml
       serviceAccountName: {{ tpl .Values.resource.default.name  . }}
       securityContext:
-        runAsUser: {{ tpl .Values.pod.user.id }}
-        runAsGroup: {{ tpl .Values.pod.group.id }}
+        runAsUser: {{ .Values.pod.user.id }}
+        runAsGroup: {{ .Values.pod.group.id }}
       containers:
-      - name: {{ tpl .Values.project.name }}
+      - name: {{ .Values.project.name }}
         image: "{{ .Values.Installation.V1.Registry.Domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
         args:
         - daemon
