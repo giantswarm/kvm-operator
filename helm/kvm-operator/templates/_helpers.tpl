@@ -20,10 +20,10 @@ Common labels
 app: {{ include "kvm-operator.name" . | quote }}
 app.giantswarm.io/branch: {{ .Values.project.branch | quote }}
 app.giantswarm.io/commit: {{ .Values.project.commit | quote }}
-{{ include "kvm-operator.selectorLabels" . | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 helm.sh/chart: {{ include "kvm-operator.chart" . | quote }}
+{{ include "kvm-operator.selectorLabels" . | quote }}
 {{- end -}}
 
 {{/*
