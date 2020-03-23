@@ -2,6 +2,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ tpl .Values.resource.default.name  . }}
+  labels:
+    {{- include "kvm-operator.labels" . | nindent 4 }}
 rules:
   - apiGroups:
       - apiextensions.k8s.io
@@ -116,6 +118,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: {{ tpl .Values.resource.default.name  . }}
+  labels:
+    {{- include "kvm-operator.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
     name: {{ tpl .Values.resource.default.name  . }}
@@ -129,6 +133,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ tpl .Values.resource.psp.name . }}
+  labels:
+    {{- include "kvm-operator.labels" . | nindent 4 }}
 rules:
   - apiGroups:
       - policy
@@ -143,6 +149,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: {{ tpl .Values.resource.psp.name . }}
+  labels:
+    {{- include "kvm-operator.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
     name: {{ tpl .Values.resource.default.name  . }}
