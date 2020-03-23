@@ -17,19 +17,19 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "kvm-operator.labels" -}}
-helm.sh/chart: {{ include "kvm-operator.chart" . | quote }}
 app: {{ include "kvm-operator.name" . | quote }}
-{{ include "kvm-operator.selectorLabels" . | quote }}
 app.giantswarm.io/branch: {{ .Values.project.branch | quote }}
 app.giantswarm.io/commit: {{ .Values.project.commit | quote }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{ include "kvm-operator.selectorLabels" . | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+helm.sh/chart: {{ include "kvm-operator.chart" . | quote }}
 {{- end -}}
 
 {{/*
 Selector labels
 */}}
 {{- define "kvm-operator.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kvm-operator.name" . | quote }}
 app.kubernetes.io/instance: {{ .Release.Name | quote }}
+app.kubernetes.io/name: {{ include "kvm-operator.name" . | quote }}
 {{- end -}}
