@@ -1,4 +1,4 @@
-kvm-operator
+./kvm-operator
 TODO
 !vendor/**
 .e2e-harness
