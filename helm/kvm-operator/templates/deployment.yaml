@@ -41,7 +41,7 @@ spec:
         - --config.dirs=/var/run/{{ .Values.project.name }}/configmap/
         - --config.files=config
         volumeMounts:
-        - name: {{ tpl .Values.project.name }}-configmap
+        - name: {{ tpl .Values.project.name . }}-configmap
           mountPath: /var/run/{{ .Values.project.name }}/configmap/
         livenessProbe:
           httpGet:
