@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/cleanupendpointips"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/node"
@@ -32,7 +33,7 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if key.VersionBundleVersion(kvmConfig) == VersionBundle().Version {
+		if key.VersionBundleVersion(kvmConfig) == project.NewVersionBundle().Version {
 			return true
 		}
 

@@ -18,6 +18,7 @@ import (
 	"github.com/giantswarm/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/clusterrolebinding"
@@ -287,7 +288,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if key.VersionBundleVersion(kvmConfig) == VersionBundle().Version {
+		if key.VersionBundleVersion(kvmConfig) == project.NewVersionBundle().Version {
 			return true
 		}
 

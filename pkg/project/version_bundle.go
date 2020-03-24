@@ -1,10 +1,10 @@
-package controller
+package project
 
 import (
 	"github.com/giantswarm/versionbundle"
 )
 
-func VersionBundle() versionbundle.Bundle {
+func NewVersionBundle() versionbundle.Bundle {
 	return versionbundle.Bundle{
 		Changelogs: []versionbundle.Changelog{
 			{

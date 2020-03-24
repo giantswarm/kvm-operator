@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/endpoint"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/pod"
@@ -36,7 +37,7 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if v == VersionBundle().Version {
+		if v == project.NewVersionBundle().Version {
 			return true
 		}
 
