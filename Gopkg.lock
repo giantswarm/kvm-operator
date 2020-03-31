@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:f313598719f69ec4edbcd75b0f2ef1c8ed9e00f6ff3d7583ac3966db2d70d326"
+  name = "github.com/Masterminds/semver"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "910aa146bd66780c2815d652b92a7fc5331e533c"
+  version = "v3.0.3"
+
+[[projects]]
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
@@ -69,8 +77,8 @@
   revision = "25d852aebe32c875e9c044af3eef9c7dc6bc777f"
 
 [[projects]]
-  branch = "master"
-  digest = "1:a15eeeca106bf7ebdb49f8fca2049998920ed4db120428826e6a41d3fa2abf66"
+  branch = "legacy-1-15"
+  digest = "1:238761e31bb6db2517d9d0a27e493d25f660dc228d3fce662acee035df072c36"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
@@ -93,7 +101,7 @@
     "pkg/clientset/versioned/typed/release/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "5b63264633ed62e1a49f15bca81aaaea827d7c81"
+  revision = "a0c93c7868c20e2dde7968dc31c62a0f18826a79"
 
 [[projects]]
   branch = "master"
@@ -143,26 +151,19 @@
   revision = "6cb127468cd6b30eaf8030b875f796e34b481938"
 
 [[projects]]
-  branch = "master"
-  digest = "1:14fa862ce8bf18d15458756d7a54a1b0600af3dcd081b640c4ccf3b25b6dbeed"
+  digest = "1:43b68f4e77ac094f072817162eb425b4e14b205e6755d0e747aa8c25007bd586"
   name = "github.com/giantswarm/k8scloudconfig"
   packages = [
     "ignition/v_2_2_0",
-    "v_4_1_1",
-    "v_4_3_0",
-    "v_4_4_0",
-    "v_4_5_0",
-    "v_4_5_1",
-    "v_4_7_0",
     "v_4_9_0",
-    "v_5_0_0",
+    "v_4_9_1",
   ]
   pruneopts = "T"
-  revision = "fc73e24eef985abf900de5e29e96e015ac1bbe9b"
+  revision = "3e566b1810ccec3dea6ad8de43f40c7aefab7840"
+  version = "v0.1.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:568716a2e87ca3f4fb9bce7f65b8491a2ab92c97adee4b2b750b1d76c709b183"
+  digest = "1:a4aed1ecd42d811ea6ab995570be14a7e1d1fb7eaae45d76f6f2841d6124f7b8"
   name = "github.com/giantswarm/microendpoint"
   packages = [
     "endpoint/healthz",
@@ -171,15 +172,16 @@
     "service/version",
   ]
   pruneopts = "UT"
-  revision = "e991deac265373d9347b96ecc56b13f228be144f"
+  revision = "f91fa28005bff806f4013d1dc7136da199e8e6a5"
+  version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:d80347cb345b2986422040821735ae0efba8b8093b765b146b90796d926b85b4"
+  digest = "1:701a5f5a7297ced0c7b9aeeba6a40ef47663b956d56e7acd09fe0d1c31eb1e4b"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e0ebc4ecf5a515b8f2a33257d08962e387120a77"
+  revision = "e8fe0fa9c0097ca80d8b773e1d728843447f9233"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
@@ -205,8 +207,7 @@
   revision = "429e22e73d3e1ccfbc9311baa3ea9526423debdf"
 
 [[projects]]
-  branch = "master"
-  digest = "1:c313924ca7110c452a83502384552f4dd2ed25dd0f3ab8aa8a34707315243561"
+  digest = "1:4e616fe01d486048e77342e2c5e638f8744ec6da802335633740aafb057f50d8"
   name = "github.com/giantswarm/micrologger"
   packages = [
     ".",
@@ -214,11 +215,11 @@
     "microloggertest",
   ]
   pruneopts = "UT"
-  revision = "d866337f739365a54de5924b8a7b29df17693ef8"
+  revision = "c4d217562e3d493e3ff571707346a5a2653475cb"
+  version = "v0.1.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:e35bb8852e24edcf07a8ebf2f0a488ff21a8686ab105963a5d712c77e24bf005"
+  digest = "1:b9df69a458f014f1e52a0683096aaebb5bcd951bdbd1542462ceadd47c0e6ec3"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "controller",
@@ -237,7 +238,8 @@
     "resource/wrapper/retryresource",
   ]
   pruneopts = "UT"
-  revision = "aa7ed959916171a1bc18c4f5ecf4b680c7e4af9e"
+  revision = "dd706952dc11009bcb15fa8ea95b35de759c1d3f"
+  version = "v0.1.0"
 
 [[projects]]
   branch = "master"
@@ -275,12 +277,12 @@
   revision = "f2078541ec95746f9e8631c944a16592d185b2d7"
 
 [[projects]]
-  branch = "master"
-  digest = "1:90fda7152f6ded9c45d67bee5f23f2d8f148eb15672f30030c095e08eccf02b0"
+  digest = "1:a7f066d94d62caeea24032011b3caa69efddd56ad62e6e401d8f8448c30239ec"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
   pruneopts = "UT"
-  revision = "be95231628aed039183214a0e337bfe621e3072a"
+  revision = "778392a99b4b04d46a480fe21cbf4547d194600c"
+  version = "v0.1.0"
 
 [[projects]]
   digest = "1:83a37f3bd4ccd13469775ef771e943e6c7cfaba6926decff6c83135e56512f08"
@@ -352,17 +354,18 @@
   version = "v1.3.2"
 
 [[projects]]
-  digest = "1:2e3c336fc7fde5c984d2841455a658a6d626450b1754a854b3b32e7a8f49a07a"
+  digest = "1:1d1cbf539d9ac35eb3148129f96be5537f1a1330cadcc7e3a83b4e72a59672a3"
   name = "github.com/google/go-cmp"
   packages = [
     "cmp",
     "cmp/internal/diff",
+    "cmp/internal/flags",
     "cmp/internal/function",
     "cmp/internal/value",
   ]
   pruneopts = "UT"
-  revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
-  version = "v0.2.0"
+  revision = "2d0692c2e9617365a95b295612ac0d4415ba4627"
+  version = "v0.3.1"
 
 [[projects]]
   digest = "1:a6181aca1fd5e27103f9a920876f29ac72854df7345a39f3b01e61c8c94cc8af"
@@ -809,11 +812,10 @@
   version = "v2.2.7"
 
 [[projects]]
-  digest = "1:41a8785ce0732e00b09a1a95f23c826e2864e6f6b2a5d305f412687f4f936c76"
+  digest = "1:975093e79aee83503409c504150df7f727c34395553b49f2a4787a58a95097d2"
   name = "k8s.io/api"
   packages = [
     "admission/v1beta1",
-    "admissionregistration/v1",
     "admissionregistration/v1beta1",
     "apps/v1",
     "apps/v1beta1",
@@ -833,7 +835,6 @@
     "coordination/v1",
     "coordination/v1beta1",
     "core/v1",
-    "discovery/v1alpha1",
     "events/v1beta1",
     "extensions/v1beta1",
     "networking/v1",
@@ -853,30 +854,27 @@
     "storage/v1beta1",
   ]
   pruneopts = "UT"
-  revision = "16d7abae0d2a8ab2a6a7ad1bf3300eaacd541f56"
-  version = "kubernetes-1.16.3"
+  revision = "c0fde1b6690b289e44d835b4ebb98a42b2ab8e7f"
+  version = "kubernetes-1.15.11"
 
 [[projects]]
-  digest = "1:5750bbcf3051ea23b48bfb39a43f20e0af7a0be569169b916bf2fcb016ede393"
+  digest = "1:720f17872db890bede54ef50268f5b0a0c21eb8e3d4413e0e2b060103966476a"
   name = "k8s.io/apiextensions-apiserver"
   packages = [
     "pkg/apis/apiextensions",
-    "pkg/apis/apiextensions/v1",
     "pkg/apis/apiextensions/v1beta1",
     "pkg/client/clientset/clientset",
     "pkg/client/clientset/clientset/scheme",
-    "pkg/client/clientset/clientset/typed/apiextensions/v1",
     "pkg/client/clientset/clientset/typed/apiextensions/v1beta1",
   ]
   pruneopts = "UT"
-  revision = "0278775368336f7d84795d0a903ea2a3a83cfd49"
-  version = "kubernetes-1.16.3"
+  revision = "3b4db33c402cdc8c02b57ee9b94456b1f7a84fa1"
+  version = "kubernetes-1.15.11"
 
 [[projects]]
-  digest = "1:76e979ab13ab7491b5f1191bda123c5f086bd4b96113617137136f83edbbb728"
+  digest = "1:313981d72da9257889215217007585fb0cfa204e18703fc80bdcec11e2ffc985"
   name = "k8s.io/apimachinery"
   packages = [
-    "pkg/api/equality",
     "pkg/api/errors",
     "pkg/api/meta",
     "pkg/api/resource",
@@ -923,8 +921,8 @@
     "third_party/forked/golang/reflect",
   ]
   pruneopts = "UT"
-  revision = "72ed19daf4bb788ae595ae4103c404cb0fa09c84"
-  version = "kubernetes-1.16.3"
+  revision = "0cd702f8b7f4e8e5d020950e1756cc7069edce18"
+  version = "kubernetes-1.15.11"
 
 [[projects]]
   digest = "1:894fa8e6814eb1c453692559c9892efc526953865e96a5206c90c7666a28f9b8"
@@ -935,11 +933,11 @@
     "pkg/endpoints/request",
   ]
   pruneopts = "UT"
-  revision = "9ca1dc5866829af144ff306b7d13fbab2157a818"
-  version = "kubernetes-1.16.3"
+  revision = "54b1e2328270e75e05916b4392c20443327f3832"
+  version = "kubernetes-1.15.11"
 
 [[projects]]
-  digest = "1:342eeb8c6dd38f9a6cd8fe90e6afa58014bfc954b0bc83e6e564e1fd8b2f2945"
+  digest = "1:fb7f31ce3c3cff1f9daa3a54ec59b1eade5b6203577feb1a86e9a8fc7e1ecfeb"
   name = "k8s.io/client-go"
   packages = [
     "discovery",
@@ -948,8 +946,6 @@
     "kubernetes",
     "kubernetes/fake",
     "kubernetes/scheme",
-    "kubernetes/typed/admissionregistration/v1",
-    "kubernetes/typed/admissionregistration/v1/fake",
     "kubernetes/typed/admissionregistration/v1beta1",
     "kubernetes/typed/admissionregistration/v1beta1/fake",
     "kubernetes/typed/apps/v1",
@@ -988,8 +984,6 @@
     "kubernetes/typed/coordination/v1beta1/fake",
     "kubernetes/typed/core/v1",
     "kubernetes/typed/core/v1/fake",
-    "kubernetes/typed/discovery/v1alpha1",
-    "kubernetes/typed/discovery/v1alpha1/fake",
     "kubernetes/typed/events/v1beta1",
     "kubernetes/typed/events/v1beta1/fake",
     "kubernetes/typed/extensions/v1beta1",
@@ -1056,8 +1050,8 @@
     "util/workqueue",
   ]
   pruneopts = "UT"
-  revision = "6c5935290e3335b200f75d874a19be3093e9c36b"
-  version = "kubernetes-1.16.3"
+  revision = "3dbadc3cbc24a58746259abd74bc7d12b8a8eccc"
+  version = "kubernetes-1.15.11"
 
 [[projects]]
   digest = "1:93e82f25d75aba18436ad1ac042cb49493f096011f2541075721ed6f9e05c044"
@@ -1148,14 +1142,8 @@
     "github.com/giantswarm/errors/tenant",
     "github.com/giantswarm/k8sclient",
     "github.com/giantswarm/k8sclient/k8srestconfig",
-    "github.com/giantswarm/k8scloudconfig/v_4_1_1",
-    "github.com/giantswarm/k8scloudconfig/v_4_3_0",
-    "github.com/giantswarm/k8scloudconfig/v_4_4_0",
-    "github.com/giantswarm/k8scloudconfig/v_4_5_0",
-    "github.com/giantswarm/k8scloudconfig/v_4_5_1",
-    "github.com/giantswarm/k8scloudconfig/v_4_7_0",
     "github.com/giantswarm/k8scloudconfig/v_4_9_0",
-    "github.com/giantswarm/k8scloudconfig/v_5_0_0",
+    "github.com/giantswarm/k8scloudconfig/v_4_9_1",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
     "github.com/giantswarm/microendpoint/endpoint/version",
     "github.com/giantswarm/microendpoint/service/version",

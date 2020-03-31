@@ -32,9 +32,9 @@ required = [
   name = "github.com/docker/distribution"
   branch = "master"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/apiextensions"
-  branch = "master"
+  branch = "legacy-1-15"
 
 [[constraint]]
   name = "github.com/giantswarm/certs"
@@ -48,29 +48,29 @@ required = [
   name = "github.com/giantswarm/k8sclient"
   branch = "master"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/k8scloudconfig"
-  branch = "master"
+  version = "~0.1.0"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/microendpoint"
-  branch = "master"
+  version = "~0.1.0"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/microerror"
-  branch = "master"
+  version = "~0.1.0"
 
 [[constraint]]
   name = "github.com/giantswarm/microkit"
   branch = "master"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/micrologger"
-  branch = "master"
+  version = "~0.1.0"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/operatorkit"
-  branch = "master"
+  version = "~0.1.0"
 
 [[constraint]]
   name = "github.com/giantswarm/randomkeys"
@@ -84,13 +84,13 @@ required = [
   name = "github.com/giantswarm/tenantcluster"
   branch = "master"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/versionbundle"
-  branch = "master"
+  version = "~0.1.0"
 
-[[constraint]]
+[[override]]
   name = "github.com/google/go-cmp"
-  version = "0.2.0"
+  version = "0.3.0"
 
 [[constraint]]
   name = "github.com/prometheus/client_golang"
@@ -100,37 +100,37 @@ required = [
   name = "github.com/spf13/viper"
   version = "1.0.0"
 
-[[constraint]]
+[[override]]
   name = "k8s.io/api"
-  version = "kubernetes-1.16.3"
+  version = "kubernetes-1.15.11"
 
-[[constraint]]
+[[override]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.16.3"
+  version = "kubernetes-1.15.11"
 
-[[constraint]]
+[[override]]
   name = "k8s.io/apiserver"
-  version = "kubernetes-1.16.3"
+  version = "kubernetes-1.15.11"
 
-[[constraint]]
-  name = "k8s.io/client-go"
-  version = "kubernetes-1.16.3"
+[[override]]
+  name = "k8s.io/apiextensions-apiserver"
+  version = "kubernetes-1.15.11"
 
 [[override]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.16.3"
+  version = "kubernetes-1.15.11"
 
 [[override]]
   name = "k8s.io/kubernetes"
-  version = "=v1.16.3"
+  version = "=v1.15.11"
 
 [[override]]
   name = "k8s.io/cli-runtime"
-  version = "kubernetes-1.16.3"
+  version = "kubernetes-1.15.11"
 
 [[override]]
   name = "k8s.io/component-base"
-  version = "kubernetes-1.16.3"
+  version = "kubernetes-1.15.11"
 
 [[override]]
   name = "sigs.k8s.io/kustomize"
