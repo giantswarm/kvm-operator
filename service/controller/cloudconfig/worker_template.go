@@ -13,18 +13,18 @@ import (
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewWorkerTemplate(data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
 	{
 		params = k8scloudconfig.DefaultParams()
 
-		params.BaseDomain = key.BaseDomain(customObject)
-		params.Cluster = customObject.Spec.Cluster
+		params.BaseDomain = key.BaseDomain(data.CustomObject)
+		params.Cluster = data.CustomObject.Spec.Cluster
 		params.Extension = &workerExtension{
-			certs:        certs,
-			customObject: customObject,
+			certs:        data.ClusterCerts,
+			customObject: data.CustomObject,
 			nodeIndex:    nodeIndex,
 		}
 		params.Node = node

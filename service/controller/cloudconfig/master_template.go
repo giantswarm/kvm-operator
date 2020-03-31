@@ -7,29 +7,28 @@ import (
 	"github.com/giantswarm/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_9_0"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/randomkeys"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, randomKeys randomkeys.Cluster, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
 	{
 		params = k8scloudconfig.DefaultParams()
 
-		params.APIServerEncryptionKey = string(randomKeys.APIServerEncryptionKey)
-		params.BaseDomain = key.BaseDomain(customObject)
-		params.Cluster = customObject.Spec.Cluster
+		params.APIServerEncryptionKey = string(data.ClusterKeys.APIServerEncryptionKey)
+		params.BaseDomain = key.BaseDomain(data.CustomObject)
+		params.Cluster = data.CustomObject.Spec.Cluster
 		// Ingress controller service remains in k8scloudconfig and will be
 		// removed in a later migration.
 		params.DisableIngressControllerService = false
 		params.Extension = &masterExtension{
-			certs:        certs,
-			customObject: customObject,
+			certs:        data.ClusterCerts,
+			customObject: data.CustomObject,
 			nodeIndex:    nodeIndex,
 		}
 		params.Node = node
