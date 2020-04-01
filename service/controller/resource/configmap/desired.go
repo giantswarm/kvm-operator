@@ -11,6 +11,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
+	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -51,7 +52,14 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 			return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for master (%q) is not available", node.ID))
 		}
 
-		template, err := r.cloudConfig.NewMasterTemplate(customResource, certs, node, keys, nodeIdx)
+		ignition := cloudconfig.IgnitionTemplateData{
+			CustomObject: customResource,
+			ClusterCerts: certs,
+			ClusterKeys:  keys,
+			// Images?
+		}
+
+		template, err := r.cloudConfig.NewMasterTemplate(ignition, node, nodeIdx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -70,7 +78,14 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 			return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for worker (%q) is not available", node.ID))
 		}
 
-		template, err := r.cloudConfig.NewWorkerTemplate(customResource, certs, node, nodeIdx)
+		ignition := cloudconfig.IgnitionTemplateData{
+			CustomObject: customResource,
+			ClusterCerts: certs,
+			ClusterKeys:  keys,
+			// Images?
+		}
+
+		template, err := r.cloudConfig.NewWorkerTemplate(ignition, node, nodeIdx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
