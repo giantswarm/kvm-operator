@@ -3,6 +3,7 @@ package configmap
 import (
 	"reflect"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -22,21 +23,25 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	CertsSearcher certs.Interface
-	CloudConfig   *cloudconfig.CloudConfig
-	K8sClient     kubernetes.Interface
-	KeyWatcher    randomkeys.Interface
-	Logger        micrologger.Logger
+	CertsSearcher  certs.Interface
+	CloudConfig    *cloudconfig.CloudConfig
+	G8sClient      versioned.Interface
+	K8sClient      kubernetes.Interface
+	KeyWatcher     randomkeys.Interface
+	Logger         micrologger.Logger
+	RegistryDomain string
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	certsSearcher certs.Interface
-	cloudConfig   *cloudconfig.CloudConfig
-	k8sClient     kubernetes.Interface
-	keyWatcher    randomkeys.Interface
-	logger        micrologger.Logger
+	certsSearcher  certs.Interface
+	cloudConfig    *cloudconfig.CloudConfig
+	g8sClient      versioned.Interface
+	k8sClient      kubernetes.Interface
+	keyWatcher     randomkeys.Interface
+	logger         micrologger.Logger
+	registryDomain string
 }
 
 // New creates a new configured config map resource.

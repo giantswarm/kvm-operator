@@ -5,10 +5,12 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_9_1"
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
@@ -46,6 +48,23 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 		return nil, microerror.Mask(err)
 	}
 
+	var release *releasev1alpha1.Release
+	{
+		releaseVersion := customResource.Labels[label.ReleaseVersion]
+		releaseName := fmt.Sprintf("v%s", releaseVersion)
+		release, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(releaseName, apismetav1.GetOptions{})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	versions, err := k8scloudconfig.ExtractComponentVersions(release.Spec.Components)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	images := k8scloudconfig.BuildImages(r.registryDomain, versions)
+
 	for _, node := range customResource.Spec.Cluster.Masters {
 		nodeIdx, exists := key.NodeIndex(customResource, node.ID)
 		if !exists {
@@ -56,7 +75,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 			CustomObject: customResource,
 			ClusterCerts: certs,
 			ClusterKeys:  keys,
-			// Images?
+			Images:       images,
 		}
 
 		template, err := r.cloudConfig.NewMasterTemplate(ignition, node, nodeIdx)
