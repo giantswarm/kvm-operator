@@ -315,7 +315,7 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 func MemoryQuantityMaster(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	q, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from node definition: ", err)
 	}
 	additionalMemory := resource.MustParse(baseMasterMemoryOverhead)
 	q.Add(additionalMemory)
@@ -332,13 +332,13 @@ func MemoryQuantityMaster(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	mQuantity, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error calculating memory overhead multiplier: ", err)
 	}
 
 	// base worker memory calculated in MB
 	q, err := resource.ParseQuantity(fmt.Sprintf("%dM", mQuantity.ScaledValue(resource.Giga)*1024))
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from node definition: ", err)
 	}
 	// IO overhead for qemu is around 512M memory
 	ioOverhead := resource.MustParse(qemuMemoryIOOverhead)
@@ -364,7 +364,7 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 
 	memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from memory overhead")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from memory overhead: ", err)
 	}
 	q.Add(memOverhead)
 
