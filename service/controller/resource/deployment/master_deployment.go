@@ -25,12 +25,12 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 
 		cpuQuantity, err := key.CPUQuantity(capabilities)
 		if err != nil {
-			return nil, microerror.Maskf(invalidConfigError, "error creating CPU quantity: ", err)
+			return nil, microerror.Maskf(invalidConfigError, "error creating CPU quantity: %s", err)
 		}
 
 		memoryQuantity, err := key.MemoryQuantityMaster(capabilities)
 		if err != nil {
-			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: ", err)
+			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: %s", err)
 		}
 
 		storageType := key.StorageType(customResource)
