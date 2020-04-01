@@ -101,7 +101,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 			CustomObject: customResource,
 			ClusterCerts: certs,
 			ClusterKeys:  keys,
-			// Images?
+			Images:       images,
 		}
 
 		template, err := r.cloudConfig.NewWorkerTemplate(ignition, node, nodeIdx)
