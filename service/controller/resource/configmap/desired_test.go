@@ -84,12 +84,12 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Name: "single master, three workers",
 			Obj: &providerv1alpha1.KVMConfig{
-				Spec: providerv1alpha1.KVMConfigSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: map[string]string{
-							label.ReleaseVersion: "1.0.0",
-						},
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
 					},
+				},
+				Spec: providerv1alpha1.KVMConfigSpec{
 					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []providerv1alpha1.ClusterNode{
