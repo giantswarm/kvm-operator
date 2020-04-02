@@ -11,9 +11,12 @@ import (
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
+
 	apiv1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig/cloudconfigtest"
 )
 
@@ -49,6 +52,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Name: "single master, single worker",
 			Obj: &providerv1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: providerv1alpha1.KVMConfigSpec{
 					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
@@ -77,6 +85,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 			Name: "single master, three workers",
 			Obj: &providerv1alpha1.KVMConfig{
 				Spec: providerv1alpha1.KVMConfigSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							label.ReleaseVersion: "1.0.0",
+						},
+					},
 					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []providerv1alpha1.ClusterNode{
@@ -107,6 +120,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Name: "three masters, three workers",
 			Obj: &providerv1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: providerv1alpha1.KVMConfigSpec{
 					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
@@ -142,6 +160,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Name: "missing node index for worker",
 			Obj: &providerv1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: providerv1alpha1.KVMConfigSpec{
 					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
@@ -168,6 +191,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		{
 			Name: "missing node index for master",
 			Obj: &providerv1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: providerv1alpha1.KVMConfigSpec{
 					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
