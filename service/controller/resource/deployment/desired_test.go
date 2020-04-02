@@ -20,6 +20,7 @@ import (
 func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	release := releasev1alpha1.NewReleaseCR()
 	release.ObjectMeta.Name = "v1.0.0"
+	targetDistro := "2345.3.0"
 	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
 		{
 			Name:    "kubernetes",
@@ -35,7 +36,7 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		},
 		{
 			Name:    "containerlinux",
-			Version: "2345.3.0",
+			Version: targetDistro,
 		},
 	}
 	clientset := apiextfake.NewSimpleClientset(release)
@@ -338,6 +339,18 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %d nodes got %d", i, tc.ExpectedMasterCount+tc.ExpectedWorkerCount, len(deployments))
 		}
 
+		for _, v := range testCorrectDistroVersions(deployments, "master-") {
+			if v.Value != targetDistro {
+				t.Fatalf("case %d expected %#v got %#v", i, targetDistro, v.Value)
+			}
+		}
+
+		for _, v := range testCorrectDistroVersions(deployments, "worker-") {
+			if v.Value != targetDistro {
+				t.Fatalf("case %d expected %#v got %#v", i, targetDistro, v.Value)
+			}
+		}
+
 		for j, r := range testGetK8sMasterKVMResources(deployments) {
 			expectedCPU := tc.ExpectedMastersResources[j].Requests.Cpu()
 			if r.Requests.Cpu().Cmp(*expectedCPU) != 0 {
@@ -360,6 +373,36 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			}
 		}
 	}
+}
+
+func testCorrectDistroVersions(deployments []*v1.Deployment, prefix string) []apiv1.EnvVar {
+	return testCorrectEnvVars(deployments, prefix, "FLATCAR_VERSION")
+}
+
+func testCorrectEnvVars(deployments []*v1.Deployment, prefix string, varName string) []apiv1.EnvVar {
+	var evs []apiv1.EnvVar
+
+	for _, d := range deployments {
+		if !strings.HasPrefix(d.Name, prefix) {
+			continue
+		}
+		for _, c := range d.Spec.Template.Spec.Containers {
+			if c.Name == "k8s-kvm" {
+				found := false
+				for _, e := range c.Env {
+					if e.Name == varName {
+						evs = append(evs, e)
+						found = true
+					}
+				}
+				if !found {
+					evs = append(evs, apiv1.EnvVar{})
+				}
+			}
+		}
+	}
+
+	return evs
 }
 
 func testGetMasterCount(deployments []*v1.Deployment) int {
