@@ -40,8 +40,6 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	}
 	clientset := apiextfake.NewSimpleClientset(release)
 
-	// fmt.Print(clientset)
-
 	testCases := []struct {
 		Name                string
 		Obj                 interface{}

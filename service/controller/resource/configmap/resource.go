@@ -56,6 +56,9 @@ func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
+	if config.G8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.G8sClient must not be empty")
+	}
 	if config.KeyWatcher == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.KeyWatcher must not be empty")
 	}
@@ -68,6 +71,7 @@ func New(config Config) (*Resource, error) {
 		certsSearcher: config.CertsSearcher,
 		cloudConfig:   config.CloudConfig,
 		k8sClient:     config.K8sClient,
+		g8sClient:     config.G8sClient,
 		keyWatcher:    config.KeyWatcher,
 		logger:        config.Logger,
 	}
