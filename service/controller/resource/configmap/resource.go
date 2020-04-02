@@ -3,6 +3,7 @@ package configmap
 import (
 	"reflect"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -22,21 +23,25 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	CertsSearcher certs.Interface
-	CloudConfig   *cloudconfig.CloudConfig
-	K8sClient     kubernetes.Interface
-	KeyWatcher    randomkeys.Interface
-	Logger        micrologger.Logger
+	CertsSearcher  certs.Interface
+	CloudConfig    *cloudconfig.CloudConfig
+	G8sClient      versioned.Interface
+	K8sClient      kubernetes.Interface
+	KeyWatcher     randomkeys.Interface
+	Logger         micrologger.Logger
+	RegistryDomain string
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	certsSearcher certs.Interface
-	cloudConfig   *cloudconfig.CloudConfig
-	k8sClient     kubernetes.Interface
-	keyWatcher    randomkeys.Interface
-	logger        micrologger.Logger
+	certsSearcher  certs.Interface
+	cloudConfig    *cloudconfig.CloudConfig
+	g8sClient      versioned.Interface
+	k8sClient      kubernetes.Interface
+	keyWatcher     randomkeys.Interface
+	logger         micrologger.Logger
+	registryDomain string
 }
 
 // New creates a new configured config map resource.
@@ -51,6 +56,9 @@ func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
+	if config.G8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.G8sClient must not be empty")
+	}
 	if config.KeyWatcher == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.KeyWatcher must not be empty")
 	}
@@ -63,6 +71,7 @@ func New(config Config) (*Resource, error) {
 		certsSearcher: config.CertsSearcher,
 		cloudConfig:   config.CloudConfig,
 		k8sClient:     config.K8sClient,
+		g8sClient:     config.G8sClient,
 		keyWatcher:    config.KeyWatcher,
 		logger:        config.Logger,
 	}

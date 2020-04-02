@@ -69,6 +69,12 @@ rules:
       - create
       - delete
   - apiGroups:
+      - release.giantswarm.io
+    resources:
+      - releases
+    verbs:
+      - get
+  - apiGroups:
       - ""
     resources:
       - namespaces

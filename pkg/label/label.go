@@ -9,5 +9,6 @@ const (
 	ManagedBy = "giantswarm.io/managed-by"
 	// Organization label denotes tenant cluster's organization ID as displayed
 	// in the front-end.
-	Organization = "giantswarm.io/organization"
+	Organization   = "giantswarm.io/organization"
+	ReleaseVersion = "release.giantswarm.io/version"
 )
