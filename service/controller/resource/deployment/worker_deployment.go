@@ -25,12 +25,12 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 
 		cpuQuantity, err := key.CPUQuantity(capabilities)
 		if err != nil {
-			return nil, microerror.Maskf(err, "creating CPU quantity")
+			return nil, microerror.Maskf(invalidConfigError, "error creating CPU quantity: %s", err)
 		}
 
 		memoryQuantity, err := key.MemoryQuantityWorker(capabilities)
 		if err != nil {
-			return nil, microerror.Maskf(err, "creating memory quantity")
+			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: %s", err)
 		}
 
 		deployment := &v1.Deployment{
