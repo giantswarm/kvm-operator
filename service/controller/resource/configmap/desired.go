@@ -48,6 +48,8 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*apiv1.Co
 		return nil, microerror.Mask(err)
 	}
 
+	r.logger.Log("level", "debug", "message", "reading the release for the configmap")
+
 	var release *releasev1alpha1.Release
 	{
 		releaseVersion := customResource.Labels[label.ReleaseVersion]

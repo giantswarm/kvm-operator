@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -50,11 +51,14 @@ const (
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
 	FlannelEnvPathPrefix = "/run/flannel"
-	CoreosImageDir       = "/var/lib/coreos-kvm-images"
-	CoreosVersion        = "2191.5.0"
+
+	ContainerLinuxComponentName = "containerlinux"
+
+	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
+	FlatcarChannel  = "stable"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:9172ffbc4838cf0c813d8e6d141e994d56dcc750"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:e9989b8667070b8a10a030e2f1f6078d2ffb803e"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:38e35d7f84a9f24e4bf16614f4ea6ca23dc7f73b"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:20517098a762a0d7ca2b0902316ddff487dbc7f5"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:022df58313aab9a185f2a78d9bd107d6f7db13c9"
 
@@ -194,6 +198,16 @@ func ClusterRoleBindingPSPName(customObject v1alpha1.KVMConfig) string {
 
 func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
+}
+
+func ContainerDistro(release *releasev1alpha1.Release) (string, error) {
+	for _, component := range release.Spec.Components {
+		if component.Name == ContainerLinuxComponentName {
+			return component.Version, nil
+		}
+	}
+
+	return "", microerror.Mask(missingVersionError)
 }
 
 func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {

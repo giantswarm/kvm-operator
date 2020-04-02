@@ -14,7 +14,7 @@ require (
 	github.com/giantswarm/micrologger v0.3.1
 	github.com/giantswarm/operatorkit v0.2.0
 	github.com/giantswarm/randomkeys v0.2.0
-	github.com/giantswarm/statusresource v0.0.0-20200103225110-1c017ce979b3
+	github.com/giantswarm/statusresource v0.2.0
 	github.com/giantswarm/tenantcluster v0.2.0
 	github.com/giantswarm/versionbundle v0.2.0
 	github.com/gogo/protobuf v1.3.1 // indirect
