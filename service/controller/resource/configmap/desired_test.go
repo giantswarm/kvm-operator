@@ -20,6 +20,21 @@ import (
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 
 	release := releasev1alpha1.NewReleaseCR()
+	release.ObjectMeta.Name = "v1.0.0"
+	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
+		{
+			Name:    "kubernetes",
+			Version: "1.15.11",
+		},
+		{
+			Name:    "calico",
+			Version: "3.9.1",
+		},
+		{
+			Name:    "etcd",
+			Version: "3.3.15",
+		},
+	}
 	clientset := apiextfake.NewSimpleClientset(release)
 
 	// fmt.Print(clientset)
