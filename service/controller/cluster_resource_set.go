@@ -127,6 +127,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := configmap.Config{
 			CertsSearcher: config.CertsSearcher,
 			CloudConfig:   cloudConfig,
+			G8sClient:     config.G8sClient,
 			K8sClient:     config.K8sClient,
 			KeyWatcher:    config.RandomkeysSearcher,
 			Logger:        config.Logger,
@@ -147,6 +148,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	{
 		c := deployment.Config{
 			DNSServers: config.DNSServers,
+			G8sClient:  config.G8sClient,
 			K8sClient:  config.K8sClient,
 			Logger:     config.Logger,
 			NTPServers: config.NTPServers,
