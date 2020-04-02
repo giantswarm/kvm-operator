@@ -10,7 +10,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_4_9_1"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_4_9_1"
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
