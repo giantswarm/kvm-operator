@@ -2,6 +2,7 @@ version: 1
 update_configs:
   - package_manager: "go:modules"
     directory: "/"
+    target_branch: "legacy-1-15"
     update_schedule: "daily"
     ignored_updates:
       - match:
