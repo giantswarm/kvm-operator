@@ -5,17 +5,25 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	providerv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	apiextfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
 	apiv1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
+
+	release := releasev1alpha1.NewReleaseCR()
+	clientset := apiextfake.NewSimpleClientset(release)
+
+	// fmt.Print(clientset)
+
 	testCases := []struct {
 		Name                string
 		Obj                 interface{}
@@ -25,20 +33,20 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	}{
 		{
 			Name: "single master, single worker",
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.Cluster{
+			Obj: &providerv1alpha1.KVMConfig{
+				Spec: providerv1alpha1.KVMConfigSpec{
+					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
+						Masters: []providerv1alpha1.ClusterNode{
 							{ID: "a"},
 						},
-						Workers: []v1alpha1.ClusterNode{
+						Workers: []providerv1alpha1.ClusterNode{
 							{ID: "b"},
 						},
 					},
 				},
-				Status: v1alpha1.KVMConfigStatus{
-					KVM: v1alpha1.KVMConfigStatusKVM{
+				Status: providerv1alpha1.KVMConfigStatus{
+					KVM: providerv1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
 							"a": 1,
 							"b": 2,
@@ -52,22 +60,22 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		},
 		{
 			Name: "single master, three workers",
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.Cluster{
+			Obj: &providerv1alpha1.KVMConfig{
+				Spec: providerv1alpha1.KVMConfigSpec{
+					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
+						Masters: []providerv1alpha1.ClusterNode{
 							{ID: "a"},
 						},
-						Workers: []v1alpha1.ClusterNode{
+						Workers: []providerv1alpha1.ClusterNode{
 							{ID: "b"},
 							{ID: "c"},
 							{ID: "d"},
 						},
 					},
 				},
-				Status: v1alpha1.KVMConfigStatus{
-					KVM: v1alpha1.KVMConfigStatusKVM{
+				Status: providerv1alpha1.KVMConfigStatus{
+					KVM: providerv1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
 							"a": 1,
 							"b": 2,
@@ -83,24 +91,24 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		},
 		{
 			Name: "three masters, three workers",
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.Cluster{
+			Obj: &providerv1alpha1.KVMConfig{
+				Spec: providerv1alpha1.KVMConfigSpec{
+					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
+						Masters: []providerv1alpha1.ClusterNode{
 							{ID: "a"},
 							{ID: "b"},
 							{ID: "c"},
 						},
-						Workers: []v1alpha1.ClusterNode{
+						Workers: []providerv1alpha1.ClusterNode{
 							{ID: "d"},
 							{ID: "e"},
 							{ID: "f"},
 						},
 					},
 				},
-				Status: v1alpha1.KVMConfigStatus{
-					KVM: v1alpha1.KVMConfigStatusKVM{
+				Status: providerv1alpha1.KVMConfigStatus{
+					KVM: providerv1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
 							"a": 1,
 							"b": 2,
@@ -118,20 +126,20 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		},
 		{
 			Name: "missing node index for worker",
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.Cluster{
+			Obj: &providerv1alpha1.KVMConfig{
+				Spec: providerv1alpha1.KVMConfigSpec{
+					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
+						Masters: []providerv1alpha1.ClusterNode{
 							{ID: "a"},
 						},
-						Workers: []v1alpha1.ClusterNode{
+						Workers: []providerv1alpha1.ClusterNode{
 							{ID: "b"},
 						},
 					},
 				},
-				Status: v1alpha1.KVMConfigStatus{
-					KVM: v1alpha1.KVMConfigStatusKVM{
+				Status: providerv1alpha1.KVMConfigStatus{
+					KVM: providerv1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
 							"a": 1,
 						},
@@ -144,20 +152,20 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		},
 		{
 			Name: "missing node index for master",
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
-					Cluster: v1alpha1.Cluster{
+			Obj: &providerv1alpha1.KVMConfig{
+				Spec: providerv1alpha1.KVMConfigSpec{
+					Cluster: providerv1alpha1.Cluster{
 						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
+						Masters: []providerv1alpha1.ClusterNode{
 							{ID: "a"},
 						},
-						Workers: []v1alpha1.ClusterNode{
+						Workers: []providerv1alpha1.ClusterNode{
 							{ID: "b"},
 						},
 					},
 				},
-				Status: v1alpha1.KVMConfigStatus{
-					KVM: v1alpha1.KVMConfigStatusKVM{
+				Status: providerv1alpha1.KVMConfigStatus{
+					KVM: providerv1alpha1.KVMConfigStatusKVM{
 						NodeIndexes: map[string]int{
 							"b": 1,
 						},
@@ -176,7 +184,8 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		resourceConfig := Config{}
 		resourceConfig.CertsSearcher = certstest.NewSearcher(certstest.Config{})
 		resourceConfig.CloudConfig = cloudconfigtest.New()
-		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.K8sClient = k8sfake.NewSimpleClientset()
+		resourceConfig.G8sClient = clientset
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
 		newResource, err = New(resourceConfig)
