@@ -144,7 +144,7 @@ metadata:
   name: {{ tpl .Values.resource.psp.name . }}
 rules:
   - apiGroups:
-      - extensions
+      - policy
     resources:
       - podsecuritypolicies
     verbs:
