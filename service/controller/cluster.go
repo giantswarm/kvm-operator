@@ -21,6 +21,8 @@ type ClusterConfig struct {
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 
+	ClusterRoleGeneral string
+	ClusterRolePSP     string
 	CRDLabelSelector   string
 	DNSServers         string
 	GuestUpdateEnabled bool
@@ -82,6 +84,8 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			RandomkeysSearcher: randomkeysSearcher,
 			TenantCluster:      config.TenantCluster,
 
+			ClusterRoleGeneral: config.ClusterRoleGeneral,
+			ClusterRolePSP:     config.ClusterRolePSP,
 			DNSServers:         config.DNSServers,
 			GuestUpdateEnabled: config.GuestUpdateEnabled,
 			IgnitionPath:       config.IgnitionPath,
