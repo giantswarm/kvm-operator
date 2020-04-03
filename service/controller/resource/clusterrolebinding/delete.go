@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/resource/crud"
-	apiv1 "k8s.io/api/rbac/v1beta1"
+	apiv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -22,7 +22,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		// Delete the cluster role bindings in the Kubernetes API.
 		for _, clusterRoleBinding := range clusterRoleBindingsToDelete {
-			err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Delete(clusterRoleBinding.Name, &apismetav1.DeleteOptions{})
+			err := r.k8sClient.RbacV1().ClusterRoleBindings().Delete(clusterRoleBinding.Name, &apismetav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 			} else if err != nil {
 				return microerror.Mask(err)
