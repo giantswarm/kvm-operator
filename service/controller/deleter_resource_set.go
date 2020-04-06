@@ -33,7 +33,7 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if key.VersionBundleVersion(kvmConfig) == project.NewVersionBundle().Version {
+		if key.OperatorVersion(kvmConfig) == project.Version() {
 			return true
 		}
 

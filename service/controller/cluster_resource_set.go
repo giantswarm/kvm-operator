@@ -247,7 +247,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			Logger:                   config.Logger,
 			RESTClient:               config.G8sClient.ProviderV1alpha1().RESTClient(),
 			TenantCluster:            config.TenantCluster,
-			VersionBundleVersionFunc: key.ToVersionBundleVersion,
+			VersionBundleVersionFunc: key.ToOperatorVersion,
 		}
 
 		statusResource, err = statusresource.NewResource(c)
@@ -295,7 +295,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if key.VersionBundleVersion(kvmConfig) == project.NewVersionBundle().Version {
+		if key.OperatorVersion(kvmConfig) == project.Version() {
 			return true
 		}
 

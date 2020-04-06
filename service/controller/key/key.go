@@ -11,6 +11,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -422,6 +423,10 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	return idx, present
 }
 
+func OperatorVersion(cr v1alpha1.KVMConfig) string {
+	return cr.GetLabels()[label.OperatorVersion]
+}
+
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	var ports []corev1.ServicePort
 
@@ -531,6 +536,15 @@ func ToNodeCount(v interface{}) (int, error) {
 	nodeCount := MasterCount(customObject) + WorkerCount(customObject)
 
 	return nodeCount, nil
+}
+
+func ToOperatorVersion(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return OperatorVersion(customObject), nil
 }
 
 func ToPod(v interface{}) (*corev1.Pod, error) {
