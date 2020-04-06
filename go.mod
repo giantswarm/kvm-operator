@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/giantswarm/apiextensions v0.2.0
 	github.com/giantswarm/certs v0.2.0
-	github.com/giantswarm/errors v0.2.2-0.20200406104130-71836ca40924
+	github.com/giantswarm/errors v0.2.2
 	github.com/giantswarm/k8sclient v0.2.0
 	github.com/giantswarm/k8scloudconfig/v6 v6.0.1
 	github.com/giantswarm/microendpoint v0.2.0
