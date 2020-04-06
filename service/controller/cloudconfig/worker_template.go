@@ -27,6 +27,7 @@ func (c *CloudConfig) NewWorkerTemplate(data IgnitionTemplateData, node v1alpha1
 			customObject: data.CustomObject,
 			nodeIndex:    nodeIndex,
 		}
+		params.Images = data.Images
 		params.Node = node
 		params.SSOPublicKey = c.ssoPublicKey
 
