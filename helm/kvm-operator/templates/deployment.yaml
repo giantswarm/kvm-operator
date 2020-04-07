@@ -10,7 +10,7 @@ spec:
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: {{ tpl .Values.resource.default.name  . }}
+      {{- include "kvm-operator.selectorLabels" . | nindent 4 }}
   strategy:
     type: Recreate
   template:
@@ -18,8 +18,7 @@ spec:
       annotations:
         releasetime: {{ $.Release.Time }}
       labels:
-        app: {{ tpl .Values.resource.default.name . }}
-        version: {{ .Values.project.version }}
+        {{- include "kvm-operator.selectorLabels" . | nindent 4 }}
     spec:
       volumes:
       - name: {{ .Values.project.name }}-configmap
