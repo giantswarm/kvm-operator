@@ -53,7 +53,7 @@ workflows:
           username_envar: "QUAY_USERNAME"
           password_envar: "QUAY_PASSWORD"
           requires:
-            - build
+            - go-build
           filters:
             # Trigger the job also on git tag.
             tags:
