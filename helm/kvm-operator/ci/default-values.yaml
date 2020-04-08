@@ -1,0 +1,9 @@
+---
+Installation:
+  V1:
+    Registry:
+      Domain: ""
+    Secret:
+      Registry:
+      PullSecret:
+        DockerConfigJSON: ""
