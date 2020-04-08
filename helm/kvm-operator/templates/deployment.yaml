@@ -4,7 +4,8 @@ metadata:
   name: {{ tpl .Values.resource.default.name . }}
   namespace: {{ tpl .Values.resource.default.namespace . }}
   labels:
-    {{- include "kvm-operator.labels" . | nindent 4 }}
+    app: {{ tpl .Values.resource.default.name . }}
+    version: {{ .Values.project.version }}
 spec:
   replicas: 1
   revisionHistoryLimit: 3

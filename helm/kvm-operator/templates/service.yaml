@@ -4,11 +4,13 @@ metadata:
   name: {{ tpl .Values.resource.default.name . }}
   namespace: {{ tpl .Values.resource.default.namespace . }}
   labels:
-    {{- include "kvm-operator.labels" . | nindent 4 }}
+    app: {{ .Values.project.name }}
+    version: {{ .Values.project.version }}
   annotations:
     prometheus.io/scrape: "true"
 spec:
   ports:
   - port: 8000
   selector:
-    {{- include "kvm-operator.labels" . | nindent 4 }}
+    app: {{ .Values.project.name }}
+    version: {{ .Values.project.version }}
