@@ -32,7 +32,7 @@ require (
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	k8s.io/api v0.16.6
-	k8s.io/apimachinery v0.16.6
+	k8s.io/apimachinery v0.18.0
 	k8s.io/client-go v0.16.6
 	k8s.io/kube-openapi v0.0.0-20191107075043-30be4d16710a // indirect
 	k8s.io/utils v0.0.0-20191114200735-6ca3b61696b6 // indirect
