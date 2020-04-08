@@ -11,4 +11,4 @@ spec:
   ports:
   - port: 8000
   selector:
-    {{- include "kvm-operator.selectorLabels" . | nindent 4 }}
+    {{- include "kvm-operator.labels" . | nindent 4 }}

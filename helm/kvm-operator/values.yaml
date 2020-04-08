@@ -1,7 +1,3 @@
-project:
-  branch: "[[ .Branch ]]"
-  commit: "[[ .SHA  ]]"
-  name: "kvm-operator"
 image:
   name: "giantswarm/kvm-operator"
   tag: "[[ .Version ]]"
@@ -14,7 +10,8 @@ pod:
     id: 1000
   group:
     id: 1000
-
+project:
+  name: "kvm-operator"
 # Resource names are truncated to 47 characters. Kubernetes allows 63 characters
 # limit for resource names. When pods for deployments are created they have
 # additional 16 characters suffix, e.g. "-957c9d6ff-pkzgw" and we want to have

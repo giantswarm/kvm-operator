@@ -10,7 +10,7 @@ spec:
     rule: MustRunAs
     ranges:
       - min: 1
-        max: 65535
+        max: 65535 
   runAsUser:
     rule: MustRunAsNonRoot
   runAsGroup:
