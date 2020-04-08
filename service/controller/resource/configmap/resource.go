@@ -76,7 +76,7 @@ func (r *Resource) Name() string {
 
 func containsConfigMap(list []*corev1.ConfigMap, item *corev1.ConfigMap) bool {
 	_, err := getConfigMapByName(list, item.Name)
-	return err != nil
+	return err == nil
 }
 
 // equals asseses the equality of ConfigMaps with regards to distinguishing
