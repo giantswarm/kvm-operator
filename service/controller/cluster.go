@@ -9,7 +9,6 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/randomkeys"
 	"github.com/giantswarm/tenantcluster"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
@@ -40,14 +39,6 @@ type ClusterConfigOIDC struct {
 	IssuerURL     string
 	UsernameClaim string
 	GroupsClaim   string
-}
-
-func (c ClusterConfig) newInformerListOptions() metav1.ListOptions {
-	listOptions := metav1.ListOptions{
-		LabelSelector: c.CRDLabelSelector,
-	}
-
-	return listOptions
 }
 
 type Cluster struct {

@@ -109,9 +109,7 @@ func containsString(list []string, s string) bool {
 func ipsForUpdateChange(currentIPs []string, desiredIPs []string) []string {
 	var ips []string
 
-	for _, ip := range currentIPs {
-		ips = append(ips, ip)
-	}
+	ips = append(ips, currentIPs...)
 
 	for _, ip := range desiredIPs {
 		if !containsIP(ips, ip) {
