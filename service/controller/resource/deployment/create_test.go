@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	apiextfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger/microloggertest"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -12,6 +14,25 @@ import (
 )
 
 func Test_Resource_Deployment_newCreateChange(t *testing.T) {
+	// Create a fake release
+	release := releasev1alpha1.NewReleaseCR()
+	release.ObjectMeta.Name = "v1.0.0"
+	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
+		{
+			Name:    "kubernetes",
+			Version: "1.15.11",
+		},
+		{
+			Name:    "calico",
+			Version: "3.9.1",
+		},
+		{
+			Name:    "etcd",
+			Version: "3.3.15",
+		},
+	}
+	clientset := apiextfake.NewSimpleClientset(release)
+
 	testCases := []struct {
 		Obj                     interface{}
 		CurrentState            interface{}
@@ -218,6 +239,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 	{
 		resourceConfig := Config{
 			DNSServers: "dnsserver1,dnsserver2",
+			G8sClient:  clientset,
 			K8sClient:  fake.NewSimpleClientset(),
 			Logger:     microloggertest.New(),
 		}

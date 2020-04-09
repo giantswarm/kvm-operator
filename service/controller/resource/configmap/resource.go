@@ -3,6 +3,7 @@ package configmap
 import (
 	"reflect"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -24,6 +25,7 @@ type Config struct {
 	// Dependencies.
 	CertsSearcher certs.Interface
 	CloudConfig   *cloudconfig.CloudConfig
+	G8sClient     versioned.Interface
 	K8sClient     kubernetes.Interface
 	KeyWatcher    randomkeys.Interface
 	Logger        micrologger.Logger
@@ -34,6 +36,7 @@ type Resource struct {
 	// Dependencies.
 	certsSearcher certs.Interface
 	cloudConfig   *cloudconfig.CloudConfig
+	g8sClient     versioned.Interface
 	k8sClient     kubernetes.Interface
 	keyWatcher    randomkeys.Interface
 	logger        micrologger.Logger

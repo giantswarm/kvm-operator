@@ -15,6 +15,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+
 	"github.com/giantswarm/kvm-operator/pkg/label"
 )
 
@@ -52,9 +54,11 @@ const (
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
 	FlannelEnvPathPrefix = "/run/flannel"
-	FlatcarImageDir      = "/var/lib/flatcar-kvm-images"
-	FlatcarVersion       = "2345.3.0"
-	FlatcarChannel       = "stable"
+
+	ContainerLinuxComponentName = "containerlinux"
+
+	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
+	FlatcarChannel  = "stable"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:416097011707a2d0991964081167b7e883c57476"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:38e35d7f84a9f24e4bf16614f4ea6ca23dc7f73b"
@@ -193,6 +197,16 @@ func ClusterRoleBindingPSPName(customObject v1alpha1.KVMConfig) string {
 
 func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
+}
+
+func ContainerDistro(release *releasev1alpha1.Release) (string, error) {
+	for _, component := range release.Spec.Components {
+		if component.Name == ContainerLinuxComponentName {
+			return component.Version, nil
+		}
+	}
+
+	return "", microerror.Mask(missingVersionError)
 }
 
 func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
