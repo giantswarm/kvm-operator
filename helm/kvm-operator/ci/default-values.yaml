@@ -5,3 +5,7 @@ Installation:
       Registry:
         PullSecret:
           DockerConfigJSON: "Dummy Secret"
+    GiantSwarm:
+      KVMOperator:
+        CRD:
+          LabelSelector: ""
