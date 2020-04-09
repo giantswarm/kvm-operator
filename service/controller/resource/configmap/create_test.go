@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	apiextfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/randomkeystest"
@@ -12,10 +14,29 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
+	release := releasev1alpha1.NewReleaseCR()
+	release.ObjectMeta.Name = "v1.0.0"
+	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
+		{
+			Name:    "kubernetes",
+			Version: "1.15.11",
+		},
+		{
+			Name:    "calico",
+			Version: "3.9.1",
+		},
+		{
+			Name:    "etcd",
+			Version: "3.3.15",
+		},
+	}
+	clientset := apiextfake.NewSimpleClientset(release)
+
 	testCases := []struct {
 		Obj                    interface{}
 		CurrentState           interface{}
@@ -26,6 +47,11 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// state should be empty.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -41,6 +67,11 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// should be empty.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -68,6 +99,11 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// state should contain the missing item of the desired state.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -91,6 +127,11 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// state should contain the missing items of the desired state.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -121,6 +162,11 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// state.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -143,6 +189,11 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// state.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -170,6 +221,11 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		// not in create state.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -223,6 +279,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		resourceConfig := Config{}
 		resourceConfig.CertsSearcher = certstest.NewSearcher(certstest.Config{})
 		resourceConfig.CloudConfig = cloudconfigtest.New()
+		resourceConfig.G8sClient = clientset
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
