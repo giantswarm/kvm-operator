@@ -1,9 +1,7 @@
 ---
 Installation:
   V1:
-    Registry:
-      Domain: ""
     Secret:
       Registry:
       PullSecret:
-        DockerConfigJSON: ""
+        DockerConfigJSON: "Dummy Secret"
