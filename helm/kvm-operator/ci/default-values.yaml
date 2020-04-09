@@ -10,10 +10,11 @@ Installation:
         CRD:
           LabelSelector: ""
     Provider:
-      DNS:
-        Servers: ""
-      NTP:
-        Servers: ""
+      KVM:
+        DNS:
+          Servers: ""
+        NTP:
+          Servers: ""
     Guest:
       Kubernetes:
         API:
