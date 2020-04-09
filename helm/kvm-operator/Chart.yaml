@@ -1,3 +1,4 @@
+home: https://github.com/giantswarm/kvm-operator
 name: kvm-operator
 version: [[ .Version ]]
 appVersion: [[ .AppVersion ]]
