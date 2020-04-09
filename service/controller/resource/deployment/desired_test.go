@@ -8,13 +8,14 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	apiextfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
-	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/micrologger/microloggertest"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
+
+	"github.com/giantswarm/kvm-operator/pkg/label"
 )
 
 func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
