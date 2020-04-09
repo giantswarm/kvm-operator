@@ -21,7 +21,7 @@ import (
 func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 	// Create a fake release
 	release := releasev1alpha1.NewReleaseCR()
-	release.ObjectMeta.Name = "v1.0.0"
+	release.ObjectMeta.Name = "v1.0.3"
 	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
 		{
 			Name:    "kubernetes",
