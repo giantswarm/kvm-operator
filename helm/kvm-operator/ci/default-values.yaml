@@ -9,3 +9,22 @@ Installation:
       KVMOperator:
         CRD:
           LabelSelector: ""
+    Provider:
+      DNS:
+        Servers: ""
+      NTP:
+        Servers: ""
+    Guest:
+      Kubernetes:
+        API:
+          Auth:
+            Provider:
+              OIDC:
+                ClientID: ""
+                IssuerURL: ""
+                UsernameClaim: ""
+                GroupsClaim: ""
+      SSH:
+        SSOPublicKey: ""
+      Update:
+        Enabled: ""
