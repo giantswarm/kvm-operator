@@ -3,5 +3,5 @@ Installation:
   V1:
     Secret:
       Registry:
-      PullSecret:
-        DockerConfigJSON: "Dummy Secret"
+        PullSecret:
+          DockerConfigJSON: "Dummy Secret"
