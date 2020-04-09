@@ -104,6 +104,7 @@ func newClusterResourceSets(config ClusterConfig) ([]*controller.ResourceSet, er
 	{
 		c := ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.K8sClient.G8sClient(),
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
