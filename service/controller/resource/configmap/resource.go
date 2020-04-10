@@ -3,6 +3,7 @@ package configmap
 import (
 	"reflect"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -24,6 +25,7 @@ type Config struct {
 	// Dependencies.
 	CertsSearcher certs.Interface
 	CloudConfig   *cloudconfig.CloudConfig
+	G8sClient     versioned.Interface
 	K8sClient     kubernetes.Interface
 	KeyWatcher    randomkeys.Interface
 	Logger        micrologger.Logger
@@ -34,6 +36,7 @@ type Resource struct {
 	// Dependencies.
 	certsSearcher certs.Interface
 	cloudConfig   *cloudconfig.CloudConfig
+	g8sClient     versioned.Interface
 	k8sClient     kubernetes.Interface
 	keyWatcher    randomkeys.Interface
 	logger        micrologger.Logger
@@ -47,6 +50,9 @@ func New(config Config) (*Resource, error) {
 	}
 	if config.CloudConfig == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.CloudConfig must not be empty")
+	}
+	if config.G8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.G8sClient must not be empty")
 	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
@@ -62,6 +68,7 @@ func New(config Config) (*Resource, error) {
 		// Dependencies.
 		certsSearcher: config.CertsSearcher,
 		cloudConfig:   config.CloudConfig,
+		g8sClient:     config.G8sClient,
 		k8sClient:     config.K8sClient,
 		keyWatcher:    config.KeyWatcher,
 		logger:        config.Logger,

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -14,12 +15,17 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
+func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
 	var deployments []*v1.Deployment
 
 	privileged := true
 	replicas := int32(1)
 	podDeletionGracePeriod := int64(key.PodDeletionGracePeriod.Seconds())
+
+	containerDistroVersion, err := key.ContainerDistro(release)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
 
 	for i, workerNode := range customResource.Spec.Cluster.Workers {
 		capabilities := customResource.Spec.KVM.Workers[i]
@@ -173,7 +179,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 									},
 									{
 										Name:  "FLATCAR_VERSION",
-										Value: key.FlatcarVersion,
+										Value: containerDistroVersion,
 									},
 									{
 										Name:  "FLATCAR_CHANNEL",
