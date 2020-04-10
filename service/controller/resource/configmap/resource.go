@@ -23,23 +23,25 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	CertsSearcher certs.Interface
-	CloudConfig   *cloudconfig.CloudConfig
-	G8sClient     versioned.Interface
-	K8sClient     kubernetes.Interface
-	KeyWatcher    randomkeys.Interface
-	Logger        micrologger.Logger
+	CertsSearcher  certs.Interface
+	CloudConfig    *cloudconfig.CloudConfig
+	G8sClient      versioned.Interface
+	K8sClient      kubernetes.Interface
+	KeyWatcher     randomkeys.Interface
+	Logger         micrologger.Logger
+	RegistryDomain string
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	certsSearcher certs.Interface
-	cloudConfig   *cloudconfig.CloudConfig
-	g8sClient     versioned.Interface
-	k8sClient     kubernetes.Interface
-	keyWatcher    randomkeys.Interface
-	logger        micrologger.Logger
+	certsSearcher  certs.Interface
+	cloudConfig    *cloudconfig.CloudConfig
+	g8sClient      versioned.Interface
+	k8sClient      kubernetes.Interface
+	keyWatcher     randomkeys.Interface
+	logger         micrologger.Logger
+	registryDomain string
 }
 
 // New creates a new configured config map resource.
@@ -63,15 +65,19 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
+	if config.RegistryDomain == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.RegistryDomain must not be empty", config)
+	}
 
 	newService := &Resource{
 		// Dependencies.
-		certsSearcher: config.CertsSearcher,
-		cloudConfig:   config.CloudConfig,
-		g8sClient:     config.G8sClient,
-		k8sClient:     config.K8sClient,
-		keyWatcher:    config.KeyWatcher,
-		logger:        config.Logger,
+		certsSearcher:  config.CertsSearcher,
+		cloudConfig:    config.CloudConfig,
+		g8sClient:      config.G8sClient,
+		k8sClient:      config.K8sClient,
+		keyWatcher:     config.KeyWatcher,
+		logger:         config.Logger,
+		registryDomain: config.RegistryDomain,
 	}
 
 	return newService, nil
