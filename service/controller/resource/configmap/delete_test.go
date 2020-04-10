@@ -334,7 +334,7 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
-		resourceConfig.RegistryDomain = "example.com"
+		resourceConfig.RegistryDomain = "example.net"
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
