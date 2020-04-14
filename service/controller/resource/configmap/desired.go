@@ -68,7 +68,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 	versions.KubernetesAPIHealthz = defaultVersions.KubernetesAPIHealthz
 	versions.KubernetesNetworkSetupDocker = defaultVersions.KubernetesNetworkSetupDocker
 	images := v_6_0_0.BuildImages(r.registryDomain, versions)
-	r.logger.Log("level", "debug", "message", fmt.Sprintf("images: %v#", images))
+
 	data := cloudconfig.IgnitionTemplateData{
 		CustomObject: customResource,
 		ClusterCerts: certs,
