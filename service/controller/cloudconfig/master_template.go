@@ -33,6 +33,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data Ig
 		}
 		params.Node = node
 		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
+		params.Images = data.Images
 		params.SSOPublicKey = c.ssoPublicKey
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
