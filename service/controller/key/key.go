@@ -11,6 +11,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_4_9_2"
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
@@ -81,6 +82,12 @@ const (
 	// DefaultOSDiskSize defines the space used to partition the root FS within
 	// k8s-kvm.
 	DefaultOSDiskSize = "5G"
+)
+
+const (
+	kubectlVersion               = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
+	KubernetesNetworkSetupDocker = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
+	kubernetesAPIHealthzVersion  = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
 )
 
 const (
@@ -218,6 +225,14 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 		return resource.Quantity{}, microerror.Mask(err)
 	}
 	return q, nil
+}
+
+func DefaultVersions() k8scloudconfig.Versions {
+	return k8scloudconfig.Versions{
+		Kubectl:                      kubectlVersion,
+		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
+		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
+	}
 }
 
 func DeploymentName(prefix string, nodeID string) string {
