@@ -107,8 +107,9 @@ const (
 
 const (
 	// TODO: Change to 1.16.8
-	kubectlVersion              = "9ccdc9dc55a01b1fde2aea73901d0a699909c9cd" // 1.15.5
-	kubernetesAPIHealthzVersion = "1c0cdf1ed5ee18fdf59063ecdd84bf3787f80fac"
+	kubectlVersion               = "9ccdc9dc55a01b1fde2aea73901d0a699909c9cd" // 1.15.5
+	KubernetesNetworkSetupDocker = "9ccdc9dc55a01b1fde2aea73901d0a699909c9cd"
+	kubernetesAPIHealthzVersion  = "1c0cdf1ed5ee18fdf59063ecdd84bf3787f80fac"
 )
 
 const (
@@ -231,8 +232,9 @@ func DeploymentName(prefix string, nodeID string) string {
 
 func DefaultVersions() v_6_0_0.Versions {
 	return v_6_0_0.Versions{
-		Kubectl:              kubectlVersion,
-		KubernetesAPIHealthz: kubernetesAPIHealthzVersion,
+		Kubectl:                      kubectlVersion,
+		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
+		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
 	}
 }
 
