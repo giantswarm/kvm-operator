@@ -39,6 +39,7 @@ type ClusterResourceSetConfig struct {
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
+	RegistryDomain     string
 	TenantCluster      tenantcluster.Interface
 
 	ClusterRoleGeneral string
@@ -131,12 +132,13 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	var configMapResource resource.Interface
 	{
 		c := configmap.Config{
-			CertsSearcher: config.CertsSearcher,
-			CloudConfig:   cloudConfig,
-			G8sClient:     config.G8sClient,
-			K8sClient:     config.K8sClient,
-			KeyWatcher:    config.RandomkeysSearcher,
-			Logger:        config.Logger,
+			CertsSearcher:  config.CertsSearcher,
+			CloudConfig:    cloudConfig,
+			G8sClient:      config.G8sClient,
+			K8sClient:      config.K8sClient,
+			KeyWatcher:     config.RandomkeysSearcher,
+			Logger:         config.Logger,
+			RegistryDomain: config.RegistryDomain,
 		}
 
 		ops, err := configmap.New(c)

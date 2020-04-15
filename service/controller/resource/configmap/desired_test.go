@@ -229,6 +229,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		resourceConfig.G8sClient = clientset
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
+		resourceConfig.RegistryDomain = "example.co.uk"
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)

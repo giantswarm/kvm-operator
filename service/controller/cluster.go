@@ -30,6 +30,7 @@ type ClusterConfig struct {
 	NTPServers         string
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
+	RegistryDomain     string
 	SSOPublicKey       string
 }
 
@@ -82,6 +83,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			K8sClient:          config.K8sClient.K8sClient(),
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
+			RegistryDomain:     config.RegistryDomain,
 			TenantCluster:      config.TenantCluster,
 
 			ClusterRoleGeneral: config.ClusterRoleGeneral,
