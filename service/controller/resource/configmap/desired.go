@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -58,7 +58,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 		}
 	}
 
-	versions, err := v_6_0_0.ExtractComponentVersions(release.Spec.Components)
+	versions, err := k8scloudconfig.ExtractComponentVersions(release.Spec.Components)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -67,7 +67,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 	versions.Kubectl = defaultVersions.Kubectl
 	versions.KubernetesAPIHealthz = defaultVersions.KubernetesAPIHealthz
 	versions.KubernetesNetworkSetupDocker = defaultVersions.KubernetesNetworkSetupDocker
-	images := v_6_0_0.BuildImages(r.registryDomain, versions)
+	images := k8scloudconfig.BuildImages(r.registryDomain, versions)
 
 	data := cloudconfig.IgnitionTemplateData{
 		CustomObject: customResource,

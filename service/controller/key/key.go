@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -229,8 +229,8 @@ func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
 }
 
-func DefaultVersions() v_6_0_0.Versions {
-	return v_6_0_0.Versions{
+func DefaultVersions() k8scloudconfig.Versions {
+	return k8scloudconfig.Versions{
 		Kubectl:                      kubectlVersion,
 		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
 		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
