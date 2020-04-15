@@ -24,7 +24,9 @@ Installation:
                 ClientID: ""
                 IssuerURL: ""
                 UsernameClaim: ""
+                UsernamePrefix: ""
                 GroupsClaim: ""
+                GroupsPrefix: ""
       SSH:
         SSOPublicKey: ""
       Update:
