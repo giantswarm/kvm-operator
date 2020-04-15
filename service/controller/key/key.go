@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -102,6 +103,12 @@ const (
 	LabelVersionBundle = "giantswarm.io/version-bundle"
 
 	LegacyLabelCluster = "cluster"
+)
+
+const (
+	kubectlVersion               = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
+	KubernetesNetworkSetupDocker = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
+	kubernetesAPIHealthzVersion  = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
 )
 
 const (
@@ -220,6 +227,14 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 
 func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
+}
+
+func DefaultVersions() k8scloudconfig.Versions {
+	return k8scloudconfig.Versions{
+		Kubectl:                      kubectlVersion,
+		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
+		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
+	}
 }
 
 func DockerVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {

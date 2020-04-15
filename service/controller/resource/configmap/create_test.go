@@ -283,6 +283,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		resourceConfig.K8sClient = fake.NewSimpleClientset()
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
+		resourceConfig.RegistryDomain = "example.org"
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
