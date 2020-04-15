@@ -40,7 +40,7 @@ type ClusterConfigOIDC struct {
 	UsernameClaim  string
 	UsernamePrefix string
 	GroupsClaim    string
-	GroupsPrefix    string
+	GroupsPrefix   string
 }
 
 type Cluster struct {
