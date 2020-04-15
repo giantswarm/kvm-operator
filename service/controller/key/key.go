@@ -60,7 +60,7 @@ const (
 	FlatcarChannel  = "stable"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:416097011707a2d0991964081167b7e883c57476"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:38e35d7f84a9f24e4bf16614f4ea6ca23dc7f73b"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:ce9ca8fed6e6d328da745479d125d5f64ec27121"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:20517098a762a0d7ca2b0902316ddff487dbc7f5"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:ca610b410c34ab7209c6393aab8fb5453c6fa2d7"
 
