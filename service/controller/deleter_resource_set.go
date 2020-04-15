@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -34,9 +32,6 @@ func NewDeleterResourceSet(config DeleterResourceSetConfig) (*controller.Resourc
 		if err != nil {
 			return false
 		}
-
-		config.Logger.Log("level", "debug", "message", fmt.Sprintf("delete key OperatorVersion: %s", key.OperatorVersion(kvmConfig)))
-		config.Logger.Log("level", "debug", "message", fmt.Sprintf("delete project Version: %s", project.Version()))
 
 		if key.OperatorVersion(kvmConfig) == project.Version() {
 			return true

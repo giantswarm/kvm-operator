@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -38,9 +36,6 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		if err != nil {
 			return false
 		}
-
-		config.Logger.Log("level", "debug", "message", fmt.Sprintf("drain v: %s", v))
-		config.Logger.Log("level", "debug", "message", fmt.Sprintf("drain project Version: %s", project.Version()))
 
 		if v == project.Version() {
 			return true

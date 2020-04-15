@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
@@ -297,9 +296,6 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		if err != nil {
 			return false
 		}
-
-		config.Logger.Log("level", "debug", "message", fmt.Sprintf("cluster key OperatorVersion: %s", key.OperatorVersion(kvmConfig)))
-		config.Logger.Log("level", "debug", "message", fmt.Sprintf("cluster project Version: %s", project.Version()))
 
 		if key.OperatorVersion(kvmConfig) == project.Version() {
 			return true
