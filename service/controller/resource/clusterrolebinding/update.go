@@ -21,6 +21,10 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 		// Create the cluster role bindings in the Kubernetes API.
 		for _, clusterRoleBinding := range clusterRoleBindingsToUpdate {
 			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
+			if isExternalFieldImmutableError(err) {
+				// Create new CRB and delete the old one
+				r.logger.Log("level", "debug", "message", "Should re-create CRB")
+			}
 			if err != nil {
 				return microerror.Mask(err)
 			}
