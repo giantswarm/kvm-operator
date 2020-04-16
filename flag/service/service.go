@@ -10,9 +10,10 @@ import (
 )
 
 type Service struct {
-	CRD          crd.CRD
-	Installation installation.Installation
-	Kubernetes   kubernetes.Kubernetes
-	RBAC         rbac.RBAC
-	Tenant       tenant.Tenant
+	CRD            crd.CRD
+	Installation   installation.Installation
+	Kubernetes     kubernetes.Kubernetes
+	RBAC           rbac.RBAC
+	RegistryDomain string
+	Tenant         tenant.Tenant
 }

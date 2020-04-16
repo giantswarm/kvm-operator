@@ -153,7 +153,8 @@ func New(config Config) (*Service, error) {
 				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
 				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
 			},
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+			RegistryDomain: config.Viper.GetString(config.Flag.Service.RegistryDomain),
+			SSOPublicKey:   config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 		}
 
 		clusterController, err = controller.NewCluster(c)
