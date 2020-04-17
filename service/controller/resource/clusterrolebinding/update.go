@@ -38,6 +38,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 				_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Create(&newCRB)
 				if apierrors.IsAlreadyExists(err) {
 				} else if err != nil {
+					r.logger.Log("level", "debug", "message", "This error is from creation")
 					return microerror.Mask(err)
 				}
 
@@ -50,8 +51,8 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 				// Delete the renamed one. Wait for all old Pods to be deleted?
 
 				// Alternatively, create the new one with a new name
-			}
-			if err != nil {
+			} else if err != nil {
+				r.logger.Log("level", "debug", "message", "This error is not an immutable error")
 				return microerror.Mask(err)
 			}
 		}
