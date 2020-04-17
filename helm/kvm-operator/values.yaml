@@ -1,6 +1,6 @@
 project:
   branch: "[[ .Branch ]]"
-  commit: "[[ .SHA ]]"
+  commit: "[[ .SHA  ]]"
 image:
   name: "giantswarm/kvm-operator"
   tag: "[[ .Version ]]"
