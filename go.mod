@@ -30,7 +30,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
-	k8s.io/api v0.16.8
+	k8s.io/api v0.18.2
 	k8s.io/apiextensions-apiserver v0.16.8 // indirect
 	k8s.io/apimachinery v0.16.8
 	k8s.io/client-go v0.16.8
