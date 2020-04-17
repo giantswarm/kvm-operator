@@ -34,6 +34,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 				newCRB.SetName(clusterRoleBinding.Name + "-upgrading")
 
 				r.logger.Log("level", "debug", "message", "Creating new CRB instead of updating")
+				r.logger.Log("level", "debug", "message", fmt.Sprintf("Creating CRB: %v#", newCRB))
 				_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Create(&newCRB)
 				if apierrors.IsAlreadyExists(err) {
 				} else if err != nil {
