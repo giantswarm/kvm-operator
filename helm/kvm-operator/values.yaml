@@ -1,9 +1,9 @@
 project:
-  branch: "test"
-  commit: "test"
+  branch: "[[ .Branch ]]"
+  commit: "[[ .SHA ]]"
 image:
   name: "giantswarm/kvm-operator"
-  tag: "test"
+  tag: "[[ .Version ]]"
 Installation:
   V1:
     Registry:
