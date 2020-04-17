@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/resource/crud"
 	apiv1 "k8s.io/api/rbac/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
@@ -24,6 +25,28 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			if isExternalFieldImmutableError(err) {
 				// Create new CRB and delete the old one
 				r.logger.Log("level", "debug", "message", "Should re-create CRB")
+
+				// Simply create this as a new CRB
+				newCRB := apiv1.ClusterRoleBinding{}
+				clusterRoleBinding.DeepCopyInto(&newCRB)
+				newCRB.SetName(clusterRoleBinding.Name + "-upgrading")
+
+				r.logger.Log("level", "debug", "message", "Creating new CRB instead of updating")
+				_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Create(&newCRB)
+				if apierrors.IsAlreadyExists(err) {
+				} else if err != nil {
+					return microerror.Mask(err)
+				}
+
+				// Get existing CRB
+
+				// Change its name
+
+				// Create the new one using the original name
+
+				// Delete the renamed one. Wait for all old Pods to be deleted?
+
+				// Alternatively, create the new one with a new name
 			}
 			if err != nil {
 				return microerror.Mask(err)
