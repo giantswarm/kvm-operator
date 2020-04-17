@@ -10,6 +10,9 @@ room for such suffix.
 {{- define "resource.default.name" -}}
 {{- .Release.Name | replace "." "-" | trunc 47 | trimSuffix "-" -}}
 {{- end -}}
+{{- define "resource.default.namespace" -}}
+giantswarm
+{{- end -}}
 
 {{- define "resource.psp.name" -}}
 {{- include "resource.default.name" . -}}-psp
