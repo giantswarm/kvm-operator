@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/giantswarm/microerror"
-	"k8s.io/apimachinery/pkg/api/validation"
 )
 
 var fieldImmutableError = &microerror.Error{
@@ -12,7 +11,9 @@ var fieldImmutableError = &microerror.Error{
 }
 
 func isExternalFieldImmutableError(err error) bool {
-	return strings.Contains(err.Error(), validation.FieldImmutableErrorMsg)
+	// Would be nice to use validation.FieldImmutableErrorMsg here,
+	// but can't seem to get it from the wrapped error reliably
+	return strings.Contains(err.Error(), "cannot change roleRef")
 }
 
 // IsFieldImmutableError asserts fieldImmutableError
