@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
@@ -13,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
+func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
 	var deployments []*v1.Deployment
 
 	privileged := true
@@ -22,6 +23,11 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 
 	for i, masterNode := range customResource.Spec.Cluster.Masters {
 		capabilities := customResource.Spec.KVM.Masters[i]
+
+		containerDistro, err := key.ContainerDistro(release)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 
 		cpuQuantity, err := key.CPUQuantity(capabilities)
 		if err != nil {
@@ -140,7 +146,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 								Name: "images",
 								VolumeSource: apiv1.VolumeSource{
 									HostPath: &apiv1.HostPathVolumeSource{
-										Path: key.CoreosImageDir,
+										Path: key.FlatcarImageDir,
 									},
 								},
 							},
@@ -203,8 +209,12 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, dnsServers, ntpServ
 										Value: fmt.Sprintf("%d", capabilities.CPUs),
 									},
 									{
-										Name:  "COREOS_VERSION",
-										Value: key.CoreosVersion,
+										Name:  "FLATCAR_VERSION",
+										Value: containerDistro,
+									},
+									{
+										Name:  "FLATCAR_CHANNEL",
+										Value: key.FlatcarChannel,
 									},
 									{
 										Name:  "DISK_DOCKER",

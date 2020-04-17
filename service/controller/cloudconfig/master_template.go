@@ -5,7 +5,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_4_9_1"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_4_9_2"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -33,6 +33,7 @@ func (c *CloudConfig) NewMasterTemplate(data IgnitionTemplateData, node v1alpha1
 		}
 		params.Node = node
 		params.Hyperkube.Apiserver.Pod.CommandExtraArgs = c.k8sAPIExtraArgs
+		params.Images = data.Images
 		params.SSOPublicKey = c.ssoPublicKey
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)

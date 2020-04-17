@@ -38,8 +38,11 @@ type ClusterResourceSetConfig struct {
 	K8sClient          kubernetes.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
+	RegistryDomain     string
 	TenantCluster      tenantcluster.Interface
 
+	ClusterRoleGeneral string
+	ClusterRolePSP     string
 	DNSServers         string
 	GuestUpdateEnabled bool
 	IgnitionPath       string
@@ -73,6 +76,9 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := clusterrolebinding.Config{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			ClusterRoleGeneral: config.ClusterRoleGeneral,
+			ClusterRolePSP:     config.ClusterRolePSP,
 		}
 
 		ops, err := clusterrolebinding.New(c)
@@ -125,11 +131,13 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	var configMapResource resource.Interface
 	{
 		c := configmap.Config{
-			CertsSearcher: config.CertsSearcher,
-			CloudConfig:   cloudConfig,
-			K8sClient:     config.K8sClient,
-			KeyWatcher:    config.RandomkeysSearcher,
-			Logger:        config.Logger,
+			CertsSearcher:  config.CertsSearcher,
+			CloudConfig:    cloudConfig,
+			G8sClient:      config.G8sClient,
+			K8sClient:      config.K8sClient,
+			KeyWatcher:     config.RandomkeysSearcher,
+			Logger:         config.Logger,
+			RegistryDomain: config.RegistryDomain,
 		}
 
 		ops, err := configmap.New(c)
@@ -147,6 +155,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	{
 		c := deployment.Config{
 			DNSServers: config.DNSServers,
+			G8sClient:  config.G8sClient,
 			K8sClient:  config.K8sClient,
 			Logger:     config.Logger,
 			NTPServers: config.NTPServers,
@@ -240,7 +249,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			Logger:                   config.Logger,
 			RESTClient:               config.G8sClient.ProviderV1alpha1().RESTClient(),
 			TenantCluster:            config.TenantCluster,
-			VersionBundleVersionFunc: key.ToVersionBundleVersion,
+			VersionBundleVersionFunc: key.ToOperatorVersion,
 		}
 
 		statusResource, err = statusresource.NewResource(c)
@@ -288,7 +297,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			return false
 		}
 
-		if key.VersionBundleVersion(kvmConfig) == project.NewVersionBundle().Version {
+		if key.OperatorVersion(kvmConfig) == project.Version() {
 			return true
 		}
 

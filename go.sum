@@ -122,12 +122,14 @@ github.com/giantswarm/certs v0.2.0 h1:IWxNmheSV1hg2H5AZJast25IM01XOXRGA9wkUT7PLg
 github.com/giantswarm/certs v0.2.0/go.mod h1:Axozt4pVBuaLKDzH8TwMEDGil4y2c4/2XvUnsGNeYg8=
 github.com/giantswarm/errors v0.2.0 h1:l9bAe0IQBHLkZQVT+h79DTCJQ3tuDFrOfUySVlbKn10=
 github.com/giantswarm/errors v0.2.0/go.mod h1:Oj1LIWs9Uoj6JGtK5HxTb50iZuqe9f60LDI0nLXA5vU=
+github.com/giantswarm/errors v0.2.2 h1:O7shm0kFukHgzuX3iVZvxleu1RZXHFVEro/e8Ge3CgI=
+github.com/giantswarm/errors v0.2.2/go.mod h1:Oj1LIWs9Uoj6JGtK5HxTb50iZuqe9f60LDI0nLXA5vU=
 github.com/giantswarm/exporterkit v0.2.0 h1:+HTGl4fmT/1OkTox8HbV3JXeavmsZv94+2CDW8cSrq0=
 github.com/giantswarm/exporterkit v0.2.0/go.mod h1:b4fuHVjsvZgznC9OEPfn0y5zvN8SnEKTiI5zTTfck94=
 github.com/giantswarm/k8sclient v0.2.0 h1:Az+Knfs2UJrNFoqfOsfkudg+rt3fn5EM1aKrnLSg3fU=
 github.com/giantswarm/k8sclient v0.2.0/go.mod h1:tUgUynwKgMnjnN2PldGmxJW6+8eZn2p7tT+tEhXDwOg=
-github.com/giantswarm/k8scloudconfig/v6 v6.0.1 h1:Ic692cOO5hFJop0ZeADfx4491qV87uMq+fHYHNre4Ik=
-github.com/giantswarm/k8scloudconfig/v6 v6.0.1/go.mod h1:N6ViyVLAem65Sw4mCgE472blmXPa/JQm32FJLL6W+JA=
+github.com/giantswarm/k8scloudconfig/v6 v6.0.3 h1:SNfJy1DWoFmuX6mh03GeFh98YE3/TvfsnCKMGw9YhgY=
+github.com/giantswarm/k8scloudconfig/v6 v6.0.3/go.mod h1:N6ViyVLAem65Sw4mCgE472blmXPa/JQm32FJLL6W+JA=
 github.com/giantswarm/microendpoint v0.2.0 h1:xCAqAVRjTw/4ifEuBeNavALdbQsLk6+k/ukzdy0GWZE=
 github.com/giantswarm/microendpoint v0.2.0/go.mod h1:SSkSp4Q4iSW7vwkil+/E3IXy9Q8To8vXmT5VCg24RDg=
 github.com/giantswarm/microerror v0.2.0 h1:SaE7S34mp/wEiQkgtPiq8wQbNUTCj1gjiCWPjO3wgJo=
@@ -140,8 +142,8 @@ github.com/giantswarm/operatorkit v0.2.0 h1:OY5NCS4L4MPpZgtzvPlpUXlLK9d7VxHOzDy0
 github.com/giantswarm/operatorkit v0.2.0/go.mod h1:i/yHa01y+d67ZzZBOck56CcZLkbRIx89ZqAoK46+Bjs=
 github.com/giantswarm/randomkeys v0.2.0 h1:e03tqr+OemoyF42BrlQpdeHZ/xvqJd4ALW5IM2X26Ek=
 github.com/giantswarm/randomkeys v0.2.0/go.mod h1:24kbDDO8XgP+nx7SKaX/z5I/qhj4X4n+hiSynpD/9Kk=
-github.com/giantswarm/statusresource v0.0.0-20200103225110-1c017ce979b3 h1:cc23Y9aYRh8vjUCiVKzR+bOZfgsQL2JBrAxf/vbpKVQ=
-github.com/giantswarm/statusresource v0.0.0-20200103225110-1c017ce979b3/go.mod h1:ouO2vJ0oIR0NlaqHN0n/C+Qj50h8bRGdZyPl8787B2o=
+github.com/giantswarm/statusresource v0.2.0 h1:e3AHF4UyUN7ulZZLLVu41J2bq5G+w0O5KAm4SoRDDg4=
+github.com/giantswarm/statusresource v0.2.0/go.mod h1:f4w2A+RpOt7SUD23iHtOP3yUZsjczhtQoA50ehoY8uo=
 github.com/giantswarm/tenantcluster v0.2.0 h1:NDra7kcxt22w4HwxuVgBGjgG5BHjZ5bxtlYk2YmXaEk=
 github.com/giantswarm/tenantcluster v0.2.0/go.mod h1:YMYyVokto7LbAhl3eezMbpKJtzJ9axqNrvM5VbYWLgs=
 github.com/giantswarm/to v0.2.0 h1:qZj0DUnjUcI/7ajwIVtT6mwmSYQm8g0qBvAPCoS1ZF8=

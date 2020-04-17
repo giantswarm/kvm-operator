@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	v1 "k8s.io/api/apps/v1"
@@ -17,6 +18,7 @@ const (
 // Config represents the configuration used to create a new deployment resource.
 type Config struct {
 	DNSServers string
+	G8sClient  versioned.Interface
 	K8sClient  kubernetes.Interface
 	Logger     micrologger.Logger
 	NTPServers string
@@ -25,6 +27,7 @@ type Config struct {
 // Resource implements the deployment resource.
 type Resource struct {
 	dnsServers string
+	g8sClient  versioned.Interface
 	k8sClient  kubernetes.Interface
 	logger     micrologger.Logger
 	ntpServers string
@@ -35,6 +38,9 @@ func New(config Config) (*Resource, error) {
 	if config.DNSServers == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.DNSServers must not be empty", config)
 	}
+	if config.G8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
+	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
@@ -44,6 +50,7 @@ func New(config Config) (*Resource, error) {
 
 	newResource := &Resource{
 		dnsServers: config.DNSServers,
+		g8sClient:  config.G8sClient,
 		k8sClient:  config.K8sClient,
 		logger:     config.Logger,
 		ntpServers: config.NTPServers,

@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_4_9_2"
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -50,13 +53,16 @@ const (
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
 	FlannelEnvPathPrefix = "/run/flannel"
-	CoreosImageDir       = "/var/lib/coreos-kvm-images"
-	CoreosVersion        = "2191.5.0"
 
-	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:9172ffbc4838cf0c813d8e6d141e994d56dcc750"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:e9989b8667070b8a10a030e2f1f6078d2ffb803e"
+	ContainerLinuxComponentName = "containerlinux"
+
+	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
+	FlatcarChannel  = "stable"
+
+	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:416097011707a2d0991964081167b7e883c57476"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:ce9ca8fed6e6d328da745479d125d5f64ec27121"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:20517098a762a0d7ca2b0902316ddff487dbc7f5"
-	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:022df58313aab9a185f2a78d9bd107d6f7db13c9"
+	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:ca610b410c34ab7209c6393aab8fb5453c6fa2d7"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
@@ -76,6 +82,12 @@ const (
 	// DefaultOSDiskSize defines the space used to partition the root FS within
 	// k8s-kvm.
 	DefaultOSDiskSize = "5G"
+)
+
+const (
+	kubectlVersion               = "1.15.11"
+	KubernetesNetworkSetupDocker = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
+	kubernetesAPIHealthzVersion  = "0999549a4c334b646288d08bd2c781c6aae2e12f"
 )
 
 const (
@@ -196,6 +208,16 @@ func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
 }
 
+func ContainerDistro(release *releasev1alpha1.Release) (string, error) {
+	for _, component := range release.Spec.Components {
+		if component.Name == ContainerLinuxComponentName {
+			return component.Version, nil
+		}
+	}
+
+	return "", microerror.Mask(missingVersionError)
+}
+
 func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	cpu := strconv.Itoa(n.CPUs)
 	q, err := resource.ParseQuantity(cpu)
@@ -203,6 +225,14 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 		return resource.Quantity{}, microerror.Mask(err)
 	}
 	return q, nil
+}
+
+func DefaultVersions() k8scloudconfig.Versions {
+	return k8scloudconfig.Versions{
+		Kubectl:                      kubectlVersion,
+		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
+		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
+	}
 }
 
 func DeploymentName(prefix string, nodeID string) string {
@@ -408,6 +438,10 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	return idx, present
 }
 
+func OperatorVersion(cr v1alpha1.KVMConfig) string {
+	return cr.GetLabels()[label.OperatorVersion]
+}
+
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	var ports []corev1.ServicePort
 
@@ -517,6 +551,15 @@ func ToNodeCount(v interface{}) (int, error) {
 	nodeCount := MasterCount(customObject) + WorkerCount(customObject)
 
 	return nodeCount, nil
+}
+
+func ToOperatorVersion(v interface{}) (string, error) {
+	customObject, err := ToCustomObject(v)
+	if err != nil {
+		return "", microerror.Mask(err)
+	}
+
+	return OperatorVersion(customObject), nil
 }
 
 func ToPod(v interface{}) (*corev1.Pod, error) {

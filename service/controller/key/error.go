@@ -18,6 +18,14 @@ func IsMissingAnnotationError(err error) bool {
 	return microerror.Cause(err) == missingAnnotationError
 }
 
+var missingVersionError = &microerror.Error{
+	Kind: "missingVersionError",
+}
+
+func IsMissingVersionError(err error) bool {
+	return microerror.Cause(err) == missingVersionError
+}
+
 var wrongTypeError = &microerror.Error{
 	Kind: "wrongTypeError",
 }

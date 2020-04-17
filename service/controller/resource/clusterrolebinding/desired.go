@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	apiv1 "k8s.io/api/rbac/v1beta1"
+	apiv1 "k8s.io/api/rbac/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -32,7 +32,6 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*apiv1.ClusterRoleBinding, error) {
 	var clusterRoleBindings []*apiv1.ClusterRoleBinding
-
 	generalClusterRoleBinding := &apiv1.ClusterRoleBinding{
 		TypeMeta: apismetav1.TypeMeta{
 			Kind:       "ClusterRoleBinding",
@@ -56,7 +55,7 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 		RoleRef: apiv1.RoleRef{
 			APIGroup: apiv1.GroupName,
 			Kind:     "ClusterRole",
-			Name:     "kvm-operator",
+			Name:     r.clusterRoleGeneral,
 		},
 	}
 
@@ -85,7 +84,7 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 		RoleRef: apiv1.RoleRef{
 			APIGroup: apiv1.GroupName,
 			Kind:     "ClusterRole",
-			Name:     "kvm-operator-psp",
+			Name:     r.clusterRolePSP,
 		},
 	}
 

@@ -12,3 +12,7 @@ const (
 	Organization   = "giantswarm.io/organization"
 	ReleaseVersion = "release.giantswarm.io/version"
 )
+
+const (
+	OperatorVersion = "kvm-operator.giantswarm.io/version"
+)

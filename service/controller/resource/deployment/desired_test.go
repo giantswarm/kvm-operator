@@ -6,14 +6,41 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	apiextfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/micrologger/microloggertest"
 	v1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
 func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
+	release := releasev1alpha1.NewReleaseCR()
+	release.ObjectMeta.Name = "v1.0.0"
+	targetDistro := "2345.3.0"
+	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
+		{
+			Name:    "kubernetes",
+			Version: "1.15.11",
+		},
+		{
+			Name:    "calico",
+			Version: "3.9.1",
+		},
+		{
+			Name:    "etcd",
+			Version: "3.3.15",
+		},
+		{
+			Name:    "containerlinux",
+			Version: targetDistro,
+		},
+	}
+	clientset := apiextfake.NewSimpleClientset(release)
+
 	testCases := []struct {
 		Obj                      interface{}
 		ExpectedMasterCount      int
@@ -25,6 +52,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		// there is one master and one worker node in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -80,6 +112,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		// there is one master and three worker nodes in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -159,6 +196,11 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		// there are three master and three worker nodes in the custom object.
 		{
 			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
@@ -264,6 +306,7 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	{
 		resourceConfig := Config{
 			DNSServers: "dnsserver1,dnsserver2",
+			G8sClient:  clientset,
 			K8sClient:  fake.NewSimpleClientset(),
 			Logger:     microloggertest.New(),
 		}
@@ -296,6 +339,18 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			t.Fatalf("case %d expected %d nodes got %d", i, tc.ExpectedMasterCount+tc.ExpectedWorkerCount, len(deployments))
 		}
 
+		for _, v := range testCorrectDistroVersions(deployments, "master-") {
+			if v.Value != targetDistro {
+				t.Fatalf("case %d expected %#v got %#v", i, targetDistro, v.Value)
+			}
+		}
+
+		for _, v := range testCorrectDistroVersions(deployments, "worker-") {
+			if v.Value != targetDistro {
+				t.Fatalf("case %d expected %#v got %#v", i, targetDistro, v.Value)
+			}
+		}
+
 		for j, r := range testGetK8sMasterKVMResources(deployments) {
 			expectedCPU := tc.ExpectedMastersResources[j].Requests.Cpu()
 			if r.Requests.Cpu().Cmp(*expectedCPU) != 0 {
@@ -318,6 +373,36 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			}
 		}
 	}
+}
+
+func testCorrectDistroVersions(deployments []*v1.Deployment, prefix string) []apiv1.EnvVar {
+	return testCorrectEnvVars(deployments, prefix, "FLATCAR_VERSION")
+}
+
+func testCorrectEnvVars(deployments []*v1.Deployment, prefix string, varName string) []apiv1.EnvVar {
+	var evs []apiv1.EnvVar
+
+	for _, d := range deployments {
+		if !strings.HasPrefix(d.Name, prefix) {
+			continue
+		}
+		for _, c := range d.Spec.Template.Spec.Containers {
+			if c.Name == "k8s-kvm" {
+				found := false
+				for _, e := range c.Env {
+					if e.Name == varName {
+						evs = append(evs, e)
+						found = true
+					}
+				}
+				if !found {
+					evs = append(evs, apiv1.EnvVar{})
+				}
+			}
+		}
+	}
+
+	return evs
 }
 
 func testGetMasterCount(deployments []*v1.Deployment) int {

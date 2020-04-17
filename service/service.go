@@ -136,6 +136,8 @@ func New(config Config) (*Service, error) {
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
+			ClusterRoleGeneral: config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.General),
+			ClusterRolePSP:     config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.PSP),
 			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
 			ProjectName:        project.Name(),
@@ -149,7 +151,8 @@ func New(config Config) (*Service, error) {
 				UsernameClaim: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
 				GroupsClaim:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
 			},
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+			RegistryDomain: config.Viper.GetString(config.Flag.Service.RegistryDomain),
+			SSOPublicKey:   config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 		}
 
 		clusterController, err = controller.NewCluster(c)

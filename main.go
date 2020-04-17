@@ -113,6 +113,8 @@ func mainError() error {
 	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim, "", "OIDC authorization provider GroupsClaim.")
 
 	daemonCommand.PersistentFlags().String(f.Service.CRD.LabelSelector, "", "Label selector for CRD informer ListOptions.")
+	daemonCommand.PersistentFlags().String(f.Service.RBAC.ClusterRole.General, "", "Name of existing general ClusterRole to be used for tenant cluster node pods.")
+	daemonCommand.PersistentFlags().String(f.Service.RBAC.ClusterRole.PSP, "", "Name of existing ClusterRole with PSP to be used for tenant cluster node pods.")
 
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.Address, "http://127.0.0.1:6443", "Address used to connect to Kubernetes. When empty in-cluster config is created.")
 	daemonCommand.PersistentFlags().Bool(f.Service.Kubernetes.InCluster, false, "Whether to use the in-cluster config to authenticate with Kubernetes.")
@@ -120,6 +122,8 @@ func mainError() error {
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.TLS.CAFile, "", "Certificate authority file path to use to authenticate with Kubernetes.")
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.TLS.CrtFile, "", "Certificate file path to use to authenticate with Kubernetes.")
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.TLS.KeyFile, "", "Key file path to use to authenticate with Kubernetes.")
+
+	daemonCommand.PersistentFlags().String(f.Service.RegistryDomain, "quay.io", "Image registry.")
 
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.Ignition.Path, "/opt/ignition", "Default path for the ignition base directory.")
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")

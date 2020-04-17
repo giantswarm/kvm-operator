@@ -5,16 +5,16 @@ go 1.14
 require (
 	github.com/giantswarm/apiextensions v0.2.0
 	github.com/giantswarm/certs v0.2.0
-	github.com/giantswarm/errors v0.2.0
+	github.com/giantswarm/errors v0.2.2
 	github.com/giantswarm/k8sclient v0.2.0
-	github.com/giantswarm/k8scloudconfig/v6 v6.0.1
+	github.com/giantswarm/k8scloudconfig/v6 v6.0.3
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.0
 	github.com/giantswarm/microkit v0.2.0
 	github.com/giantswarm/micrologger v0.3.1
 	github.com/giantswarm/operatorkit v0.2.0
 	github.com/giantswarm/randomkeys v0.2.0
-	github.com/giantswarm/statusresource v0.0.0-20200103225110-1c017ce979b3
+	github.com/giantswarm/statusresource v0.2.0
 	github.com/giantswarm/tenantcluster v0.2.0
 	github.com/giantswarm/versionbundle v0.2.0
 	github.com/gogo/protobuf v1.3.1 // indirect

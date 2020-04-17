@@ -65,15 +65,19 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
+	if config.RegistryDomain == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.RegistryDomain must not be empty", config)
+	}
 
 	newService := &Resource{
 		// Dependencies.
-		certsSearcher: config.CertsSearcher,
-		cloudConfig:   config.CloudConfig,
-		k8sClient:     config.K8sClient,
-		g8sClient:     config.G8sClient,
-		keyWatcher:    config.KeyWatcher,
-		logger:        config.Logger,
+		certsSearcher:  config.CertsSearcher,
+		cloudConfig:    config.CloudConfig,
+		k8sClient:      config.K8sClient,
+		g8sClient:      config.G8sClient,
+		keyWatcher:     config.KeyWatcher,
+		logger:         config.Logger,
+		registryDomain: config.RegistryDomain,
 	}
 
 	return newService, nil
