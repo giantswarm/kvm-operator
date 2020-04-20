@@ -37,10 +37,12 @@ type ClusterConfig struct {
 // ClusterConfigOIDC represents the configuration of the OIDC authorization
 // provider.
 type ClusterConfigOIDC struct {
-	ClientID      string
-	IssuerURL     string
-	UsernameClaim string
-	GroupsClaim   string
+	ClientID       string
+	IssuerURL      string
+	UsernameClaim  string
+	UsernamePrefix string
+	GroupsClaim    string
+	GroupsPrefix   string
 }
 
 func (c ClusterConfig) newInformerListOptions() metav1.ListOptions {
@@ -94,10 +96,12 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			NTPServers:         config.NTPServers,
 			ProjectName:        config.ProjectName,
 			OIDC: cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
+				ClientID:       config.OIDC.ClientID,
+				IssuerURL:      config.OIDC.IssuerURL,
+				UsernameClaim:  config.OIDC.UsernameClaim,
+				UsernamePrefix: config.OIDC.UsernamePrefix,
+				GroupsClaim:    config.OIDC.GroupsClaim,
+				GroupsPrefix:   config.OIDC.GroupsPrefix,
 			},
 			SSOPublicKey: config.SSOPublicKey,
 		}

@@ -54,10 +54,12 @@ type CloudConfig struct {
 
 // OIDCConfig represents the configuration of the OIDC authorization provider
 type OIDCConfig struct {
-	ClientID      string
-	IssuerURL     string
-	UsernameClaim string
-	GroupsClaim   string
+	ClientID       string
+	IssuerURL      string
+	UsernameClaim  string
+	UsernamePrefix string
+	GroupsClaim    string
+	GroupsPrefix   string
 }
 
 // New creates a new configured cloud config service.
@@ -82,8 +84,14 @@ func New(config Config) (*CloudConfig, error) {
 		if config.OIDC.UsernameClaim != "" {
 			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-username-claim=%s", config.OIDC.UsernameClaim))
 		}
+		if config.OIDC.UsernamePrefix != "" {
+			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-username-prefix=%s", config.OIDC.UsernamePrefix))
+		}
 		if config.OIDC.GroupsClaim != "" {
 			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-groups-claim=%s", config.OIDC.GroupsClaim))
+		}
+		if config.OIDC.GroupsPrefix != "" {
+			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-groups-prefix=%s", config.OIDC.GroupsPrefix))
 		}
 	}
 
