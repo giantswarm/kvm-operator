@@ -70,27 +70,6 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	// var clusterRoleBindingResource resource.Interface
-	// {
-	// 	c := clusterrolebinding.Config{
-	// 		K8sClient: config.K8sClient,
-	// 		Logger:    config.Logger,
-
-	// 		ClusterRoleGeneral: config.ClusterRoleGeneral,
-	// 		ClusterRolePSP:     config.ClusterRolePSP,
-	// 	}
-
-	// 	ops, err := clusterrolebinding.New(c)
-	// 	if err != nil {
-	// 		return nil, microerror.Mask(err)
-	// 	}
-
-	// 	clusterRoleBindingResource, err = toCRUDResource(config.Logger, ops)
-	// 	if err != nil {
-	// 		return nil, microerror.Mask(err)
-	// 	}
-	// }
-
 	var namespaceResource resource.Interface
 	{
 		c := namespace.DefaultConfig()
@@ -260,7 +239,6 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	resources := []resource.Interface{
 		statusResource,
 		nodeIndexStatusResource,
-		// clusterRoleBindingResource,
 		namespaceResource,
 		serviceAccountResource,
 		configMapResource,
