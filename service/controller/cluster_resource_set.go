@@ -21,7 +21,6 @@ import (
 	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/clusterrolebinding"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/configmap"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/deployment"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/ingress"
@@ -71,26 +70,26 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var clusterRoleBindingResource resource.Interface
-	{
-		c := clusterrolebinding.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
+	// var clusterRoleBindingResource resource.Interface
+	// {
+	// 	c := clusterrolebinding.Config{
+	// 		K8sClient: config.K8sClient,
+	// 		Logger:    config.Logger,
 
-			ClusterRoleGeneral: config.ClusterRoleGeneral,
-			ClusterRolePSP:     config.ClusterRolePSP,
-		}
+	// 		ClusterRoleGeneral: config.ClusterRoleGeneral,
+	// 		ClusterRolePSP:     config.ClusterRolePSP,
+	// 	}
 
-		ops, err := clusterrolebinding.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
+	// 	ops, err := clusterrolebinding.New(c)
+	// 	if err != nil {
+	// 		return nil, microerror.Mask(err)
+	// 	}
 
-		clusterRoleBindingResource, err = toCRUDResource(config.Logger, ops)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
+	// 	clusterRoleBindingResource, err = toCRUDResource(config.Logger, ops)
+	// 	if err != nil {
+	// 		return nil, microerror.Mask(err)
+	// 	}
+	// }
 
 	var namespaceResource resource.Interface
 	{
@@ -261,7 +260,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	resources := []resource.Interface{
 		statusResource,
 		nodeIndexStatusResource,
-		clusterRoleBindingResource,
+		// clusterRoleBindingResource,
 		namespaceResource,
 		serviceAccountResource,
 		configMapResource,
