@@ -24,19 +24,8 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 		for _, clusterRoleBinding := range clusterRoleBindingsToUpdate {
 			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
 			if isExternalFieldImmutableError(err) {
-				// We can't change a RoleRef, so create a temporary CRB which references the new RoleRef
-				newCRB := apiv1.ClusterRoleBinding{}
+				// We can't change a RoleRef, so delete the old CRB and replace it
 
-				clusterRoleBinding.DeepCopyInto(&newCRB)
-				temporaryName := clusterRoleBinding.Name + "-upgrading"
-				newCRB.SetName(temporaryName)
-
-				_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Create(&newCRB)
-				if apierrors.IsAlreadyExists(err) {
-				} else if err != nil {
-					return microerror.Mask(err)
-				}
-				// Try deleting and then move to re-create-crb branch
 				// Delete the old CRB
 				err = r.k8sClient.RbacV1().ClusterRoleBindings().Delete(clusterRoleBinding.Name, &apismetav1.DeleteOptions{})
 				if apierrors.IsNotFound(err) {
@@ -44,21 +33,13 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 					return microerror.Mask(err)
 				}
 
-				// Create a CRB with the original name, but use the new configuration
-				newCRB.SetName(clusterRoleBinding.Name)
-
-				_, err = r.k8sClient.RbacV1().ClusterRoleBindings().Create(&newCRB)
+				// Create the new CRB
+				_, err = r.k8sClient.RbacV1().ClusterRoleBindings().Create(clusterRoleBinding)
 				if apierrors.IsAlreadyExists(err) {
 				} else if err != nil {
 					return microerror.Mask(err)
 				}
 
-				// Delete the intermediate CRB
-				err = r.k8sClient.RbacV1().ClusterRoleBindings().Delete(temporaryName, &apismetav1.DeleteOptions{})
-				if apierrors.IsNotFound(err) {
-				} else if err != nil {
-					return microerror.Mask(err)
-				}
 			} else if err != nil {
 				return microerror.Mask(err)
 			}
