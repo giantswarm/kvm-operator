@@ -21,7 +21,7 @@ import (
 
 func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 	release := releasev1alpha1.NewReleaseCR()
-	release.ObjectMeta.Name = "v1.0.0"
+	release.ObjectMeta.Name = "v1.0.1"
 	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
 		{
 			Name:    "kubernetes",

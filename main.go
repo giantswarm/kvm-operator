@@ -132,7 +132,10 @@ func mainError() error {
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")
 	daemonCommand.PersistentFlags().Bool(f.Service.Tenant.Update.Enabled, false, "Whether updates of tenant cluster nodes are allowed to be processed upon reconciliation.")
 
-	newCommand.CobraCommand().Execute()
+	err = newCommand.CobraCommand().Execute()
+	if err != nil {
+		return microerror.Mask(err)
+	}
 
 	return nil
 }

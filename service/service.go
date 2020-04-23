@@ -242,7 +242,12 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.statusResourceCollector.Boot(context.Background())
+		go func() {
+			err := s.statusResourceCollector.Boot(context.Background())
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+		}()
 
 		go s.clusterController.Boot(context.Background())
 		go s.deleterController.Boot(context.Background())

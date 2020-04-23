@@ -129,13 +129,9 @@ const (
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
 	var results []v1alpha1.ClusterNode
 
-	for _, v := range cr.Spec.Cluster.Masters {
-		results = append(results, v)
-	}
+	results = append(results, cr.Spec.Cluster.Masters...)
 
-	for _, v := range cr.Spec.Cluster.Workers {
-		results = append(results, v)
-	}
+	results = append(results, cr.Spec.Cluster.Workers...)
 
 	return results
 }
