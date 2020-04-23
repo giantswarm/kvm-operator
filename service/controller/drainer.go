@@ -1,14 +1,11 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -22,18 +19,6 @@ type DrainerConfig struct {
 
 	CRDLabelSelector string
 	ProjectName      string
-}
-
-func (c DrainerConfig) newInformerListOptions() metav1.ListOptions {
-	listOptions := metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("%s=%s", key.PodWatcherLabel, c.ProjectName),
-	}
-
-	if c.CRDLabelSelector != "" {
-		listOptions.LabelSelector = listOptions.LabelSelector + "," + c.CRDLabelSelector
-	}
-
-	return listOptions
 }
 
 type Drainer struct {

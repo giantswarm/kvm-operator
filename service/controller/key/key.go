@@ -12,11 +12,12 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_4_9_2"
-	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/giantswarm/kvm-operator/pkg/label"
 )
 
 const (
@@ -128,13 +129,9 @@ const (
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
 	var results []v1alpha1.ClusterNode
 
-	for _, v := range cr.Spec.Cluster.Masters {
-		results = append(results, v)
-	}
+	results = append(results, cr.Spec.Cluster.Masters...)
 
-	for _, v := range cr.Spec.Cluster.Workers {
-		results = append(results, v)
-	}
+	results = append(results, cr.Spec.Cluster.Workers...)
 
 	return results
 }
