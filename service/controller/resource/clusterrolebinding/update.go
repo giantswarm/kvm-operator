@@ -25,7 +25,9 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
 			if isExternalFieldImmutableError(err) {
 				// We can't change a RoleRef, so delete the old CRB and replace it
+				r.logger.LogCtx(ctx, "level", "debug", "message", "unable to update immutable field, re-creating the cluster role binding instead")
 
+				r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the old cluster role binding")
 				// Delete the old CRB
 				err = r.k8sClient.RbacV1().ClusterRoleBindings().Delete(clusterRoleBinding.Name, &apismetav1.DeleteOptions{})
 				if apierrors.IsNotFound(err) {
@@ -33,6 +35,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 					return microerror.Mask(err)
 				}
 
+				r.logger.LogCtx(ctx, "level", "debug", "message", "creating the new cluster role binding")
 				// Create the new CRB
 				_, err = r.k8sClient.RbacV1().ClusterRoleBindings().Create(clusterRoleBinding)
 				if apierrors.IsAlreadyExists(err) {
