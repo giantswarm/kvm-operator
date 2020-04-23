@@ -3,14 +3,15 @@ package main
 import (
 	"fmt"
 
-	"github.com/giantswarm/kvm-operator/flag"
-	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command"
 	microserver "github.com/giantswarm/microkit/server"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/versionbundle"
 	"github.com/spf13/viper"
+
+	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 
 	"github.com/giantswarm/kvm-operator/server"
 	"github.com/giantswarm/kvm-operator/service"
