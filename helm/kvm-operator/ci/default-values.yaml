@@ -1,0 +1,31 @@
+---
+Installation:
+  V1:
+    Secret:
+      Registry:
+        PullSecret:
+          DockerConfigJSON: ""
+    GiantSwarm:
+      KVMOperator:
+        CRD:
+          LabelSelector: ""
+    Provider:
+      KVM:
+        DNS:
+          Servers: ""
+        NTP:
+          Servers: ""
+    Guest:
+      Kubernetes:
+        API:
+          Auth:
+            Provider:
+              OIDC:
+                ClientID: ""
+                IssuerURL: ""
+                UsernameClaim: ""
+                GroupsClaim: ""
+      SSH:
+        SSOPublicKey: ""
+      Update:
+        Enabled: ""
