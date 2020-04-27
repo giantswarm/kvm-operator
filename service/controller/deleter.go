@@ -10,7 +10,6 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/tenantcluster"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -24,14 +23,6 @@ type DeleterConfig struct {
 
 	CRDLabelSelector string
 	ProjectName      string
-}
-
-func (c DeleterConfig) newInformerListOptions() metav1.ListOptions {
-	listOptions := metav1.ListOptions{
-		LabelSelector: c.CRDLabelSelector,
-	}
-
-	return listOptions
 }
 
 type Deleter struct {

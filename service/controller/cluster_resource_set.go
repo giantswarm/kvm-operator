@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
@@ -33,9 +34,11 @@ import (
 
 type ClusterResourceSetConfig struct {
 	CertsSearcher      certs.Interface
+	G8sClient          versioned.Interface
 	K8sClient          k8sclient.Interface
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
+	RegistryDomain     string
 	TenantCluster      tenantcluster.Interface
 
 	ClusterRoleGeneral string
@@ -128,11 +131,13 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	var configMapResource resource.Interface
 	{
 		c := configmap.Config{
-			CertsSearcher: config.CertsSearcher,
-			CloudConfig:   cloudConfig,
-			K8sClient:     config.K8sClient.K8sClient(),
-			KeyWatcher:    config.RandomkeysSearcher,
-			Logger:        config.Logger,
+			CertsSearcher:  config.CertsSearcher,
+			CloudConfig:    cloudConfig,
+			G8sClient:      config.G8sClient,
+			K8sClient:      config.K8sClient.K8sClient(),
+			KeyWatcher:     config.RandomkeysSearcher,
+			Logger:         config.Logger,
+			RegistryDomain: config.RegistryDomain,
 		}
 
 		ops, err := configmap.New(c)
@@ -150,6 +155,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	{
 		c := deployment.Config{
 			DNSServers: config.DNSServers,
+			G8sClient:  config.G8sClient,
 			K8sClient:  config.K8sClient.K8sClient(),
 			Logger:     config.Logger,
 			NTPServers: config.NTPServers,

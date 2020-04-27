@@ -10,10 +10,13 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 )
@@ -52,9 +55,11 @@ const (
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
 	FlannelEnvPathPrefix = "/run/flannel"
-	FlatcarImageDir      = "/var/lib/flatcar-kvm-images"
-	FlatcarVersion       = "2345.3.0"
-	FlatcarChannel       = "stable"
+
+	ContainerLinuxComponentName = "containerlinux"
+
+	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
+	FlatcarChannel  = "stable"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:416097011707a2d0991964081167b7e883c57476"
 	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:38e35d7f84a9f24e4bf16614f4ea6ca23dc7f73b"
@@ -101,6 +106,12 @@ const (
 )
 
 const (
+	kubectlVersion               = "1.16.9"
+	KubernetesNetworkSetupDocker = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
+	kubernetesAPIHealthzVersion  = "0999549a4c334b646288d08bd2c781c6aae2e12f"
+)
+
+const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
 )
 
@@ -119,13 +130,9 @@ const (
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
 	var results []v1alpha1.ClusterNode
 
-	for _, v := range cr.Spec.Cluster.Masters {
-		results = append(results, v)
-	}
+	results = append(results, cr.Spec.Cluster.Masters...)
 
-	for _, v := range cr.Spec.Cluster.Workers {
-		results = append(results, v)
-	}
+	results = append(results, cr.Spec.Cluster.Workers...)
 
 	return results
 }
@@ -199,6 +206,16 @@ func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
 }
 
+func ContainerDistro(release *releasev1alpha1.Release) (string, error) {
+	for _, component := range release.Spec.Components {
+		if component.Name == ContainerLinuxComponentName {
+			return component.Version, nil
+		}
+	}
+
+	return "", microerror.Mask(missingVersionError)
+}
+
 func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	cpu := strconv.Itoa(n.CPUs)
 	q, err := resource.ParseQuantity(cpu)
@@ -210,6 +227,14 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 
 func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
+}
+
+func DefaultVersions() k8scloudconfig.Versions {
+	return k8scloudconfig.Versions{
+		Kubectl:                      kubectlVersion,
+		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
+		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
+	}
 }
 
 func DockerVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
@@ -318,7 +343,7 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 func MemoryQuantityMaster(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	q, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from node definition: %s", err)
 	}
 	additionalMemory := resource.MustParse(baseMasterMemoryOverhead)
 	q.Add(additionalMemory)
@@ -335,13 +360,13 @@ func MemoryQuantityMaster(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	mQuantity, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "calculating memory overhead multiplier")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error calculating memory overhead multiplier: %s", err)
 	}
 
 	// base worker memory calculated in MB
 	q, err := resource.ParseQuantity(fmt.Sprintf("%dM", mQuantity.ScaledValue(resource.Giga)*1024))
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from node definition")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from node definition: %s", err)
 	}
 	// IO overhead for qemu is around 512M memory
 	ioOverhead := resource.MustParse(qemuMemoryIOOverhead)
@@ -367,7 +392,7 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 
 	memOverhead, err := resource.ParseQuantity(workerMemoryOverhead)
 	if err != nil {
-		return resource.Quantity{}, microerror.Maskf(err, "creating Memory quantity from memory overhead")
+		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from memory overhead: %s", err)
 	}
 	q.Add(memOverhead)
 

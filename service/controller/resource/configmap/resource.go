@@ -3,6 +3,7 @@ package configmap
 import (
 	"reflect"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -22,21 +23,25 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	CertsSearcher certs.Interface
-	CloudConfig   *cloudconfig.CloudConfig
-	K8sClient     kubernetes.Interface
-	KeyWatcher    randomkeys.Interface
-	Logger        micrologger.Logger
+	CertsSearcher  certs.Interface
+	CloudConfig    *cloudconfig.CloudConfig
+	G8sClient      versioned.Interface
+	K8sClient      kubernetes.Interface
+	KeyWatcher     randomkeys.Interface
+	Logger         micrologger.Logger
+	RegistryDomain string
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	certsSearcher certs.Interface
-	cloudConfig   *cloudconfig.CloudConfig
-	k8sClient     kubernetes.Interface
-	keyWatcher    randomkeys.Interface
-	logger        micrologger.Logger
+	certsSearcher  certs.Interface
+	cloudConfig    *cloudconfig.CloudConfig
+	g8sClient      versioned.Interface
+	k8sClient      kubernetes.Interface
+	keyWatcher     randomkeys.Interface
+	logger         micrologger.Logger
+	registryDomain string
 }
 
 // New creates a new configured config map resource.
@@ -48,6 +53,9 @@ func New(config Config) (*Resource, error) {
 	if config.CloudConfig == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.CloudConfig must not be empty")
 	}
+	if config.G8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.G8sClient must not be empty")
+	}
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
@@ -57,14 +65,19 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
+	if config.RegistryDomain == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.RegistryDomain must not be empty", config)
+	}
 
 	newService := &Resource{
 		// Dependencies.
-		certsSearcher: config.CertsSearcher,
-		cloudConfig:   config.CloudConfig,
-		k8sClient:     config.K8sClient,
-		keyWatcher:    config.KeyWatcher,
-		logger:        config.Logger,
+		certsSearcher:  config.CertsSearcher,
+		cloudConfig:    config.CloudConfig,
+		g8sClient:      config.G8sClient,
+		k8sClient:      config.K8sClient,
+		keyWatcher:     config.KeyWatcher,
+		logger:         config.Logger,
+		registryDomain: config.RegistryDomain,
 	}
 
 	return newService, nil
@@ -76,11 +89,7 @@ func (r *Resource) Name() string {
 
 func containsConfigMap(list []*corev1.ConfigMap, item *corev1.ConfigMap) bool {
 	_, err := getConfigMapByName(list, item.Name)
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 // equals asseses the equality of ConfigMaps with regards to distinguishing

@@ -1,14 +1,16 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: {{ tpl .Values.resource.psp.name . }}
+  name: {{ include "resource.psp.name" . }}
+  labels:
+    {{- include "labels.common" . | nindent 4 }}
 spec:
   privileged: false
   fsGroup:
     rule: MustRunAs
     ranges:
       - min: 1
-        max: 65535 
+        max: 65535
   runAsUser:
     rule: MustRunAsNonRoot
   runAsGroup:

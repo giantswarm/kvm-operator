@@ -5,7 +5,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_5_0_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -13,7 +13,7 @@ import (
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs certs.Cluster, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
 	var err error
 
 	var params k8scloudconfig.Params
@@ -23,10 +23,11 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, certs c
 		params.BaseDomain = key.BaseDomain(customObject)
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &workerExtension{
-			certs:        certs,
+			certs:        data.ClusterCerts,
 			customObject: customObject,
 			nodeIndex:    nodeIndex,
 		}
+		params.Images = data.Images
 		params.Node = node
 		params.SSOPublicKey = c.ssoPublicKey
 

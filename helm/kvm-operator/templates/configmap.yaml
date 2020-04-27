@@ -1,8 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ tpl .Values.resource.default.name  . }}
-  namespace: {{ tpl .Values.resource.default.namespace  . }}
+  name: {{ include "resource.default.name"  . }}
+  namespace: {{ include "resource.default.namespace"  . }}
+  labels:
+    {{- include "labels.common" . | nindent 4 }}
 data:
   config.yml: |
     server:
@@ -16,8 +18,8 @@ data:
         labelSelector: '{{ .Values.Installation.V1.GiantSwarm.KVMOperator.CRD.LabelSelector }}'
       rbac:
         clusterRole:
-          general: {{ tpl .Values.resource.default.name . }}
-          psp: {{ tpl .Values.resource.psp.name . }}
+          general: {{ include "resource.default.name" . }}
+          psp: {{ include "resource.psp.name" . }}
       kubernetes:
         address: ''
         inCluster: true
@@ -40,7 +42,9 @@ data:
                     clientID: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.ClientID }}'
                     issuerURL: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.IssuerURL }}'
                     usernameClaim: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim }}'
+                    usernamePrefix: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix }}'
                     groupsClaim: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim }}'
+                    groupsPrefix: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix }}'
         {{- end }}
       tenant:
         ssh:

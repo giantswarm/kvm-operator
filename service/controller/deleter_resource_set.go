@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"github.com/giantswarm/kvm-operator/service/controller/resource/cleanupendpointips"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/cleanupendpointips"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/node"
 )
 

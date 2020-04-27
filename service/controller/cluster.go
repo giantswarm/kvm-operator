@@ -9,7 +9,6 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/randomkeys"
 	"github.com/giantswarm/tenantcluster"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
@@ -30,24 +29,19 @@ type ClusterConfig struct {
 	NTPServers         string
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
+	RegistryDomain     string
 	SSOPublicKey       string
 }
 
 // ClusterConfigOIDC represents the configuration of the OIDC authorization
 // provider.
 type ClusterConfigOIDC struct {
-	ClientID      string
-	IssuerURL     string
-	UsernameClaim string
-	GroupsClaim   string
-}
-
-func (c ClusterConfig) newInformerListOptions() metav1.ListOptions {
-	listOptions := metav1.ListOptions{
-		LabelSelector: c.CRDLabelSelector,
-	}
-
-	return listOptions
+	ClientID       string
+	IssuerURL      string
+	UsernameClaim  string
+	UsernamePrefix string
+	GroupsClaim    string
+	GroupsPrefix   string
 }
 
 type Cluster struct {
@@ -113,9 +107,11 @@ func newClusterResourceSets(config ClusterConfig) ([]*controller.ResourceSet, er
 	{
 		c := ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
+			G8sClient:          config.K8sClient.G8sClient(),
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
+			RegistryDomain:     config.RegistryDomain,
 			TenantCluster:      config.TenantCluster,
 
 			ClusterRoleGeneral: config.ClusterRoleGeneral,
@@ -126,10 +122,12 @@ func newClusterResourceSets(config ClusterConfig) ([]*controller.ResourceSet, er
 			NTPServers:         config.NTPServers,
 			ProjectName:        config.ProjectName,
 			OIDC: cloudconfig.OIDCConfig{
-				ClientID:      config.OIDC.ClientID,
-				IssuerURL:     config.OIDC.IssuerURL,
-				UsernameClaim: config.OIDC.UsernameClaim,
-				GroupsClaim:   config.OIDC.GroupsClaim,
+				ClientID:       config.OIDC.ClientID,
+				IssuerURL:      config.OIDC.IssuerURL,
+				UsernameClaim:  config.OIDC.UsernameClaim,
+				UsernamePrefix: config.OIDC.UsernamePrefix,
+				GroupsClaim:    config.OIDC.GroupsClaim,
+				GroupsPrefix:   config.OIDC.GroupsPrefix,
 			},
 			SSOPublicKey: config.SSOPublicKey,
 		}

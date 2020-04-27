@@ -1,18 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ tpl .Values.resource.default.name  . }}
-  namespace: {{ tpl .Values.resource.default.namespace  . }}
+  name: {{ include "resource.default.name"  . }}
+  namespace: {{ include "resource.default.namespace"  . }}
   labels:
-    app: {{ .Values.project.name }}
-    version: {{ .Values.project.version }}
+    {{- include "labels.common" . | nindent 4 }}
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: {{ .Values.project.name }}
-      version: {{ .Values.project.version }}
+      {{- include "labels.selector" . | nindent 6 }}
   strategy:
     type: Recreate
   template:
@@ -20,30 +18,29 @@ spec:
       annotations:
         releasetime: {{ $.Release.Time }}
       labels:
-        app: {{ .Values.project.name }}
-        version: {{ .Values.project.version }}
+        {{- include "labels.selector" . | nindent 8 }}
     spec:
       volumes:
-      - name: {{ .Values.project.name }}-configmap
+      - name: {{ .Chart.Name }}-configmap
         configMap:
-          name: {{ tpl .Values.resource.default.name  . }}
+          name: {{ include "resource.default.name"  . }}
           items:
           - key: config.yml
             path: config.yml
-      serviceAccountName: {{ tpl .Values.resource.default.name  . }}
+      serviceAccountName: {{ include "resource.default.name"  . }}
       securityContext:
         runAsUser: {{ .Values.pod.user.id }}
         runAsGroup: {{ .Values.pod.group.id }}
       containers:
-      - name: {{ .Values.project.name }}
+      - name: {{ .Chart.Name }}
         image: "{{ .Values.Installation.V1.Registry.Domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
         args:
         - daemon
-        - --config.dirs=/var/run/{{ .Values.project.name }}/configmap/
+        - --config.dirs=/var/run/{{ .Chart.Name }}/configmap/
         - --config.files=config
         volumeMounts:
-        - name: {{ .Values.project.name }}-configmap
-          mountPath: /var/run/{{ .Values.project.name }}/configmap/
+        - name: {{ .Chart.Name }}-configmap
+          mountPath: /var/run/{{ .Chart.Name }}/configmap/
         livenessProbe:
           httpGet:
             path: /healthz
@@ -58,4 +55,4 @@ spec:
             cpu: 250m
             memory: 250Mi
       imagePullSecrets:
-      - name: {{ tpl .Values.resource.pullSecret.name . }}
+      - name: {{ include "resource.pullSecret.name" . }}

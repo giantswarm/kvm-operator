@@ -146,12 +146,15 @@ func New(config Config) (*Service, error) {
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
 			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
 			OIDC: controller.ClusterConfigOIDC{
-				ClientID:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
-				IssuerURL:     config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
-				UsernameClaim: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
-				GroupsClaim:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
+				ClientID:       config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
+				IssuerURL:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
+				UsernameClaim:  config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
+				UsernamePrefix: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix),
+				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
+				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
 			},
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+			RegistryDomain: config.Viper.GetString(config.Flag.Service.RegistryDomain),
+			SSOPublicKey:   config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 		}
 
 		clusterController, err = controller.NewCluster(c)
@@ -239,7 +242,12 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.statusResourceCollector.Boot(context.Background())
+		go func() {
+			err := s.statusResourceCollector.Boot(context.Background())
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+		}()
 
 		go s.clusterController.Boot(context.Background())
 		go s.deleterController.Boot(context.Background())

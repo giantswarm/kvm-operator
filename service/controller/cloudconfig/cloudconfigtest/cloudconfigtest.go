@@ -1,7 +1,7 @@
 package cloudconfigtest
 
 import (
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v_5_0_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_5_0_0"
 	"github.com/giantswarm/micrologger/microloggertest"
 
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
