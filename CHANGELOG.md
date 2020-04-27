@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.11.0] 2020-04-27
+
 ### Added
 
 - First release as a flattened operator.
@@ -21,5 +23,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/TODO...legacy-1-15
-[TODO First Release]: https://github.com/giantswarm/kvm-operator/releases/tag/TODO
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.11.0...HEAD
+[TODO First Release]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.11.0
