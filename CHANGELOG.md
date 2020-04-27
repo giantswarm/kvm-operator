@@ -24,4 +24,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove limit of calico node init container.
 
 [Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.11.0...HEAD
-[TODO First Release]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.11.0
+[3.11.0]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.11.0
