@@ -17,7 +17,6 @@ require (
 	github.com/giantswarm/statusresource v0.2.0
 	github.com/giantswarm/tenantcluster v0.2.0
 	github.com/giantswarm/versionbundle v0.2.0
-	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/google/go-cmp v0.4.0
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
@@ -34,6 +33,5 @@ require (
 	k8s.io/api v0.16.6
 	k8s.io/apimachinery v0.18.2
 	k8s.io/client-go v0.16.6
-	k8s.io/kube-openapi v0.0.0-20191107075043-30be4d16710a // indirect
 	k8s.io/utils v0.0.0-20191114200735-6ca3b61696b6 // indirect
 )
