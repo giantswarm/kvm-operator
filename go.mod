@@ -23,7 +23,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/pelletier/go-toml v1.6.0 // indirect
-	github.com/prometheus/client_golang v1.3.0
+	github.com/prometheus/client_golang v1.5.1
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.6.2
 	golang.org/x/net v0.0.0-20191207000613-e7e4b65ae663 // indirect
