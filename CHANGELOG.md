@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Use release.Revision in Helm chart for Helm 3 support.
+- Use Release.Revision in Helm chart for Helm 3 support.
 
 
 
