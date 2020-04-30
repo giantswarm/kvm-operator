@@ -12,6 +12,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/server/endpoint"
 	"github.com/giantswarm/kvm-operator/service"
 )
@@ -21,8 +22,6 @@ type Config struct {
 	Logger  micrologger.Logger
 	Service *service.Service
 	Viper   *viper.Viper
-
-	ProjectName string
 }
 
 type Server struct {
@@ -47,10 +46,6 @@ func New(config Config) (*Server, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Viper must not be empty", config)
 	}
 
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
-	}
-
 	var err error
 
 	var endpointCollection *endpoint.Endpoint
@@ -73,7 +68,7 @@ func New(config Config) (*Server, error) {
 		bootOnce: sync.Once{},
 		config: microserver.Config{
 			Logger:      config.Logger,
-			ServiceName: config.ProjectName,
+			ServiceName: project.Name(),
 			Viper:       config.Viper,
 
 			Endpoints: []microserver.Endpoint{
