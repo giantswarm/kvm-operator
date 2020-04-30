@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.11.1] 2020-04-30
+
 ### Changed
 
 - Use Release.Revision in Helm chart for Helm 3 support.
-
+- Fix OIDC settings.
 
 
 ## [3.11.0] 2020-04-27
@@ -29,5 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.11.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.11.1...HEAD
+[3.11.1]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.11.1
 [3.11.0]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.11.0
