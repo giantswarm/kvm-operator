@@ -85,13 +85,13 @@ func New(config Config) (*CloudConfig, error) {
 			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-username-claim=%s", config.OIDC.UsernameClaim))
 		}
 		if config.OIDC.UsernamePrefix != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-username-prefix=%s", config.OIDC.UsernamePrefix))
+			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("'--oidc-username-prefix=%s'", config.OIDC.UsernamePrefix))
 		}
 		if config.OIDC.GroupsClaim != "" {
 			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-groups-claim=%s", config.OIDC.GroupsClaim))
 		}
 		if config.OIDC.GroupsPrefix != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-groups-prefix=%s", config.OIDC.GroupsPrefix))
+			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("'--oidc-groups-prefix=%s'", config.OIDC.GroupsPrefix))
 		}
 	}
 
