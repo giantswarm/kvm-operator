@@ -106,7 +106,6 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			CRD:       v1alpha1.NewKVMConfigCRD(),
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{

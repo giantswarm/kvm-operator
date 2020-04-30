@@ -3,4 +3,4 @@ name: kvm-operator
 home: https://github.com/giantswarm/kvm-operator
 description: Handles Kubernetes clusters running on a Kubernetes cluster with workers and masters in KVMs on bare metal
 version: "[[ .Version ]]"
-appVersion: "[[ .AppVersion ]]"
+appVersion: "3.9.1-1"
