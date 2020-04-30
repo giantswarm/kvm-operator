@@ -1,19 +1,52 @@
-version: 2
-jobs:
-  build:
-    machine: true
-    steps:
-    - checkout
+orbs:
+  architect: giantswarm/architect@0.8.6
 
-    - run: |
-        wget -q $(curl -sS -H "Authorization: token $RELEASE_TOKEN" https://api.github.com/repos/giantswarm/architect/releases/latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
-        chmod +x ./architect
-        ./architect version
-    - run: ./architect build
-    - store_test_results:
-        path: /tmp/results
-    - deploy:
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            ./architect deploy
-          fi
+version: 2.1
+
+workflows:
+  build:
+    jobs:
+      - architect/go-build:
+          name: go-build
+          binary: kvm-operator
+          filters:
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-docker:
+          name: push-kvm-operator-to-quay
+          image: "quay.io/giantswarm/kvm-operator"
+          username_envar: "QUAY_USERNAME"
+          password_envar: "QUAY_PASSWORD"
+          requires:
+            - go-build
+          filters:
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-catalog:
+          name: push-kvm-operator-to-control-plane-app-catalog
+          app_catalog: "control-plane-catalog"
+          app_catalog_test: "control-plane-test-catalog"
+          chart: "kvm-operator"
+          requires:
+            - push-kvm-operator-to-quay
+          filters:
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-collection:
+          name: push-kvm-operator-to-kvm-app-collection
+          app_name: "kvm-operator"
+          app_collection_repo: "kvm-app-collection"
+          requires:
+            - push-kvm-operator-to-control-plane-app-catalog
+          filters:
+            # Do not trigger the job on commit.
+            branches:
+              ignore: /.*/
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/

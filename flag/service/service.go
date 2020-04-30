@@ -5,12 +5,15 @@ import (
 
 	"github.com/giantswarm/kvm-operator/flag/service/crd"
 	"github.com/giantswarm/kvm-operator/flag/service/installation"
+	"github.com/giantswarm/kvm-operator/flag/service/rbac"
 	"github.com/giantswarm/kvm-operator/flag/service/tenant"
 )
 
 type Service struct {
-	CRD          crd.CRD
-	Installation installation.Installation
-	Kubernetes   kubernetes.Kubernetes
-	Tenant       tenant.Tenant
+	CRD            crd.CRD
+	Installation   installation.Installation
+	Kubernetes     kubernetes.Kubernetes
+	RBAC           rbac.RBAC
+	RegistryDomain string
+	Tenant         tenant.Tenant
 }

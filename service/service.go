@@ -5,33 +5,32 @@ import (
 	"sync"
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
+	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
+	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/k8srestconfig"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/giantswarm/statusresource"
 	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/versionbundle"
 	"github.com/spf13/viper"
-	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/kvm-operator/flag"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller"
 )
 
+// Config represents the configuration used to create a new service.
 type Config struct {
+	// Dependencies.
 	Logger micrologger.Logger
 
-	Description string
-	Flag        *flag.Flag
-	GitCommit   string
-	Name        string
-	Source      string
-	Version     string
-	Viper       *viper.Viper
+	// Settings.
+	Flag  *flag.Flag
+	Viper *viper.Viper
 }
 
 type Service struct {
@@ -44,7 +43,14 @@ type Service struct {
 	statusResourceCollector *statusresource.CollectorSet
 }
 
+// New creates a new service with given configuration.
 func New(config Config) (*Service, error) {
+	// Dependencies.
+	if config.Logger == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+	}
+
+	// Settings.
 	if config.Flag == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Flag must not be empty", config)
 	}
@@ -75,25 +81,27 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	g8sClient, err := versioned.NewForConfig(restConfig)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
+	var k8sClient *k8sclient.Clients
+	{
+		c := k8sclient.ClientsConfig{
+			SchemeBuilder: k8sclient.SchemeBuilder{
+				v1alpha1.AddToScheme,
+			},
+			Logger: config.Logger,
 
-	k8sClient, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
+			RestConfig: restConfig,
+		}
 
-	k8sExtClient, err := apiextensionsclient.NewForConfig(restConfig)
-	if err != nil {
-		return nil, microerror.Mask(err)
+		k8sClient, err = k8sclient.NewClients(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	var certsSearcher certs.Interface
 	{
 		c := certs.Config{
-			K8sClient: k8sClient,
+			K8sClient: k8sClient.K8sClient(),
 			Logger:    config.Logger,
 
 			WatchTimeout: 5 * time.Second,
@@ -124,26 +132,29 @@ func New(config Config) (*Service, error) {
 	{
 		c := controller.ClusterConfig{
 			CertsSearcher: certsSearcher,
-			G8sClient:     g8sClient,
 			K8sClient:     k8sClient,
-			K8sExtClient:  k8sExtClient,
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
+			ClusterRoleGeneral: config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.General),
+			ClusterRolePSP:     config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.PSP),
 			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
 			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
-			ProjectName:        config.Name,
+			ProjectName:        project.Name(),
 
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
 			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
 			OIDC: controller.ClusterConfigOIDC{
-				ClientID:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
-				IssuerURL:     config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
-				UsernameClaim: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
-				GroupsClaim:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
+				ClientID:       config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
+				IssuerURL:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
+				UsernameClaim:  config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
+				UsernamePrefix: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix),
+				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
+				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
 			},
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+			RegistryDomain: config.Viper.GetString(config.Flag.Service.RegistryDomain),
+			SSOPublicKey:   config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 		}
 
 		clusterController, err = controller.NewCluster(c)
@@ -156,13 +167,12 @@ func New(config Config) (*Service, error) {
 	{
 		c := controller.DeleterConfig{
 			CertsSearcher: certsSearcher,
-			G8sClient:     g8sClient,
 			K8sClient:     k8sClient,
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
 			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      config.Name,
+			ProjectName:      project.Name(),
 		}
 
 		deleterController, err = controller.NewDeleter(c)
@@ -174,12 +184,11 @@ func New(config Config) (*Service, error) {
 	var drainerController *controller.Drainer
 	{
 		c := controller.DrainerConfig{
-			G8sClient: g8sClient,
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
 			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      config.Name,
+			ProjectName:      project.Name(),
 		}
 
 		drainerController, err = controller.NewDrainer(c)
@@ -192,7 +201,7 @@ func New(config Config) (*Service, error) {
 	{
 		c := statusresource.CollectorSetConfig{
 			Logger:  config.Logger,
-			Watcher: g8sClient.ProviderV1alpha1().KVMConfigs("").Watch,
+			Watcher: k8sClient.G8sClient().ProviderV1alpha1().KVMConfigs("").Watch,
 		}
 
 		statusResourceCollector, err = statusresource.NewCollectorSet(c)
@@ -204,12 +213,12 @@ func New(config Config) (*Service, error) {
 	var versionService *version.Service
 	{
 		versionConfig := version.Config{
-			Description:    config.Description,
-			GitCommit:      config.GitCommit,
-			Name:           config.Name,
-			Source:         config.Source,
-			Version:        config.Version,
-			VersionBundles: NewVersionBundles(),
+			Description:    project.Description(),
+			GitCommit:      project.GitSHA(),
+			Name:           project.Name(),
+			Source:         project.Source(),
+			Version:        project.Version(),
+			VersionBundles: []versionbundle.Bundle{project.NewVersionBundle()},
 		}
 
 		versionService, err = version.New(versionConfig)
@@ -233,7 +242,12 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.statusResourceCollector.Boot(context.Background())
+		go func() {
+			err := s.statusResourceCollector.Boot(context.Background())
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+		}()
 
 		go s.clusterController.Boot(context.Background())
 		go s.deleterController.Boot(context.Background())
