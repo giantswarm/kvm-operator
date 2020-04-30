@@ -2,13 +2,13 @@
 
 # kvm-operator
 
-The kvm-operator handles Kubernetes clusters running on a Kubernetes cluster.
-
+The `kvm-operator` handles Kubernetes clusters running on a Kubernetes cluster.
 
 ## Branches
 
 - `thiccc`
-    - Up to and including version v3.10.0.
+  - Up to and including version v3.9.0.
+- `legacy-1-15`
+  - From version v3.9.1 up to v3.10.X.
 - `master`
-    - From version v3.11.0.
-
+  - From version v3.11.0.
