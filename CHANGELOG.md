@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.9.2] - 2020-04-30
+
+### Changed
+
+- Fixed OIDC setting quotation.
+
 ## [3.9.1] - 2020-04-24
 
 ### Added
@@ -25,5 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.9.1...legacy-1-15
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.9.2...legacy-1-15
+[3.9.2]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.9.2
 [3.9.1]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.9.1
