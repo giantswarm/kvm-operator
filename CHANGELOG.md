@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Fixed OIDC setting quotation.
+- Use Release.Revision in Helm chart for Helm 3 support.
+
 
 ## [3.9.1] - 2020-04-24
 
