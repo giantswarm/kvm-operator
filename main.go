@@ -68,8 +68,6 @@ func mainError() error {
 				Logger:  newLogger,
 				Service: newService,
 				Viper:   v,
-
-				ProjectName: project.Name(),
 			}
 
 			newServer, err = server.New(c)
