@@ -1,7 +1,7 @@
 package cloudconfigtest
 
 import (
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_5_0_0"
+	"github.com/giantswarm/k8scloudconfig/v6/pkg/template"
 	"github.com/giantswarm/micrologger/microloggertest"
 
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
@@ -12,7 +12,7 @@ func New() *cloudconfig.CloudConfig {
 
 	c.Logger = microloggertest.New()
 
-	packagePath, err := k8scloudconfig.GetPackagePath()
+	packagePath, err := template.GetPackagePath()
 	if err != nil {
 		panic(err)
 	}

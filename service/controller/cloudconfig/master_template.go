@@ -5,7 +5,7 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
+	"github.com/giantswarm/k8scloudconfig/v6/pkg/template"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -16,9 +16,9 @@ import (
 func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
 	var err error
 
-	var params k8scloudconfig.Params
+	var params template.Params
 	{
-		params = k8scloudconfig.DefaultParams()
+		params = template.DefaultParams()
 
 		params.APIServerEncryptionKey = string(data.ClusterKeys.APIServerEncryptionKey)
 		params.BaseDomain = key.BaseDomain(customObject)
@@ -36,20 +36,20 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data Ig
 		params.Images = data.Images
 		params.SSOPublicKey = c.ssoPublicKey
 
-		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
-		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
+		ignitionPath := template.GetIgnitionPath(c.ignitionPath)
+		params.Files, err = template.RenderFiles(ignitionPath, params)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
 	}
 
-	var newCloudConfig *k8scloudconfig.CloudConfig
+	var newCloudConfig *template.CloudConfig
 	{
-		cloudConfigConfig := k8scloudconfig.DefaultCloudConfigConfig()
+		cloudConfigConfig := template.DefaultCloudConfigConfig()
 		cloudConfigConfig.Params = params
-		cloudConfigConfig.Template = k8scloudconfig.MasterTemplate
+		cloudConfigConfig.Template = template.MasterTemplate
 
-		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
+		newCloudConfig, err = template.NewCloudConfig(cloudConfigConfig)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
@@ -69,18 +69,18 @@ type masterExtension struct {
 	nodeIndex    int
 }
 
-func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
-	var filesMeta []k8scloudconfig.FileMetadata
+func (e *masterExtension) Files() ([]template.FileAsset, error) {
+	var filesMeta []template.FileMetadata
 
 	for _, f := range certs.NewFilesClusterMaster(e.certs) {
-		m := k8scloudconfig.FileMetadata{
+		m := template.FileMetadata{
 			AssetContent: string(f.Data),
 			Path:         f.AbsolutePath,
-			Owner: k8scloudconfig.Owner{
-				User: k8scloudconfig.User{
+			Owner: template.Owner{
+				User: template.User{
 					Name: FileOwnerUserName,
 				},
-				Group: k8scloudconfig.Group{
+				Group: template.Group{
 					Name: FileOwnerGroupName,
 				},
 			},
@@ -89,14 +89,14 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 		filesMeta = append(filesMeta, m)
 	}
 
-	iscsiInitiatorFile := k8scloudconfig.FileMetadata{
+	iscsiInitiatorFile := template.FileMetadata{
 		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.nodeIndex, key.MasterID)),
 		Path:         IscsiInitiatorNameFilePath,
-		Owner: k8scloudconfig.Owner{
-			User: k8scloudconfig.User{
+		Owner: template.Owner{
+			User: template.User{
 				Name: FileOwnerUserName,
 			},
-			Group: k8scloudconfig.Group{
+			Group: template.Group{
 				Name: FileOwnerGroupName,
 			},
 		},
@@ -105,14 +105,14 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	filesMeta = append(filesMeta, iscsiInitiatorFile)
 
 	// iscsi config as workaround for this bug https://github.com/kubernetes/kubernetes/issues/73181
-	iscsiConfigFile := k8scloudconfig.FileMetadata{
+	iscsiConfigFile := template.FileMetadata{
 		AssetContent: IscsiConfigFileContent,
 		Path:         IscsiConfigFilePath,
-		Owner: k8scloudconfig.Owner{
-			User: k8scloudconfig.User{
+		Owner: template.Owner{
+			User: template.User{
 				Name: FileOwnerUserName,
 			},
-			Group: k8scloudconfig.Group{
+			Group: template.Group{
 				Name: FileOwnerGroupName,
 			},
 		},
@@ -120,15 +120,15 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 	filesMeta = append(filesMeta, iscsiConfigFile)
 
-	var newFiles []k8scloudconfig.FileAsset
+	var newFiles []template.FileAsset
 
 	for _, fm := range filesMeta {
-		c, err := k8scloudconfig.RenderFileAssetContent(fm.AssetContent, nil)
+		c, err := template.RenderFileAssetContent(fm.AssetContent, nil)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		fileAsset := k8scloudconfig.FileAsset{
+		fileAsset := template.FileAsset{
 			Metadata: fm,
 			Content:  c,
 		}
@@ -139,8 +139,8 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	return newFiles, nil
 }
 
-func (e *masterExtension) Units() ([]k8scloudconfig.UnitAsset, error) {
-	unitsMeta := []k8scloudconfig.UnitMetadata{
+func (e *masterExtension) Units() ([]template.UnitAsset, error) {
+	unitsMeta := []template.UnitMetadata{
 		// Mount etcd volume when directory first accessed
 		// This automount is workaround for
 		// https://bugzilla.redhat.com/show_bug.cgi?id=1184122
@@ -237,15 +237,15 @@ WantedBy=multi-user.target`,
 		},
 	}
 
-	var newUnits []k8scloudconfig.UnitAsset
+	var newUnits []template.UnitAsset
 
 	for _, fm := range unitsMeta {
-		c, err := k8scloudconfig.RenderAssetContent(fm.AssetContent, nil)
+		c, err := template.RenderAssetContent(fm.AssetContent, nil)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		unitAsset := k8scloudconfig.UnitAsset{
+		unitAsset := template.UnitAsset{
 			Metadata: fm,
 			Content:  c,
 		}
@@ -256,6 +256,6 @@ WantedBy=multi-user.target`,
 	return newUnits, nil
 }
 
-func (e *masterExtension) VerbatimSections() []k8scloudconfig.VerbatimSection {
+func (e *masterExtension) VerbatimSections() []template.VerbatimSection {
 	return nil
 }

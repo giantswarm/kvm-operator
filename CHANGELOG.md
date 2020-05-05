@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Use Local as NGINX external traffic policy
+
 ## [3.11.1] 2020-04-30
 
 ### Changed
 
 - Use Release.Revision in Helm chart for Helm 3 support.
 - Fix OIDC settings.
-
 
 ## [3.11.0] 2020-04-27
 
