@@ -25,39 +25,12 @@ workflows:
             tags:
               only: /^v.*/
 
-      - architect/push-to-docker:
-          name: push-to-aliyun-master
-          image: "registry-intl.cn-shanghai.aliyuncs.com/giantswarm/kvm-operator"
-          username_envar: "ALIYUN_USERNAME"
-          password_envar: "ALIYUN_PASSWORD"
-          requires:
-            - go-build
-          filters:
-            branches:
-              only: master
-            tags:
-              only: /^v.*/
-
-      - architect/push-to-docker:
-          name: push-to-aliyun-pr
-          image: "registry-intl.cn-shanghai.aliyuncs.com/giantswarm/kvm-operator"
-          username_envar: "ALIYUN_USERNAME"
-          password_envar: "ALIYUN_PASSWORD"
-          requires:
-            - go-build
-          filters:
-            branches:
-              ignore: master
-            tags:
-              ignore: /^v.*/
-
       - architect/push-to-app-catalog:
           name: push-to-app-catalog-master
           app_catalog: "control-plane-catalog"
           app_catalog_test: "control-plane-test-catalog"
           chart: "kvm-operator"
           requires:
-            - push-to-aliyun-master
             - push-to-quay
           filters:
             branches:
