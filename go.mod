@@ -3,7 +3,7 @@ module github.com/giantswarm/kvm-operator
 go 1.14
 
 require (
-	github.com/giantswarm/apiextensions v0.3.4
+	github.com/giantswarm/apiextensions v0.3.5
 	github.com/giantswarm/certs v0.2.0
 	github.com/giantswarm/errors v0.2.3
 	github.com/giantswarm/k8sclient v0.2.0
@@ -12,7 +12,7 @@ require (
 	github.com/giantswarm/microerror v0.2.0
 	github.com/giantswarm/microkit v0.2.1
 	github.com/giantswarm/micrologger v0.3.1
-	github.com/giantswarm/operatorkit v0.2.0
+	github.com/giantswarm/operatorkit v0.2.1
 	github.com/giantswarm/randomkeys v0.2.0
 	github.com/giantswarm/statusresource v0.3.0
 	github.com/giantswarm/tenantcluster v0.2.0
