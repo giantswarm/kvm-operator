@@ -1,6 +1,8 @@
 version: 1
 update_configs:
   - package_manager: "go:modules"
+    default_reviewers:
+      - "giantswarm/team-ludacris"
     directory: "/"
     target_branch: "master"
     update_schedule: "daily"
@@ -10,6 +12,8 @@ update_configs:
           dependency_name: "k8s.io/**"
           version_requirement: ">=0.17.0"
   - package_manager: "go:modules"
+    default_reviewers:
+      - "giantswarm/team-ludacris"
     directory: "/"
     target_branch: "legacy-1-15"
     update_schedule: "daily"
