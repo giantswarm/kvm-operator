@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/v_6_0_0"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/pkg/template"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -242,8 +242,8 @@ func DockerVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
 	}
 
-	if node.Disk != 0 {
-		return fmt.Sprintf("%sG", strconv.FormatFloat(node.Disk, 'f', 0, 64))
+	if node.Disk != "" {
+		return fmt.Sprintf("%sG", node.Disk)
 	}
 
 	return DefaultDockerDiskSize
@@ -307,8 +307,8 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
 	}
 
-	if node.Disk != 0 {
-		return fmt.Sprintf("%sG", strconv.FormatFloat(node.Disk, 'f', 0, 64))
+	if node.Disk != "" {
+		return fmt.Sprintf("%sG", node.Disk)
 	}
 
 	return DefaultKubeletDiskSize

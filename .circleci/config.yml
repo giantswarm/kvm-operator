@@ -1,7 +1,7 @@
-orbs:
-  architect: giantswarm/architect@0.8.6
-
 version: 2.1
+
+orbs:
+  architect: giantswarm/architect@0.8.12
 
 workflows:
   build:
@@ -9,44 +9,54 @@ workflows:
       - architect/go-build:
           name: go-build
           binary: kvm-operator
+          resource_class: large
           filters:
             tags:
               only: /^v.*/
 
       - architect/push-to-docker:
-          name: push-kvm-operator-to-quay
+          name: push-to-quay
           image: "quay.io/giantswarm/kvm-operator"
           username_envar: "QUAY_USERNAME"
           password_envar: "QUAY_PASSWORD"
           requires:
             - go-build
           filters:
-            # Trigger the job also on git tag.
             tags:
               only: /^v.*/
 
       - architect/push-to-app-catalog:
-          name: push-kvm-operator-to-control-plane-app-catalog
+          name: push-to-app-catalog-master
           app_catalog: "control-plane-catalog"
           app_catalog_test: "control-plane-test-catalog"
           chart: "kvm-operator"
           requires:
-            - push-kvm-operator-to-quay
+            - push-to-quay
           filters:
-            # Trigger the job also on git tag.
+            branches:
+              only: master
             tags:
               only: /^v.*/
 
+      - architect/push-to-app-catalog:
+          name: push-to-app-catalog-pr
+          app_catalog: "control-plane-catalog"
+          app_catalog_test: "control-plane-test-catalog"
+          chart: "kvm-operator"
+          requires:
+            - push-to-quay
+          filters:
+            branches:
+              ignore: master
+
       - architect/push-to-app-collection:
-          name: push-kvm-operator-to-kvm-app-collection
+          name: push-to-kvm-app-collection
           app_name: "kvm-operator"
           app_collection_repo: "kvm-app-collection"
           requires:
-            - push-kvm-operator-to-control-plane-app-catalog
+            - push-to-app-catalog-master
           filters:
-            # Do not trigger the job on commit.
             branches:
               ignore: /.*/
-            # Trigger the job also on git tag.
             tags:
               only: /^v.*/
