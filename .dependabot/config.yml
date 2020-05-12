@@ -13,6 +13,9 @@ update_configs:
     directory: "/"
     target_branch: "legacy-1-15"
     update_schedule: "daily"
+    allowed_updates:
+      - match:
+          update_type: "security"
     ignored_updates:
       - match:
           # Ignore k8s.io dependencies which aren't 0.16.x
