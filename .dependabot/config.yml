@@ -9,3 +9,15 @@ update_configs:
           # Ignore k8s.io dependencies which aren't 0.16.x
           dependency_name: "k8s.io/**"
           version_requirement: ">=0.17.0"
+  - package_manager: "go:modules"
+    directory: "/"
+    target_branch: "legacy-1-15"
+    update_schedule: "daily"
+    allowed_updates:
+      - match:
+          update_type: "security"
+    ignored_updates:
+      - match:
+          # Ignore k8s.io dependencies which aren't 0.16.x
+          dependency_name: "k8s.io/**"
+          version_requirement: ">=0.17.0"
