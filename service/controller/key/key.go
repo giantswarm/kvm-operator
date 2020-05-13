@@ -231,7 +231,6 @@ func DeploymentName(prefix string, nodeID string) string {
 
 func DefaultVersions() k8scloudconfig.Versions {
 	return k8scloudconfig.Versions{
-		Kubectl:                      kubectlVersion,
 		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
 		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
 	}
