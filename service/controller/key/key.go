@@ -106,7 +106,6 @@ const (
 )
 
 const (
-	kubectlVersion               = "1.16.9"
 	KubernetesNetworkSetupDocker = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
 	kubernetesAPIHealthzVersion  = "0999549a4c334b646288d08bd2c781c6aae2e12f"
 )
