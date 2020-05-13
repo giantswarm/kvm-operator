@@ -240,8 +240,8 @@ func DockerVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
 	}
 
-	if node.Disk != "" {
-		return fmt.Sprintf("%sG", node.Disk)
+	if node.Disk.Value != 0 {
+		return fmt.Sprintf("%fG", node.Disk.Value)
 	}
 
 	return DefaultDockerDiskSize
@@ -305,8 +305,8 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
 	}
 
-	if node.Disk != "" {
-		return fmt.Sprintf("%sG", node.Disk)
+	if node.Disk.Value != 0 {
+		return fmt.Sprintf("%fG", node.Disk.Value)
 	}
 
 	return DefaultKubeletDiskSize
