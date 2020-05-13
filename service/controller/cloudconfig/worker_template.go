@@ -28,6 +28,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data Ig
 			nodeIndex:    nodeIndex,
 		}
 		params.Images = data.Images
+		params.Versions = data.Versions
 		params.Node = node
 		params.SSOPublicKey = c.ssoPublicKey
 

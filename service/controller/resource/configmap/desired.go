@@ -73,6 +73,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 		ClusterCerts: certs,
 		ClusterKeys:  keys,
 		Images:       images,
+		Versions:     versions,
 	}
 
 	for _, node := range customResource.Spec.Cluster.Masters {

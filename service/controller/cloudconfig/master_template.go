@@ -34,6 +34,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data Ig
 		params.Node = node
 		params.Kubernetes.Apiserver.CommandExtraArgs = c.k8sAPIExtraArgs
 		params.Images = data.Images
+		params.Versions = data.Versions
 		params.SSOPublicKey = c.ssoPublicKey
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
