@@ -41,9 +41,9 @@ const (
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config.
 	TimeoutSeconds = 5
 	// PeriodSeconds is PeriodSeconds param in liveness probe config.
-	PeriodSeconds = 35
+	PeriodSeconds = 45
 	// FailureThreshold is FailureThreshold param in liveness probe config
-	FailureThreshold = 4
+	FailureThreshold = 5
 	// SuccessThreshold is SuccessThreshold param in liveness probe config
 	SuccessThreshold = 1
 
