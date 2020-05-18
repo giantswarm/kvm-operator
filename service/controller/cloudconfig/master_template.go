@@ -214,19 +214,19 @@ Requires=k8s-kubelet.service
 After=k8s-kubelet.service
 
 [Service]
-Environment="KUBECONFIG=/etc/kubernetes/config/addons-kubeconfig.yml"
-Environment="KUBECTL=quay.io/giantswarm/docker-kubectl:e777d4eaf369d4dabc393c5da42121c2a725ea6a"
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin"
+Environment="KUBECONFIG=/etc/kubernetes/kubeconfig/addons.yaml"
 ExecStart=/bin/sh -c '\
-	while [ "$(/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL get cs | grep Healthy | wc -l)" -ne "3" ]; do sleep 1 && echo "Waiting for healthy k8s";done;sleep 30s; \
+	while [ "$(kubectl get cs | grep Healthy | wc -l)" -ne "3" ]; do sleep 1 && echo "Waiting for healthy k8s";done;sleep 30s; \
 	RETRY=5;result="";\
 	while [ "$result" != "ok" ] && [ $RETRY -gt 0 ]; do\
 		sleep 10s; echo "Trying to restart k8s services ...";\
 		let RETRY=$RETRY-1;\
-		/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-node && \
+		kubectl -n kube-system delete pod -l k8s-app=calico-node && \
 		sleep 1m && \
-		/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=kube-proxy && \
-		/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=calico-kube-controllers && \
-		/usr/bin/docker run -e KUBECONFIG=${KUBECONFIG} --net=host --rm -v /etc/kubernetes:/etc/kubernetes $KUBECTL -n kube-system delete pod -l k8s-app=coredns &&\
+		kubectl -n kube-system delete pod -l k8s-app=kube-proxy && \
+		kubectl -n kube-system delete pod -l k8s-app=calico-kube-controllers && \
+		kubectl -n kube-system delete pod -l k8s-app=coredns &&\
 		result="ok" || echo "failed";\
 	done;\
 	[ "$result" != "ok" ] && echo "Failed to restart k8s services." && exit 1 || echo "Successfully restarted k8s services.";'
