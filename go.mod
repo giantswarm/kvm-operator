@@ -7,7 +7,7 @@ require (
 	github.com/giantswarm/certs v0.2.0
 	github.com/giantswarm/errors v0.2.3
 	github.com/giantswarm/k8sclient v0.2.0
-	github.com/giantswarm/k8scloudconfig/v6 v6.1.2-0.20200520112532-de457179f066
+	github.com/giantswarm/k8scloudconfig/v6 v6.1.1
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.0
 	github.com/giantswarm/microkit v0.2.1
