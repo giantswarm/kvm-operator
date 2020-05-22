@@ -154,11 +154,12 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	var deploymentResource resource.Interface
 	{
 		c := deployment.Config{
-			DNSServers: config.DNSServers,
-			G8sClient:  config.G8sClient,
-			K8sClient:  config.K8sClient.K8sClient(),
-			Logger:     config.Logger,
-			NTPServers: config.NTPServers,
+			DNSServers:    config.DNSServers,
+			G8sClient:     config.G8sClient,
+			K8sClient:     config.K8sClient.K8sClient(),
+			Logger:        config.Logger,
+			NTPServers:    config.NTPServers,
+			TenantCluster: config.TenantCluster,
 		}
 
 		ops, err := deployment.New(c)
