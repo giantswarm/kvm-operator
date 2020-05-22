@@ -4,10 +4,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/giantswarm/errors/tenant"
+	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
 	"github.com/giantswarm/operatorkit/resource/crud"
+	"github.com/giantswarm/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -73,6 +78,47 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
+	// Create a client for the reconciled tenant cluster
+	var tcK8sClient kubernetes.Interface
+	{
+		customObject, err := key.ToCustomObject(obj)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
+
+		i := key.ClusterID(customObject)
+		e := key.ClusterAPIEndpoint(customObject)
+
+		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
+		if tenantcluster.IsTimeout(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+			return nil, nil // TODO: appropriate error here
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		clientsConfig := k8sclient.ClientsConfig{
+			Logger:     r.logger,
+			RestConfig: restConfig,
+		}
+		k8sClients, err := k8sclient.NewClients(clientsConfig)
+		if tenant.IsAPINotAvailable(err) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+			return nil, nil // TODO: Appropriate error here
+		} else if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		tcK8sClient = k8sClients.K8sClient()
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
+	}
+
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be updated")
 
@@ -109,6 +155,29 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
 				continue
 			}
+
+			// If worker deployment, check that master does not have any prohibited states before updating it
+			if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
+				// List all master nodes in the tenant
+				tcNodes, err := tcK8sClient.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "role=master"})
+				if err != nil {
+					r.logger.LogCtx(ctx, "level", "debug", "message", "unable to list tenant cluster master nodes")
+					return nil, microerror.Mask(err)
+				}
+				for _, n := range tcNodes.Items {
+					r.logger.Log(n.Spec.Taints)
+					if n.Spec.Unschedulable {
+						msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
+						r.logger.LogCtx(ctx, "level", "debug", "message", msg)
+						continue
+					}
+				}
+			}
+			// corev1.Taint
+			// corev1.TaintEffectNoSchedule
+			// if isWorker and anyMasterHasProhibitedStatus {
+
+			// }
 
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
 
