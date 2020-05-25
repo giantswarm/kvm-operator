@@ -64,7 +64,6 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 	}
 
 	defaultVersions := key.DefaultVersions()
-	versions.Kubectl = defaultVersions.Kubectl
 	versions.KubernetesAPIHealthz = defaultVersions.KubernetesAPIHealthz
 	versions.KubernetesNetworkSetupDocker = defaultVersions.KubernetesNetworkSetupDocker
 	images := k8scloudconfig.BuildImages(r.registryDomain, versions)
@@ -74,6 +73,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 		ClusterCerts: certs,
 		ClusterKeys:  keys,
 		Images:       images,
+		Versions:     versions,
 	}
 
 	for _, node := range customResource.Spec.Cluster.Masters {

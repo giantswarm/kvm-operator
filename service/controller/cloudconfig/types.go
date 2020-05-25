@@ -12,4 +12,5 @@ type IgnitionTemplateData struct {
 	ClusterCerts certs.Cluster
 	ClusterKeys  randomkeys.Cluster
 	Images       k8scloudconfig.Images
+	Versions     k8scloudconfig.Versions
 }

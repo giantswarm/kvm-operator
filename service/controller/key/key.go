@@ -35,7 +35,7 @@ const (
 	// ProbeHost host for liveness probe.
 	ProbeHost = "127.0.0.1"
 	// LivenessProbeInitialDelaySeconds is LivenessProbeInitialDelaySeconds param in liveness probe config.
-	LivenessProbeInitialDelaySeconds = 360
+	LivenessProbeInitialDelaySeconds = 500
 	// ReadinessProbeInitialDelaySeconds is ReadinessProbeInitialDelaySeconds param in readiness probe config.
 	ReadinessProbeInitialDelaySeconds = 100
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config.
@@ -106,7 +106,6 @@ const (
 )
 
 const (
-	kubectlVersion               = "1.16.9"
 	KubernetesNetworkSetupDocker = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
 	kubernetesAPIHealthzVersion  = "0999549a4c334b646288d08bd2c781c6aae2e12f"
 )
@@ -231,7 +230,6 @@ func DeploymentName(prefix string, nodeID string) string {
 
 func DefaultVersions() k8scloudconfig.Versions {
 	return k8scloudconfig.Versions{
-		Kubectl:                      kubectlVersion,
 		KubernetesAPIHealthz:         kubernetesAPIHealthzVersion,
 		KubernetesNetworkSetupDocker: KubernetesNetworkSetupDocker,
 	}

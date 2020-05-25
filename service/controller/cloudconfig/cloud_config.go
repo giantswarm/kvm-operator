@@ -23,6 +23,39 @@ const (
 iscsid.safe_logout = Yes`
 )
 
+const calicoKubeKillScript = `#!/bin/bash
+
+HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
+
+while [ "$(kubectl get nodes $HOSTNAME -o jsonpath='{.metadata.name}')" != "$HOSTNAME" ]; do
+  sleep 1
+  echo "Waiting for node $HOSTNAME to be registered"
+done
+
+sleep 30s
+
+RETRY=5
+result=""
+
+while [ "$result" != "ok" ] && [ $RETRY -gt 0 ]; do
+  sleep 10s
+  echo "Trying to restart k8s services ..."
+  let RETRY=$RETRY-1
+  kubectl -n kube-system delete pod -l k8s-app=calico-node && \
+    sleep 1m && \
+    kubectl -n kube-system delete pod -l k8s-app=kube-proxy && \
+    kubectl -n kube-system delete pod -l k8s-app=calico-kube-controllers && \
+    kubectl -n kube-system delete pod -l k8s-app=coredns && \
+    result="ok" || echo "failed"
+done
+
+if [ "$result" != "ok" ]; then
+  echo "Failed to restart k8s services."
+  exit 1
+fi
+
+echo "Successfully restarted k8s services."`
+
 // Config represents the configuration used to create a cloud config service.
 type Config struct {
 	// Dependencies.
