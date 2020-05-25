@@ -1228,11 +1228,17 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 	var err error
 	var newResource *Resource
 	{
+		// fakeTC, err := tenantcluster.New(tenantcluster.Config{})
+		// if err != nil {
+		// 	t.Fatalf("can't create fake tenantcluster client: %#v", err)
+		// }
+		// fakeTC := FakeTenantClusterInterface{}
 		resourceConfig := Config{
 			DNSServers: "dnsserver1,dnsserver2",
 			G8sClient:  clientset,
 			K8sClient:  fake.NewSimpleClientset(),
 			Logger:     microloggertest.New(),
+			// TenantCluster: fakeTC,
 		}
 		newResource, err = New(resourceConfig)
 		if err != nil {
@@ -1263,3 +1269,10 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		})
 	}
 }
+
+// type FakeTenantClusterInterface struct {
+// }
+
+// func (FakeTenantClusterInterface) NewRestConfig(ctx context.Context, s string, t string) (*rest.Config, error) {
+
+// }
