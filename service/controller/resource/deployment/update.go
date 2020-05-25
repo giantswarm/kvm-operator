@@ -79,44 +79,50 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	// Create a client for the reconciled tenant cluster
+
 	var tcK8sClient kubernetes.Interface
 	{
-		customObject, err := key.ToCustomObject(obj)
-		if err != nil {
-			return nil, microerror.Mask(err)
+		if r.tenantCluster != nil {
+			customObject, err := key.ToCustomObject(obj)
+			if err != nil {
+				return nil, microerror.Mask(err)
+			}
+
+			r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
+
+			i := key.ClusterID(customObject)
+			e := key.ClusterAPIEndpoint(customObject)
+
+			restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
+			if tenantcluster.IsTimeout(err) {
+				r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
+				r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
+				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+				return nil, nil // TODO: appropriate error here
+			} else if err != nil {
+				return nil, microerror.Mask(err)
+			}
+			clientsConfig := k8sclient.ClientsConfig{
+				Logger:     r.logger,
+				RestConfig: restConfig,
+			}
+			k8sClients, err := k8sclient.NewClients(clientsConfig)
+			if tenant.IsAPINotAvailable(err) {
+				r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
+				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+				return nil, nil // TODO: Appropriate error here
+			} else if err != nil {
+				return nil, microerror.Mask(err)
+			}
+
+			tcK8sClient = k8sClients.K8sClient()
+			r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
+		} else {
+			r.logger.LogCtx(ctx, "level", "warning", "message", "unable to create Kubernetes client for tenant cluster")
+			tcK8sClient = nil
 		}
-
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
-
-		i := key.ClusterID(customObject)
-		e := key.ClusterAPIEndpoint(customObject)
-
-		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
-		if tenantcluster.IsTimeout(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-
-			return nil, nil // TODO: appropriate error here
-		} else if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		clientsConfig := k8sclient.ClientsConfig{
-			Logger:     r.logger,
-			RestConfig: restConfig,
-		}
-		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if tenant.IsAPINotAvailable(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-
-			return nil, nil // TODO: Appropriate error here
-		} else if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		tcK8sClient = k8sClients.K8sClient()
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 	}
 
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
@@ -157,22 +163,27 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			}
 
 			// If worker deployment, check that master does not have any prohibited states before updating it
-			if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
-				// List all master nodes in the tenant
-				tcNodes, err := tcK8sClient.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "role=master"})
-				if err != nil {
-					r.logger.LogCtx(ctx, "level", "debug", "message", "unable to list tenant cluster master nodes")
-					return nil, microerror.Mask(err)
-				}
-				for _, n := range tcNodes.Items {
-					r.logger.Log(n.Spec.Taints)
-					if n.Spec.Unschedulable {
-						msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
-						r.logger.LogCtx(ctx, "level", "debug", "message", msg)
-						continue
+			if tcK8sClient != nil {
+				if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
+					// List all master nodes in the tenant
+					tcNodes, err := tcK8sClient.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "role=master"})
+					if err != nil {
+						r.logger.LogCtx(ctx, "level", "debug", "message", "unable to list tenant cluster master nodes")
+						return nil, microerror.Mask(err)
+					}
+					for _, n := range tcNodes.Items {
+						r.logger.Log(n.Spec.Taints)
+						if n.Spec.Unschedulable {
+							msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
+							r.logger.LogCtx(ctx, "level", "debug", "message", msg)
+							continue
+						}
 					}
 				}
+			} else {
+				r.logger.LogCtx(ctx, "level", "dwarningebug", "message", "unable to check tenant cluster master status. No tenant cluster client configured")
 			}
+
 			// corev1.Taint
 			// corev1.TaintEffectNoSchedule
 			// if isWorker and anyMasterHasProhibitedStatus {
