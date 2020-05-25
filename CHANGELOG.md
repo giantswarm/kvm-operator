@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Compatibility with kubernetes 1.17.
+
+### Changed
+
+- Fix cluster creation with `float64` wrapper in CRD.
+
+
 ## [3.11.1] 2020-04-30
 
 ### Changed
