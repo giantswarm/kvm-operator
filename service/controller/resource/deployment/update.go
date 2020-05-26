@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/resource/crud"
 	"github.com/giantswarm/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -79,7 +80,12 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	// Create a client for the reconciled tenant cluster
-
+	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+	r.logger.LogCtx(ctx, "level", "debug", "warning", fmt.Sprintf("r.tenantCluster: %#v", r.tenantCluster))
 	var tcK8sClient kubernetes.Interface
 	{
 		if r.tenantCluster != nil {
@@ -172,12 +178,27 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 						return nil, microerror.Mask(err)
 					}
 					for _, n := range tcNodes.Items {
+						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
+						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
 						r.logger.Log(n.Spec.Taints)
-						if n.Spec.Unschedulable {
-							msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
-							r.logger.LogCtx(ctx, "level", "debug", "message", msg)
-							continue
+						for _, t := range n.Spec.Taints {
+							if t.Effect == corev1.TaintEffectNoSchedule {
+								// Node has NoSchedule taint
+								msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
+								r.logger.LogCtx(ctx, "level", "debug", "message", msg)
+								continue
+							}
 						}
+						// r.logger.Log(n.Spec.Taints)
+						// n.Spec.Taints[0].Effect == corev1.TaintEffectNoSchedule
+						// if n.Spec.Unschedulable {
+						// 	msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
+						// 	r.logger.LogCtx(ctx, "level", "debug", "message", msg)
+						// 	continue
+						// }
 					}
 				}
 			} else {
