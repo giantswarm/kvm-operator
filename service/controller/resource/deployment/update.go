@@ -118,7 +118,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 				r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
 				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
-				return nil, nil // TODO: Appropriate error here
+				// return nil, nil // TODO: Appropriate error here
 			} else if err != nil {
 				return nil, microerror.Mask(err)
 			}
@@ -202,7 +202,8 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 					}
 				}
 			} else {
-				r.logger.LogCtx(ctx, "level", "dwarningebug", "message", "unable to check tenant cluster master status. No tenant cluster client configured")
+				r.logger.LogCtx(ctx, "level", "warning", "message", "unable to check tenant cluster master status. No tenant cluster client configured")
+				continue
 			}
 
 			// corev1.Taint
