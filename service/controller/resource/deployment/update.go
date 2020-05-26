@@ -80,12 +80,6 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	// Create a client for the reconciled tenant cluster
-	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-	r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-	r.logger.LogCtx(ctx, "level", "debug", "warning", fmt.Sprintf("r.tenantCluster: %#v", r.tenantCluster))
 	var tcK8sClient kubernetes.Interface
 	{
 		if r.tenantCluster != nil {
@@ -103,9 +97,6 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			if tenantcluster.IsTimeout(err) {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
 				r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
-				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-
-				return nil, nil // TODO: appropriate error here
 			} else if err != nil {
 				return nil, microerror.Mask(err)
 			}
@@ -117,8 +108,6 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			if tenant.IsAPINotAvailable(err) {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
 				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-
-				// return nil, nil // TODO: Appropriate error here
 			} else if err != nil {
 				return nil, microerror.Mask(err)
 			}
@@ -168,7 +157,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 				continue
 			}
 
-			// If worker deployment, check that master does not have any prohibited states before updating it
+			// If worker deployment, check that master does not have any prohibited states before updating the worker
 			if tcK8sClient != nil {
 				if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
 					// List all master nodes in the tenant
@@ -178,12 +167,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 						return nil, microerror.Mask(err)
 					}
 					for _, n := range tcNodes.Items {
-						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-						r.logger.LogCtx(ctx, "level", "debug", "message", "|")
-						r.logger.Log(n.Spec.Taints)
+						r.logger.Log(n.Spec.Taints) // TODO: Remove
 						for _, t := range n.Spec.Taints {
 							if t.Effect == corev1.TaintEffectNoSchedule {
 								// Node has NoSchedule taint
@@ -192,25 +176,12 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 								continue
 							}
 						}
-						// r.logger.Log(n.Spec.Taints)
-						// n.Spec.Taints[0].Effect == corev1.TaintEffectNoSchedule
-						// if n.Spec.Unschedulable {
-						// 	msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
-						// 	r.logger.LogCtx(ctx, "level", "debug", "message", msg)
-						// 	continue
-						// }
 					}
 				}
 			} else {
 				r.logger.LogCtx(ctx, "level", "warning", "message", "unable to check tenant cluster master status. No tenant cluster client configured")
 				continue
 			}
-
-			// corev1.Taint
-			// corev1.TaintEffectNoSchedule
-			// if isWorker and anyMasterHasProhibitedStatus {
-
-			// }
 
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
 
