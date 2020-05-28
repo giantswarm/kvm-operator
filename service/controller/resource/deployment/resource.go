@@ -51,9 +51,9 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-	// if config.TenantCluster == nil {
-	// 	return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
-	// }
+	if config.TenantCluster == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
+	}
 
 	newResource := &Resource{
 		dnsServers:    config.DNSServers,

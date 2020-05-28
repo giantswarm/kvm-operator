@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/errors/tenant"
-	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
 	"github.com/giantswarm/operatorkit/resource/crud"
@@ -70,46 +69,24 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
 
-	// Create a client for the reconciled tenant cluster
-	var tcK8sClient kubernetes.Interface
-	{
-		if r.tenantCluster != nil {
-			customObject, err := key.ToCustomObject(obj)
-			if err != nil {
-				return nil, microerror.Mask(err)
-			}
+	r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
 
-			r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
+	tcK8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
+	if tenantcluster.IsTimeout(err) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
 
-			i := key.ClusterID(customObject)
-			e := key.ClusterAPIEndpoint(customObject)
+		return nil, microerror.Mask(err)
+	} else if tenant.IsAPINotAvailable(err) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
 
-			restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
-			if tenantcluster.IsTimeout(err) {
-				r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
-				r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
-			} else if err != nil {
-				return nil, microerror.Mask(err)
-			}
-			clientsConfig := k8sclient.ClientsConfig{
-				Logger:     r.logger,
-				RestConfig: restConfig,
-			}
-			k8sClients, err := k8sclient.NewClients(clientsConfig)
-			if tenant.IsAPINotAvailable(err) {
-				r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
-				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-			} else if err != nil {
-				return nil, microerror.Mask(err)
-			}
-
-			tcK8sClient = k8sClients.K8sClient()
-			r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
-		} else {
-			r.logger.LogCtx(ctx, "level", "warning", "message", "unable to create Kubernetes client for tenant cluster")
-			tcK8sClient = nil
-		}
+		return nil, microerror.Mask(err)
+	} else if err != nil {
+		return nil, microerror.Mask(err)
 	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
 		return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient)
