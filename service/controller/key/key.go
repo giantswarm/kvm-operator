@@ -429,6 +429,16 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
+// NodeHasNoScheduleOrNoExecute examines a Node and returns true if the Node has Taint with a NoSchedule or NoExecute effect.
+func NodeHasNoScheduleOrNoExecute(node corev1.Node) bool {
+	for _, t := range node.Spec.Taints {
+		if t.Effect == corev1.TaintEffectNoSchedule || t.Effect == corev1.TaintEffectNoExecute {
+			return true
+		}
+	}
+	return false
+}
+
 func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	idx, present := cr.Status.KVM.NodeIndexes[nodeID]
 	return idx, present

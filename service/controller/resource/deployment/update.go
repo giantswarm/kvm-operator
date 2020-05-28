@@ -11,7 +11,6 @@ import (
 	"github.com/giantswarm/operatorkit/resource/crud"
 	"github.com/giantswarm/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -114,9 +113,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	if updateallowedcontext.IsUpdateAllowed(ctx) {
 		return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient)
-	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "not computing update state because deployments are not allowed to be updated")
 	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "not computing update state because deployments are not allowed to be updated")
 
 	return nil, nil
 }
@@ -150,7 +149,8 @@ func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredS
 	// deployment is already up to date. We also check if there are any other
 	// changes on the pod specs. In case there are none, we check the next one.
 	// The first one not being up to date will be chosen to be updated next and
-	// the loop will be broken immediatelly.
+	// the loop will be broken immediately.
+DeploymentsLoop:
 	for _, currentDeployment := range currentDeployments {
 		desiredDeployment, err := getDeploymentByName(desiredDeployments, currentDeployment.Name)
 		if IsNotFound(err) {
@@ -173,24 +173,21 @@ func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredS
 				// List all master nodes in the tenant
 				tcNodes, err := tcK8sClient.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "role=master"})
 				if err != nil {
-					r.logger.LogCtx(ctx, "level", "debug", "message", "unable to list tenant cluster master nodes")
+					r.logger.LogCtx(ctx, "level", "warning", "message", "unable to list tenant cluster master nodes")
 					return nil, microerror.Mask(err)
 				}
 				for _, n := range tcNodes.Items {
-					r.logger.Log(n.Spec.Taints) // TODO: Remove
-					for _, t := range n.Spec.Taints {
-						if t.Effect == corev1.TaintEffectNoSchedule {
-							// Node has NoSchedule taint
-							msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
-							r.logger.LogCtx(ctx, "level", "debug", "message", msg)
-							continue
-						}
+					if key.NodeHasNoScheduleOrNoExecute(n) {
+						// Node has NoSchedule or NoExecute taint
+						msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
+						r.logger.LogCtx(ctx, "level", "warning", "message", msg)
+						continue DeploymentsLoop
 					}
 				}
 			}
 		} else {
 			r.logger.LogCtx(ctx, "level", "warning", "message", "unable to check tenant cluster master status. No tenant cluster client configured")
-			continue
+			continue DeploymentsLoop
 		}
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))

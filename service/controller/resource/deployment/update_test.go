@@ -13,6 +13,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -44,6 +45,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		CurrentState                interface{}
 		DesiredState                interface{}
 		ExpectedDeploymentsToUpdate []*v1.Deployment
+		FakeTCObjects               []runtime.Object
 	}{
 		// Test 0, in case current state and desired state are empty the update
 		// state should be empty.
@@ -457,7 +459,7 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 			},
 		},
 
-		// Test 5, when deployments should be updaated but their status is not "safe",
+		// Test 5, when deployments should be updated but their status is not "safe",
 		// the update state should be empty.
 		{
 			Ctx: func() context.Context {
@@ -1223,6 +1225,136 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 				},
 			},
 		},
+
+		// Test 11: if update is allowed but a tenant cluster master is unschedulable, do not update the worker deployment
+		{
+			Ctx: func() context.Context {
+				ctx := context.Background()
+
+				{
+					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
+					updateallowedcontext.SetUpdateAllowed(ctx)
+				}
+
+				return ctx
+			}(),
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+					},
+				},
+			},
+			CurrentState: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+						Labels: map[string]string{"app": "master"},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+					Status: v1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.VersionBundleVersionAnnotation: "1.2.0",
+						},
+						Labels: map[string]string{"app": "worker"},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+					Status: v1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+			},
+			DesiredState: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+						Labels: map[string]string{"app": "master"},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+						Labels: map[string]string{"app": "worker"},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ExpectedDeploymentsToUpdate: nil,
+			FakeTCObjects: []runtime.Object{
+				// Create a master Node with a NoSchedule taint
+				&corev1.Node{
+					ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{"role": "master"}},
+					Spec: corev1.NodeSpec{
+						Taints: []corev1.Taint{corev1.Taint{
+							Key:    "NoSchedule",
+							Effect: corev1.TaintEffectNoSchedule,
+						}},
+					},
+				},
+			},
+		},
 	}
 
 	var err error
@@ -1240,9 +1372,9 @@ func Test_Resource_Deployment_newUpdateChange(t *testing.T) {
 		}
 	}
 
-	tenantK8sClient := fake.NewSimpleClientset()
-
 	for _, tc := range testCases {
+		tenantK8sClient := fake.NewSimpleClientset(tc.FakeTCObjects...) // Pass in any fake TC objects
+
 		updateState, err := newResource.updateDeployments(tc.Ctx, tc.CurrentState, tc.DesiredState, tenantK8sClient)
 		if err != nil {
 			t.Fatalf("expected %#v got %#v", nil, err)
