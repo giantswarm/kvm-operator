@@ -145,26 +145,21 @@ DeploymentsLoop:
 		}
 
 		// If worker deployment, check that master does not have any prohibited states before updating the worker
-		if tcK8sClient != nil {
-			if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
-				// List all master nodes in the tenant
-				tcNodes, err := tcK8sClient.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "role=master"})
-				if err != nil {
-					r.logger.LogCtx(ctx, "level", "warning", "message", "unable to list tenant cluster master nodes")
-					return nil, microerror.Mask(err)
-				}
-				for _, n := range tcNodes.Items {
-					if key.NodeHasNoScheduleOrNoExecute(n) {
-						// Node has NoSchedule or NoExecute taint
-						msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
-						r.logger.LogCtx(ctx, "level", "warning", "message", msg)
-						continue DeploymentsLoop
-					}
+		if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
+			// List all master nodes in the tenant
+			tcNodes, err := tcK8sClient.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "role=master"})
+			if err != nil {
+				r.logger.LogCtx(ctx, "level", "warning", "message", "unable to list tenant cluster master nodes")
+				return nil, microerror.Mask(err)
+			}
+			for _, n := range tcNodes.Items {
+				if key.NodeHasNoScheduleOrNoExecute(n) {
+					// Node has NoSchedule or NoExecute taint
+					msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
+					r.logger.LogCtx(ctx, "level", "warning", "message", msg)
+					continue DeploymentsLoop
 				}
 			}
-		} else {
-			r.logger.LogCtx(ctx, "level", "warning", "message", "unable to check tenant cluster master status. No tenant cluster client configured")
-			continue DeploymentsLoop
 		}
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
