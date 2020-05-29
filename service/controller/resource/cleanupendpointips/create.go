@@ -6,12 +6,10 @@ import (
 	"sort"
 
 	"github.com/giantswarm/errors/tenant"
-	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -23,40 +21,26 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 	// At first we need to create a Kubernetes client for the reconciled tenant
 	// cluster.
-	var k8sClient kubernetes.Interface
-	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
 
-		i := key.ClusterID(customObject)
-		e := key.ClusterAPIEndpoint(customObject)
+	r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
 
-		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
-		if tenantcluster.IsTimeout(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+	k8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
+	if tenantcluster.IsTimeout(err) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
-			return nil
-		} else if err != nil {
-			return microerror.Mask(err)
-		}
-		clientsConfig := k8sclient.ClientsConfig{
-			Logger:     r.logger,
-			RestConfig: restConfig,
-		}
-		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if tenant.IsAPINotAvailable(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+		return nil
+	} else if tenant.IsAPINotAvailable(err) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 
-			return nil
-		} else if err != nil {
-			return microerror.Mask(err)
-		}
-
-		k8sClient = k8sClients.K8sClient()
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
+		return nil
+	} else if err != nil {
+		return microerror.Mask(err)
 	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 
 	// We need to fetch the nodes being registered within the tenant cluster's
 	// Kubernetes API.
