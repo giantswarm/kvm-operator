@@ -468,10 +468,16 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
-// NodeHasNoScheduleOrNoExecute examines a Node and returns true if the Node has Taint with a NoSchedule or NoExecute effect.
-func NodeHasNoScheduleOrNoExecute(node corev1.Node) bool {
+// NodeIsUnschedulable examines a Node and returns true if the Node is marked Unschedulable or has a NoSchedule/NoExecute taint.
+// Ignores the default NoSchedule effect for master nodes.
+func NodeIsUnschedulable(node corev1.Node) bool {
+	if node.Spec.Unschedulable {
+		return true
+	}
+
 	for _, t := range node.Spec.Taints {
-		if t.Effect == corev1.TaintEffectNoSchedule || t.Effect == corev1.TaintEffectNoExecute {
+		if (t.Effect == corev1.TaintEffectNoSchedule && t.Key != "node-role.kubernetes.io/master") ||
+			t.Effect == corev1.TaintEffectNoExecute {
 			return true
 		}
 	}

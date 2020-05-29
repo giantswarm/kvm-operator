@@ -153,7 +153,7 @@ DeploymentsLoop:
 				return nil, microerror.Mask(err)
 			}
 			for _, n := range tcNodes.Items {
-				if key.NodeHasNoScheduleOrNoExecute(n) {
+				if key.NodeIsUnschedulable(n) {
 					// Node has NoSchedule or NoExecute taint
 					msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
 					r.logger.LogCtx(ctx, "level", "warning", "message", msg)
