@@ -70,6 +70,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		pods = list.Items
 	}
 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("pods: %v#!", pods))
+
 	// Check if all k8s-kvm pods in CP are registered as nodes in the TC.
 	if podsEqualNodes(pods, nodes) {
 		n := key.ClusterID(customObject)
@@ -80,7 +81,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("master endpoint: %v#!", masterEndpoint))
-			epRemoved, masterEndpoint := removeDeadIPFromEndpoints(masterEndpoint, nodes)
+			epRemoved, masterEndpoint, err := removeDeadIPFromEndpoints(masterEndpoint, nodes, pods)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("epRemovedMaster: %v#!", epRemoved))
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
@@ -98,7 +102,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("worker endpoint: %v#!", workerEndpoint))
-			epRemoved, workerEndpoint := removeDeadIPFromEndpoints(workerEndpoint, nodes)
+			epRemoved, workerEndpoint, err := removeDeadIPFromEndpoints(workerEndpoint, nodes, pods)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("epRemovedWorker: %v#!", epRemoved))
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
@@ -152,9 +159,20 @@ func removeFromEndpointAddressList(addresses []corev1.EndpointAddress, indexesTo
 	return newAddresses
 }
 
+func controlPlanePodForTCNode(node corev1.Node, pods []corev1.Pod) (corev1.Pod, error) {
+	for _, pod := range pods {
+		if pod.Name == node.Name {
+			return pod, nil
+		}
+	}
+	// Unless there is a race condition where the Pods are modified
+	// after being checked by podsEqualNodes(), this should never be reached
+	return corev1.Pod{}, microerror.Maskf(noPodForNodeError, fmt.Sprintf("no control plane pod for tenant cluster node %s", node.Name))
+}
+
 // removeDeadIPFromEndpoints compares endpoint IPs with current state of nodes and
 // removes any IP addresses that does not belong to any node.
-func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node) (int, *corev1.Endpoints) {
+func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node, cpPods []corev1.Pod) (int, *corev1.Endpoints, error) {
 	fmt.Println(fmt.Sprintf("removing dead endpoints from %s", endpoints.Name))
 	endpointAddresses := endpoints.Subsets[0].Addresses
 
@@ -164,10 +182,28 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node)
 		found := false
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
-			if node.Labels["ip"] == ip.IP { // Check && node.Status.Conditions
-				fmt.Println(fmt.Sprintf("found IP match"))
-				found = true
-				break
+
+			if node.Labels["ip"] == ip.IP {
+				// Find the control plane pod representing this node
+				cpPod, err := controlPlanePodForTCNode(node, cpPods)
+				if err != nil {
+					return len(indexesToDelete), endpoints, microerror.Mask(err)
+				}
+
+				// Check if the CP pod is Ready
+				cpPodReady := false
+				for _, c := range cpPod.Status.Conditions {
+					if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
+						cpPodReady = true
+					}
+				}
+
+				if cpPodReady {
+					// Keep this Pod in our endpoints
+					found = true
+					break
+				}
+				// Otherwise, let this pod be removed
 			}
 		}
 		// endpoint ip does not belong to any node, lets remove it
@@ -179,5 +215,5 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node)
 	if len(indexesToDelete) > 0 {
 		endpoints.Subsets[0].Addresses = removeFromEndpointAddressList(endpointAddresses, indexesToDelete)
 	}
-	return len(indexesToDelete), endpoints
+	return len(indexesToDelete), endpoints, nil
 }

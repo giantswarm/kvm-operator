@@ -12,3 +12,12 @@ var invalidConfigError = &microerror.Error{
 func IsInvalidConfig(err error) bool {
 	return microerror.Cause(err) == invalidConfigError
 }
+
+var noPodForNodeError = &microerror.Error{
+	Kind: "noPodForNodeError",
+}
+
+// IsNoPodForNodeError asserts noPodForNodeError
+func IsNoPodForNodeError(err error) bool {
+	return microerror.Cause(err) == noPodForNodeError
+}
