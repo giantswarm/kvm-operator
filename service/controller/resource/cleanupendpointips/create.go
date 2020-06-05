@@ -69,7 +69,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 		pods = list.Items
 	}
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("pods: %v#!", pods))
 
 	// Check if all k8s-kvm pods in CP are registered as nodes in the TC.
 	if podsEqualNodes(pods, nodes) {
@@ -80,12 +79,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("master endpoint: %v#!", masterEndpoint))
 			epRemoved, masterEndpoint, err := removeDeadIPFromEndpoints(masterEndpoint, nodes, pods)
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("epRemovedMaster: %v#!", epRemoved))
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
 
@@ -101,12 +98,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("worker endpoint: %v#!", workerEndpoint))
 			epRemoved, workerEndpoint, err := removeDeadIPFromEndpoints(workerEndpoint, nodes, pods)
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("epRemovedWorker: %v#!", epRemoved))
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
 
@@ -173,12 +168,10 @@ func controlPlanePodForTCNode(node corev1.Node, pods []corev1.Pod) (corev1.Pod, 
 // removeDeadIPFromEndpoints compares endpoint IPs with current state of nodes and
 // removes any IP addresses that does not belong to any node.
 func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node, cpPods []corev1.Pod) (int, *corev1.Endpoints, error) {
-	fmt.Println(fmt.Sprintf("removing dead endpoints from %s", endpoints.Name))
 	endpointAddresses := endpoints.Subsets[0].Addresses
 
 	var indexesToDelete []int
 	for i, ip := range endpointAddresses {
-		fmt.Println(fmt.Sprintf("i: %d // ip: %v#", i, ip))
 		found := false
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
@@ -206,9 +199,8 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 				// Otherwise, let this pod be removed
 			}
 		}
-		// endpoint ip does not belong to any node, lets remove it
+		// endpoint ip does not belong to any node with a healthy CP pod, lets remove it
 		if !found {
-			fmt.Println(fmt.Sprintf("did not find match, deleting %v", endpointAddresses[i]))
 			indexesToDelete = append(indexesToDelete, i)
 		}
 	}
