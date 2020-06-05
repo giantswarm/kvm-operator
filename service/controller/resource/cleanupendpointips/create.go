@@ -161,7 +161,7 @@ func controlPlanePodForTCNode(node corev1.Node, pods []corev1.Pod) (corev1.Pod, 
 		}
 	}
 	// Unless there is a race condition where the Pods are modified
-	// after being checked by podsEqualNodes(), this should never be reached
+	// after being checked by podsEqualNodes(), this should never be reached.
 	return corev1.Pod{}, microerror.Maskf(noPodForNodeError, fmt.Sprintf("no control plane pod for tenant cluster node %s", node.Name))
 }
 
@@ -184,18 +184,14 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 				}
 
 				// Check if the CP pod is Ready
-				cpPodReady := false
 				for _, c := range cpPod.Status.Conditions {
 					if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
-						cpPodReady = true
+						// Keep this Pod in our endpoints
+						found = true
+						break
 					}
 				}
 
-				if cpPodReady {
-					// Keep this Pod in our endpoints
-					found = true
-					break
-				}
 				// Otherwise, let this pod be removed
 			}
 		}
