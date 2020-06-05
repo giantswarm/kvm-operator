@@ -69,6 +69,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 		pods = list.Items
 	}
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("pods: %v#!", pods))
 	// Check if all k8s-kvm pods in CP are registered as nodes in the TC.
 	if podsEqualNodes(pods, nodes) {
 		n := key.ClusterID(customObject)
@@ -78,8 +79,9 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("master endpoint: %v#!", masterEndpoint))
 			epRemoved, masterEndpoint := removeDeadIPFromEndpoints(masterEndpoint, nodes)
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("epRemovedMaster: %v#!", epRemoved))
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
 
@@ -95,8 +97,9 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("worker endpoint: %v#!", workerEndpoint))
 			epRemoved, workerEndpoint := removeDeadIPFromEndpoints(workerEndpoint, nodes)
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("epRemovedWorker: %v#!", epRemoved))
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
 
