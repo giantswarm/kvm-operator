@@ -152,20 +152,24 @@ func removeFromEndpointAddressList(addresses []corev1.EndpointAddress, indexesTo
 // removeDeadIPFromEndpoints compares endpoint IPs with current state of nodes and
 // removes any IP addresses that does not belong to any node.
 func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node) (int, *corev1.Endpoints) {
+	fmt.Println(fmt.Sprintf("removing dead endpoints from %s", endpoints.Name))
 	endpointAddresses := endpoints.Subsets[0].Addresses
 
 	var indexesToDelete []int
 	for i, ip := range endpointAddresses {
+		fmt.Println(fmt.Sprintf("i: %d // ip: %v#", i, ip))
 		found := false
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
-			if node.Labels["ip"] == ip.IP {
+			if node.Labels["ip"] == ip.IP { // Check && node.Status.Conditions
+				fmt.Println(fmt.Sprintf("found IP match"))
 				found = true
 				break
 			}
 		}
 		// endpoint ip does not belong to any node, lets remove it
 		if !found {
+			fmt.Println(fmt.Sprintf("did not find match, deleting %v", endpointAddresses[i]))
 			indexesToDelete = append(indexesToDelete, i)
 		}
 	}
