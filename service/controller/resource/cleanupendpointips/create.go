@@ -105,6 +105,17 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
 
+				// E 06/09 14:54:30 /apis/provider.giantswarm.io/v1alpha1/namespaces/default/kvmconfigs/73j3v failed processing event | operatorkit/controller/controller.go:513 | controller=kvm-operator-deleter | event=update | loop=170 | stack=map[annotation:
+				// Endpoints "worker" is invalid: subsets[0]: Required value: must specify `addresses` or `notReadyAddresses` kind:unknown
+				// stack:[map[file:/root/project/service/controller/resource/cleanupendpointips/create.go line:110]
+				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/resource/wrapper/retryresource/basic_resource.go line:52]
+				// map[file:/go/pkg/mod/github.com/giantswarm/backoff@v0.2.0/retry.go line:23]
+				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/resource/wrapper/retryresource/basic_resource.go line:64]
+				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/resource/wrapper/metricsresource/basic_resource.go line:43]
+				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/controller/controller.go line:619]]]
+
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting workerEndpoint: %v#!", workerEndpoint))
+
 				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(workerEndpoint)
 				if err != nil {
 					return microerror.Mask(err)
