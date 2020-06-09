@@ -76,12 +76,12 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
 		r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
 
-		return nil, microerror.Mask(err)
+		return nil, nil
 	} else if tenant.IsAPINotAvailable(err) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
 		r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
 
-		return nil, microerror.Mask(err)
+		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
