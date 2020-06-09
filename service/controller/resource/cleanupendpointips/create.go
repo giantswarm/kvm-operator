@@ -95,6 +95,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		{
 			workerEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(key.WorkerID, metav1.GetOptions{})
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("1: updating workerEndpoint: %v#!", workerEndpoint))
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -181,38 +182,51 @@ func controlPlanePodForTCNode(node corev1.Node, pods []corev1.Pod) (corev1.Pod, 
 func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node, cpPods []corev1.Pod) (int, *corev1.Endpoints, error) {
 	endpointAddresses := endpoints.Subsets[0].Addresses
 
+	fmt.Printf("removing dead endpoints")
+	fmt.Printf("endpoints: %v#!", endpoints)
+	fmt.Printf("nodes: %v#!", nodes)
+	fmt.Printf("pods: %v#!", cpPods)
+
 	var indexesToDelete []int
 	for i, ip := range endpointAddresses {
 		found := false
+		fmt.Printf("i // ip: %d // %v#!", i, ip)
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
-
+			fmt.Printf("node: %v#!", node)
 			if node.Labels["ip"] == ip.IP {
+				fmt.Printf("found node ip matching endpoint ip")
 				// Find the control plane pod representing this node
 				cpPod, err := controlPlanePodForTCNode(node, cpPods)
 				if err != nil {
 					return len(indexesToDelete), endpoints, microerror.Mask(err)
 				}
-
+				fmt.Printf("cpPod: %v#!", cpPod)
 				// Check if the CP pod is Ready
 				for _, c := range cpPod.Status.Conditions {
 					if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
 						// Keep this Pod in our endpoints
+						fmt.Printf("cpPod is Ready")
 						found = true
 						break
 					}
 				}
 
 				// Otherwise, let this pod be removed
+				fmt.Printf("cpPod will be dropped")
 			}
 		}
 		// endpoint ip does not belong to any node with a healthy CP pod, lets remove it
 		if !found {
 			indexesToDelete = append(indexesToDelete, i)
+			fmt.Printf("indexes to delete: %v#!", indexesToDelete)
 		}
 	}
 	if len(indexesToDelete) > 0 {
+		fmt.Printf("endpoints before update: %v#!", endpoints)
 		endpoints.Subsets[0].Addresses = removeFromEndpointAddressList(endpointAddresses, indexesToDelete)
+		fmt.Printf("endpoints after update: %v#!", endpoints)
+		fmt.Printf("endpoints.subsets[0] addresses: %v#!", endpoints.Subsets[0].Addresses)
 	}
 	return len(indexesToDelete), endpoints, nil
 }
