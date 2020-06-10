@@ -95,7 +95,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		{
 			workerEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(key.WorkerID, metav1.GetOptions{})
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("1: updating workerEndpoint: %v#!", workerEndpoint))
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -106,17 +105,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
 
-				// E 06/09 14:54:30 /apis/provider.giantswarm.io/v1alpha1/namespaces/default/kvmconfigs/73j3v failed processing event | operatorkit/controller/controller.go:513 | controller=kvm-operator-deleter | event=update | loop=170 | stack=map[annotation:
-				// Endpoints "worker" is invalid: subsets[0]: Required value: must specify `addresses` or `notReadyAddresses` kind:unknown
-				// stack:[map[file:/root/project/service/controller/resource/cleanupendpointips/create.go line:110]
-				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/resource/wrapper/retryresource/basic_resource.go line:52]
-				// map[file:/go/pkg/mod/github.com/giantswarm/backoff@v0.2.0/retry.go line:23]
-				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/resource/wrapper/retryresource/basic_resource.go line:64]
-				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/resource/wrapper/metricsresource/basic_resource.go line:43]
-				// map[file:/go/pkg/mod/github.com/giantswarm/operatorkit@v0.2.1/controller/controller.go line:619]]]
-
-				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting workerEndpoint: %v#!", workerEndpoint))
-
+				// If this is the last worker in the endpoints list, this will fail with an error like:
+				// Endpoints "worker" is invalid: subsets[0]: Required value: must specify `addresses` or `notReadyAddresses`.
+				// It should be rare, but if this becomes a problem, our logic will need to either delete the endpoint
+				// or move the address to NotReadyAddresses
 				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(workerEndpoint)
 				if err != nil {
 					return microerror.Mask(err)
@@ -182,26 +174,18 @@ func controlPlanePodForTCNode(node corev1.Node, pods []corev1.Pod) (corev1.Pod, 
 func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node, cpPods []corev1.Pod) (int, *corev1.Endpoints, error) {
 	endpointAddresses := endpoints.Subsets[0].Addresses
 
-	fmt.Println("removing dead endpoints")
-	fmt.Println(fmt.Sprintf("endpoints: %v#!", endpoints))
-	// fmt.Println("nodes: %v#!", nodes)
-	// fmt.Println("pods: %v#!", cpPods)
-
 	var indexesToDelete []int
 	for i, ip := range endpointAddresses {
 		found := false
-		fmt.Println(fmt.Sprintf("i // ip: %d // %v#!", i, ip))
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
-			fmt.Println(fmt.Sprintf("node: %v#!", node))
 			if node.Labels["ip"] == ip.IP {
-				fmt.Println("found node ip matching endpoint ip")
 				// Find the control plane pod representing this node
 				cpPod, err := controlPlanePodForTCNode(node, cpPods)
 				if err != nil {
 					return len(indexesToDelete), endpoints, microerror.Mask(err)
 				}
-				fmt.Println(fmt.Sprintf("cpPod: %v#!", cpPod))
+
 				// Check if the CP pod is Ready
 				if key.PodIsReady(cpPod) {
 					// Keep this Pod in our endpoints
@@ -210,20 +194,15 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 				}
 
 				// Otherwise, let this pod be removed
-				fmt.Println("cpPod will be dropped")
 			}
 		}
 		// endpoint ip does not belong to any node with a "Ready" CP pod, lets remove it
 		if !found {
 			indexesToDelete = append(indexesToDelete, i)
-			fmt.Println(fmt.Sprintf("indexes to delete: %v#!", indexesToDelete))
 		}
 	}
 	if len(indexesToDelete) > 0 {
-		fmt.Println(fmt.Sprintf("endpoints before update: %v#!", endpoints))
 		endpoints.Subsets[0].Addresses = removeFromEndpointAddressList(endpointAddresses, indexesToDelete)
-		fmt.Println(fmt.Sprintf("endpoints after update: %v#!", endpoints))
-		fmt.Println(fmt.Sprintf("endpoints.subsets[0] addresses: %v#!", endpoints.Subsets[0].Addresses))
 	}
 	return len(indexesToDelete), endpoints, nil
 }
