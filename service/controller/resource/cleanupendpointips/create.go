@@ -203,20 +203,17 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 				}
 				fmt.Println(fmt.Sprintf("cpPod: %v#!", cpPod))
 				// Check if the CP pod is Ready
-				for _, c := range cpPod.Status.Conditions {
-					if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
-						// Keep this Pod in our endpoints
-						fmt.Println("cpPod is Ready")
-						found = true
-						break
-					}
+				if key.PodIsReady(cpPod) {
+					// Keep this Pod in our endpoints
+					found = true
+					break
 				}
 
 				// Otherwise, let this pod be removed
 				fmt.Println("cpPod will be dropped")
 			}
 		}
-		// endpoint ip does not belong to any node with a healthy CP pod, lets remove it
+		// endpoint ip does not belong to any node with a "Ready" CP pod, lets remove it
 		if !found {
 			indexesToDelete = append(indexesToDelete, i)
 			fmt.Println(fmt.Sprintf("indexes to delete: %v#!", indexesToDelete))
