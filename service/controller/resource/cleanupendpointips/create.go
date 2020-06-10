@@ -105,6 +105,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
 
+				// If this is the last worker in the endpoints list, this will fail with an error like:
+				// Endpoints "worker" is invalid: subsets[0]: Required value: must specify `addresses` or `notReadyAddresses`.
+				// It should be rare, but if this becomes a problem, our logic will need to either delete the endpoint
+				// or move the address to NotReadyAddresses
 				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(workerEndpoint)
 				if err != nil {
 					return microerror.Mask(err)
@@ -175,7 +179,6 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 		found := false
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
-
 			if node.Labels["ip"] == ip.IP {
 				// Find the control plane pod representing this node
 				cpPod, err := controlPlanePodForTCNode(node, cpPods)
@@ -184,18 +187,16 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 				}
 
 				// Check if the CP pod is Ready
-				for _, c := range cpPod.Status.Conditions {
-					if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
-						// Keep this Pod in our endpoints
-						found = true
-						break
-					}
+				if key.PodIsReady(cpPod) {
+					// Keep this Pod in our endpoints
+					found = true
+					break
 				}
 
 				// Otherwise, let this pod be removed
 			}
 		}
-		// endpoint ip does not belong to any node with a healthy CP pod, lets remove it
+		// endpoint ip does not belong to any node with a "Ready" CP pod, lets remove it
 		if !found {
 			indexesToDelete = append(indexesToDelete, i)
 		}

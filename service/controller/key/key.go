@@ -493,6 +493,18 @@ func OperatorVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.OperatorVersion]
 }
 
+// PodIsReady examines the Status Conditions of a Pod
+// and returns true if the PodReady Condition is true.
+func PodIsReady(pod corev1.Pod) bool {
+	podReady := false
+	for _, c := range pod.Status.Conditions {
+		if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
+			podReady = true
+		}
+	}
+	return podReady
+}
+
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	var ports []corev1.ServicePort
 
