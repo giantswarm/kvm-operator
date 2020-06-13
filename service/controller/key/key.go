@@ -40,7 +40,7 @@ const (
 	// ProbeHost host for liveness probe.
 	ProbeHost = "127.0.0.1"
 	// LivenessProbeInitialDelaySeconds is LivenessProbeInitialDelaySeconds param in liveness probe config.
-	LivenessProbeInitialDelaySeconds = 600
+	LivenessProbeInitialDelaySeconds = 1200
 	// ReadinessProbeInitialDelaySeconds is ReadinessProbeInitialDelaySeconds param in readiness probe config.
 	ReadinessProbeInitialDelaySeconds = 100
 	// TimeoutSeconds is TimeoutSeconds param in liveness probe config.
