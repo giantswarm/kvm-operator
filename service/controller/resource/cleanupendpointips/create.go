@@ -69,6 +69,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 		pods = list.Items
 	}
+
 	// Check if all k8s-kvm pods in CP are registered as nodes in the TC.
 	if podsEqualNodes(pods, nodes) {
 		n := key.ClusterID(customObject)
@@ -78,8 +79,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-
-			epRemoved, masterEndpoint := removeDeadIPFromEndpoints(masterEndpoint, nodes)
+			epRemoved, masterEndpoint, err := removeDeadIPFromEndpoints(masterEndpoint, nodes, pods)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
 
@@ -95,11 +98,17 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-
-			epRemoved, workerEndpoint := removeDeadIPFromEndpoints(workerEndpoint, nodes)
+			epRemoved, workerEndpoint, err := removeDeadIPFromEndpoints(workerEndpoint, nodes, pods)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
 
+				// If this is the last worker in the endpoints list, this will fail with an error like:
+				// Endpoints "worker" is invalid: subsets[0]: Required value: must specify `addresses` or `notReadyAddresses`.
+				// It should be rare, but if this becomes a problem, our logic will need to either delete the endpoint
+				// or move the address to NotReadyAddresses
 				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(workerEndpoint)
 				if err != nil {
 					return microerror.Mask(err)
@@ -149,9 +158,20 @@ func removeFromEndpointAddressList(addresses []corev1.EndpointAddress, indexesTo
 	return newAddresses
 }
 
+func controlPlanePodForTCNode(node corev1.Node, pods []corev1.Pod) (corev1.Pod, error) {
+	for _, pod := range pods {
+		if pod.Name == node.Name {
+			return pod, nil
+		}
+	}
+	// Unless there is a race condition where the Pods are modified
+	// after being checked by podsEqualNodes(), this should never be reached.
+	return corev1.Pod{}, microerror.Maskf(noPodForNodeError, fmt.Sprintf("no control plane pod for tenant cluster node %s", node.Name))
+}
+
 // removeDeadIPFromEndpoints compares endpoint IPs with current state of nodes and
 // removes any IP addresses that does not belong to any node.
-func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node) (int, *corev1.Endpoints) {
+func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node, cpPods []corev1.Pod) (int, *corev1.Endpoints, error) {
 	endpointAddresses := endpoints.Subsets[0].Addresses
 
 	var indexesToDelete []int
@@ -160,11 +180,23 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node)
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
 			if node.Labels["ip"] == ip.IP {
-				found = true
-				break
+				// Find the control plane pod representing this node
+				cpPod, err := controlPlanePodForTCNode(node, cpPods)
+				if err != nil {
+					return len(indexesToDelete), endpoints, microerror.Mask(err)
+				}
+
+				// Check if the CP pod is Ready
+				if key.PodIsReady(cpPod) {
+					// Keep this Pod in our endpoints
+					found = true
+					break
+				}
+
+				// Otherwise, let this pod be removed
 			}
 		}
-		// endpoint ip does not belong to any node, lets remove it
+		// endpoint ip does not belong to any node with a "Ready" CP pod, lets remove it
 		if !found {
 			indexesToDelete = append(indexesToDelete, i)
 		}
@@ -172,5 +204,5 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node)
 	if len(indexesToDelete) > 0 {
 		endpoints.Subsets[0].Addresses = removeFromEndpointAddressList(endpointAddresses, indexesToDelete)
 	}
-	return len(indexesToDelete), endpoints
+	return len(indexesToDelete), endpoints, nil
 }
