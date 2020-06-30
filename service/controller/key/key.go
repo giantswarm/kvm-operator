@@ -66,10 +66,10 @@ const (
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
 	FlatcarChannel  = "stable"
 
-	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:416097011707a2d0991964081167b7e883c57476"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:38e35d7f84a9f24e4bf16614f4ea6ca23dc7f73b"
-	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:20517098a762a0d7ca2b0902316ddff487dbc7f5"
-	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:ca610b410c34ab7209c6393aab8fb5453c6fa2d7"
+	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.1.0"
+	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
+	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
@@ -111,8 +111,8 @@ const (
 )
 
 const (
-	KubernetesNetworkSetupDocker = "68e90113331feca3b9ffe6a75a601b381ba8c1f7"
-	kubernetesAPIHealthzVersion  = "0999549a4c334b646288d08bd2c781c6aae2e12f"
+	KubernetesNetworkSetupDocker = "0.1.0"
+	kubernetesAPIHealthzVersion  = "0.1.0"
 )
 
 const (
