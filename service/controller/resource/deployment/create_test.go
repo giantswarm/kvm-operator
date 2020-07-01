@@ -3,6 +3,10 @@ package deployment
 import (
 	"context"
 	"testing"
+	"time"
+
+	"github.com/giantswarm/certs"
+	"github.com/giantswarm/tenantcluster"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
@@ -234,14 +238,45 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		},
 	}
 
+	logger := microloggertest.New()
+
 	var err error
+	var certsSearcher certs.Interface
+	{
+		c := certs.Config{
+			K8sClient:    fake.NewSimpleClientset(),
+			Logger:       logger,
+			WatchTimeout: 5 * time.Second,
+		}
+
+		certsSearcher, err = certs.NewSearcher(c)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+	}
+
+	var tenantCluster tenantcluster.Interface
+	{
+		c := tenantcluster.Config{
+			CertsSearcher: certsSearcher,
+			Logger:        logger,
+			CertID:        certs.APICert,
+		}
+
+		tenantCluster, err = tenantcluster.New(c)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+	}
+
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			DNSServers: "dnsserver1,dnsserver2",
-			G8sClient:  clientset,
-			K8sClient:  fake.NewSimpleClientset(),
-			Logger:     microloggertest.New(),
+			DNSServers:    "dnsserver1,dnsserver2",
+			G8sClient:     clientset,
+			K8sClient:     fake.NewSimpleClientset(),
+			Logger:        logger,
+			TenantCluster: tenantCluster,
 		}
 		newResource, err = New(resourceConfig)
 		if err != nil {

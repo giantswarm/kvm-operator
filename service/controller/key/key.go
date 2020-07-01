@@ -1,6 +1,7 @@
 package key
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"path/filepath"
@@ -10,11 +11,15 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/k8sclient"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v6/pkg/template"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/client-go/kubernetes"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 
@@ -224,6 +229,40 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	return q, nil
 }
 
+// CreateK8sClientForTenantCluster takes the context of the reconciled object
+// and the provided logger and tenant cluster interface and creates a K8s client for the tenant cluster
+func CreateK8sClientForTenantCluster(ctx context.Context, obj interface{}, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (kubernetes.Interface, error) {
+
+	// Create a client for the reconciled tenant cluster
+	var tcK8sClient kubernetes.Interface
+	{
+		customObject, err := ToCustomObject(obj)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		i := ClusterID(customObject)
+		e := ClusterAPIEndpoint(customObject)
+
+		restConfig, err := tenantCluster.NewRestConfig(ctx, i, e)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		clientsConfig := k8sclient.ClientsConfig{
+			Logger:     logger,
+			RestConfig: restConfig,
+		}
+		k8sClients, err := k8sclient.NewClients(clientsConfig)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		tcK8sClient = k8sClients.K8sClient()
+	}
+
+	return tcK8sClient, nil
+}
+
 func DeploymentName(prefix string, nodeID string) string {
 	return fmt.Sprintf("%s-%s", prefix, nodeID)
 }
@@ -429,6 +468,22 @@ func NetworkNTPBlock(servers []net.IP) string {
 	return ntpBlock
 }
 
+// NodeIsUnschedulable examines a Node and returns true if the Node is marked Unschedulable or has a NoSchedule/NoExecute taint.
+// Ignores the default NoSchedule effect for master nodes.
+func NodeIsUnschedulable(node corev1.Node) bool {
+	if node.Spec.Unschedulable {
+		return true
+	}
+
+	for _, t := range node.Spec.Taints {
+		if (t.Effect == corev1.TaintEffectNoSchedule && t.Key != "node-role.kubernetes.io/master") ||
+			t.Effect == corev1.TaintEffectNoExecute {
+			return true
+		}
+	}
+	return false
+}
+
 func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	idx, present := cr.Status.KVM.NodeIndexes[nodeID]
 	return idx, present
@@ -436,6 +491,18 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 
 func OperatorVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.OperatorVersion]
+}
+
+// PodIsReady examines the Status Conditions of a Pod
+// and returns true if the PodReady Condition is true.
+func PodIsReady(pod corev1.Pod) bool {
+	podReady := false
+	for _, c := range pod.Status.Conditions {
+		if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
+			podReady = true
+		}
+	}
+	return podReady
 }
 
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {

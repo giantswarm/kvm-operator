@@ -135,6 +135,7 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 	testCases := []struct {
 		Endpoints               *corev1.Endpoints
 		Nodes                   []corev1.Node
+		Pods                    []corev1.Pod
 		ExpectedDeletedEndpoint int
 		ExpectedEndpoints       *corev1.Endpoints
 	}{
@@ -181,6 +182,42 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 						Name: "testNode2",
 						Labels: map[string]string{
 							"ip": "1.1.1.1",
+						},
+					},
+				},
+			},
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode1",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
+						},
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode2",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
 						},
 					},
 				},
@@ -258,6 +295,42 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 				},
 			},
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode1",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
+						},
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode2",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
+						},
+					},
+				},
+			},
 			ExpectedDeletedEndpoint: 1,
 			ExpectedEndpoints: &corev1.Endpoints{
 				TypeMeta: metav1.TypeMeta{
@@ -320,6 +393,42 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 				},
 			},
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode1",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
+						},
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode2",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
+						},
+					},
+				},
+			},
 			ExpectedDeletedEndpoint: 2,
 			ExpectedEndpoints: &corev1.Endpoints{
 				TypeMeta: metav1.TypeMeta{
@@ -340,9 +449,149 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 				},
 			},
 		},
+		// case 3 - 1 dead CP Pod
+		{
+			Endpoints: &corev1.Endpoints{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "v1",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "TestService",
+					Namespace: "TestNamespace",
+				},
+				Subsets: []corev1.EndpointSubset{
+					{
+						Addresses: []corev1.EndpointAddress{
+							{
+								IP: "1.2.3.4",
+							},
+							{
+								IP: "1.1.1.1",
+							},
+							{
+								IP: "1.1.1.4",
+							},
+						},
+					},
+				},
+			},
+			Nodes: []corev1.Node{
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode1",
+						Labels: map[string]string{
+							"ip": "1.2.3.4",
+						},
+					},
+				},
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode2",
+						Labels: map[string]string{
+							"ip": "1.1.1.1",
+						},
+					},
+				},
+				{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode3",
+						Labels: map[string]string{
+							"ip": "1.1.1.4",
+						},
+					},
+				},
+			},
+			Pods: []corev1.Pod{
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode1",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
+						},
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode2",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionTrue,
+							},
+						},
+					},
+				},
+				{
+
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "testNode3",
+					},
+					Status: corev1.PodStatus{
+						Conditions: []corev1.PodCondition{
+							{
+								Type:   corev1.PodReady,
+								Status: corev1.ConditionFalse,
+							},
+						},
+					},
+				},
+			},
+			ExpectedDeletedEndpoint: 1,
+			ExpectedEndpoints: &corev1.Endpoints{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "v1",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "TestService",
+					Namespace: "TestNamespace",
+				},
+				Subsets: []corev1.EndpointSubset{
+					{
+						Addresses: []corev1.EndpointAddress{
+							{
+								IP: "1.2.3.4",
+							},
+							{
+								IP: "1.1.1.1",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for i, tc := range testCases {
-		deletedEndpoints, returnedEndpoints := removeDeadIPFromEndpoints(tc.Endpoints, tc.Nodes)
+		deletedEndpoints, returnedEndpoints, err := removeDeadIPFromEndpoints(tc.Endpoints, tc.Nodes, tc.Pods)
+		if err != nil {
+			t.Fatalf("case %d expected %d deleted endpoint ips but got error %v#", i, tc.ExpectedDeletedEndpoint, err)
+		}
 
 		if deletedEndpoints != tc.ExpectedDeletedEndpoint {
 			t.Fatalf("case %d expected %d deleted endpoint ips got %d", i, tc.ExpectedDeletedEndpoint, deletedEndpoints)
