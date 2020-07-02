@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Fix cluster creation with `float64` wrapper in CRD.
-
+- Use `k8s-kvm:0.2.0` with QEMU 4.0.0.
 
 ## [3.11.1] 2020-04-30
 
