@@ -111,7 +111,7 @@ const (
 )
 
 const (
-	KubernetesNetworkSetupDocker = "0.1.0"
+	KubernetesNetworkSetupDocker = "0.1.0-a71a2349501386a8902c6fb2effb5048c29899a3"
 	kubernetesAPIHealthzVersion  = "0.1.0"
 )
 
