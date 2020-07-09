@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.12.0] - 2020-07-09
+
 ### Added
 
 - Compatibility with kubernetes 1.17.
@@ -41,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.11.1...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.12.0...HEAD
+[3.12.0]: https://github.com/giantswarm/kvm-operator/compare/v3.11.1...v3.12.0
 [3.11.1]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.11.1
 [3.11.0]: https://github.com/giantswarm/kvm-operator/releases/tag/v3.11.0
