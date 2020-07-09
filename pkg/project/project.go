@@ -6,7 +6,7 @@ var (
 	name        string = "kvm-operator"
 	source      string = "https://github.com/giantswarm/kvm-operator"
 
-//	version            = "3.9.1-1"
+//	version            = "3.9.1-2"
 )
 
 func Description() string {
