@@ -16,7 +16,7 @@ require (
 	github.com/giantswarm/randomkeys v0.2.0
 	github.com/giantswarm/statusresource v0.4.0
 	github.com/giantswarm/tenantcluster v0.2.0
-	github.com/giantswarm/versionbundle v0.2.0
+	github.com/giantswarm/versionbundle v0.2.1-0.20200716132503-ee12b2cde2f2
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/google/go-cmp v0.5.0
