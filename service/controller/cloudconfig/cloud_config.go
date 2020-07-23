@@ -136,6 +136,7 @@ func New(config Config) (*CloudConfig, error) {
 
 		ignitionPath:    config.IgnitionPath,
 		k8sAPIExtraArgs: k8sAPIExtraArgs,
+		registryMirrors: config.RegistryMirrors,
 		ssoPublicKey:    config.SSOPublicKey,
 	}
 
