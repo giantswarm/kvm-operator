@@ -114,6 +114,7 @@ func newClusterResourceSets(config ClusterConfig) ([]*controller.ResourceSet, er
 			Logger:             config.Logger,
 			RandomkeysSearcher: randomkeysSearcher,
 			RegistryDomain:     config.RegistryDomain,
+			RegistryMirrors:    config.RegistryMirrors,
 			TenantCluster:      config.TenantCluster,
 
 			ClusterRoleGeneral: config.ClusterRoleGeneral,
