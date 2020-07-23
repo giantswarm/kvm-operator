@@ -30,6 +30,7 @@ type ClusterConfig struct {
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
 	RegistryDomain     string
+	RegistryMirrors    []string
 	SSOPublicKey       string
 }
 
@@ -43,6 +44,8 @@ type ClusterConfigOIDC struct {
 	GroupsClaim    string
 	GroupsPrefix   string
 }
+
+type Registry struct{}
 
 type Cluster struct {
 	*controller.Controller
