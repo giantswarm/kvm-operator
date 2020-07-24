@@ -61,9 +61,10 @@ type Config struct {
 	// Dependencies.
 	Logger micrologger.Logger
 
-	IgnitionPath string
-	OIDC         OIDCConfig
-	SSOPublicKey string
+	IgnitionPath    string
+	OIDC            OIDCConfig
+	RegistryMirrors []string
+	SSOPublicKey    string
 }
 
 // DefaultConfig provides a default configuration to create a new cloud config
@@ -82,6 +83,7 @@ type CloudConfig struct {
 
 	ignitionPath    string
 	k8sAPIExtraArgs []string
+	registryMirrors []string
 	ssoPublicKey    string
 }
 
@@ -134,6 +136,7 @@ func New(config Config) (*CloudConfig, error) {
 
 		ignitionPath:    config.IgnitionPath,
 		k8sAPIExtraArgs: k8sAPIExtraArgs,
+		registryMirrors: config.RegistryMirrors,
 		ssoPublicKey:    config.SSOPublicKey,
 	}
 

@@ -39,6 +39,7 @@ type ClusterResourceSetConfig struct {
 	Logger             micrologger.Logger
 	RandomkeysSearcher randomkeys.Interface
 	RegistryDomain     string
+	RegistryMirrors    []string
 	TenantCluster      tenantcluster.Interface
 
 	ClusterRoleGeneral string
@@ -60,9 +61,10 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := cloudconfig.Config{
 			Logger: config.Logger,
 
-			IgnitionPath: config.IgnitionPath,
-			OIDC:         config.OIDC,
-			SSOPublicKey: config.SSOPublicKey,
+			IgnitionPath:    config.IgnitionPath,
+			OIDC:            config.OIDC,
+			RegistryMirrors: config.RegistryMirrors,
+			SSOPublicKey:    config.SSOPublicKey,
 		}
 
 		cloudConfig, err = cloudconfig.New(c)
