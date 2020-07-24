@@ -45,8 +45,6 @@ type ClusterConfigOIDC struct {
 	GroupsPrefix   string
 }
 
-type Registry struct{}
-
 type Cluster struct {
 	*controller.Controller
 }
