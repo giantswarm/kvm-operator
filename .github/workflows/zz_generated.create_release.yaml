@@ -120,7 +120,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Update project.go
         id: update_project_go
+        env:
+          branch: "${{ github.ref }}-version-bump"
         run: |
+          git checkout -b ${{ env.branch }}
           file="${{ needs.gather_facts.outputs.project_go_path }}"
           version="${{ needs.gather_facts.outputs.version }}"
           new_version="$(semver bump patch $version)-dev"
@@ -137,12 +140,22 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add $file
-          git commit -m "pkg/project: bump version to ${{ steps.update_project_go.outputs.new_version }}"
+          git commit -m "Bump version to ${{ steps.update_project_go.outputs.new_version }}"
       - name: Push changes
         env:
           REMOTE_REPO: "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          branch: "${{ github.ref }}-version-bump"
         run: |
-          git push "${REMOTE_REPO}" HEAD:${{ github.ref }}
+          git push "${REMOTE_REPO}" HEAD:${{ env.branch }}
+      - name: Create PR
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          base: "${{ github.ref }}"
+          branch: "${{ github.ref }}-version-bump"
+          version: "${{ needs.gather_facts.outputs.version }}"
+          title: "Bump version to ${{ steps.update_project_go.outputs.new_version }}"
+        run: |
+          hub pull-request -f  -m "${{ env.title }}" -b ${{ env.base }} -h ${{ env.branch }} -r ${{ github.actor }}
   create_release:
     name: Create release
     runs-on: ubuntu-18.04
@@ -180,7 +193,6 @@ jobs:
         with:
           tag_name: "v${{ needs.gather_facts.outputs.version }}"
           release_name: "v${{ needs.gather_facts.outputs.version }}"
-
   create-release-branch:
     name: Create release branch
     runs-on: ubuntu-18.04
