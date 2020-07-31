@@ -48,15 +48,3 @@ workflows:
           filters:
             branches:
               ignore: master
-
-      - architect/push-to-app-collection:
-          name: push-to-kvm-app-collection
-          app_name: "kvm-operator"
-          app_collection_repo: "kvm-app-collection"
-          requires:
-            - push-to-app-catalog-master
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
