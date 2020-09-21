@@ -28,5 +28,5 @@ require (
 	k8s.io/client-go v0.18.6
 )
 
-// v3.3.17 is required by sigs.k8s.io/controller-runtime v0.5.2. Can remove this replace when updated.
-replace github.com/coreos/etcd v3.3.17+incompatible => github.com/coreos/etcd v3.3.24+incompatible
+// v3.3.X is required by sigs.k8s.io/controller-runtime. Can remove this replace when updated.
+replace github.com/coreos/etcd => github.com/coreos/etcd v3.3.25+incompatible
