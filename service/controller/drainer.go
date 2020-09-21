@@ -1,16 +1,21 @@
 package controller
 
 import (
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/v2/pkg/controller"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource/wrapper/retryresource"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/endpoint"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/pod"
 )
 
 type DrainerConfig struct {
@@ -32,7 +37,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 
 	var err error
 
-	resourceSets, err := newDrainerResourceSets(config)
+	resources, err := newDrainerResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -44,10 +49,10 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(corev1.Pod)
 			},
-			Logger:       config.Logger,
-			ResourceSets: resourceSets,
+			Logger:    config.Logger,
+			Resources: resources,
 			Selector: labels.SelectorFromSet(map[string]string{
-				key.PodWatcherLabel: project.Name(),
+				label.OperatorVersion: project.Version(),
 			}),
 
 			Name: config.ProjectName + "-drainer",
@@ -66,28 +71,66 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	return d, nil
 }
 
-func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, error) {
+func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 	var err error
 
-	var resourceSet *controller.ResourceSet
+	var podResource resource.Interface
 	{
-		c := DrainerResourceSetConfig{
+		c := pod.Config{
 			G8sClient: config.K8sClient.G8sClient(),
 			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
 		}
 
-		resourceSet, err = NewDrainerResourceSet(c)
+		podResource, err = pod.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
-	resourceSets := []*controller.ResourceSet{
-		resourceSet,
+	var endpointResource resource.Interface
+	{
+		c := endpoint.Config{
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
+
+		ops, err := endpoint.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		endpointResource, err = toCRUDResource(config.Logger, ops)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
-	return resourceSets, nil
+	resources := []resource.Interface{
+		endpointResource,
+		podResource,
+	}
+
+	{
+		c := retryresource.WrapConfig{
+			Logger: config.Logger,
+		}
+
+		resources, err = retryresource.Wrap(resources, c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	{
+		c := metricsresource.WrapConfig{}
+
+		resources, err = metricsresource.Wrap(resources, c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	return resources, nil
 }

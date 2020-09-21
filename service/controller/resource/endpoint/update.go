@@ -5,8 +5,9 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/resource/crud"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource/crud"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState interface{}) error {
@@ -18,7 +19,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 	if !isEmptyEndpoint(endpointToUpdate) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating endpoint '%s'", endpointToUpdate.GetName()))
 
-		_, err = r.k8sClient.CoreV1().Endpoints(endpointToUpdate.Namespace).Update(endpointToUpdate)
+		_, err = r.k8sClient.CoreV1().Endpoints(endpointToUpdate.Namespace).Update(ctx, endpointToUpdate, v1.UpdateOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}

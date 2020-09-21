@@ -2,11 +2,11 @@ package serviceaccount
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -26,7 +26,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the service account in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
-		_, err := r.k8sClient.CoreV1().ServiceAccounts(namespace).Create(serviceAccountToCreate)
+		_, err := r.k8sClient.CoreV1().ServiceAccounts(namespace).Create(ctx, serviceAccountToCreate, v1.CreateOptions{})
 		if apierrors.IsAlreadyExists(err) {
 		} else if err != nil {
 			return microerror.Mask(err)
@@ -57,7 +57,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		serviceAccountToCreate = desiredServiceAccount
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found out that service account that has to be created"))
+	r.logger.LogCtx(ctx, "level", "debug", "message", "found out that service account that has to be created")
 
 	return serviceAccountToCreate, nil
 }

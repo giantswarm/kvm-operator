@@ -10,18 +10,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v7/pkg/template"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/tenantcluster/v3/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 )
@@ -98,7 +98,6 @@ const (
 	AnnotationService           = "endpoint.kvm.giantswarm.io/service"
 	AnnotationPodDrained        = "endpoint.kvm.giantswarm.io/drained"
 	AnnotationPrometheusCluster = "giantswarm.io/prometheus-cluster"
-	AnnotationVersionBundle     = "kvm-operator.giantswarm.io/version-bundle"
 
 	LabelApp           = "app"
 	LabelCluster       = "giantswarm.io/cluster"
@@ -112,15 +111,11 @@ const (
 
 const (
 	KubernetesNetworkSetupDocker = "0.2.0"
-	kubernetesAPIHealthzVersion  = "0.1.0"
+	kubernetesAPIHealthzVersion  = "0.1.1"
 )
 
 const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
-)
-
-const (
-	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
 )
 
 const (
@@ -636,19 +631,6 @@ func ToPod(v interface{}) (*corev1.Pod, error) {
 	}
 
 	return pod, nil
-}
-
-func VersionBundleVersionFromPod(pod *corev1.Pod) (string, error) {
-	a := pod.GetAnnotations()
-	if a == nil {
-		return "", microerror.Mask(missingAnnotationError)
-	}
-	v, ok := a[AnnotationVersionBundle]
-	if !ok {
-		return "", microerror.Mask(missingAnnotationError)
-	}
-
-	return v, nil
 }
 
 func VMNumber(ID int) string {

@@ -3,8 +3,8 @@ package deployment
 import (
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -12,6 +12,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -47,9 +49,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
-				Annotations: map[string]string{
-					key.VersionBundleVersionAnnotation: key.OperatorVersion(customResource),
-				},
 				Labels: map[string]string{
 					key.LabelApp:          key.WorkerID,
 					"cluster":             key.ClusterID(customResource),
@@ -58,6 +57,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 					key.LabelOrganization: key.ClusterCustomer(customResource),
 					key.LabelManagedBy:    key.OperatorName,
 					"node":                workerNode.ID,
+					label.OperatorVersion: project.Version(),
 				},
 			},
 			Spec: v1.DeploymentSpec{
@@ -75,11 +75,10 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 				Template: corev1.PodTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Annotations: map[string]string{
-							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customResource),
-							key.AnnotationIp:            "",
-							key.AnnotationService:       key.WorkerID,
-							key.AnnotationPodDrained:    "False",
-							key.AnnotationVersionBundle: key.OperatorVersion(customResource),
+							key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(customResource),
+							key.AnnotationIp:          "",
+							key.AnnotationService:     key.WorkerID,
+							key.AnnotationPodDrained:  "False",
 						},
 						Name: key.WorkerID,
 						Labels: map[string]string{
@@ -89,7 +88,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							key.LabelCluster:      key.ClusterID(customResource),
 							key.LabelOrganization: key.ClusterCustomer(customResource),
 							"node":                workerNode.ID,
-							key.PodWatcherLabel:   "kvm-operator",
+							label.OperatorVersion: project.Version(),
 						},
 					},
 					Spec: corev1.PodSpec{

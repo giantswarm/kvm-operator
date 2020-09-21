@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v2/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -334,7 +334,7 @@ func Test_EnsureCreated(t *testing.T) {
 				t.Fatalf("error == %#v, want matching", err)
 			}
 
-			kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(tc.inputKVMConfig.GetNamespace()).Get(tc.inputKVMConfig.GetName(), metav1.GetOptions{})
+			kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(tc.inputKVMConfig.GetNamespace()).Get(context.Background(), tc.inputKVMConfig.GetName(), metav1.GetOptions{})
 			if err != nil {
 				t.Fatal(err)
 			}

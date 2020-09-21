@@ -1,11 +1,12 @@
 package cloudconfig
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v7/pkg/template"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v8/pkg/template"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -13,22 +14,29 @@ import (
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
 	var err error
+
+	var certFiles []certs.File
+	{
+		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.APICert)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+		certFiles = append(certFiles, certs.NewFilesAPI(tls)...)
+	}
 
 	var params k8scloudconfig.Params
 	{
-		params = k8scloudconfig.DefaultParams()
-
 		params.APIServerEncryptionKey = string(data.ClusterKeys.APIServerEncryptionKey)
-		params.BaseDomain = key.BaseDomain(customObject)
-		params.Cluster = customObject.Spec.Cluster
+		params.BaseDomain = key.BaseDomain(cr)
+		params.Cluster = cr.Spec.Cluster
 		// Ingress controller service remains in k8scloudconfig and will be
 		// removed in a later migration.
 		params.DisableIngressControllerService = true
 		params.Extension = &masterExtension{
-			certs:        data.ClusterCerts,
-			customObject: customObject,
+			certs:        certFiles,
+			customObject: cr,
 			nodeIndex:    nodeIndex,
 		}
 		params.Node = node
@@ -47,9 +55,10 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data Ig
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
 	{
-		cloudConfigConfig := k8scloudconfig.DefaultCloudConfigConfig()
-		cloudConfigConfig.Params = params
-		cloudConfigConfig.Template = k8scloudconfig.MasterTemplate
+		cloudConfigConfig := k8scloudconfig.CloudConfigConfig{
+			Params:   params,
+			Template: k8scloudconfig.MasterTemplate,
+		}
 
 		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
 		if err != nil {
@@ -66,7 +75,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data Ig
 }
 
 type masterExtension struct {
-	certs        certs.Cluster
+	certs        []certs.File
 	customObject v1alpha1.KVMConfig
 	nodeIndex    int
 }
@@ -74,7 +83,7 @@ type masterExtension struct {
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	var filesMeta []k8scloudconfig.FileMetadata
 
-	for _, f := range certs.NewFilesClusterMaster(e.certs) {
+	for _, f := range e.certs {
 		m := k8scloudconfig.FileMetadata{
 			AssetContent: string(f.Data),
 			Path:         f.AbsolutePath,

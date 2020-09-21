@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/errors/tenant"
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/tenantcluster/v3/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -63,7 +63,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// to be deleted if there does no associated control plane pod exist.
 	var nodes []corev1.Node
 	{
-		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
+		list, err := k8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 		if tenant.IsAPINotAvailable(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
@@ -81,7 +81,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var pods []corev1.Pod
 	{
 		n := key.ClusterID(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
+		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -111,7 +111,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting node '%s' in the tenant cluster's Kubernetes API", n.GetName()))
 
-		err = k8sClient.CoreV1().Nodes().Delete(n.GetName(), nil)
+		err = k8sClient.CoreV1().Nodes().Delete(ctx, n.GetName(), metav1.DeleteOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}

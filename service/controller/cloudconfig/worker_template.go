@@ -3,9 +3,9 @@ package cloudconfig
 import (
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v7/pkg/template"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v8/pkg/template"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -18,12 +18,10 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data Ig
 
 	var params k8scloudconfig.Params
 	{
-		params = k8scloudconfig.DefaultParams()
-
 		params.BaseDomain = key.BaseDomain(customObject)
 		params.Cluster = customObject.Spec.Cluster
 		params.Extension = &workerExtension{
-			certs:        data.ClusterCerts,
+			certs:        []certs.File{},
 			customObject: customObject,
 			nodeIndex:    nodeIndex,
 		}
@@ -42,9 +40,10 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data Ig
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
 	{
-		cloudConfigConfig := k8scloudconfig.DefaultCloudConfigConfig()
-		cloudConfigConfig.Params = params
-		cloudConfigConfig.Template = k8scloudconfig.WorkerTemplate
+		cloudConfigConfig := k8scloudconfig.CloudConfigConfig{
+			Params:   params,
+			Template: k8scloudconfig.WorkerTemplate,
+		}
 
 		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
 		if err != nil {
@@ -61,7 +60,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data Ig
 }
 
 type workerExtension struct {
-	certs        certs.Cluster
+	certs        []certs.File
 	customObject v1alpha1.KVMConfig
 	nodeIndex    int
 }
@@ -69,7 +68,7 @@ type workerExtension struct {
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	var filesMeta []k8scloudconfig.FileMetadata
 
-	for _, f := range certs.NewFilesClusterWorker(e.certs) {
+	for _, f := range e.certs {
 		m := k8scloudconfig.FileMetadata{
 			AssetContent: string(f.Data),
 			Path:         f.AbsolutePath,

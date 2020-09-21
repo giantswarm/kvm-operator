@@ -7,7 +7,7 @@ import (
 
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/tenantcluster/v3/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -46,7 +46,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// Kubernetes API.
 	var nodes []corev1.Node
 	{
-		list, err := k8sClient.CoreV1().Nodes().List(metav1.ListOptions{})
+		list, err := k8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 		if tenant.IsAPINotAvailable(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
@@ -63,7 +63,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var pods []corev1.Pod
 	{
 		n := key.ClusterID(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(metav1.ListOptions{})
+		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -75,7 +75,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		n := key.ClusterID(customObject)
 
 		{
-			masterEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(key.MasterID, metav1.GetOptions{})
+			masterEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(ctx, key.MasterID, metav1.GetOptions{})
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -86,7 +86,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			if epRemoved > 0 {
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
 
-				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(masterEndpoint)
+				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(ctx, masterEndpoint, metav1.UpdateOptions{})
 				if err != nil {
 					return microerror.Mask(err)
 				}
@@ -94,7 +94,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		{
-			workerEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(key.WorkerID, metav1.GetOptions{})
+			workerEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(ctx, key.WorkerID, metav1.GetOptions{})
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -109,7 +109,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				// Endpoints "worker" is invalid: subsets[0]: Required value: must specify `addresses` or `notReadyAddresses`.
 				// It should be rare, but if this becomes a problem, our logic will need to either delete the endpoint
 				// or move the address to NotReadyAddresses
-				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(workerEndpoint)
+				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(ctx, workerEndpoint, metav1.UpdateOptions{})
 				if err != nil {
 					return microerror.Mask(err)
 				}

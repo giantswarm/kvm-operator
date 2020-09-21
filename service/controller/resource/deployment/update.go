@@ -6,9 +6,9 @@ import (
 
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
-	"github.com/giantswarm/operatorkit/resource/crud"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/operatorkit/v2/pkg/controller/context/updateallowedcontext"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource/crud"
+	"github.com/giantswarm/tenantcluster/v3/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -31,7 +31,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 
 		namespace := key.ClusterNamespace(customResource)
 		for _, deployment := range deploymentsToUpdate {
-			_, err := r.k8sClient.AppsV1().Deployments(namespace).Update(deployment)
+			_, err := r.k8sClient.AppsV1().Deployments(namespace).Update(ctx, deployment, metav1.UpdateOptions{})
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -147,7 +147,7 @@ DeploymentsLoop:
 		// If worker deployment, check that master does not have any prohibited states before updating the worker
 		if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
 			// List all master nodes in the tenant
-			tcNodes, err := tcK8sClient.CoreV1().Nodes().List(metav1.ListOptions{LabelSelector: "role=master"})
+			tcNodes, err := tcK8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{LabelSelector: "role=master"})
 			if err != nil {
 				r.logger.LogCtx(ctx, "level", "warning", "message", "unable to list tenant cluster master nodes")
 				return nil, microerror.Mask(err)

@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	g8sfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
+	g8sfake "github.com/giantswarm/apiextensions/v2/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
+	"github.com/giantswarm/operatorkit/v2/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -90,7 +90,7 @@ func Test_Resource_Endpoint_ApplyCreateChange(t *testing.T) {
 			t.Fatal("case", i, "expected", nil, "got", err)
 		}
 		for _, k8sEndpoint := range tc.ExpectedEndpoints {
-			returnedEndpoint, err := fakeK8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Get(k8sEndpoint.Name, metav1.GetOptions{})
+			returnedEndpoint, err := fakeK8sClient.CoreV1().Endpoints(k8sEndpoint.Namespace).Get(context.Background(), k8sEndpoint.Name, metav1.GetOptions{})
 			if err != nil {
 				t.Fatalf("%d: error returned setting up k8s endpoints: %s\n", i, err)
 			}

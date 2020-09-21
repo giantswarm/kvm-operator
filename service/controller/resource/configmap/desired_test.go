@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
-	"github.com/giantswarm/certs/certstest"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	apiextfake "github.com/giantswarm/apiextensions/v2/pkg/clientset/versioned/fake"
+	"github.com/giantswarm/certs/v3/pkg/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/randomkeys/randomkeystest"
+	"github.com/giantswarm/randomkeys/v2/randomkeystest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -25,15 +25,15 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
 		{
 			Name:    "kubernetes",
-			Version: "1.15.11",
+			Version: "1.18.5",
 		},
 		{
 			Name:    "calico",
-			Version: "3.9.1",
+			Version: "3.15.3",
 		},
 		{
 			Name:    "etcd",
-			Version: "3.3.15",
+			Version: "3.4.9",
 		},
 	}
 	clientset := apiextfake.NewSimpleClientset(release)
