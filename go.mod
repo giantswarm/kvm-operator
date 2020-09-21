@@ -12,7 +12,7 @@ require (
 	github.com/giantswarm/microerror v0.2.1
 	github.com/giantswarm/microkit v0.2.2
 	github.com/giantswarm/micrologger v0.3.3
-	github.com/giantswarm/operatorkit/v2 v2.0.0
+	github.com/giantswarm/operatorkit/v2 v2.0.1-0.20200918074959-97033d7a9954
 	github.com/giantswarm/randomkeys/v2 v2.0.0
 	github.com/giantswarm/statusresource/v2 v2.0.0
 	github.com/giantswarm/tenantcluster/v3 v3.0.0
@@ -27,3 +27,5 @@ require (
 	k8s.io/apimachinery v0.18.6
 	k8s.io/client-go v0.18.6
 )
+
+replace sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.6.3
