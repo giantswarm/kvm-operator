@@ -31,7 +31,7 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
-		certFiles = append(certFiles, certs.NewFilesAPI(tls)...)
+		certFiles = append(certFiles, certs.NewFilesEtcd(tls)...)
 	}
 
 	var params k8scloudconfig.Params
