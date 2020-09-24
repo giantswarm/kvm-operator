@@ -47,6 +47,11 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 			customObject: cr,
 			nodeIndex:    nodeIndex,
 		}
+		params.Etcd = k8scloudconfig.Etcd{
+			HighAvailability:    false,
+			InitialClusterState: k8scloudconfig.InitialClusterStateNew,
+		}
+		params.ImagePullProgressDeadline = "1m"
 		params.Node = node
 		params.Kubernetes.Apiserver.CommandExtraArgs = c.k8sAPIExtraArgs
 		params.Images = data.Images
