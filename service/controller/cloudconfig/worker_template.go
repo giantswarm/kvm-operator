@@ -1,6 +1,7 @@
 package cloudconfig
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/v2/pkg/apis/provider/v1alpha1"
@@ -13,16 +14,25 @@ import (
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
 	var err error
+
+	var certFiles []certs.File
+	{
+		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.WorkerCert)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+		certFiles = append(certFiles, certs.NewFilesAPI(tls)...)
+	}
 
 	var params k8scloudconfig.Params
 	{
-		params.BaseDomain = key.BaseDomain(customObject)
-		params.Cluster = customObject.Spec.Cluster
+		params.BaseDomain = key.BaseDomain(cr)
+		params.Cluster = cr.Spec.Cluster
 		params.Extension = &workerExtension{
-			certs:        []certs.File{},
-			customObject: customObject,
+			certs:        certFiles,
+			customObject: cr,
 			nodeIndex:    nodeIndex,
 		}
 		params.Images = data.Images

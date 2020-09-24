@@ -96,7 +96,7 @@ func (r *Resource) newConfigMaps(ctx context.Context, customResource v1alpha1.KV
 			return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for worker (%q) is not available", node.ID))
 		}
 
-		template, err := r.cloudConfig.NewWorkerTemplate(customResource, data, node, nodeIdx)
+		template, err := r.cloudConfig.NewWorkerTemplate(ctx, customResource, data, node, nodeIdx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

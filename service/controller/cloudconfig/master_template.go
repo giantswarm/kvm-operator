@@ -26,6 +26,14 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		certFiles = append(certFiles, certs.NewFilesAPI(tls)...)
 	}
 
+	{
+		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.EtcdCert)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+		certFiles = append(certFiles, certs.NewFilesAPI(tls)...)
+	}
+
 	var params k8scloudconfig.Params
 	{
 		params.APIServerEncryptionKey = string(data.ClusterKeys.APIServerEncryptionKey)
