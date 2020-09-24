@@ -56,6 +56,7 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 			nodeIndex:    nodeIndex,
 		}
 		params.Etcd = k8scloudconfig.Etcd{
+			ClientPort:          key.EtcdPort,
 			HighAvailability:    false,
 			InitialClusterState: k8scloudconfig.InitialClusterStateNew,
 		}
