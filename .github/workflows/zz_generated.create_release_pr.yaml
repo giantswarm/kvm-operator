@@ -66,7 +66,7 @@ jobs:
       architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ github.event.repository.name }}"
     steps:
       - name: Install tools
-        uses: giantswarm/install-tools-action@v0.1.0
+        uses: giantswarm/install-tools-action@v0.2.0
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Prepare release changes

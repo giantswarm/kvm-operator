@@ -83,7 +83,7 @@ jobs:
       - gather_facts
     steps:
       - name: Install tools
-        uses: giantswarm/install-tools-action@v0.1.0
+        uses: giantswarm/install-tools-action@v0.2.0
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Update project.go
@@ -169,7 +169,7 @@ jobs:
     if: ${{ needs.gather_facts.outputs.version }}
     steps:
       - name: Install tools
-        uses: giantswarm/install-tools-action@v0.1.0
+        uses: giantswarm/install-tools-action@v0.2.0
       - name: Check out the repository
         uses: actions/checkout@v2
         with:
