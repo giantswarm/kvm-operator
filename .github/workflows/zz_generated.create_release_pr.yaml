@@ -68,7 +68,7 @@ jobs:
       - name: Install tools
         uses: giantswarm/install-tools-action@v0.1.0
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.3
       - name: Prepare release changes
         run: |
           architect prepare-release ${{ env.architect_flags }} --version "${{ needs.gather_facts.outputs.version }}"
