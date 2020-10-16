@@ -1,4 +1,4 @@
-module github.com/giantswarm/kvm-operator
+module github.com/giantswarm/kvm-operator/v3
 
 go 1.14
 
