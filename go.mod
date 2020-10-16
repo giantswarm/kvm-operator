@@ -21,10 +21,9 @@ require (
 	github.com/google/go-cmp v0.5.2
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
-	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/client_golang v1.8.0
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
-	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	k8s.io/api v0.17.2
