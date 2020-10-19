@@ -1,11 +1,11 @@
 package project
 
 var (
-	description string = "The kvm-operator handles Kubernetes clusters running on a Kubernetes cluster."
-	gitSHA             = "n/a"
-	name        string = "kvm-operator"
-	source      string = "https://github.com/giantswarm/kvm-operator"
-	version            = "3.12.2"
+	description = "The kvm-operator handles Kubernetes clusters running on a Kubernetes cluster."
+	gitSHA      = "n/a"
+	name        = "kvm-operator"
+	source      = "https://github.com/giantswarm/kvm-operator"
+	version     = "3.12.3-dev"
 )
 
 func Description() string {
