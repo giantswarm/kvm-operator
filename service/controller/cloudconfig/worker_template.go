@@ -15,34 +15,24 @@ import (
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
 func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
-	var err error
-
-	var certFiles []certs.File
+	var extension *workerExtension
 	{
-		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.WorkerCert)
+		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(cr), workerCertFiles)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
-		certFiles = append(certFiles, certs.NewFilesWorker(tls)...)
-	}
-
-	{
-		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.CalicoEtcdClientCert)
-		if err != nil {
-			return "", microerror.Mask(err)
+		extension = &workerExtension{
+			certs:        certFiles,
+			customObject: cr,
+			nodeIndex:    nodeIndex,
 		}
-		certFiles = append(certFiles, certs.NewFilesCalicoEtcdClient(tls)...)
 	}
 
 	var params k8scloudconfig.Params
 	{
 		params.BaseDomain = key.BaseDomain(cr)
 		params.Cluster = cr.Spec.Cluster
-		params.Extension = &workerExtension{
-			certs:        certFiles,
-			customObject: cr,
-			nodeIndex:    nodeIndex,
-		}
+		params.Extension = extension
 		params.Images = data.Images
 		params.Versions = data.Versions
 		params.Node = node
@@ -51,9 +41,12 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.ImagePullProgressDeadline = "1m"
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
-		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
-		if err != nil {
-			return "", microerror.Mask(err)
+		{
+			var err error
+			params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
+			if err != nil {
+				return "", microerror.Mask(err)
+			}
 		}
 	}
 
@@ -64,6 +57,7 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 			Template: k8scloudconfig.WorkerTemplate,
 		}
 
+		var err error
 		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
 		if err != nil {
 			return "", microerror.Mask(err)

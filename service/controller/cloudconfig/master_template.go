@@ -15,39 +15,17 @@ import (
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
 func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
-	var err error
-
-	var certFiles []certs.File
+	var extension *masterExtension
 	{
-		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.APICert)
+		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(cr), masterCertFiles)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
-		certFiles = append(certFiles, certs.NewFilesAPI(tls)...)
-	}
-
-	{
-		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.EtcdCert)
-		if err != nil {
-			return "", microerror.Mask(err)
+		extension = &masterExtension{
+			certs:        certFiles,
+			customObject: cr,
+			nodeIndex:    nodeIndex,
 		}
-		certFiles = append(certFiles, certs.NewFilesEtcd(tls)...)
-	}
-
-	{
-		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.ServiceAccountCert)
-		if err != nil {
-			return "", microerror.Mask(err)
-		}
-		certFiles = append(certFiles, certs.NewFilesServiceAccount(tls)...)
-	}
-
-	{
-		tls, err := data.CertsSearcher.SearchTLS(ctx, key.ClusterID(cr), certs.CalicoEtcdClientCert)
-		if err != nil {
-			return "", microerror.Mask(err)
-		}
-		certFiles = append(certFiles, certs.NewFilesCalicoEtcdClient(tls)...)
 	}
 
 	var params k8scloudconfig.Params
@@ -58,16 +36,12 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		// Ingress controller service remains in k8scloudconfig and will be
 		// removed in a later migration.
 		params.DisableIngressControllerService = true
-		params.Extension = &masterExtension{
-			certs:        certFiles,
-			customObject: cr,
-			nodeIndex:    nodeIndex,
-		}
 		params.Etcd = k8scloudconfig.Etcd{
 			ClientPort:          key.EtcdPort,
 			HighAvailability:    false,
 			InitialClusterState: k8scloudconfig.InitialClusterStateNew,
 		}
+		params.Extension = extension
 		params.ImagePullProgressDeadline = "1m"
 		params.Node = node
 		params.Kubernetes.Apiserver.CommandExtraArgs = c.k8sAPIExtraArgs
@@ -77,9 +51,12 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.SSOPublicKey = c.ssoPublicKey
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
-		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
-		if err != nil {
-			return "", microerror.Mask(err)
+		{
+			var err error
+			params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
+			if err != nil {
+				return "", microerror.Mask(err)
+			}
 		}
 	}
 
@@ -90,6 +67,7 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 			Template: k8scloudconfig.MasterTemplate,
 		}
 
+		var err error
 		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
 		if err != nil {
 			return "", microerror.Mask(err)

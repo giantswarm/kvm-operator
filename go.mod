@@ -7,7 +7,7 @@ require (
 	github.com/giantswarm/certs/v3 v3.1.0
 	github.com/giantswarm/errors v0.2.3
 	github.com/giantswarm/k8sclient/v4 v4.0.0
-	github.com/giantswarm/k8scloudconfig/v8 v8.0.4-0.20201019104636-1891d41c832a
+	github.com/giantswarm/k8scloudconfig/v8 v8.0.4-0.20201019200237-e63ea4b1b0b4
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.1
 	github.com/giantswarm/microkit v0.2.2
@@ -22,6 +22,7 @@ require (
 	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	k8s.io/api v0.18.9
 	k8s.io/apimachinery v0.18.9
