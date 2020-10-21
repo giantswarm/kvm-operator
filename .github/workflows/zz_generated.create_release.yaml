@@ -82,8 +82,19 @@ jobs:
     needs:
       - gather_facts
     steps:
-      - name: Install tools
-        uses: giantswarm/install-tools-action@v0.1.0
+      - name: Install architect
+        uses: giantswarm/install-binary-action@v1.0.0
+        with:
+          binary: "architect"
+          version: "3.0.5"
+      - name: Install semver
+        uses: giantswarm/install-binary-action@v1.0.0
+        with:
+          binary: "semver"
+          version: "3.0.0"
+          download_url: "https://github.com/fsaintjacques/${binary}-tool/archive/${version}.tar.gz"
+          tarball_binary_path: "*/src/${binary}"
+          smoke_test: "${binary} --version"
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Update project.go
@@ -168,8 +179,14 @@ jobs:
       - gather_facts
     if: ${{ needs.gather_facts.outputs.version }}
     steps:
-      - name: Install tools
-        uses: giantswarm/install-tools-action@v0.1.0
+      - name: Install semver
+        uses: giantswarm/install-binary-action@v1.0.0
+        with:
+          binary: "semver"
+          version: "3.0.0"
+          download_url: "https://github.com/fsaintjacques/${binary}-tool/archive/${version}.tar.gz"
+          tarball_binary_path: "*/src/${binary}"
+          smoke_test: "${binary} --version"
       - name: Check out the repository
         uses: actions/checkout@v2
         with:
