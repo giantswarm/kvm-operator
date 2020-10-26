@@ -42,7 +42,7 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 			InitialClusterState: k8scloudconfig.InitialClusterStateNew,
 		}
 		params.Extension = extension
-		params.ImagePullProgressDeadline = "1m"
+		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 		params.Node = node
 		params.Kubernetes.Apiserver.CommandExtraArgs = c.k8sAPIExtraArgs
 		params.Images = data.Images

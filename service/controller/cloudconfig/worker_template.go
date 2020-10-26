@@ -38,7 +38,7 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.Node = node
 		params.RegistryMirrors = c.registryMirrors
 		params.SSOPublicKey = c.ssoPublicKey
-		params.ImagePullProgressDeadline = "1m"
+		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
 		{

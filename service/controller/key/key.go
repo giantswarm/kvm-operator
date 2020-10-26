@@ -89,6 +89,8 @@ const (
 	// DefaultOSDiskSize defines the space used to partition the root FS within
 	// k8s-kvm.
 	DefaultOSDiskSize = "5G"
+
+	DefaultImagePullProgressDeadline = "1m"
 )
 
 const (
