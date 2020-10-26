@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated Kubernetes libraries to 1.18 and all other client-go-dependent libraries.
+- Updated Kubernetes libraries to 1.18 along with all other client-go-dependent libraries.
 
 ## [3.12.2] - 2020-10-16
 
