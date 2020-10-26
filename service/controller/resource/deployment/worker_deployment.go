@@ -12,8 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -49,6 +47,9 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
+				Annotations: map[string]string{
+					key.VersionBundleVersionAnnotation: key.OperatorVersion(customResource),
+				},
 				Labels: map[string]string{
 					key.LabelApp:          key.WorkerID,
 					"cluster":             key.ClusterID(customResource),
@@ -57,7 +58,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 					key.LabelOrganization: key.ClusterCustomer(customResource),
 					key.LabelManagedBy:    key.OperatorName,
 					"node":                workerNode.ID,
-					label.OperatorVersion: project.Version(),
 				},
 			},
 			Spec: v1.DeploymentSpec{
@@ -75,10 +75,11 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 				Template: corev1.PodTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Annotations: map[string]string{
-							key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(customResource),
-							key.AnnotationIp:          "",
-							key.AnnotationService:     key.WorkerID,
-							key.AnnotationPodDrained:  "False",
+							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customResource),
+							key.AnnotationIp:            "",
+							key.AnnotationService:       key.WorkerID,
+							key.AnnotationPodDrained:    "False",
+							key.AnnotationVersionBundle: key.OperatorVersion(customResource),
 						},
 						Name: key.WorkerID,
 						Labels: map[string]string{
@@ -88,7 +89,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							key.LabelCluster:      key.ClusterID(customResource),
 							key.LabelOrganization: key.ClusterCustomer(customResource),
 							"node":                workerNode.ID,
-							label.OperatorVersion: project.Version(),
+							key.PodWatcherLabel:   key.OperatorName,
 						},
 					},
 					Spec: corev1.PodSpec{

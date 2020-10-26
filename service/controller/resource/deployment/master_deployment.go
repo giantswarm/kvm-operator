@@ -12,8 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -108,10 +106,11 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 				Template: corev1.PodTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Annotations: map[string]string{
-							key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(customResource),
-							key.AnnotationIp:          "",
-							key.AnnotationService:     key.MasterID,
-							key.AnnotationPodDrained:  "False",
+							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customResource),
+							key.AnnotationIp:            "",
+							key.AnnotationService:       key.MasterID,
+							key.AnnotationPodDrained:    "False",
+							key.AnnotationVersionBundle: key.OperatorVersion(customResource),
 						},
 						GenerateName: key.MasterID,
 						Labels: map[string]string{
@@ -121,7 +120,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							key.LabelCluster:      key.ClusterID(customResource),
 							key.LabelOrganization: key.ClusterCustomer(customResource),
 							"node":                masterNode.ID,
-							label.OperatorVersion: project.Version(),
+							key.PodWatcherLabel:   key.OperatorName,
 						},
 					},
 					Spec: corev1.PodSpec{

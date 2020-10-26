@@ -100,6 +100,7 @@ const (
 	AnnotationService           = "endpoint.kvm.giantswarm.io/service"
 	AnnotationPodDrained        = "endpoint.kvm.giantswarm.io/drained"
 	AnnotationPrometheusCluster = "giantswarm.io/prometheus-cluster"
+	AnnotationVersionBundle     = "kvm-operator.giantswarm.io/version-bundle"
 
 	LabelApp           = "app"
 	LabelCluster       = "giantswarm.io/cluster"
@@ -118,6 +119,10 @@ const (
 
 const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
+)
+
+const (
+	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
 )
 
 const (
