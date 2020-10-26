@@ -6,7 +6,6 @@ import (
 
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/v2/pkg/controller/context/updateallowedcontext"
 	"github.com/giantswarm/operatorkit/v2/pkg/resource/crud"
 	"github.com/giantswarm/tenantcluster/v3/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
@@ -68,7 +67,6 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-
 	r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
 
 	tcK8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
@@ -88,13 +86,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
 
-	if updateallowedcontext.IsUpdateAllowed(ctx) {
-		return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient)
-	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", "not computing update state because deployments are not allowed to be updated")
-
-	return nil, nil
+	return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient)
 }
 
 func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredState interface{}, tcK8sClient kubernetes.Interface) (interface{}, error) {

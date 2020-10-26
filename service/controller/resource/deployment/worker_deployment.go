@@ -12,6 +12,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -90,6 +92,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							key.LabelOrganization: key.ClusterCustomer(customResource),
 							"node":                workerNode.ID,
 							key.PodWatcherLabel:   key.OperatorName,
+							label.OperatorVersion: project.Version(),
 						},
 					},
 					Spec: corev1.PodSpec{

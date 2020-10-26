@@ -11,6 +11,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 type DrainerConfig struct {
@@ -47,6 +48,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			Logger:    config.Logger,
 			Resources: resources,
 			Selector: labels.SelectorFromSet(map[string]string{
+				key.PodWatcherLabel:   project.Name(),
 				label.OperatorVersion: project.Version(),
 			}),
 
