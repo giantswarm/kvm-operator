@@ -5,7 +5,7 @@ RUN cat /etc/go.mod | grep k8scloudconfig | awk '{print $1"/...@"$2}' | xargs -I
 # This is needed to extract the versioned catalog name, e.g. v6@6.0.1
 RUN ln -s /go/pkg/mod/$(cat /etc/go.mod | grep k8scloudconfig | awk '{print $1"@"$2}') /opt/k8scloudconfig
 
-FROM alpine:3.12.0
+FROM alpine:3.12.1
 
 RUN apk add --update ca-certificates \
     && rm -rf /var/cache/apk/*
