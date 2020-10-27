@@ -8,7 +8,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/key"

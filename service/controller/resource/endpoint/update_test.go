@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	g8sfake "github.com/giantswarm/apiextensions/v2/pkg/clientset/versioned/fake"
+	g8sfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/google/go-cmp/cmp"
 	corev1 "k8s.io/api/core/v1"
