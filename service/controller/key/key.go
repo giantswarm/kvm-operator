@@ -117,6 +117,7 @@ const (
 
 const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
+	ReleaseVersionAnnotation       = "giantswarm.io/release-version"
 )
 
 const (
@@ -546,6 +547,10 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	}
 
 	return names
+}
+
+func ReleaseVersion(cr v1alpha1.KVMConfig) string {
+	return cr.GetLabels()[label.ReleaseVersion]
 }
 
 func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
