@@ -1925,9 +1925,9 @@ func setupReleasesClientSet() *apiextfake.Clientset {
 	}
 
 	releases := map[string]*releasev1alpha1.Release{
-		"13.0.0": release,
-		"14.0.0": triggerUpdateRelease,
-		"15.0.0": dontTriggerUpdateRelease,
+		"v13.0.0": release,
+		"v14.0.0": triggerUpdateRelease,
+		"v15.0.0": dontTriggerUpdateRelease,
 	}
 	clientset := apiextfake.NewSimpleClientset()
 	clientset.ReactionChain = append([]k8stesting.Reactor{

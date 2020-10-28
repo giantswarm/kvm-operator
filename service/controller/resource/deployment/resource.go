@@ -1,6 +1,9 @@
 package deployment
 
 import (
+	"strings"
+
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -71,6 +74,19 @@ func (r *Resource) Name() string {
 	return Name
 }
 
+func (r *Resource) getRelease(releaseName string) (*releasev1alpha1.Release, error) {
+	if !strings.HasPrefix(releaseName, "v") {
+		releaseName = "v" + releaseName
+	}
+
+	release, err := r.g8sClient.ReleaseV1alpha1().Releases().Get(releaseName, metav1.GetOptions{})
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	return release, nil
+}
+
 func (r *Resource) isDeploymentModified(a, b *v1.Deployment) (bool, error) {
 	versionA, versionB, present := getAnnotationsIfPresent(a, b, key.VersionBundleVersionAnnotation)
 	if !present || (versionA != versionB) {
@@ -97,12 +113,12 @@ func (r *Resource) isDeploymentModified(a, b *v1.Deployment) (bool, error) {
 }
 
 func (r *Resource) releaseComponentsChanged(a, b string) (bool, error) {
-	aRelease, err := r.g8sClient.ReleaseV1alpha1().Releases().Get(a, metav1.GetOptions{})
+	aRelease, err := r.getRelease(a)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
 
-	bRelease, err := r.g8sClient.ReleaseV1alpha1().Releases().Get(b, metav1.GetOptions{})
+	bRelease, err := r.getRelease(b)
 	if err != nil {
 		return false, microerror.Mask(err)
 	}
