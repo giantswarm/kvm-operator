@@ -22,6 +22,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data Ig
 
 		params.BaseDomain = key.BaseDomain(customObject)
 		params.Cluster = customObject.Spec.Cluster
+		params.DockerhubToken = c.dockerhubToken
 		params.Extension = &workerExtension{
 			certs:        data.ClusterCerts,
 			customObject: customObject,
