@@ -27,6 +27,12 @@ spec:
           items:
           - key: config.yml
             path: config.yml
+      - name: {{ .Chart.Name }}-secret
+        secret:
+          secretName: {{ include "resource.default.name"  . }}
+          items:
+          - key: secret.yml
+            path: secret.yml
       serviceAccountName: {{ include "resource.default.name"  . }}
       securityContext:
         runAsUser: {{ .Values.pod.user.id }}
@@ -36,11 +42,13 @@ spec:
         image: "{{ .Values.Installation.V1.Registry.Domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
         args:
         - daemon
-        - --config.dirs=/var/run/{{ .Chart.Name }}/configmap/
-        - --config.files=config
+        - --config.dirs=/var/run/{{ .Chart.Name }}/configmap/,/var/run/{{ .Chart.Name }}/secret/
+        - --config.files=config,secret
         volumeMounts:
         - name: {{ .Chart.Name }}-configmap
           mountPath: /var/run/{{ .Chart.Name }}/configmap/
+        - name: {{ .Chart.Name }}-secret
+          mountPath: /var/run/{{ .Chart.Name }}/secret/
         livenessProbe:
           httpGet:
             path: /healthz

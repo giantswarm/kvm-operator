@@ -39,6 +39,7 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.RegistryMirrors = c.registryMirrors
 		params.SSOPublicKey = c.ssoPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
+		params.DockerhubToken = c.dockerhubToken
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
 		{
