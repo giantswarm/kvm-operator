@@ -29,7 +29,7 @@ spec:
             path: config.yml
       - name: {{ .Chart.Name }}-secret
         secret:
-          name: {{ include "resource.default.name"  . }}
+          secretName: {{ include "resource.default.name"  . }}
           items:
           - key: secret.yml
             path: secret.yml
