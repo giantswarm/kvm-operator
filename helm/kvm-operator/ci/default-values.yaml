@@ -3,6 +3,8 @@ Installation:
   V1:
     Secret:
       Registry:
+        Dockerhub:
+          Token: "token"
         PullSecret:
           DockerConfigJSON: ""
     GiantSwarm:
