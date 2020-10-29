@@ -47,7 +47,6 @@ spec:
         volumeMounts:
         - name: {{ .Chart.Name }}-configmap
           mountPath: /var/run/{{ .Chart.Name }}/configmap/
-        volumeMounts:
         - name: {{ .Chart.Name }}-secret
           mountPath: /var/run/{{ .Chart.Name }}/secret/
         livenessProbe:
