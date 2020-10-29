@@ -142,6 +142,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			KeyWatcher:     config.RandomkeysSearcher,
 			Logger:         config.Logger,
 			RegistryDomain: config.RegistryDomain,
+			DockerhubToken: config.DockerhubToken,
 		}
 
 		ops, err := configmap.New(c)
