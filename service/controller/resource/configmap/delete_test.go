@@ -335,7 +335,7 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
 		resourceConfig.RegistryDomain = "example.net"
-		resourceConfig.DockerhubToken = "token"
+		resourceConfig.DockerhubToken = "tokenC"
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)

@@ -284,7 +284,7 @@ func Test_Resource_CloudConfig_newCreateChange(t *testing.T) {
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
 		resourceConfig.RegistryDomain = "example.org"
-		resourceConfig.DockerhubToken = "token"
+		resourceConfig.DockerhubToken = "tokenB"
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
