@@ -31,8 +31,8 @@ spec:
         secret:
           secretName: {{ include "resource.default.name"  . }}
           items:
-          - key: secret.yml
-            path: secret.yml
+          - key: dockerhub-secret.yml
+            path: dockerhub-secret.yml
       serviceAccountName: {{ include "resource.default.name"  . }}
       securityContext:
         runAsUser: {{ .Values.pod.user.id }}
@@ -43,7 +43,7 @@ spec:
         args:
         - daemon
         - --config.dirs=/var/run/{{ include "name" . }}/configmap/,/var/run/{{ include "name" . }}/secret/
-        - --config.files=config,secret
+        - --config.files=config,dockerhub-secret
         volumeMounts:
         - name: {{ include "name" . }}-configmap
           mountPath: /var/run/{{ include "name" . }}/configmap/
