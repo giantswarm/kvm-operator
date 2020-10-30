@@ -170,8 +170,6 @@ github.com/giantswarm/k8sclient v0.2.0 h1:Az+Knfs2UJrNFoqfOsfkudg+rt3fn5EM1aKrnL
 github.com/giantswarm/k8sclient v0.2.0/go.mod h1:tUgUynwKgMnjnN2PldGmxJW6+8eZn2p7tT+tEhXDwOg=
 github.com/giantswarm/k8sclient/v3 v3.1.0 h1:5Zk9P0hBR3afkdFHkSne3ZwNqbvrp3KRWAyjUQ1oVm0=
 github.com/giantswarm/k8sclient/v3 v3.1.0/go.mod h1:kDOgbAQ3V8YqroN4T7RVPk+rapvT/IV2KNNbxfM2xys=
-github.com/giantswarm/k8scloudconfig/v7 v7.1.3-0.20201028154750-1f408f94a5c0 h1:AaFY/xTvk83+FzK11ylUL5ealvwUUHyfwuNFeMZxvgU=
-github.com/giantswarm/k8scloudconfig/v7 v7.1.3-0.20201028154750-1f408f94a5c0/go.mod h1:EnsZfiL+f8Kv5jro26yhnw/6Yj5dboz/QgW/pEyXUqg=
 github.com/giantswarm/k8scloudconfig/v7 v7.2.0 h1:L0DaLrdsn9H/xC02GdpP//hJdrYkQidEGCEfcoWU4Sk=
 github.com/giantswarm/k8scloudconfig/v7 v7.2.0/go.mod h1:EnsZfiL+f8Kv5jro26yhnw/6Yj5dboz/QgW/pEyXUqg=
 github.com/giantswarm/microendpoint v0.2.0 h1:xCAqAVRjTw/4ifEuBeNavALdbQsLk6+k/ukzdy0GWZE=
