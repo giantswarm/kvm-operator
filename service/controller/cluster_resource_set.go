@@ -34,6 +34,7 @@ import (
 
 type ClusterResourceSetConfig struct {
 	CertsSearcher      certs.Interface
+	DockerhubToken     string
 	G8sClient          versioned.Interface
 	K8sClient          k8sclient.Interface
 	Logger             micrologger.Logger
@@ -61,6 +62,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := cloudconfig.Config{
 			Logger: config.Logger,
 
+			DockerhubToken:  config.DockerhubToken,
 			IgnitionPath:    config.IgnitionPath,
 			OIDC:            config.OIDC,
 			RegistryMirrors: config.RegistryMirrors,
@@ -140,6 +142,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 			KeyWatcher:     config.RandomkeysSearcher,
 			Logger:         config.Logger,
 			RegistryDomain: config.RegistryDomain,
+			DockerhubToken: config.DockerhubToken,
 		}
 
 		ops, err := configmap.New(c)

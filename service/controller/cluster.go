@@ -29,9 +29,11 @@ type ClusterConfig struct {
 	NTPServers         string
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
-	RegistryDomain     string
-	RegistryMirrors    []string
 	SSOPublicKey       string
+
+	DockerhubToken  string
+	RegistryDomain  string
+	RegistryMirrors []string
 }
 
 // ClusterConfigOIDC represents the configuration of the OIDC authorization
@@ -107,6 +109,7 @@ func newClusterResourceSets(config ClusterConfig) ([]*controller.ResourceSet, er
 	{
 		c := ClusterResourceSetConfig{
 			CertsSearcher:      config.CertsSearcher,
+			DockerhubToken:     config.DockerhubToken,
 			G8sClient:          config.K8sClient.G8sClient(),
 			K8sClient:          config.K8sClient,
 			Logger:             config.Logger,

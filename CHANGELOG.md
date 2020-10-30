@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update `k8scloudconfig` to v7.2.0, containing a fix for DockerHub QPS.
+
 ## [3.12.2] - 2020-10-16
 
 ### Added
