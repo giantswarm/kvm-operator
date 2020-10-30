@@ -58,6 +58,10 @@ func New(config Config) (*Service, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Viper must not be empty", config)
 	}
 
+	if config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken) == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Flag.Service.Registry.DockerhubToken must not be empty", config)
+	}
+
 	var err error
 
 	var restConfig *rest.Config
