@@ -30,11 +30,9 @@ type ClusterConfig struct {
 	NTPServers         string
 	OIDC               ClusterConfigOIDC
 	ProjectName        string
+	RegistryDomain     string
+	RegistryMirrors    []string
 	SSOPublicKey       string
-
-	DockerhubToken  string
-	RegistryDomain  string
-	RegistryMirrors []string
 }
 
 // ClusterConfigOIDC represents the configuration of the OIDC authorization

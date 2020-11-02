@@ -11,7 +11,6 @@ func New() *cloudconfig.CloudConfig {
 	c := cloudconfig.DefaultConfig()
 
 	c.Logger = microloggertest.New()
-	c.DockerhubToken = "token"
 
 	packagePath, err := k8scloudconfig.GetPackagePath()
 	if err != nil {

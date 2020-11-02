@@ -29,7 +29,6 @@ type Config struct {
 	K8sClient      kubernetes.Interface
 	KeyWatcher     randomkeys.Interface
 	Logger         micrologger.Logger
-	DockerhubToken string
 	RegistryDomain string
 }
 
@@ -68,9 +67,6 @@ func New(config Config) (*Resource, error) {
 	}
 	if config.RegistryDomain == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.RegistryDomain must not be empty", config)
-	}
-	if config.DockerhubToken == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.DockerhubToken must not be empty", config)
 	}
 
 	newService := &Resource{
