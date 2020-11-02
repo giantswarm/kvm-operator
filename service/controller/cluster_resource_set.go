@@ -44,7 +44,8 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		c := cloudconfig.Config{
 			Logger: config.Logger,
 
-			IgnitionPath: config.IgnitionPath,
+			DockerhubToken: config.DockerhubToken,
+			IgnitionPath:   config.IgnitionPath,
 			OIDC: cloudconfig.OIDCConfig{
 				ClientID:       config.OIDC.ClientID,
 				IssuerURL:      config.OIDC.IssuerURL,
@@ -130,6 +131,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 			KeyWatcher:     randomkeysSearcher,
 			Logger:         config.Logger,
 			RegistryDomain: config.RegistryDomain,
+			DockerhubToken: config.DockerhubToken,
 		}
 
 		ops, err := configmap.New(c)

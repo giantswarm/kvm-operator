@@ -61,6 +61,7 @@ type Config struct {
 	// Dependencies.
 	Logger micrologger.Logger
 
+	DockerhubToken  string
 	IgnitionPath    string
 	OIDC            OIDCConfig
 	RegistryMirrors []string
@@ -81,6 +82,7 @@ type CloudConfig struct {
 	// Dependencies.
 	logger micrologger.Logger
 
+	dockerhubToken  string
 	ignitionPath    string
 	k8sAPIExtraArgs []string
 	registryMirrors []string
@@ -134,6 +136,7 @@ func New(config Config) (*CloudConfig, error) {
 		// Dependencies.
 		logger: config.Logger,
 
+		dockerhubToken:  config.DockerhubToken,
 		ignitionPath:    config.IgnitionPath,
 		k8sAPIExtraArgs: k8sAPIExtraArgs,
 		registryMirrors: config.RegistryMirrors,
