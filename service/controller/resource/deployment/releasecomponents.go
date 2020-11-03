@@ -1,16 +1,22 @@
 package deployment
 
-import releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+import (
+	"github.com/giantswarm/kvm-operator/service/controller/key"
+
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+)
 
 var keyComponents = []string{"calico", "containerlinux", "etcd", "kubernetes"}
 
-func keyReleaseComponentsEqual(a, b *releasev1alpha1.Release) bool {
-	for _, keyComponent := range keyComponents {
-		if componentVersion(a, keyComponent) != componentVersion(b, keyComponent) {
-			return false
+func addKeyComponentsAnnotations(annotations map[string]string, release *releasev1alpha1.Release) {
+	for _, component := range keyComponents {
+		version := componentVersion(release, component)
+		if version == "" {
+			continue
 		}
+		annotationName := key.AnnotationComponentVersion + "-" + component
+		annotations[annotationName] = version
 	}
-	return true
 }
 
 func componentVersion(release *releasev1alpha1.Release, component string) string {

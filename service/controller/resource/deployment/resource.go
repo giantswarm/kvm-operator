@@ -1,15 +1,11 @@
 package deployment
 
 import (
-	"strings"
-
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -74,56 +70,12 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func (r *Resource) getRelease(releaseName string) (*releasev1alpha1.Release, error) {
-	if !strings.HasPrefix(releaseName, "v") {
-		releaseName = "v" + releaseName
-	}
-
-	release, err := r.g8sClient.ReleaseV1alpha1().Releases().Get(releaseName, metav1.GetOptions{})
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	return release, nil
-}
-
 func (r *Resource) isDeploymentModified(a, b *v1.Deployment) (bool, error) {
-	versionA, versionB, present := getAnnotationsIfPresent(a, b, key.VersionBundleVersionAnnotation)
-	if !present || (versionA != versionB) {
+	if isAnnotationModified(a, b, key.VersionBundleVersionAnnotation) {
 		return true, nil
 	}
 
-	releaseA, releaseB, present := getAnnotationsIfPresent(a, b, key.ReleaseVersionAnnotation)
-	if !present {
-		return true, nil
-	}
-
-	if releaseA != releaseB {
-		componentsChanged, err := r.releaseComponentsChanged(releaseA, releaseB)
-		if err != nil {
-			return false, err
-		}
-
-		if componentsChanged {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
-func (r *Resource) releaseComponentsChanged(a, b string) (bool, error) {
-	aRelease, err := r.getRelease(a)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	bRelease, err := r.getRelease(b)
-	if err != nil {
-		return false, microerror.Mask(err)
-	}
-
-	if !keyReleaseComponentsEqual(aRelease, bRelease) {
+	if isAnnotationModified(a, b, key.ReleaseVersionAnnotation) {
 		return true, nil
 	}
 
@@ -156,16 +108,6 @@ func containsDeployment(list []*v1.Deployment, item *v1.Deployment) bool {
 	return false
 }
 
-func getAnnotationsIfPresent(a, b *v1.Deployment, annotation string) (string, string, bool) {
-	aVersion := a.GetAnnotations()[annotation]
-	bVersion := b.GetAnnotations()[annotation]
-	if aVersion == "" || bVersion == "" {
-		return aVersion, bVersion, false
-	}
-
-	return aVersion, bVersion, true
-}
-
 func getDeploymentByName(list []*v1.Deployment, name string) (*v1.Deployment, error) {
 	for _, l := range list {
 		if l.Name == name {
@@ -176,6 +118,29 @@ func getDeploymentByName(list []*v1.Deployment, name string) (*v1.Deployment, er
 	return nil, microerror.Mask(notFoundError)
 }
 
+func isAnnotationModified(a, b *v1.Deployment, annotation string) bool {
+	aVersion, ok := a.GetAnnotations()[annotation]
+	if !ok {
+		return true
+	}
+	if aVersion == "" {
+		return true
+	}
+
+	bVersion, ok := b.GetAnnotations()[annotation]
+	if !ok {
+		return true
+	}
+	if bVersion == "" {
+		return true
+	}
+
+	if aVersion != bVersion {
+		return true
+	}
+
+	return false
+}
 func toDeployments(v interface{}) ([]*v1.Deployment, error) {
 	if v == nil {
 		return nil, nil

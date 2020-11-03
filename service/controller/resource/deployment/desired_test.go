@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"context"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -19,33 +20,10 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
-	// Create a fake release
-	release := releasev1alpha1.NewReleaseCR()
-	release.ObjectMeta.Name = "v1.0.0"
-	targetDistroVersion := "2345.3.0"
-	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
-		{
-			Name:    "kubernetes",
-			Version: "1.15.11",
-		},
-		{
-			Name:    "calico",
-			Version: "3.9.1",
-		},
-		{
-			Name:    "etcd",
-			Version: "3.3.15",
-		},
-		{
-			Name:    "containerlinux",
-			Version: targetDistroVersion,
-		},
-	}
-	clientset := apiextfake.NewSimpleClientset(release)
-
 	testCases := []struct {
 		Obj                      interface{}
 		ExpectedMasterCount      int
@@ -306,50 +284,9 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 		},
 	}
 
-	logger := microloggertest.New()
-
-	var err error
-	var certsSearcher certs.Interface
-	{
-		c := certs.Config{
-			K8sClient:    fake.NewSimpleClientset(),
-			Logger:       logger,
-			WatchTimeout: 5 * time.Second,
-		}
-
-		certsSearcher, err = certs.NewSearcher(c)
-		if err != nil {
-			t.Fatal("expected", nil, "got", err)
-		}
-	}
-
-	var tenantCluster tenantcluster.Interface
-	{
-		c := tenantcluster.Config{
-			CertsSearcher: certsSearcher,
-			Logger:        logger,
-			CertID:        certs.APICert,
-		}
-
-		tenantCluster, err = tenantcluster.New(c)
-		if err != nil {
-			t.Fatal("expected", nil, "got", err)
-		}
-	}
-
-	var newResource *Resource
-	{
-		resourceConfig := Config{
-			DNSServers:    "dnsserver1,dnsserver2",
-			G8sClient:     clientset,
-			K8sClient:     fake.NewSimpleClientset(),
-			Logger:        logger,
-			TenantCluster: tenantCluster,
-		}
-		newResource, err = New(resourceConfig)
-		if err != nil {
-			t.Fatal("expected", nil, "got", err)
-		}
+	newResource, err := buildResource()
+	if err != nil {
+		t.Fatalf("expected %#v got %#v", nil, err)
 	}
 
 	for i, tc := range testCases {
@@ -397,6 +334,169 @@ func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 			}
 		}
 	}
+}
+
+func Test_Annotations_Deployment_GetDesiredState(t *testing.T) {
+
+	testCases := []struct {
+		Obj                              interface{}
+		ExpectedComponentsPodAnnotations map[string]string
+	}{
+		// Test 0 ensures that all deployments have the key components versions
+		// in the pod template spec annotations
+		{
+			Obj: &v1alpha1.KVMConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						label.ReleaseVersion: "1.0.0",
+					},
+				},
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+						Masters: []v1alpha1.ClusterNode{
+							{},
+						},
+						Workers: []v1alpha1.ClusterNode{
+							{},
+						},
+					},
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						Masters: []v1alpha1.KVMConfigSpecKVMNode{
+							{CPUs: 1, Memory: "1G"},
+						},
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
+							{CPUs: 4, Memory: "8G"},
+						},
+					},
+				},
+			},
+			ExpectedComponentsPodAnnotations: map[string]string{
+				key.AnnotationComponentVersion + "-calico":         "3.9.1",
+				key.AnnotationComponentVersion + "-containerlinux": "2345.3.0",
+				key.AnnotationComponentVersion + "-etcd":           "3.3.15",
+				key.AnnotationComponentVersion + "-kubernetes":     "1.15.11",
+			},
+		},
+	}
+
+	newResource, err := buildResource()
+	if err != nil {
+		t.Fatalf("expected %#v got %#v", nil, err)
+	}
+
+	for i, tc := range testCases {
+		result, err := newResource.GetDesiredState(context.TODO(), tc.Obj)
+		if err != nil {
+			t.Fatalf("case %d expected %#v got %#v", i, nil, err)
+		}
+
+		deployments, ok := result.([]*v1.Deployment)
+		if !ok {
+			t.Fatalf("case %d expected %T got %T", i, []*v1.Deployment{}, result)
+		}
+
+		for _, r := range testGetComponentsAnnotations(deployments) {
+			if !reflect.DeepEqual(r, tc.ExpectedComponentsPodAnnotations) {
+				t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedComponentsPodAnnotations, r)
+			}
+
+			if !reflect.DeepEqual(r, tc.ExpectedComponentsPodAnnotations) {
+				t.Fatalf("case %d expected %#v got %#v", i, tc.ExpectedComponentsPodAnnotations, r)
+			}
+		}
+	}
+}
+
+func buildResource() (*Resource, error) {
+	// Create a fake release
+	release := releasev1alpha1.NewReleaseCR()
+	release.ObjectMeta.Name = "v1.0.0"
+	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
+		{
+			Name:    "kubernetes",
+			Version: "1.15.11",
+		},
+		{
+			Name:    "calico",
+			Version: "3.9.1",
+		},
+		{
+			Name:    "etcd",
+			Version: "3.3.15",
+		},
+		{
+			Name:    "containerlinux",
+			Version: "2345.3.0",
+		},
+	}
+	clientset := apiextfake.NewSimpleClientset(release)
+
+	logger := microloggertest.New()
+
+	var err error
+	var certsSearcher certs.Interface
+	{
+		c := certs.Config{
+			K8sClient:    fake.NewSimpleClientset(),
+			Logger:       logger,
+			WatchTimeout: 5 * time.Second,
+		}
+
+		certsSearcher, err = certs.NewSearcher(c)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var tenantCluster tenantcluster.Interface
+	{
+		c := tenantcluster.Config{
+			CertsSearcher: certsSearcher,
+			Logger:        logger,
+			CertID:        certs.APICert,
+		}
+
+		tenantCluster, err = tenantcluster.New(c)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var newResource *Resource
+	{
+		resourceConfig := Config{
+			DNSServers:    "dnsserver1,dnsserver2",
+			G8sClient:     clientset,
+			K8sClient:     fake.NewSimpleClientset(),
+			Logger:        logger,
+			TenantCluster: tenantCluster,
+		}
+		newResource, err = New(resourceConfig)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return newResource, nil
+
+}
+
+func testGetComponentsAnnotations(deployments []*v1.Deployment) []map[string]string {
+	results := []map[string]string{}
+
+	for _, d := range deployments {
+		annotations := make(map[string]string)
+		for k, v := range d.Spec.Template.ObjectMeta.Annotations {
+			if strings.HasPrefix(k, key.AnnotationComponentVersion) {
+				annotations[k] = v
+			}
+		}
+
+		results = append(results, annotations)
+	}
+
+	return results
 }
 
 func testGetMasterCount(deployments []*v1.Deployment) int {
