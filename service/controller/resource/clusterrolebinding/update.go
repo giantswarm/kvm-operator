@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/resource/crud"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	apiv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,14 +22,14 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 
 		// Create the cluster role bindings in the Kubernetes API.
 		for _, clusterRoleBinding := range clusterRoleBindingsToUpdate {
-			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Update(clusterRoleBinding)
+			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Update(ctx, clusterRoleBinding, apismetav1.UpdateOptions{})
 			if isExternalFieldImmutableError(err) {
 				// We can't change a RoleRef, so delete the old CRB and replace it
 				r.logger.LogCtx(ctx, "level", "debug", "message", "unable to update immutable field, re-creating the cluster role binding instead")
 
 				r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the old cluster role binding")
 				// Delete the old CRB
-				err = r.k8sClient.RbacV1().ClusterRoleBindings().Delete(clusterRoleBinding.Name, &apismetav1.DeleteOptions{})
+				err = r.k8sClient.RbacV1().ClusterRoleBindings().Delete(ctx, clusterRoleBinding.Name, apismetav1.DeleteOptions{})
 				if apierrors.IsNotFound(err) {
 				} else if err != nil {
 					return microerror.Mask(err)
@@ -37,7 +37,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 
 				r.logger.LogCtx(ctx, "level", "debug", "message", "creating the new cluster role binding")
 				// Create the new CRB
-				_, err = r.k8sClient.RbacV1().ClusterRoleBindings().Create(clusterRoleBinding)
+				_, err = r.k8sClient.RbacV1().ClusterRoleBindings().Create(ctx, clusterRoleBinding, apismetav1.CreateOptions{})
 				if apierrors.IsAlreadyExists(err) {
 				} else if err != nil {
 					return microerror.Mask(err)

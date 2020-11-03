@@ -3,10 +3,10 @@ package pod
 import (
 	"context"
 
-	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
-	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +24,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the current version of the reconciled pod in the Kubernetes API")
 
-		currentPod, err = r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(reconciledPod.Name, metav1.GetOptions{})
+		currentPod, err = r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(ctx, reconciledPod.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			// In case we reconcile a pod we cannot find anymore this means the
 			// informer's watch event is outdated and the pod got already deleted in
@@ -62,7 +62,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		p := currentPod.GetName()
 		o := metav1.GetOptions{}
 
-		drainerConfig, err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Get(p, o)
+		drainerConfig, err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Get(ctx, p, o)
 		if apierrors.IsNotFound(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for tenant cluster node")
 
@@ -151,7 +151,7 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 		},
 	}
 
-	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(c)
+	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(ctx, c, metav1.CreateOptions{})
 	if apierrors.IsAlreadyExists(err) {
 		r.logger.LogCtx(ctx, "level", "warning", "message", "drainer config for tenant cluster node already exists")
 	} else if err != nil {
@@ -171,9 +171,9 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 
 		n := currentPod.GetNamespace()
 		i := currentPod.GetName()
-		o := &metav1.DeleteOptions{}
+		o := metav1.DeleteOptions{}
 
-		err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Delete(i, o)
+		err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Delete(ctx, i, o)
 		if apierrors.IsNotFound(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config for tenant cluster node already deleted")
 		} else if err != nil {
@@ -195,7 +195,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "updating the pod in the Kubernetes API")
 
-		_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(podToDelete)
+		_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(ctx, podToDelete, metav1.UpdateOptions{})
 		if apierrors.IsConflict(err) {
 			// The reconciled pod may be updated by other processes or even humans
 			// meanwhile. In case the resource version we currently know does not
@@ -219,10 +219,10 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the pod in the Kubernetes API")
 
 		gracePeriodSeconds := int64(0)
-		options := &metav1.DeleteOptions{
+		options := metav1.DeleteOptions{
 			GracePeriodSeconds: &gracePeriodSeconds,
 		}
-		err = r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Delete(podToDelete.Name, options)
+		err = r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Delete(ctx, podToDelete.Name, options)
 		if err != nil {
 			return microerror.Mask(err)
 		}

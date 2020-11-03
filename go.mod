@@ -3,33 +3,36 @@ module github.com/giantswarm/kvm-operator
 go 1.14
 
 require (
-	github.com/giantswarm/apiextensions v0.4.20
-	github.com/giantswarm/certs v0.2.0
+	github.com/giantswarm/apiextensions/v3 v3.4.0
+	github.com/giantswarm/certs/v3 v3.1.0
 	github.com/giantswarm/errors v0.2.3
-	github.com/giantswarm/k8sclient v0.2.0
-	github.com/giantswarm/k8scloudconfig/v7 v7.2.0
+	github.com/giantswarm/k8sclient/v5 v5.0.0
+	github.com/giantswarm/k8scloudconfig/v9 v9.1.0
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.1
 	github.com/giantswarm/microkit v0.2.2
 	github.com/giantswarm/micrologger v0.3.3
-	github.com/giantswarm/operatorkit v0.2.1
-	github.com/giantswarm/randomkeys v0.2.0
-	github.com/giantswarm/statusresource v0.4.0
-	github.com/giantswarm/tenantcluster v0.2.0
+	github.com/giantswarm/operatorkit/v4 v4.0.0
+	github.com/giantswarm/randomkeys/v2 v2.0.0
+	github.com/giantswarm/statusresource/v3 v3.0.0
+	github.com/giantswarm/tenantcluster/v4 v4.0.0
 	github.com/giantswarm/versionbundle v0.2.0
-	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/google/go-cmp v0.5.2
-	github.com/hashicorp/golang-lru v0.5.3 // indirect
-	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/prometheus/client_golang v1.8.0
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
-	google.golang.org/appengine v1.6.5 // indirect
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	gopkg.in/ini.v1 v1.51.1 // indirect
-	k8s.io/api v0.17.2
-	k8s.io/apimachinery v0.17.2
-	k8s.io/client-go v0.17.2
+	k8s.io/api v0.18.9
+	k8s.io/apimachinery v0.18.9
+	k8s.io/client-go v0.18.9
 )
 
-// v3.3.17 is required by sigs.k8s.io/controller-runtime v0.5.2. Can remove this replace when updated.
-replace github.com/coreos/etcd v3.3.17+incompatible => github.com/coreos/etcd v3.3.24+incompatible
+// v3.3.10 is required by spf13/viper. Can remove this replace when updated.
+replace github.com/coreos/etcd v3.3.10+incompatible => github.com/coreos/etcd v3.3.25+incompatible
+
+// v3.3.13 is required by bketelsen/crypt. Can remove this replace when updated.
+replace github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3.3.25+incompatible
+
+// keep in sync with giantswarm/apiextensions
+replace sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs

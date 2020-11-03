@@ -6,7 +6,7 @@ import (
 	"sort"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/reconciliationcanceledcontext"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -58,13 +58,13 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "updating status with node indexes")
 
 		if !reflect.DeepEqual(cr.Status.KVM.NodeIndexes, nodeIndexes) {
-			newObj, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
+			newObj, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(cr.GetNamespace()).Get(ctx, cr.GetName(), metav1.GetOptions{})
 			if err != nil {
 				return microerror.Mask(err)
 			}
 
 			newObj.Status.KVM.NodeIndexes = nodeIndexes
-			_, err = r.g8sClient.ProviderV1alpha1().KVMConfigs(newObj.GetNamespace()).UpdateStatus(newObj)
+			_, err = r.g8sClient.ProviderV1alpha1().KVMConfigs(newObj.GetNamespace()).UpdateStatus(ctx, newObj, metav1.UpdateOptions{})
 			if err != nil {
 				return microerror.Mask(err)
 			}

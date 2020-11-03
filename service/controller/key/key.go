@@ -10,18 +10,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/k8sclient"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v7/pkg/template"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v9/pkg/template"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 )
@@ -89,6 +89,8 @@ const (
 	// DefaultOSDiskSize defines the space used to partition the root FS within
 	// k8s-kvm.
 	DefaultOSDiskSize = "5G"
+
+	DefaultImagePullProgressDeadline = "1m"
 )
 
 const (
@@ -112,7 +114,7 @@ const (
 
 const (
 	KubernetesNetworkSetupDocker = "0.2.0"
-	kubernetesAPIHealthzVersion  = "0.1.0"
+	kubernetesAPIHealthzVersion  = "0.1.1"
 )
 
 const (
@@ -356,6 +358,18 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 func ArePodContainersTerminated(pod *corev1.Pod) bool {
 	for _, cs := range pod.Status.ContainerStatuses {
 		if cs.State.Terminated == nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+// ArePodContainersWaiting checks ContainerState for all containers present
+// in given pod. When all containers are in Waiting state, true is returned.
+func ArePodContainersWaiting(pod *corev1.Pod) bool {
+	for _, cs := range pod.Status.ContainerStatuses {
+		if cs.State.Waiting == nil {
 			return false
 		}
 	}
@@ -636,19 +650,6 @@ func ToPod(v interface{}) (*corev1.Pod, error) {
 	}
 
 	return pod, nil
-}
-
-func VersionBundleVersionFromPod(pod *corev1.Pod) (string, error) {
-	a := pod.GetAnnotations()
-	if a == nil {
-		return "", microerror.Mask(missingAnnotationError)
-	}
-	v, ok := a[AnnotationVersionBundle]
-	if !ok {
-		return "", microerror.Mask(missingAnnotationError)
-	}
-
-	return v, nil
 }
 
 func VMNumber(ID int) string {

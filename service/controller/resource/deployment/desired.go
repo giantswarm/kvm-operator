@@ -8,7 +8,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -26,7 +26,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	{
 		releaseVersion := customResource.Labels[label.ReleaseVersion]
 		releaseName := fmt.Sprintf("v%s", releaseVersion)
-		release, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(releaseName, apismetav1.GetOptions{})
+		release, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(ctx, releaseName, apismetav1.GetOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

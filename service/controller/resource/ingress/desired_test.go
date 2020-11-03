@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/api/networking/v1beta1"
 	"k8s.io/client-go/kubernetes/fake"

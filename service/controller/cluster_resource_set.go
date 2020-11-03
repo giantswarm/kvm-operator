@@ -1,24 +1,15 @@
 package controller
 
 import (
-	"context"
-
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
-	"github.com/giantswarm/certs"
-	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
-	"github.com/giantswarm/operatorkit/resource"
-	"github.com/giantswarm/operatorkit/resource/crud"
-	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
-	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
-	"github.com/giantswarm/randomkeys"
-	"github.com/giantswarm/statusresource"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/retryresource"
+	"github.com/giantswarm/randomkeys/v2"
+	"github.com/giantswarm/statusresource/v3"
 
-	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/clusterrolebinding"
@@ -32,39 +23,37 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/resource/serviceaccount"
 )
 
-type ClusterResourceSetConfig struct {
-	CertsSearcher      certs.Interface
-	DockerhubToken     string
-	G8sClient          versioned.Interface
-	K8sClient          k8sclient.Interface
-	Logger             micrologger.Logger
-	RandomkeysSearcher randomkeys.Interface
-	RegistryDomain     string
-	RegistryMirrors    []string
-	TenantCluster      tenantcluster.Interface
-
-	ClusterRoleGeneral string
-	ClusterRolePSP     string
-	DNSServers         string
-	GuestUpdateEnabled bool
-	IgnitionPath       string
-	NTPServers         string
-	OIDC               cloudconfig.OIDCConfig
-	ProjectName        string
-	SSOPublicKey       string
-}
-
-func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.ResourceSet, error) {
+func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var err error
+
+	var randomkeysSearcher randomkeys.Interface
+	{
+		c := randomkeys.Config{
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
+
+		randomkeysSearcher, err = randomkeys.NewSearcher(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
 
 	var cloudConfig *cloudconfig.CloudConfig
 	{
 		c := cloudconfig.Config{
 			Logger: config.Logger,
 
-			DockerhubToken:  config.DockerhubToken,
-			IgnitionPath:    config.IgnitionPath,
-			OIDC:            config.OIDC,
+			DockerhubToken: config.DockerhubToken,
+			IgnitionPath:   config.IgnitionPath,
+			OIDC: cloudconfig.OIDCConfig{
+				ClientID:       config.OIDC.ClientID,
+				IssuerURL:      config.OIDC.IssuerURL,
+				UsernameClaim:  config.OIDC.UsernameClaim,
+				UsernamePrefix: config.OIDC.UsernamePrefix,
+				GroupsClaim:    config.OIDC.GroupsClaim,
+				GroupsPrefix:   config.OIDC.GroupsPrefix,
+			},
 			RegistryMirrors: config.RegistryMirrors,
 			SSOPublicKey:    config.SSOPublicKey,
 		}
@@ -137,9 +126,9 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		c := configmap.Config{
 			CertsSearcher:  config.CertsSearcher,
 			CloudConfig:    cloudConfig,
-			G8sClient:      config.G8sClient,
+			G8sClient:      config.K8sClient.G8sClient(),
 			K8sClient:      config.K8sClient.K8sClient(),
-			KeyWatcher:     config.RandomkeysSearcher,
+			KeyWatcher:     randomkeysSearcher,
 			Logger:         config.Logger,
 			RegistryDomain: config.RegistryDomain,
 			DockerhubToken: config.DockerhubToken,
@@ -160,7 +149,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 	{
 		c := deployment.Config{
 			DNSServers:    config.DNSServers,
-			G8sClient:     config.G8sClient,
+			G8sClient:     config.K8sClient.G8sClient(),
 			K8sClient:     config.K8sClient.K8sClient(),
 			Logger:        config.Logger,
 			NTPServers:    config.NTPServers,
@@ -297,43 +286,7 @@ func NewClusterResourceSet(config ClusterResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	handlesFunc := func(obj interface{}) bool {
-		cr, err := key.ToCustomObject(obj)
-		if err != nil {
-			return false
-		}
-
-		if key.OperatorVersion(cr) == project.Version() {
-			return true
-		}
-
-		return false
-	}
-
-	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		if config.GuestUpdateEnabled {
-			updateallowedcontext.SetUpdateAllowed(ctx)
-		}
-
-		return ctx, nil
-	}
-
-	var clusterResourceSet *controller.ResourceSet
-	{
-		c := controller.ResourceSetConfig{
-			Handles:   handlesFunc,
-			InitCtx:   initCtxFunc,
-			Logger:    config.Logger,
-			Resources: resources,
-		}
-
-		clusterResourceSet, err = controller.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	return clusterResourceSet, nil
+	return resources, nil
 }
 
 func toCRUDResource(logger micrologger.Logger, ops crud.Interface) (resource.Interface, error) {

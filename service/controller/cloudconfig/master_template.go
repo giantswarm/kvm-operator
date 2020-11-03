@@ -1,11 +1,12 @@
 package cloudconfig
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v7/pkg/template"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v9/pkg/template"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -13,45 +14,61 @@ import (
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
-	var err error
+func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+	var extension *masterExtension
+	{
+		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(cr), masterCertFiles)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+		extension = &masterExtension{
+			certs:        certFiles,
+			customObject: cr,
+			nodeIndex:    nodeIndex,
+		}
+	}
 
 	var params k8scloudconfig.Params
 	{
-		params = k8scloudconfig.DefaultParams()
-
 		params.APIServerEncryptionKey = string(data.ClusterKeys.APIServerEncryptionKey)
-		params.BaseDomain = key.BaseDomain(customObject)
-		params.Cluster = customObject.Spec.Cluster
+		params.BaseDomain = key.BaseDomain(cr)
+		params.Cluster = cr.Spec.Cluster
 		// Ingress controller service remains in k8scloudconfig and will be
 		// removed in a later migration.
 		params.DisableIngressControllerService = true
-		params.DockerhubToken = c.dockerhubToken
-		params.Extension = &masterExtension{
-			certs:        data.ClusterCerts,
-			customObject: customObject,
-			nodeIndex:    nodeIndex,
+		params.Etcd = k8scloudconfig.Etcd{
+			ClientPort:          key.EtcdPort,
+			HighAvailability:    false,
+			InitialClusterState: k8scloudconfig.InitialClusterStateNew,
 		}
+		params.Extension = extension
+		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 		params.Node = node
 		params.Kubernetes.Apiserver.CommandExtraArgs = c.k8sAPIExtraArgs
 		params.Images = data.Images
 		params.Versions = data.Versions
 		params.RegistryMirrors = c.registryMirrors
 		params.SSOPublicKey = c.ssoPublicKey
+		params.DockerhubToken = c.dockerhubToken
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
-		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
-		if err != nil {
-			return "", microerror.Mask(err)
+		{
+			var err error
+			params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
+			if err != nil {
+				return "", microerror.Mask(err)
+			}
 		}
 	}
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
 	{
-		cloudConfigConfig := k8scloudconfig.DefaultCloudConfigConfig()
-		cloudConfigConfig.Params = params
-		cloudConfigConfig.Template = k8scloudconfig.MasterTemplate
+		cloudConfigConfig := k8scloudconfig.CloudConfigConfig{
+			Params:   params,
+			Template: k8scloudconfig.MasterTemplate,
+		}
 
+		var err error
 		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
 		if err != nil {
 			return "", microerror.Mask(err)
@@ -67,7 +84,7 @@ func (c *CloudConfig) NewMasterTemplate(customObject v1alpha1.KVMConfig, data Ig
 }
 
 type masterExtension struct {
-	certs        certs.Cluster
+	certs        []certs.File
 	customObject v1alpha1.KVMConfig
 	nodeIndex    int
 }
@@ -75,7 +92,7 @@ type masterExtension struct {
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	var filesMeta []k8scloudconfig.FileMetadata
 
-	for _, f := range certs.NewFilesClusterMaster(e.certs) {
+	for _, f := range e.certs {
 		m := k8scloudconfig.FileMetadata{
 			AssetContent: string(f.Data),
 			Path:         f.AbsolutePath,

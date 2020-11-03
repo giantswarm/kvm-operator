@@ -1,14 +1,15 @@
 package controller
 
 import (
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -32,7 +33,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 
 	var err error
 
-	resourceSets, err := newDrainerResourceSets(config)
+	resources, err := newDrainerResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -44,10 +45,11 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(corev1.Pod)
 			},
-			Logger:       config.Logger,
-			ResourceSets: resourceSets,
+			Logger:    config.Logger,
+			Resources: resources,
 			Selector: labels.SelectorFromSet(map[string]string{
-				key.PodWatcherLabel: project.Name(),
+				key.PodWatcherLabel:   project.Name(),
+				label.OperatorVersion: project.Version(),
 			}),
 
 			Name: config.ProjectName + "-drainer",
@@ -64,30 +66,4 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 	}
 
 	return d, nil
-}
-
-func newDrainerResourceSets(config DrainerConfig) ([]*controller.ResourceSet, error) {
-	var err error
-
-	var resourceSet *controller.ResourceSet
-	{
-		c := DrainerResourceSetConfig{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSet, err = NewDrainerResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	resourceSets := []*controller.ResourceSet{
-		resourceSet,
-	}
-
-	return resourceSets, nil
 }

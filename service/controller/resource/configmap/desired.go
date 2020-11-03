@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v7/pkg/template"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v9/pkg/template"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,7 +25,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new config maps")
 
-	configMaps, err := r.newConfigMaps(customResource)
+	configMaps, err := r.newConfigMaps(ctx, customResource)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -35,15 +35,10 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return configMaps, nil
 }
 
-func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.ConfigMap, error) {
+func (r *Resource) newConfigMaps(ctx context.Context, customResource v1alpha1.KVMConfig) ([]*corev1.ConfigMap, error) {
 	var configMaps []*corev1.ConfigMap
 
-	certs, err := r.certsSearcher.SearchCluster(key.ClusterID(customResource))
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	keys, err := r.keyWatcher.SearchCluster(key.ClusterID(customResource))
+	keys, err := r.keyWatcher.SearchCluster(ctx, key.ClusterID(customResource))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -52,7 +47,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 	{
 		releaseVersion := customResource.Labels[label.ReleaseVersion]
 		releaseName := fmt.Sprintf("v%s", releaseVersion)
-		release, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(releaseName, metav1.GetOptions{})
+		release, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(ctx, releaseName, metav1.GetOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -69,11 +64,11 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 	images := k8scloudconfig.BuildImages(r.registryDomain, versions)
 
 	data := cloudconfig.IgnitionTemplateData{
-		CustomObject: customResource,
-		ClusterCerts: certs,
-		ClusterKeys:  keys,
-		Images:       images,
-		Versions:     versions,
+		CustomObject:  customResource,
+		CertsSearcher: r.certsSearcher,
+		ClusterKeys:   keys,
+		Images:        images,
+		Versions:      versions,
 	}
 
 	for _, node := range customResource.Spec.Cluster.Masters {
@@ -82,7 +77,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 			return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for master (%q) is not available", node.ID))
 		}
 
-		template, err := r.cloudConfig.NewMasterTemplate(customResource, data, node, nodeIdx)
+		template, err := r.cloudConfig.NewMasterTemplate(ctx, customResource, data, node, nodeIdx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -101,7 +96,7 @@ func (r *Resource) newConfigMaps(customResource v1alpha1.KVMConfig) ([]*corev1.C
 			return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for worker (%q) is not available", node.ID))
 		}
 
-		template, err := r.cloudConfig.NewWorkerTemplate(customResource, data, node, nodeIdx)
+		template, err := r.cloudConfig.NewWorkerTemplate(ctx, customResource, data, node, nodeIdx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

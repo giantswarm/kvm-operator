@@ -1,17 +1,18 @@
 package controller
 
 import (
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs"
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/randomkeys"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller"
+	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 )
 
 type ClusterConfig struct {
@@ -58,7 +59,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
-	resourceSets, err := newClusterResourceSets(config)
+	resources, err := newClusterResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -66,12 +67,15 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			K8sClient:    config.K8sClient,
-			Logger:       config.Logger,
-			ResourceSets: resourceSets,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+			Resources: resources,
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(v1alpha1.KVMConfig)
 			},
+			Selector: labels.SelectorFromSet(map[string]string{
+				label.OperatorVersion: project.Version(),
+			}),
 
 			Name: config.ProjectName,
 		}
@@ -87,64 +91,4 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 	}
 
 	return c, nil
-}
-
-func newClusterResourceSets(config ClusterConfig) ([]*controller.ResourceSet, error) {
-	var err error
-
-	var randomkeysSearcher randomkeys.Interface
-	{
-		c := randomkeys.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
-		}
-
-		randomkeysSearcher, err = randomkeys.NewSearcher(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var resourceSet *controller.ResourceSet
-	{
-		c := ClusterResourceSetConfig{
-			CertsSearcher:      config.CertsSearcher,
-			DockerhubToken:     config.DockerhubToken,
-			G8sClient:          config.K8sClient.G8sClient(),
-			K8sClient:          config.K8sClient,
-			Logger:             config.Logger,
-			RandomkeysSearcher: randomkeysSearcher,
-			RegistryDomain:     config.RegistryDomain,
-			RegistryMirrors:    config.RegistryMirrors,
-			TenantCluster:      config.TenantCluster,
-
-			ClusterRoleGeneral: config.ClusterRoleGeneral,
-			ClusterRolePSP:     config.ClusterRolePSP,
-			DNSServers:         config.DNSServers,
-			GuestUpdateEnabled: config.GuestUpdateEnabled,
-			IgnitionPath:       config.IgnitionPath,
-			NTPServers:         config.NTPServers,
-			ProjectName:        config.ProjectName,
-			OIDC: cloudconfig.OIDCConfig{
-				ClientID:       config.OIDC.ClientID,
-				IssuerURL:      config.OIDC.IssuerURL,
-				UsernameClaim:  config.OIDC.UsernameClaim,
-				UsernamePrefix: config.OIDC.UsernamePrefix,
-				GroupsClaim:    config.OIDC.GroupsClaim,
-				GroupsPrefix:   config.OIDC.GroupsPrefix,
-			},
-			SSOPublicKey: config.SSOPublicKey,
-		}
-
-		resourceSet, err = NewClusterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	resourceSets := []*controller.ResourceSet{
-		resourceSet,
-	}
-
-	return resourceSets, nil
 }

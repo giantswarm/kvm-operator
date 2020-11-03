@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState interface{}) error {
@@ -18,7 +19,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createState inter
 	if !isEmptyEndpoint(endpointToCreate) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating endpoint '%s'", endpointToCreate.GetName()))
 
-		_, err = r.k8sClient.CoreV1().Endpoints(endpointToCreate.Namespace).Create(endpointToCreate)
+		_, err = r.k8sClient.CoreV1().Endpoints(endpointToCreate.Namespace).Create(ctx, endpointToCreate, v1.CreateOptions{})
 		if errors.IsAlreadyExists(err) {
 			// fall through
 		} else if err != nil {

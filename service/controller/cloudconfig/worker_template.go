@@ -1,11 +1,12 @@
 package cloudconfig
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v7/pkg/template"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v9/pkg/template"
 	"github.com/giantswarm/microerror"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -13,40 +14,51 @@ import (
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
-	var err error
+func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+	var extension *workerExtension
+	{
+		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(cr), workerCertFiles)
+		if err != nil {
+			return "", microerror.Mask(err)
+		}
+		extension = &workerExtension{
+			certs:        certFiles,
+			customObject: cr,
+			nodeIndex:    nodeIndex,
+		}
+	}
 
 	var params k8scloudconfig.Params
 	{
-		params = k8scloudconfig.DefaultParams()
-
-		params.BaseDomain = key.BaseDomain(customObject)
-		params.Cluster = customObject.Spec.Cluster
-		params.DockerhubToken = c.dockerhubToken
-		params.Extension = &workerExtension{
-			certs:        data.ClusterCerts,
-			customObject: customObject,
-			nodeIndex:    nodeIndex,
-		}
+		params.BaseDomain = key.BaseDomain(cr)
+		params.Cluster = cr.Spec.Cluster
+		params.Extension = extension
 		params.Images = data.Images
 		params.Versions = data.Versions
 		params.Node = node
 		params.RegistryMirrors = c.registryMirrors
 		params.SSOPublicKey = c.ssoPublicKey
+		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
+		params.DockerhubToken = c.dockerhubToken
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
-		params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
-		if err != nil {
-			return "", microerror.Mask(err)
+		{
+			var err error
+			params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)
+			if err != nil {
+				return "", microerror.Mask(err)
+			}
 		}
 	}
 
 	var newCloudConfig *k8scloudconfig.CloudConfig
 	{
-		cloudConfigConfig := k8scloudconfig.DefaultCloudConfigConfig()
-		cloudConfigConfig.Params = params
-		cloudConfigConfig.Template = k8scloudconfig.WorkerTemplate
+		cloudConfigConfig := k8scloudconfig.CloudConfigConfig{
+			Params:   params,
+			Template: k8scloudconfig.WorkerTemplate,
+		}
 
+		var err error
 		newCloudConfig, err = k8scloudconfig.NewCloudConfig(cloudConfigConfig)
 		if err != nil {
 			return "", microerror.Mask(err)
@@ -62,7 +74,7 @@ func (c *CloudConfig) NewWorkerTemplate(customObject v1alpha1.KVMConfig, data Ig
 }
 
 type workerExtension struct {
-	certs        certs.Cluster
+	certs        []certs.File
 	customObject v1alpha1.KVMConfig
 	nodeIndex    int
 }
@@ -70,7 +82,7 @@ type workerExtension struct {
 func (e *workerExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	var filesMeta []k8scloudconfig.FileMetadata
 
-	for _, f := range certs.NewFilesClusterWorker(e.certs) {
+	for _, f := range e.certs {
 		m := k8scloudconfig.FileMetadata{
 			AssetContent: string(f.Data),
 			Path:         f.AbsolutePath,
