@@ -107,7 +107,14 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found current version of the reconciled pod in the Kubernetes API")
 
-			if !key.ArePodContainersTerminated(currentPod) {
+			// Due to a bug in Kubernetes, if the liveness probe fails while the pod is being terminated, the containers will
+			// change to ContainerCreating state even though the containers will never actually be started by the kubelet. We
+			// consider the pod to be terminated if all containers are terminated or all containers are in creating state and
+			// there is a deletion timestamp as coded below.
+			containersTerminated := key.ArePodContainersTerminated(currentPod) ||
+				(key.ArePodContainersWaiting(currentPod) && key.IsPodDeleted(currentPod))
+
+			if !containersTerminated {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
 				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 				resourcecanceledcontext.SetCanceled(ctx)
