@@ -3,8 +3,8 @@ package deployment
 import (
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -12,6 +12,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -90,7 +92,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							key.LabelCluster:      key.ClusterID(customResource),
 							key.LabelOrganization: key.ClusterCustomer(customResource),
 							"node":                workerNode.ID,
-							key.PodWatcherLabel:   "kvm-operator",
+							key.PodWatcherLabel:   key.OperatorName,
+							label.OperatorVersion: project.Version(),
 						},
 					},
 					Spec: corev1.PodSpec{

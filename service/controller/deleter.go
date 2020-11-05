@@ -3,14 +3,18 @@ package controller
 import (
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs"
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller"
+	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 )
 
 const deleterResyncPeriod = time.Minute * 2
@@ -36,7 +40,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 
 	var err error
 
-	resourceSets, err := newDeleterResourceSets(config)
+	resources, err := newDeleterResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -46,8 +50,11 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 		c := controller.Config{
 			K8sClient:    config.K8sClient,
 			Logger:       config.Logger,
-			ResourceSets: resourceSets,
+			Resources:    resources,
 			ResyncPeriod: deleterResyncPeriod,
+			Selector: labels.SelectorFromSet(map[string]string{
+				label.OperatorVersion: project.Version(),
+			}),
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(v1alpha1.KVMConfig)
 			},
@@ -66,30 +73,4 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 	}
 
 	return d, nil
-}
-
-func newDeleterResourceSets(config DeleterConfig) ([]*controller.ResourceSet, error) {
-	var err error
-
-	var resourceSet *controller.ResourceSet
-	{
-		c := DeleterResourceSetConfig{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
-
-			ProjectName: config.ProjectName,
-		}
-
-		resourceSet, err = NewDeleterResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	resourceSets := []*controller.ResourceSet{
-		resourceSet,
-	}
-
-	return resourceSets, nil
 }

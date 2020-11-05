@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/resource/crud"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,7 +27,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		// Delete service account in the Kubernetes API.
 		namespace := key.ClusterNamespace(customObject)
-		err := r.k8sClient.CoreV1().ServiceAccounts(namespace).Delete(serviceAccountToDelete.Name, &metav1.DeleteOptions{})
+		err := r.k8sClient.CoreV1().ServiceAccounts(namespace).Delete(ctx, serviceAccountToDelete.Name, metav1.DeleteOptions{})
 		if apierrors.IsNotFound(err) {
 		} else if err != nil {
 			return microerror.Mask(err)

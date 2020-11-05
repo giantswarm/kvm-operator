@@ -5,15 +5,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs"
-	"github.com/giantswarm/k8sclient"
-	"github.com/giantswarm/k8sclient/k8srestconfig"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8srestconfig"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/statusresource"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/statusresource/v3"
+	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"github.com/giantswarm/versionbundle"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
@@ -56,6 +56,10 @@ func New(config Config) (*Service, error) {
 	}
 	if config.Viper == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Viper must not be empty", config)
+	}
+
+	if config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken) == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Flag.Service.Registry.DockerhubToken must not be empty", config)
 	}
 
 	var err error
@@ -153,9 +157,11 @@ func New(config Config) (*Service, error) {
 				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
 				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
 			},
+			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+
+			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
 			RegistryDomain:  config.Viper.GetString(config.Flag.Service.Registry.Domain),
 			RegistryMirrors: config.Viper.GetStringSlice(config.Flag.Service.Registry.Mirrors),
-			SSOPublicKey:    config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 		}
 
 		clusterController, err = controller.NewCluster(c)

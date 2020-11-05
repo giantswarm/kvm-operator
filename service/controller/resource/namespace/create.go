@@ -6,6 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
@@ -17,7 +18,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if namespaceToCreate != nil {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the namespace in the Kubernetes API")
 
-		_, err = r.k8sClient.CoreV1().Namespaces().Create(namespaceToCreate)
+		_, err = r.k8sClient.CoreV1().Namespaces().Create(ctx, namespaceToCreate, v1.CreateOptions{})
 		if apierrors.IsAlreadyExists(err) {
 			// fall through
 		} else if err != nil {

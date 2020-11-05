@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -38,7 +38,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, project.Name()),
 		}
 
-		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(lo)
+		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(ctx, lo)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/resource/crud"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +24,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if isEmptyEndpoint(endpointToDelete) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting endpoint '%s'", endpointToDelete.GetName()))
 
-		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(endpointToDelete.GetName(), &metav1.DeleteOptions{})
+		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(ctx, endpointToDelete.GetName(), metav1.DeleteOptions{})
 		if errors.IsNotFound(err) {
 			// fall through
 		} else if err != nil {

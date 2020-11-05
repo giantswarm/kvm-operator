@@ -1,54 +1,23 @@
 package controller
 
 import (
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/operatorkit/resource"
-	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
-	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
-	"k8s.io/client-go/kubernetes"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/endpoint"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/pod"
 )
 
-type DrainerResourceSetConfig struct {
-	G8sClient versioned.Interface
-	K8sClient kubernetes.Interface
-	Logger    micrologger.Logger
-
-	ProjectName string
-}
-
-func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.ResourceSet, error) {
+func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 	var err error
-
-	handlesFunc := func(obj interface{}) bool {
-		p, err := key.ToPod(obj)
-		if err != nil {
-			return false
-		}
-		v, err := key.VersionBundleVersionFromPod(p)
-		if err != nil {
-			return false
-		}
-
-		if v == project.Version() {
-			return true
-		}
-
-		return false
-	}
 
 	var podResource resource.Interface
 	{
 		c := pod.Config{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 		}
 
@@ -61,8 +30,8 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 	var endpointResource resource.Interface
 	{
 		c := endpoint.Config{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 		}
 
@@ -102,19 +71,5 @@ func NewDrainerResourceSet(config DrainerResourceSetConfig) (*controller.Resourc
 		}
 	}
 
-	var drainerResourceSet *controller.ResourceSet
-	{
-		c := controller.ResourceSetConfig{
-			Handles:   handlesFunc,
-			Logger:    config.Logger,
-			Resources: resources,
-		}
-
-		drainerResourceSet, err = controller.NewResourceSet(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	return drainerResourceSet, nil
+	return resources, nil
 }

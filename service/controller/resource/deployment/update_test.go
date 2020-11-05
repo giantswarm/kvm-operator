@@ -6,17 +6,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/provider/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
-	"github.com/giantswarm/certs"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
+	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/operatorkit/controller/context/updateallowedcontext"
-	"github.com/giantswarm/tenantcluster"
+	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 
@@ -70,16 +68,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// Test 1, in case current state and desired state are equal the update
 		// state should be empty.
 		{
-			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
-			}(),
+			Ctx: context.TODO(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
 					Cluster: v1alpha1.Cluster{
@@ -235,14 +224,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// Test 3, the deployment with changed bundle version is being updated.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -361,14 +343,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// Test 4, the deployment with changed release version is being updated.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -489,14 +464,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// the update state should be empty.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -604,17 +572,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 6, is the same as 6 but with only one deployment not being "safe".
+		// Test 6, is the same as 5 but with only one deployment not being "safe".
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -726,14 +687,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// updated.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -865,14 +819,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// Test 8, is based of 7 where the next deployment is ready to be updated.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -1001,19 +948,12 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			},
 		},
 
-		// Test 9, is the same as 10 but ensures the update behaviour is preserved
+		// Test 9, is the same as 8 but ensures the update behaviour is preserved
 		// even if no version bundle version annotation is present in the current
 		// state.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -1145,14 +1085,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// state.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -1284,14 +1217,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// annotation.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -1423,14 +1349,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// annotation.
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{
@@ -1562,14 +1481,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		// Test 13: if update is allowed but a tenant cluster master is unschedulable, do not update the worker deployment
 		{
 			Ctx: func() context.Context {
-				ctx := context.Background()
-
-				{
-					ctx = updateallowedcontext.NewContext(ctx, make(chan struct{}))
-					updateallowedcontext.SetUpdateAllowed(ctx)
-				}
-
-				return ctx
+				return context.Background()
 			}(),
 			Obj: &v1alpha1.KVMConfig{
 				Spec: v1alpha1.KVMConfigSpec{

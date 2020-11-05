@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/resource/crud"
+	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	v1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,7 +28,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		for _, deployment := range deploymentsToDelete {
 			n := key.ClusterNamespace(customResource)
-			err := r.k8sClient.AppsV1().Deployments(n).Delete(deployment.Name, newDeleteOptions())
+			err := r.k8sClient.AppsV1().Deployments(n).Delete(ctx, deployment.Name, newDeleteOptions())
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -110,10 +110,10 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 	return deploymentsToDelete, nil
 }
 
-func newDeleteOptions() *metav1.DeleteOptions {
+func newDeleteOptions() metav1.DeleteOptions {
 	propagation := metav1.DeletePropagationForeground
 
-	options := &metav1.DeleteOptions{
+	options := metav1.DeleteOptions{
 		PropagationPolicy: &propagation,
 	}
 

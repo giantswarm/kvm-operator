@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/controller/context/finalizerskeptcontext"
-	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,7 +41,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding service")
 
-		service, err = r.k8sClient.CoreV1().Services(pod.GetNamespace()).Get(serviceName, metav1.GetOptions{})
+		service, err = r.k8sClient.CoreV1().Services(pod.GetNamespace()).Get(ctx, serviceName, metav1.GetOptions{})
 		if errors.IsNotFound(err) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find service")
 		} else if err != nil {
@@ -61,7 +61,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			ServiceNamespace: pod.GetNamespace(),
 		}
 
-		k8sEndpoints, err := r.k8sClient.CoreV1().Endpoints(pod.GetNamespace()).Get(serviceName, metav1.GetOptions{})
+		k8sEndpoints, err := r.k8sClient.CoreV1().Endpoints(pod.GetNamespace()).Get(ctx, serviceName, metav1.GetOptions{})
 		if errors.IsNotFound(err) {
 			// In case the endpoint manifest cannot be found in the Kubernetes API we
 			// return the endpoint structure we dispatch without filling any IP.
@@ -95,7 +95,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	if serviceName == key.MasterID && key.IsPodDeleted(pod) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current version of the reconciled pod in the Kubernetes API")
 
-		currentPod, err := r.k8sClient.CoreV1().Pods(pod.GetNamespace()).Get(pod.GetName(), metav1.GetOptions{})
+		currentPod, err := r.k8sClient.CoreV1().Pods(pod.GetNamespace()).Get(ctx, pod.GetName(), metav1.GetOptions{})
 		if errors.IsNotFound(err) {
 			// In case we reconcile a pod we cannot find anymore this means the
 			// informer's watch event is outdated and the pod got already deleted in
@@ -107,7 +107,14 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found current version of the reconciled pod in the Kubernetes API")
 
-			if !key.ArePodContainersTerminated(currentPod) {
+			// Due to a bug in Kubernetes, if the liveness probe fails while the pod is being terminated, the containers will
+			// change to ContainerCreating state even though the containers will never actually be started by the kubelet. We
+			// consider the pod to be terminated if all containers are terminated or all containers are in creating state and
+			// there is a deletion timestamp as coded below.
+			containersTerminated := key.ArePodContainersTerminated(currentPod) ||
+				(key.ArePodContainersWaiting(currentPod) && key.IsPodDeleted(currentPod))
+
+			if !containersTerminated {
 				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
 				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 				resourcecanceledcontext.SetCanceled(ctx)

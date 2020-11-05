@@ -22,7 +22,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	namespace := key.ClusterNamespace(customObject)
 	var currentServiceAccount *corev1.ServiceAccount
-	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(key.ServiceAccountName(customObject), metav1.GetOptions{})
+	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(ctx, key.ServiceAccountName(customObject), metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "did not find the service account in the Kubernetes API")
 		//When service account is not found api still returning non nil value so it can break create/update/delete
