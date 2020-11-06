@@ -70,18 +70,6 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func (r *Resource) isDeploymentModified(a, b *v1.Deployment) (bool, error) {
-	if isAnnotationModified(a, b, key.VersionBundleVersionAnnotation) {
-		return true, nil
-	}
-
-	if isAnnotationModified(a, b, key.ReleaseVersionAnnotation) {
-		return true, nil
-	}
-
-	return false, nil
-}
-
 func allNumbersEqual(numbers ...int32) bool {
 	if len(numbers) == 0 {
 		return false
@@ -141,6 +129,19 @@ func isAnnotationModified(a, b *v1.Deployment, annotation string) bool {
 
 	return false
 }
+
+func isDeploymentModified(a, b *v1.Deployment) bool {
+	if isAnnotationModified(a, b, key.VersionBundleVersionAnnotation) {
+		return true
+	}
+
+	if isAnnotationModified(a, b, key.ReleaseVersionAnnotation) {
+		return true
+	}
+
+	return false
+}
+
 func toDeployments(v interface{}) ([]*v1.Deployment, error) {
 	if v == nil {
 		return nil, nil

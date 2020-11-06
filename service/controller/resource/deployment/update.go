@@ -131,11 +131,7 @@ DeploymentsLoop:
 			return nil, microerror.Mask(err)
 		}
 
-		deploymentModified, err := r.isDeploymentModified(desiredDeployment, currentDeployment)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		if !deploymentModified {
+		if !isDeploymentModified(desiredDeployment, currentDeployment) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
 			continue
 		}
