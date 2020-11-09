@@ -15,6 +15,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/resource/clusterrolebinding"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/configmap"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/deployment"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/flannel"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/ingress"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/namespace"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/nodeindexstatus"
@@ -145,6 +146,19 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		}
 	}
 
+	var flannelResource resource.Interface
+	{
+		c := flannel.Config{
+			K8sClient: config.K8sClient.K8sClient(),
+			Logger:    config.Logger,
+		}
+
+		flannelResource, err = flannel.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var deploymentResource resource.Interface
 	{
 		c := deployment.Config{
@@ -260,6 +274,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		namespaceResource,
 		serviceAccountResource,
 		configMapResource,
+		flannelResource,
 		deploymentResource,
 		ingressResource,
 		pvcResource,

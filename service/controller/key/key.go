@@ -133,6 +133,10 @@ const (
 	PodDeletionGracePeriod = 5 * time.Minute
 )
 
+const (
+	FlannelNetworkDaemonSetName = "flannel-network"
+)
+
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
 	var results []v1alpha1.ClusterNode
 
@@ -185,6 +189,10 @@ func ClusterEtcdDomain(customObject v1alpha1.KVMConfig) string {
 
 func ClusterID(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.ID
+}
+
+func FlannelNetworkNamespace(customObject v1alpha1.KVMConfig) string {
+	return fmt.Sprintf("flannel-network-%s", ClusterID(customObject))
 }
 
 func ClusterIDFromPod(pod *corev1.Pod) string {
