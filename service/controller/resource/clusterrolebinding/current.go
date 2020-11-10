@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	apiv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,6 +18,15 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
+
+	if key.IsDeleted(customObject) {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "redirecting responsibility of deletion of cluster role bindings to namespace termination")
+		resourcecanceledcontext.SetCanceled(ctx)
+		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+		return nil, nil
+	}
+
 	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for a list of cluster role bindings in the Kubernetes API")
 
 	var currentClusterRoleBinding []*apiv1.ClusterRoleBinding
