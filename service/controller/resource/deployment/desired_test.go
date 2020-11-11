@@ -23,6 +23,13 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
+const (
+	calicoVersion         = "3.9.1"
+	containerlinuxVersion = "2345.3.0"
+	etcdVersion           = "3.3.15"
+	kubernetesVersion     = "1.15.11"
+)
+
 func Test_Resource_Deployment_GetDesiredState(t *testing.T) {
 	testCases := []struct {
 		Obj                      interface{}
@@ -372,10 +379,10 @@ func Test_Annotations_Deployment_GetDesiredState(t *testing.T) {
 				},
 			},
 			ExpectedComponentsPodAnnotations: map[string]string{
-				key.AnnotationComponentVersion + "-calico":         "3.9.1",
-				key.AnnotationComponentVersion + "-containerlinux": "2345.3.0",
-				key.AnnotationComponentVersion + "-etcd":           "3.3.15",
-				key.AnnotationComponentVersion + "-kubernetes":     "1.15.11",
+				key.AnnotationComponentVersionPrefix + "-calico":         calicoVersion,
+				key.AnnotationComponentVersionPrefix + "-containerlinux": containerlinuxVersion,
+				key.AnnotationComponentVersionPrefix + "-etcd":           etcdVersion,
+				key.AnnotationComponentVersionPrefix + "-kubernetes":     kubernetesVersion,
 			},
 		},
 	}
@@ -415,19 +422,19 @@ func buildResource() (*Resource, error) {
 	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
 		{
 			Name:    "kubernetes",
-			Version: "1.15.11",
+			Version: kubernetesVersion,
 		},
 		{
 			Name:    "calico",
-			Version: "3.9.1",
+			Version: calicoVersion,
 		},
 		{
 			Name:    "etcd",
-			Version: "3.3.15",
+			Version: etcdVersion,
 		},
 		{
 			Name:    "containerlinux",
-			Version: "2345.3.0",
+			Version: containerlinuxVersion,
 		},
 	}
 	clientset := apiextfake.NewSimpleClientset(release)
@@ -488,7 +495,7 @@ func testGetComponentsAnnotations(deployments []*v1.Deployment) []map[string]str
 	for _, d := range deployments {
 		annotations := make(map[string]string)
 		for k, v := range d.Spec.Template.ObjectMeta.Annotations {
-			if strings.HasPrefix(k, key.AnnotationComponentVersion) {
+			if strings.HasPrefix(k, key.AnnotationComponentVersionPrefix) {
 				annotations[k] = v
 			}
 		}

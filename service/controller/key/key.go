@@ -94,14 +94,14 @@ const (
 )
 
 const (
-	AnnotationAPIEndpoint       = "kvm-operator.giantswarm.io/api-endpoint"
-	AnnotationComponentVersion  = "kvm-operator.giantswarm.io/component-version"
-	AnnotationEtcdDomain        = "giantswarm.io/etcd-domain"
-	AnnotationIp                = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService           = "endpoint.kvm.giantswarm.io/service"
-	AnnotationPodDrained        = "endpoint.kvm.giantswarm.io/drained"
-	AnnotationPrometheusCluster = "giantswarm.io/prometheus-cluster"
-	AnnotationVersionBundle     = "kvm-operator.giantswarm.io/version-bundle"
+	AnnotationAPIEndpoint            = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationComponentVersionPrefix = "kvm-operator.giantswarm.io/component-version"
+	AnnotationEtcdDomain             = "giantswarm.io/etcd-domain"
+	AnnotationIp                     = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService                = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained             = "endpoint.kvm.giantswarm.io/drained"
+	AnnotationPrometheusCluster      = "giantswarm.io/prometheus-cluster"
+	AnnotationVersionBundle          = "kvm-operator.giantswarm.io/version-bundle"
 
 	LabelApp           = "app"
 	LabelCluster       = "giantswarm.io/cluster"

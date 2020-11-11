@@ -421,7 +421,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 				},
 			},
 		}
-		addKeyComponentsAnnotations(deployment.Spec.Template.ObjectMeta.Annotations, release)
+		addCoreComponentsAnnotations(deployment.Spec.Template.ObjectMeta.Annotations, release)
 
 		deployments = append(deployments, deployment)
 	}

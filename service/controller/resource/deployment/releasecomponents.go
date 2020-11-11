@@ -6,15 +6,15 @@ import (
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 )
 
-var keyComponents = []string{"calico", "containerlinux", "etcd", "kubernetes"}
+var coreComponents = []string{"calico", "containerlinux", "etcd", "kubernetes"}
 
-func addKeyComponentsAnnotations(annotations map[string]string, release *releasev1alpha1.Release) {
-	for _, component := range keyComponents {
+func addCoreComponentsAnnotations(annotations map[string]string, release *releasev1alpha1.Release) {
+	for _, component := range coreComponents {
 		version := componentVersion(release, component)
 		if version == "" {
 			continue
 		}
-		annotationName := key.AnnotationComponentVersion + "-" + component
+		annotationName := key.AnnotationComponentVersionPrefix + "-" + component
 		annotations[annotationName] = version
 	}
 }

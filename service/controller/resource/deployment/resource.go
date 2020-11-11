@@ -107,27 +107,17 @@ func getDeploymentByName(list []*v1.Deployment, name string) (*v1.Deployment, er
 }
 
 func isAnnotationModified(a, b *v1.Deployment, annotation string) bool {
-	aVersion, ok := a.GetAnnotations()[annotation]
-	if !ok {
-		return true
-	}
+	aVersion := a.GetAnnotations()[annotation]
 	if aVersion == "" {
 		return true
 	}
 
-	bVersion, ok := b.GetAnnotations()[annotation]
-	if !ok {
-		return true
-	}
+	bVersion := b.GetAnnotations()[annotation]
 	if bVersion == "" {
 		return true
 	}
 
-	if aVersion != bVersion {
-		return true
-	}
-
-	return false
+	return aVersion != bVersion
 }
 
 func isDeploymentModified(a, b *v1.Deployment) bool {
