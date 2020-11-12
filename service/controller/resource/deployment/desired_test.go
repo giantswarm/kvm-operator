@@ -11,6 +11,7 @@ import (
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/v3/pkg/certs"
+	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
@@ -452,7 +453,7 @@ func buildResource() (*Resource, error) {
 
 		certsSearcher, err = certs.NewSearcher(c)
 		if err != nil {
-			return nil, err
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -466,7 +467,7 @@ func buildResource() (*Resource, error) {
 
 		tenantCluster, err = tenantcluster.New(c)
 		if err != nil {
-			return nil, err
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -481,7 +482,7 @@ func buildResource() (*Resource, error) {
 		}
 		newResource, err = New(resourceConfig)
 		if err != nil {
-			return nil, err
+			return nil, microerror.Mask(err)
 		}
 	}
 

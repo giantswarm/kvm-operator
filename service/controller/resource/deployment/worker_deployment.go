@@ -377,7 +377,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 				},
 			},
 		}
-		addCoreComponentsAnnotations(deployment.Spec.Template.ObjectMeta.Annotations, release)
+		addCoreComponentsAnnotations(deployment, release)
 
 		deployments = append(deployments, deployment)
 	}
