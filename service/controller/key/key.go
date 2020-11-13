@@ -94,13 +94,14 @@ const (
 )
 
 const (
-	AnnotationAPIEndpoint       = "kvm-operator.giantswarm.io/api-endpoint"
-	AnnotationEtcdDomain        = "giantswarm.io/etcd-domain"
-	AnnotationIp                = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService           = "endpoint.kvm.giantswarm.io/service"
-	AnnotationPodDrained        = "endpoint.kvm.giantswarm.io/drained"
-	AnnotationPrometheusCluster = "giantswarm.io/prometheus-cluster"
-	AnnotationVersionBundle     = "kvm-operator.giantswarm.io/version-bundle"
+	AnnotationAPIEndpoint            = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationComponentVersionPrefix = "kvm-operator.giantswarm.io/component-version"
+	AnnotationEtcdDomain             = "giantswarm.io/etcd-domain"
+	AnnotationIp                     = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService                = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained             = "endpoint.kvm.giantswarm.io/drained"
+	AnnotationPrometheusCluster      = "giantswarm.io/prometheus-cluster"
+	AnnotationVersionBundle          = "kvm-operator.giantswarm.io/version-bundle"
 
 	LabelApp           = "app"
 	LabelCluster       = "giantswarm.io/cluster"
@@ -119,6 +120,7 @@ const (
 
 const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
+	ReleaseVersionAnnotation       = "giantswarm.io/release-version"
 )
 
 const (
@@ -560,6 +562,10 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	}
 
 	return names
+}
+
+func ReleaseVersion(cr v1alpha1.KVMConfig) string {
+	return cr.GetLabels()[label.ReleaseVersion]
 }
 
 func ServiceAccountName(customObject v1alpha1.KVMConfig) string {

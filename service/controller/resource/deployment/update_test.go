@@ -81,6 +81,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -102,6 +103,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -137,6 +139,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -156,6 +159,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -177,6 +181,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -196,6 +201,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -215,8 +221,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			ExpectedDeploymentsToUpdate: nil,
 		},
 
-		// Test 3, is the same as 2 but with the version bundle version being
-		// changed.
+		// Test 3, the deployment with changed bundle version is being updated.
 		{
 			Ctx: func() context.Context {
 				return context.Background()
@@ -233,6 +238,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -252,7 +258,8 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							key.VersionBundleVersionAnnotation: "1.1.0",
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
@@ -273,6 +280,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -292,7 +300,8 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							key.VersionBundleVersionAnnotation: "1.2.0",
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
@@ -313,7 +322,8 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							key.VersionBundleVersionAnnotation: "1.2.0",
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
@@ -330,9 +340,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 				},
 			},
 		},
-
-		// Test 4, is the same as 4 but with the version bundle version being
-		// changed.
+		// Test 4, the deployment with changed release version is being updated.
 		{
 			Ctx: func() context.Context {
 				return context.Background()
@@ -349,6 +357,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -368,6 +377,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -389,6 +399,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -408,7 +419,8 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							key.VersionBundleVersionAnnotation: "1.3.0",
+							key.ReleaseVersionAnnotation:       "14.0.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
@@ -429,7 +441,8 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
-							key.VersionBundleVersionAnnotation: "1.3.0",
+							key.ReleaseVersionAnnotation:       "14.0.0",
+							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
 					Spec: v1.DeploymentSpec{
@@ -465,6 +478,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -490,6 +504,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -517,6 +532,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -536,6 +552,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -572,6 +589,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -597,6 +615,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -624,6 +643,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -643,6 +663,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -661,7 +682,6 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			},
 			ExpectedDeploymentsToUpdate: nil,
 		},
-
 		// Test 7, when all deployments are "safe" the update state should only
 		// contain one deployment even though if multiple deployments should be
 		// updated.
@@ -681,6 +701,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -706,6 +727,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -733,6 +755,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -752,6 +775,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -773,6 +797,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -808,6 +833,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -833,6 +859,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 					},
@@ -860,6 +887,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -879,6 +907,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -900,6 +929,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -937,6 +967,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -961,6 +992,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation: "13.0.0",
+						},
 					},
 					Spec: v1.DeploymentSpec{
 						Template: corev1.PodTemplateSpec{
@@ -986,6 +1020,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -1005,6 +1040,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -1026,6 +1062,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -1043,9 +1080,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 				},
 			},
 		},
-
-		// Test 10, is the same as 9 but with an empty version bundle version
-		// annotation.
+		// Test 10, is the same as 9 but ensures the update behaviour is preserved
+		// even if no release version annotation is present in the current
+		// state.
 		{
 			Ctx: func() context.Context {
 				return context.Background()
@@ -1062,6 +1099,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -1087,6 +1125,139 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+					Status: v1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+			},
+			DesiredState: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		// Test 11, is the same as 10 but with an empty version bundle version
+		// annotation.
+		{
+			Ctx: func() context.Context {
+				return context.Background()
+			}(),
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+					},
+				},
+			},
+			CurrentState: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+					Status: v1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "",
 						},
 					},
@@ -1114,6 +1285,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -1133,6 +1305,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -1154,6 +1327,139 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		// Test 12, is the same as 11 but with an empty release version
+		// annotation.
+		{
+			Ctx: func() context.Context {
+				return context.Background()
+			}(),
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
+					},
+				},
+			},
+			CurrentState: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+					Status: v1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+					Status: v1.DeploymentStatus{
+						AvailableReplicas: 2,
+						ReadyReplicas:     2,
+						Replicas:          2,
+						UpdatedReplicas:   2,
+					},
+				},
+			},
+			DesiredState: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-1",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-1-container-1",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
+							key.VersionBundleVersionAnnotation: "1.3.0",
+						},
+					},
+					Spec: v1.DeploymentSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{
+										Name: "deployment-2-container-2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			ExpectedDeploymentsToUpdate: []*v1.Deployment{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "deployment-2",
+						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 					},
@@ -1172,7 +1478,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			},
 		},
 
-		// Test 11: if update is allowed but a tenant cluster master is unschedulable, do not update the worker deployment
+		// Test 13: if update is allowed but a tenant cluster master is unschedulable, do not update the worker deployment
 		{
 			Ctx: func() context.Context {
 				return context.Background()
@@ -1189,6 +1495,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 						Labels: map[string]string{"app": "master"},
@@ -1215,6 +1522,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.2.0",
 						},
 						Labels: map[string]string{"app": "worker"},
@@ -1243,6 +1551,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-1",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 						Labels: map[string]string{"app": "master"},
@@ -1263,6 +1572,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "deployment-2",
 						Annotations: map[string]string{
+							key.ReleaseVersionAnnotation:       "13.0.0",
 							key.VersionBundleVersionAnnotation: "1.3.0",
 						},
 						Labels: map[string]string{"app": "worker"},

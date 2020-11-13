@@ -50,6 +50,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.DeploymentName(key.WorkerID, workerNode.ID),
 				Annotations: map[string]string{
+					key.ReleaseVersionAnnotation:       key.ReleaseVersion(customResource),
 					key.VersionBundleVersionAnnotation: key.OperatorVersion(customResource),
 				},
 				Labels: map[string]string{
@@ -376,6 +377,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 				},
 			},
 		}
+		addCoreComponentsAnnotations(deployment, release)
 
 		deployments = append(deployments, deployment)
 	}
