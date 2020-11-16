@@ -61,6 +61,57 @@ DNS=8.8.4.4`
 	}
 }
 
+func Test_NodeClusterIP(t *testing.T) {
+	testCases := []struct {
+		Node         corev1.Node
+		ExpectedIP   string
+		ErrorMatcher func(error) bool
+	}{
+		// Test 1, node has an internal IP address
+		{
+			Node: corev1.Node{
+				Status: corev1.NodeStatus{
+					Addresses: []corev1.NodeAddress{
+						corev1.NodeAddress{
+							Type:    corev1.NodeInternalIP,
+							Address: "some-address",
+						},
+					},
+				},
+			},
+			ExpectedIP:   "some-address",
+			ErrorMatcher: nil,
+		},
+		// Test 2, node doesn't have an internal IP address
+		{
+			Node:         corev1.Node{},
+			ExpectedIP:   "",
+			ErrorMatcher: IsMissingNodeInternalIP,
+		},
+	}
+
+	for i, tc := range testCases {
+		ip, err := NodeInternalIP(tc.Node)
+
+		switch {
+		case err == nil && tc.ErrorMatcher == nil:
+			// correct; carry on
+		case err != nil && tc.ErrorMatcher == nil:
+			t.Fatalf("error == %#v, want nil", err)
+		case err == nil && tc.ErrorMatcher != nil:
+			t.Fatalf("error == nil, want non-nil")
+		case !tc.ErrorMatcher(err):
+			t.Fatalf("error == %#v, want matching", err)
+		case tc.ErrorMatcher(err):
+			return
+		}
+
+		if ip != tc.ExpectedIP {
+			t.Fatalf("case %d expected %T got %T", i+1, tc.ExpectedIP, ip)
+		}
+	}
+}
+
 func Test_PortMappings(t *testing.T) {
 	customObject := v1alpha1.KVMConfig{
 		Spec: v1alpha1.KVMConfigSpec{
