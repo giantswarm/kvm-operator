@@ -162,6 +162,7 @@ github.com/getsentry/sentry-go v0.7.0/go.mod h1:pLFpD2Y5RHIKF9Bw3KH6/68DeN2K/XBJ
 github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/giantswarm/apiextensions/v3 v3.4.0/go.mod h1:MMLkRJta4mbTbrikP9LewADiCL+55LmsagyhdTU7XAY=
+github.com/giantswarm/apiextensions/v3 v3.4.1/go.mod h1:MMLkRJta4mbTbrikP9LewADiCL+55LmsagyhdTU7XAY=
 github.com/giantswarm/apiextensions/v3 v3.7.0 h1:KUAjZn3OMMkmTWvgAfAPTLdrNbFY2zukMntdeLhMGY4=
 github.com/giantswarm/apiextensions/v3 v3.7.0/go.mod h1:MMLkRJta4mbTbrikP9LewADiCL+55LmsagyhdTU7XAY=
 github.com/giantswarm/backoff v0.2.0 h1:kdfAf83pZ/l8X0KiA2dJ2Wq19nS9hISijVn7ZRdFhfU=
@@ -177,8 +178,8 @@ github.com/giantswarm/exporterkit v0.2.0 h1:+HTGl4fmT/1OkTox8HbV3JXeavmsZv94+2CD
 github.com/giantswarm/exporterkit v0.2.0/go.mod h1:b4fuHVjsvZgznC9OEPfn0y5zvN8SnEKTiI5zTTfck94=
 github.com/giantswarm/k8sclient/v5 v5.0.0 h1:+Qs75jAphCC6ddlpjyGqXG9525rABUb160gVsJq2uHg=
 github.com/giantswarm/k8sclient/v5 v5.0.0/go.mod h1:OhlknCs1Wgc0ErjWBgeZDGe4Y6aThus21nQOXPAq4rQ=
-github.com/giantswarm/k8scloudconfig/v9 v9.1.0 h1:IW8kTK7OXvB8cHPjq9lGEAVTJxDzwrymukGcmySeg+8=
-github.com/giantswarm/k8scloudconfig/v9 v9.1.0/go.mod h1:DrgZ8BYFNxlG4+ylLIZo3MXQ1jMbtO7NnuoN73Z/Wok=
+github.com/giantswarm/k8scloudconfig/v9 v9.1.1 h1:iMs3nRMl1NHUoUUdZN8FIUIR4lyMAaoOPXDtbeV4/gc=
+github.com/giantswarm/k8scloudconfig/v9 v9.1.1/go.mod h1:7PHCfkSxinzrrRFVHHca1sajGpLuzFaWeQsziNhyXbg=
 github.com/giantswarm/microendpoint v0.2.0 h1:xCAqAVRjTw/4ifEuBeNavALdbQsLk6+k/ukzdy0GWZE=
 github.com/giantswarm/microendpoint v0.2.0/go.mod h1:SSkSp4Q4iSW7vwkil+/E3IXy9Q8To8vXmT5VCg24RDg=
 github.com/giantswarm/microerror v0.2.0/go.mod h1:1YtJq/m7Vlq1Y6NP7B+SODOKCGlG7e5wctV2OoE9n34=
