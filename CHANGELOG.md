@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Roll nodes when versions of `calico`, `containerlinux`, `etcd`, `kubernetes` change in release.
+
 ### Changed
 
 - Updated Kubernetes libraries to 1.18 along with all other client-go-dependent libraries.
