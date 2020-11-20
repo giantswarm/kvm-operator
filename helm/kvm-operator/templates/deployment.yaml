@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "labels.selector" . | nindent 6 }}
+      anotherlables: test
   strategy:
     type: Recreate
   template:
