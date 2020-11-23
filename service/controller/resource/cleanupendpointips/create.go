@@ -179,7 +179,11 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 		found := false
 		// check if the ip belongs to any k8s node
 		for _, node := range nodes {
-			if node.Labels["ip"] == ip.IP {
+			nodeIP, err := key.NodeInternalIP(node)
+			if err != nil {
+				return len(indexesToDelete), endpoints, microerror.Mask(err)
+			}
+			if nodeIP == ip.IP {
 				// Find the control plane pod representing this node
 				cpPod, err := controlPlanePodForTCNode(node, cpPods)
 				if err != nil {

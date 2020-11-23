@@ -18,6 +18,14 @@ func IsMissingAnnotationError(err error) bool {
 	return microerror.Cause(err) == missingAnnotationError
 }
 
+var missingNodeInternalIP = &microerror.Error{
+	Kind: "missingNodeInternalIP",
+}
+
+func IsMissingNodeInternalIP(err error) bool {
+	return microerror.Cause(err) == missingNodeInternalIP
+}
+
 var missingVersionError = &microerror.Error{
 	Kind: "missingVersionError",
 }
