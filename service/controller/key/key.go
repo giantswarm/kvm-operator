@@ -493,6 +493,17 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	return idx, present
 }
 
+// NodeInternalIP examines the Status Adresses of a Node
+// and returns its InternalIP..
+func NodeInternalIP(node corev1.Node) (string, error) {
+	for _, a := range node.Status.Addresses {
+		if a.Type == corev1.NodeInternalIP {
+			return a.Address, nil
+		}
+	}
+	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP adress in its status", node.Name)
+}
+
 func OperatorVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.OperatorVersion]
 }
