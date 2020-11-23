@@ -367,18 +367,6 @@ func ArePodContainersTerminated(pod *corev1.Pod) bool {
 	return true
 }
 
-// ArePodContainersWaiting checks ContainerState for all containers present
-// in given pod. When all containers are in Waiting state, true is returned.
-func ArePodContainersWaiting(pod *corev1.Pod) bool {
-	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Waiting == nil {
-			return false
-		}
-	}
-
-	return true
-}
-
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
 	return int32(livenessPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
