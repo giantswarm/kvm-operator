@@ -169,8 +169,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode1",
-						Labels: map[string]string{
-							"ip": "1.2.3.4",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.2.3.4",
+							},
 						},
 					},
 				},
@@ -180,8 +185,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode2",
-						Labels: map[string]string{
-							"ip": "1.1.1.1",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.1.1.1",
+							},
 						},
 					},
 				},
@@ -278,8 +288,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode1",
-						Labels: map[string]string{
-							"ip": "1.2.3.4",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.2.3.4",
+							},
 						},
 					},
 				},
@@ -289,8 +304,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode2",
-						Labels: map[string]string{
-							"ip": "1.1.1.1",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.1.1.1",
+							},
 						},
 					},
 				},
@@ -387,8 +407,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode1",
-						Labels: map[string]string{
-							"ip": "1.2.3.4",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.2.3.4",
+							},
 						},
 					},
 				},
@@ -482,8 +507,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode1",
-						Labels: map[string]string{
-							"ip": "1.2.3.4",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.2.3.4",
+							},
 						},
 					},
 				},
@@ -493,8 +523,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode2",
-						Labels: map[string]string{
-							"ip": "1.1.1.1",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.1.1.1",
+							},
 						},
 					},
 				},
@@ -504,8 +539,13 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "testNode3",
-						Labels: map[string]string{
-							"ip": "1.1.1.4",
+					},
+					Status: corev1.NodeStatus{
+						Addresses: []corev1.NodeAddress{
+							corev1.NodeAddress{
+								Type:    corev1.NodeInternalIP,
+								Address: "1.1.1.4",
+							},
 						},
 					},
 				},
