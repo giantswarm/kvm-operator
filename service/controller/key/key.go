@@ -94,13 +94,14 @@ const (
 )
 
 const (
-	AnnotationAPIEndpoint       = "kvm-operator.giantswarm.io/api-endpoint"
-	AnnotationEtcdDomain        = "giantswarm.io/etcd-domain"
-	AnnotationIp                = "endpoint.kvm.giantswarm.io/ip"
-	AnnotationService           = "endpoint.kvm.giantswarm.io/service"
-	AnnotationPodDrained        = "endpoint.kvm.giantswarm.io/drained"
-	AnnotationPrometheusCluster = "giantswarm.io/prometheus-cluster"
-	AnnotationVersionBundle     = "kvm-operator.giantswarm.io/version-bundle"
+	AnnotationAPIEndpoint            = "kvm-operator.giantswarm.io/api-endpoint"
+	AnnotationComponentVersionPrefix = "kvm-operator.giantswarm.io/component-version"
+	AnnotationEtcdDomain             = "giantswarm.io/etcd-domain"
+	AnnotationIp                     = "endpoint.kvm.giantswarm.io/ip"
+	AnnotationService                = "endpoint.kvm.giantswarm.io/service"
+	AnnotationPodDrained             = "endpoint.kvm.giantswarm.io/drained"
+	AnnotationPrometheusCluster      = "giantswarm.io/prometheus-cluster"
+	AnnotationVersionBundle          = "kvm-operator.giantswarm.io/version-bundle"
 
 	LabelApp           = "app"
 	LabelCluster       = "giantswarm.io/cluster"
@@ -119,6 +120,7 @@ const (
 
 const (
 	VersionBundleVersionAnnotation = "giantswarm.io/version-bundle-version"
+	ReleaseVersionAnnotation       = "giantswarm.io/release-version"
 )
 
 const (
@@ -365,18 +367,6 @@ func ArePodContainersTerminated(pod *corev1.Pod) bool {
 	return true
 }
 
-// ArePodContainersWaiting checks ContainerState for all containers present
-// in given pod. When all containers are in Waiting state, true is returned.
-func ArePodContainersWaiting(pod *corev1.Pod) bool {
-	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Waiting == nil {
-			return false
-		}
-	}
-
-	return true
-}
-
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
 	return int32(livenessPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
@@ -503,6 +493,17 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	return idx, present
 }
 
+// NodeInternalIP examines the Status Adresses of a Node
+// and returns its InternalIP..
+func NodeInternalIP(node corev1.Node) (string, error) {
+	for _, a := range node.Status.Addresses {
+		if a.Type == corev1.NodeInternalIP {
+			return a.Address, nil
+		}
+	}
+	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP adress in its status", node.Name)
+}
+
 func OperatorVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.OperatorVersion]
 }
@@ -560,6 +561,10 @@ func PVCNames(customObject v1alpha1.KVMConfig) []string {
 	}
 
 	return names
+}
+
+func ReleaseVersion(cr v1alpha1.KVMConfig) string {
+	return cr.GetLabels()[label.ReleaseVersion]
 }
 
 func ServiceAccountName(customObject v1alpha1.KVMConfig) string {

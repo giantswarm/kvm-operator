@@ -1,13 +1,12 @@
 package deployment
 
 import (
+	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/client-go/kubernetes"
-
-	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -107,24 +106,26 @@ func getDeploymentByName(list []*v1.Deployment, name string) (*v1.Deployment, er
 	return nil, microerror.Mask(notFoundError)
 }
 
-func isDeploymentModified(a, b *v1.Deployment) bool {
-	aVersion, ok := a.GetAnnotations()[key.VersionBundleVersionAnnotation]
-	if !ok {
-		return true
-	}
+func isAnnotationModified(a, b *v1.Deployment, annotation string) bool {
+	aVersion := a.GetAnnotations()[annotation]
 	if aVersion == "" {
 		return true
 	}
 
-	bVersion, ok := b.GetAnnotations()[key.VersionBundleVersionAnnotation]
-	if !ok {
-		return true
-	}
+	bVersion := b.GetAnnotations()[annotation]
 	if bVersion == "" {
 		return true
 	}
 
-	if aVersion != bVersion {
+	return aVersion != bVersion
+}
+
+func isDeploymentModified(a, b *v1.Deployment) bool {
+	if isAnnotationModified(a, b, key.VersionBundleVersionAnnotation) {
+		return true
+	}
+
+	if isAnnotationModified(a, b, key.ReleaseVersionAnnotation) {
 		return true
 	}
 
