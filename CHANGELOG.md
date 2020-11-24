@@ -13,8 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated Kubernetes libraries to 1.18 along with all other client-go-dependent libraries.
-- Use InternalIP from TC node's status instead of label for dead endpoints detection
+- Update Kubernetes libraries to 1.18 along with all other client-go-dependent libraries.
+- Use InternalIP from TC node's status instead of label for dead endpoints detection.
+- Shorten `calico-node` wait timeout in `k8s-addons` and add retry for faster cluster initialization.
+- Remove unused Kubernetes scheduler configuration fields preventing strict YAML unmarshalling.
 
 ## [3.13.0] - 2020-10-30
 
