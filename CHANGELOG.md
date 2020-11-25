@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.0] - 2020-11-25
+
 ### Added
 
 - Roll nodes when versions of `calico`, `containerlinux`, `etcd`, `kubernetes` change in release.
@@ -73,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...HEAD
+[3.14.0]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/giantswarm/kvm-operator/compare/v3.12.2...v3.13.0
 [3.12.2]: https://github.com/giantswarm/kvm-operator/compare/v3.12.1...v3.12.2
 [3.12.1]: https://github.com/giantswarm/kvm-operator/compare/v3.12.0...v3.12.1
