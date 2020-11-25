@@ -7,13 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.0] - 2020-11-25
+
 ### Added
 
 - Roll nodes when versions of `calico`, `containerlinux`, `etcd`, `kubernetes` change in release.
 
 ### Changed
 
-- Updated Kubernetes libraries to 1.18 along with all other client-go-dependent libraries.
+- Update Kubernetes libraries to 1.18 along with all other client-go-dependent libraries.
+- Use InternalIP from TC node's status instead of label for dead endpoints detection.
+- Shorten `calico-node` wait timeout in `k8s-addons` and add retry for faster cluster initialization.
+- Remove unused Kubernetes scheduler configuration fields preventing strict YAML unmarshalling.
 
 ## [3.13.0] - 2020-10-30
 
@@ -70,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...HEAD
+[3.14.0]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/giantswarm/kvm-operator/compare/v3.12.2...v3.13.0
 [3.12.2]: https://github.com/giantswarm/kvm-operator/compare/v3.12.1...v3.12.2
 [3.12.1]: https://github.com/giantswarm/kvm-operator/compare/v3.12.0...v3.12.1

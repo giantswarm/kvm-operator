@@ -367,18 +367,6 @@ func ArePodContainersTerminated(pod *corev1.Pod) bool {
 	return true
 }
 
-// ArePodContainersWaiting checks ContainerState for all containers present
-// in given pod. When all containers are in Waiting state, true is returned.
-func ArePodContainersWaiting(pod *corev1.Pod) bool {
-	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Waiting == nil {
-			return false
-		}
-	}
-
-	return true
-}
-
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
 	return int32(livenessPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
 }
@@ -503,6 +491,17 @@ func NodeIsUnschedulable(node corev1.Node) bool {
 func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	idx, present := cr.Status.KVM.NodeIndexes[nodeID]
 	return idx, present
+}
+
+// NodeInternalIP examines the Status Adresses of a Node
+// and returns its InternalIP..
+func NodeInternalIP(node corev1.Node) (string, error) {
+	for _, a := range node.Status.Addresses {
+		if a.Type == corev1.NodeInternalIP {
+			return a.Address, nil
+		}
+	}
+	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP adress in its status", node.Name)
 }
 
 func OperatorVersion(cr v1alpha1.KVMConfig) string {
