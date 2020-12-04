@@ -190,8 +190,8 @@ github.com/giantswarm/microkit v0.2.2 h1:BNK55FyS+AXls6mH+81Iloo3z2+FRWqeEz2jYb7
 github.com/giantswarm/microkit v0.2.2/go.mod h1:XCj0vA/+jHiM03XDMlcWuvYdgZQyNS3O7ZVHDOUCYA8=
 github.com/giantswarm/micrologger v0.3.1/go.mod h1:PjAgtcJ922ZMX/Aa05IPi0bdYvOj2P7pZ7+6dBShMQs=
 github.com/giantswarm/micrologger v0.3.3/go.mod h1:fkzQdDBC6HjJq4nllBDt6XB4t4yeVyhdHKblFX6QoMQ=
-github.com/giantswarm/micrologger v0.3.4 h1:NKD6pz1++Hkq/ulOT9iu7hwTnG3ZfjnPUtuK/tbeCc8=
-github.com/giantswarm/micrologger v0.3.4/go.mod h1:fkzQdDBC6HjJq4nllBDt6XB4t4yeVyhdHKblFX6QoMQ=
+github.com/giantswarm/micrologger v0.4.0 h1:2EpnX86HKpqUNY8C4qbB2SzniB4bgES8Cd/mYrVyOrI=
+github.com/giantswarm/micrologger v0.4.0/go.mod h1:xsD5laBXORMy/P34IHZMK0y/D1gTkYtASUL4gUm5KN4=
 github.com/giantswarm/operatorkit/v4 v4.0.0 h1:rC3MZGA6Rg2HeEbn5poPH/EWHpJk6NpnbpBWc6t7w7Y=
 github.com/giantswarm/operatorkit/v4 v4.0.0/go.mod h1:9VLDXCofhooOPbRt3XCZQmMZJ0tW7X3x7G/2Sz3kb5o=
 github.com/giantswarm/randomkeys/v2 v2.0.0 h1:WSdM/aAX65v6Ft44NZPNmolhfxtfG9ZfsZJodq+hxEU=
@@ -328,6 +328,8 @@ github.com/google/go-cmp v0.4.1/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.3 h1:x95R7cp+rSeeqAMI2knLtQ0DKlaBhv2NrtrOvafPHRo=
 github.com/google/go-cmp v0.5.3/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.4 h1:L8R9j+yAqZuZjsqh/z+F1NCffTKKLShY6zXTItVIZ8M=
+github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-github v17.0.0+incompatible/go.mod h1:zLgOLi98H3fifZn+44m+umXrS52loVEgC2AApnigrVQ=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/google/gofuzz v0.0.0-20161122191042-44d81051d367/go.mod h1:HP5RmnzzSNb993RKQDq4+1A4ia9nllfqcQFTQJedwGI=
