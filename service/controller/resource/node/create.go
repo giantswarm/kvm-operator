@@ -2,7 +2,6 @@ package node
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
@@ -25,16 +24,16 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// cluster.
 	var k8sClient kubernetes.Interface
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
+		r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
 		i := key.ClusterID(customObject)
 		e := key.ClusterAPIEndpoint(customObject)
 
 		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
 		if tenantcluster.IsTimeout(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
+			r.logger.Debugf(ctx, "waiting for certificates timed out")
+			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil
 		} else if err != nil {
@@ -46,8 +45,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 		k8sClients, err := k8sclient.NewClients(clientsConfig)
 		if tenant.IsAPINotAvailable(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			r.logger.Debugf(ctx, "tenant cluster is not available")
+			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil
 		} else if err != nil {
@@ -55,7 +54,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		k8sClient = k8sClients.K8sClient()
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
+		r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
 	}
 
 	// We need to fetch the nodes being registered within the tenant cluster's
@@ -65,8 +64,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		list, err := k8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 		if tenant.IsAPINotAvailable(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			r.logger.Debugf(ctx, "tenant cluster is not available")
+			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil
 		} else if err != nil {
@@ -95,28 +94,28 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// Kubernetes API.
 	for _, n := range nodes {
 		if isNodeReady(&n) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because it is in state 'Ready'", n.GetName()))
+			r.logger.Debugf(ctx, "not deleting node '%s' because it is in state 'Ready'", n.GetName())
 			continue
 		}
 
 		if doesNodeExistAsPod(pods, n) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because its control plane pod does exist", n.GetName()))
+			r.logger.Debugf(ctx, "not deleting node '%s' because its control plane pod does exist", n.GetName())
 			continue
 		}
 
 		if isPodOfNodeRunning(pods, n) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting node '%s' because its control plane pod is running", n.GetName()))
+			r.logger.Debugf(ctx, "not deleting node '%s' because its control plane pod is running", n.GetName())
 			continue
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting node '%s' in the tenant cluster's Kubernetes API", n.GetName()))
+		r.logger.Debugf(ctx, "deleting node '%s' in the tenant cluster's Kubernetes API", n.GetName())
 
 		err = k8sClient.CoreV1().Nodes().Delete(ctx, n.GetName(), metav1.DeleteOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted node '%s' in the tenant cluster's Kubernetes API", n.GetName()))
+		r.logger.Debugf(ctx, "deleted node '%s' in the tenant cluster's Kubernetes API", n.GetName())
 	}
 
 	return nil

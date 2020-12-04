@@ -2,7 +2,6 @@ package ingress
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
@@ -20,7 +19,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for ingresses in the Kubernetes API")
+	r.logger.Debugf(ctx, "looking for ingresses in the Kubernetes API")
 
 	var ingresses []*v1beta1.Ingress
 
@@ -33,17 +32,17 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	for _, name := range ingressNames {
 		manifest, err := r.k8sClient.NetworkingV1beta1().Ingresses(namespace).Get(ctx, name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find a ingress in the Kubernetes API")
+			r.logger.Debugf(ctx, "did not find a ingress in the Kubernetes API")
 			// fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found a ingress in the Kubernetes API")
+			r.logger.Debugf(ctx, "found a ingress in the Kubernetes API")
 			ingresses = append(ingresses, manifest)
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d ingresses in the Kubernetes API", len(ingresses)))
+	r.logger.Debugf(ctx, "found %d ingresses in the Kubernetes API", len(ingresses))
 
 	// In case a cluster deletion happens, we want to delete the tenant cluster
 	// ingresses. We still need to use the ingresses for ingress routing in order
@@ -59,10 +58,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		}
 		if len(list.Items) != 0 {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot finish deletion of ingresses due to existing pods")
+			r.logger.Debugf(ctx, "cannot finish deletion of ingresses due to existing pods")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil, nil
 		}

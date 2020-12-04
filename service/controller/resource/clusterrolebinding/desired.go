@@ -2,7 +2,6 @@ package clusterrolebinding
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -18,14 +17,14 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new cluster role bindings")
+	r.logger.Debugf(ctx, "computing the new cluster role bindings")
 
 	clusterRoleBindings, err := r.newClusterRoleBindings(customObject)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed the %d new cluster role bindings", len(clusterRoleBindings)))
+	r.logger.Debugf(ctx, "computed the %d new cluster role bindings", len(clusterRoleBindings))
 
 	return clusterRoleBindings, nil
 }

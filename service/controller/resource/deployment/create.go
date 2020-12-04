@@ -2,7 +2,6 @@ package deployment
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
@@ -23,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(deploymentsToCreate) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the deployments in the Kubernetes API")
+		r.logger.Debugf(ctx, "creating the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customResource)
 		for _, deployment := range deploymentsToCreate {
@@ -35,9 +34,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created the deployments in the Kubernetes API")
+		r.logger.Debugf(ctx, "created the deployments in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the deployments do not need to be created in the Kubernetes API")
+		r.logger.Debugf(ctx, "the deployments do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -53,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be created")
+	r.logger.Debugf(ctx, "finding out which deployments have to be created")
 
 	var deploymentsToCreate []*v1.Deployment
 
@@ -63,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d deployments that have to be created", len(deploymentsToCreate)))
+	r.logger.Debugf(ctx, "found %d deployments that have to be created", len(deploymentsToCreate))
 
 	return deploymentsToCreate, nil
 }

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
@@ -23,7 +22,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(servicesToCreate) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the services in the Kubernetes API")
+		r.logger.Debugf(ctx, "creating the services in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, service := range servicesToCreate {
@@ -35,9 +34,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created the services in the Kubernetes API")
+		r.logger.Debugf(ctx, "created the services in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the services do not need to be created in the Kubernetes API")
+		r.logger.Debugf(ctx, "the services do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -53,7 +52,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which services have to be created")
+	r.logger.Debugf(ctx, "finding out which services have to be created")
 
 	var servicesToCreate []*corev1.Service
 
@@ -63,7 +62,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d services that have to be created", len(servicesToCreate)))
+	r.logger.Debugf(ctx, "found %d services that have to be created", len(servicesToCreate))
 
 	return servicesToCreate, nil
 }

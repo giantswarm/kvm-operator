@@ -2,7 +2,6 @@ package ingress
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
@@ -24,7 +23,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(ingressesToDelete) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the ingresses in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleting the ingresses in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToDelete {
@@ -36,9 +35,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the ingresses in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleted the ingresses in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the ingresses do not need to be deleted from the Kubernetes API")
+		r.logger.Debugf(ctx, "the ingresses do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -66,7 +65,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which ingresses have to be deleted")
+	r.logger.Debugf(ctx, "finding out which ingresses have to be deleted")
 
 	var ingressesToDelete []*v1beta1.Ingress
 
@@ -76,7 +75,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d ingresses that have to be deleted", len(ingressesToDelete)))
+	r.logger.Debugf(ctx, "found %d ingresses that have to be deleted", len(ingressesToDelete))
 
 	return ingressesToDelete, nil
 }

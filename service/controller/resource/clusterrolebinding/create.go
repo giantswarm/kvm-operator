@@ -2,7 +2,6 @@ package clusterrolebinding
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/rbac/v1"
@@ -18,7 +17,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 	// Create the cluster role bindings in the Kubernetes API.
 	if len(clusterRoleBindingsToCreate) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the cluster role bindings in the Kubernetes API")
+		r.logger.Debugf(ctx, "creating the cluster role bindings in the Kubernetes API")
 
 		for _, clusterRoleBinding := range clusterRoleBindingsToCreate {
 			_, err := r.k8sClient.RbacV1().ClusterRoleBindings().Create(ctx, clusterRoleBinding, v1.CreateOptions{})
@@ -28,9 +27,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created the cluster role bindings in the Kubernetes API")
+		r.logger.Debugf(ctx, "created the cluster role bindings in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the cluster role bindings do not need to be created in the Kubernetes API")
+		r.logger.Debugf(ctx, "the cluster role bindings do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -46,7 +45,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which cluster role bindings have to be created")
+	r.logger.Debugf(ctx, "finding out which cluster role bindings have to be created")
 
 	var clusterRoleBindingsToCreate []*apiv1.ClusterRoleBinding
 
@@ -56,7 +55,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d cluster role bindings that have to be created", len(clusterRoleBindingsToCreate)))
+	r.logger.Debugf(ctx, "found %d cluster role bindings that have to be created", len(clusterRoleBindingsToCreate))
 
 	return clusterRoleBindingsToCreate, nil
 }

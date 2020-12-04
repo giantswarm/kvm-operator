@@ -16,7 +16,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the desired namespace")
+	r.logger.Debugf(ctx, "computing the desired namespace")
 
 	// Compute the desired state of the namespace to have a reference of data how
 	// it should be.
@@ -34,7 +34,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		},
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computed the desired namespace")
+	r.logger.Debugf(ctx, "computed the desired namespace")
 
 	return namespace, nil
 }

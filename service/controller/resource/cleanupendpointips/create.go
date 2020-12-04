@@ -22,25 +22,25 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// At first we need to create a Kubernetes client for the reconciled tenant
 	// cluster.
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
+	r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
 	k8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
 	if tenantcluster.IsTimeout(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
-		r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
-		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
+		r.logger.Debugf(ctx, "waiting for certificates timed out")
+		r.logger.Debugf(ctx, "canceling resource")
 
 		return nil
 	} else if tenant.IsAPINotAvailable(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
-		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+		r.logger.Debugf(ctx, "tenant cluster is not available")
+		r.logger.Debugf(ctx, "canceling resource")
 
 		return nil
 	} else if err != nil {
 		return microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
+	r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
 
 	// We need to fetch the nodes being registered within the tenant cluster's
 	// Kubernetes API.
@@ -48,8 +48,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		list, err := k8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 		if tenant.IsAPINotAvailable(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			r.logger.Debugf(ctx, "tenant cluster is not available")
+			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil
 		} else if err != nil {
@@ -84,7 +84,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 			if epRemoved > 0 {
-				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the master endpoints", epRemoved))
+				r.logger.Debugf(ctx, "removing %d dead ips from the master endpoints", epRemoved)
 
 				_, err = r.k8sClient.CoreV1().Endpoints(n).Update(ctx, masterEndpoint, metav1.UpdateOptions{})
 				if err != nil {
@@ -103,7 +103,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 			if epRemoved > 0 {
-				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("removing %d dead ips from the worker endpoints", epRemoved))
+				r.logger.Debugf(ctx, "removing %d dead ips from the worker endpoints", epRemoved)
 
 				// If this is the last worker in the endpoints list, this will fail with an error like:
 				// Endpoints "worker" is invalid: subsets[0]: Required value: must specify `addresses` or `notReadyAddresses`.
