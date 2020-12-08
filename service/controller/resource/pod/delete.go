@@ -49,7 +49,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			return microerror.Maskf(missingClusterLabelError, "pod is missing cluster label")
 		}
 
-		kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs("").Get(ctx, clusterID, metav1.GetOptions{})
+		kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(metav1.NamespaceDefault).Get(ctx, clusterID, metav1.GetOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
