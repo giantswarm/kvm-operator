@@ -20,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 
@@ -233,38 +234,51 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	return q, nil
 }
 
+// CreateCtrlClientForTenantCluster takes the context of the reconciled object
+// and the provided logger and tenant cluster interface and creates a K8s client for the tenant cluster
+func CreateCtrlClientForTenantCluster(ctx context.Context, obj interface{}, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (client.Client, error) {
+	k8sClients, err := createK8sClients(ctx, obj, logger, tenantCluster)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	return k8sClients.CtrlClient(), nil
+}
+
 // CreateK8sClientForTenantCluster takes the context of the reconciled object
 // and the provided logger and tenant cluster interface and creates a K8s client for the tenant cluster
 func CreateK8sClientForTenantCluster(ctx context.Context, obj interface{}, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (kubernetes.Interface, error) {
-
-	// Create a client for the reconciled tenant cluster
-	var tcK8sClient kubernetes.Interface
-	{
-		customObject, err := ToCustomObject(obj)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		i := ClusterID(customObject)
-		e := ClusterAPIEndpoint(customObject)
-
-		restConfig, err := tenantCluster.NewRestConfig(ctx, i, e)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		clientsConfig := k8sclient.ClientsConfig{
-			Logger:     logger,
-			RestConfig: restConfig,
-		}
-		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		tcK8sClient = k8sClients.K8sClient()
+	k8sClients, err := createK8sClients(ctx, obj, logger, tenantCluster)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
-	return tcK8sClient, nil
+	return k8sClients.K8sClient(), nil
+}
+
+func createK8sClients(ctx context.Context, obj interface{}, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (*k8sclient.Clients, error) {
+	customObject, err := ToCustomObject(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	i := ClusterID(customObject)
+	e := ClusterAPIEndpoint(customObject)
+
+	restConfig, err := tenantCluster.NewRestConfig(ctx, i, e)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	clientsConfig := k8sclient.ClientsConfig{
+		Logger:     logger,
+		RestConfig: restConfig,
+	}
+	k8sClients, err := k8sclient.NewClients(clientsConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	return k8sClients, nil
 }
 
 func DeploymentName(prefix string, nodeID string) string {
