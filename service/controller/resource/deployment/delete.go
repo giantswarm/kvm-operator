@@ -2,7 +2,6 @@ package deployment
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
@@ -24,7 +23,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(deploymentsToDelete) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the deployments in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleting the deployments in the Kubernetes API")
 
 		for _, deployment := range deploymentsToDelete {
 			n := key.ClusterNamespace(customResource)
@@ -36,9 +35,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the deployments in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleted the deployments in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the deployments do not need to be deleted from the Kubernetes API")
+		r.logger.Debugf(ctx, "the deployments do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -68,7 +67,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be deleted")
+	r.logger.Debugf(ctx, "finding out which deployments have to be deleted")
 
 	var deploymentsToDelete []*v1.Deployment
 
@@ -78,7 +77,7 @@ func (r *Resource) newDeleteChangeForDeletePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
+	r.logger.Debugf(ctx, "found %d deployments that have to be deleted", len(deploymentsToDelete))
 
 	return deploymentsToDelete, nil
 }
@@ -95,7 +94,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be deleted")
+	r.logger.Debugf(ctx, "finding out which deployments have to be deleted")
 
 	var deploymentsToDelete []*v1.Deployment
 
@@ -105,7 +104,7 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d deployments that have to be deleted", len(deploymentsToDelete)))
+	r.logger.Debugf(ctx, "found %d deployments that have to be deleted", len(deploymentsToDelete))
 
 	return deploymentsToDelete, nil
 }

@@ -2,7 +2,6 @@ package configmap
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
@@ -24,7 +23,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 	// Create the config maps in the Kubernetes API.
 	if len(configMapsToCreate) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the config maps in the Kubernetes API")
+		r.logger.Debugf(ctx, "creating the config maps in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customResource)
 		for _, configMap := range configMapsToCreate {
@@ -36,9 +35,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created the config maps in the Kubernetes API")
+		r.logger.Debugf(ctx, "created the config maps in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the config maps do not need to be created in the Kubernetes API")
+		r.logger.Debugf(ctx, "the config maps do not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -54,7 +53,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which config maps have to be created")
+	r.logger.Debugf(ctx, "finding out which config maps have to be created")
 
 	var configMapsToCreate []*corev1.ConfigMap
 
@@ -64,7 +63,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d config maps that have to be created", len(configMapsToCreate)))
+	r.logger.Debugf(ctx, "found %d config maps that have to be created", len(configMapsToCreate))
 
 	return configMapsToCreate, nil
 }

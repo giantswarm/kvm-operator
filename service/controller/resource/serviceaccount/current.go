@@ -20,27 +20,27 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	if key.IsDeleted(customObject) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "redirecting responsibility of deletion of service accounts to namespace termination")
+		r.logger.Debugf(ctx, "redirecting responsibility of deletion of service accounts to namespace termination")
 		resourcecanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+		r.logger.Debugf(ctx, "canceling resource")
 
 		return nil, nil
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for a service account in the Kubernetes API")
+	r.logger.Debugf(ctx, "looking for a service account in the Kubernetes API")
 
 	namespace := key.ClusterNamespace(customObject)
 	var currentServiceAccount *corev1.ServiceAccount
 	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(ctx, key.ServiceAccountName(customObject), metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "did not find the service account in the Kubernetes API")
+		r.logger.Debugf(ctx, "did not find the service account in the Kubernetes API")
 		//When service account is not found api still returning non nil value so it can break create/update/delete
 		// and is why force the return value to nil
 		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "found a service account in the Kubernetes API")
+		r.logger.Debugf(ctx, "found a service account in the Kubernetes API")
 	}
 
 	return currentServiceAccount, nil

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
@@ -24,7 +23,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(servicesToDelete) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the services in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleting the services in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, service := range servicesToDelete {
@@ -36,9 +35,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the services in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleted the services in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the services do not need to be deleted from the Kubernetes API")
+		r.logger.Debugf(ctx, "the services do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -66,7 +65,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which services have to be deleted")
+	r.logger.Debugf(ctx, "finding out which services have to be deleted")
 
 	var servicesToDelete []*corev1.Service
 
@@ -76,7 +75,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d services that have to be deleted", len(servicesToDelete)))
+	r.logger.Debugf(ctx, "found %d services that have to be deleted", len(servicesToDelete))
 
 	return servicesToDelete, nil
 }

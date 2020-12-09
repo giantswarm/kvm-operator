@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
@@ -17,16 +16,16 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateState inter
 	}
 
 	if !isEmptyEndpoint(endpointToUpdate) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating endpoint '%s'", endpointToUpdate.GetName()))
+		r.logger.Debugf(ctx, "updating endpoint '%s'", endpointToUpdate.GetName())
 
 		_, err = r.k8sClient.CoreV1().Endpoints(endpointToUpdate.Namespace).Update(ctx, endpointToUpdate, v1.UpdateOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updated endpoint '%s'", endpointToUpdate.GetName()))
+		r.logger.Debugf(ctx, "updated endpoint '%s'", endpointToUpdate.GetName())
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not updating endpoint '%s'", endpointToUpdate.GetName()))
+		r.logger.Debugf(ctx, "not updating endpoint '%s'", endpointToUpdate.GetName())
 	}
 
 	return nil

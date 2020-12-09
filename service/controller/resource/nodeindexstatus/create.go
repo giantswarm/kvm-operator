@@ -55,7 +55,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updating status with node indexes")
+		r.logger.Debugf(ctx, "updating status with node indexes")
 
 		if !reflect.DeepEqual(cr.Status.KVM.NodeIndexes, nodeIndexes) {
 			newObj, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(cr.GetNamespace()).Get(ctx, cr.GetName(), metav1.GetOptions{})
@@ -69,14 +69,14 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 
-			r.logger.LogCtx(ctx, "level", "debug", "message", "updated status with node indexes")
+			r.logger.Debugf(ctx, "updated status with node indexes")
 
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
+			r.logger.Debugf(ctx, "canceling reconciliation")
 			reconciliationcanceledcontext.SetCanceled(ctx)
 
 			return nil
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not update status with node indexes")
+			r.logger.Debugf(ctx, "did not update status with node indexes")
 		}
 	}
 
