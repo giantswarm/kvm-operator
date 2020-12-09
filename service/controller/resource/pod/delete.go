@@ -22,7 +22,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 	var currentPod *corev1.Pod
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the current version of the reconciled pod in the Kubernetes API")
+		r.logger.Debugf(ctx, "looking for the current version of the reconciled pod in the Kubernetes API")
 
 		currentPod, err = r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(ctx, reconciledPod.Name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
@@ -30,15 +30,15 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			// informer's watch event is outdated and the pod got already deleted in
 			// the Kubernetes API. This is a normal transition behaviour, so we just
 			// ignore it and assume we are done.
-			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot find the current version of the reconciled pod in the Kubernetes API")
+			r.logger.Debugf(ctx, "cannot find the current version of the reconciled pod in the Kubernetes API")
 			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
+			r.logger.Debugf(ctx, "canceling reconciliation for pod")
 
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
-		r.logger.LogCtx(ctx, "level", "debug", "message", "found the current version of the reconciled pod in the Kubernetes API")
+		r.logger.Debugf(ctx, "found the current version of the reconciled pod in the Kubernetes API")
 	}
 
 	{
@@ -47,16 +47,16 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 		if isDrained {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is already drained")
+			r.logger.Debugf(ctx, "pod is already drained")
 			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil
 		}
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "looking for the drainer config for the tenant cluster")
+		r.logger.Debugf(ctx, "looking for the drainer config for the tenant cluster")
 
 		n := currentPod.GetNamespace()
 		p := currentPod.GetName()
@@ -64,7 +64,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 		drainerConfig, err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Get(ctx, p, o)
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find drainer config for tenant cluster node")
+			r.logger.Debugf(ctx, "did not find drainer config for tenant cluster node")
 
 			err := r.createDrainerConfig(ctx, currentPod)
 			if err != nil {
@@ -73,55 +73,55 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation for pod")
+			r.logger.Debugf(ctx, "canceling reconciliation for pod")
 			return nil
 
 		} else if err != nil {
 			return microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found drainer config for the tenant cluster")
+			r.logger.Debugf(ctx, "found drainer config for the tenant cluster")
 
-			r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for inspection of the reconciled pod")
+			r.logger.Debugf(ctx, "waiting for inspection of the reconciled pod")
 		}
 
 		if drainerConfig.Status.HasDrainedCondition() {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of tenant cluster has drained condition")
+			r.logger.Debugf(ctx, "drainer config of tenant cluster has drained condition")
 
 			err := r.finishDraining(ctx, currentPod, drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		} else if drainerConfig.Status.HasTimeoutCondition() {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config of tenant cluster has timeout condition")
+			r.logger.Debugf(ctx, "drainer config of tenant cluster has timeout condition")
 
 			err := r.finishDraining(ctx, currentPod, drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		} else if key.ArePodContainersTerminated(currentPod) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "pod is treated as drained")
-			r.logger.LogCtx(ctx, "level", "debug", "message", "all pod's containers are terminated")
+			r.logger.Debugf(ctx, "pod is treated as drained")
+			r.logger.Debugf(ctx, "all pod's containers are terminated")
 
 			err := r.finishDraining(ctx, currentPod, drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "node termination is still in progress")
+			r.logger.Debugf(ctx, "node termination is still in progress")
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
+	r.logger.Debugf(ctx, "canceling reconciliation")
 	resourcecanceledcontext.SetCanceled(ctx)
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
+	r.logger.Debugf(ctx, "keeping finalizers")
 	finalizerskeptcontext.SetKept(ctx)
 
 	return nil
 }
 
 func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) error {
-	r.logger.LogCtx(ctx, "level", "debug", "message", "creating drainer config for tenant cluster node")
+	r.logger.Debugf(ctx, "creating drainer config for tenant cluster node")
 
 	apiEndpoint, err := key.ClusterAPIEndpointFromPod(pod)
 	if err != nil {
@@ -157,7 +157,7 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 	} else if err != nil {
 		return microerror.Mask(err)
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created drainer config for tenant cluster node")
+		r.logger.Debugf(ctx, "created drainer config for tenant cluster node")
 	}
 
 	return nil
@@ -167,7 +167,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 	var err error
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting drainer config for tenant cluster node")
+		r.logger.Debugf(ctx, "deleting drainer config for tenant cluster node")
 
 		n := currentPod.GetNamespace()
 		i := currentPod.GetName()
@@ -175,11 +175,11 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 
 		err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Delete(ctx, i, o)
 		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "drainer config for tenant cluster node already deleted")
+			r.logger.Debugf(ctx, "drainer config for tenant cluster node already deleted")
 		} else if err != nil {
 			return microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "deleted drainer config for tenant cluster node")
+			r.logger.Debugf(ctx, "deleted drainer config for tenant cluster node")
 		}
 	}
 
@@ -193,7 +193,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updating the pod in the Kubernetes API")
+		r.logger.Debugf(ctx, "updating the pod in the Kubernetes API")
 
 		_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(ctx, podToDelete, metav1.UpdateOptions{})
 		if apierrors.IsConflict(err) {
@@ -202,21 +202,21 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 			// match the latest existing one, we give up here and wait for the
 			// delete event to be replayed. Then we try again later until we
 			// succeed.
-			r.logger.LogCtx(ctx, "level", "debug", "message", "cannot update the pod in the Kubernetes API due to outdated resource version")
+			r.logger.Debugf(ctx, "cannot update the pod in the Kubernetes API due to outdated resource version")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling reconciliation")
+			r.logger.Debugf(ctx, "canceling reconciliation")
 
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updated the pod in the Kubernetes API")
+		r.logger.Debugf(ctx, "updated the pod in the Kubernetes API")
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the pod in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleting the pod in the Kubernetes API")
 
 		gracePeriodSeconds := int64(0)
 		options := metav1.DeleteOptions{
@@ -227,7 +227,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the pod in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleted the pod in the Kubernetes API")
 	}
 
 	return nil

@@ -21,39 +21,39 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var serviceName string
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "finding annotations")
+		r.logger.Debugf(ctx, "finding annotations")
 
 		_, serviceName, err = getAnnotations(*pod, IPAnnotation, ServiceAnnotation)
 		if IsMissingAnnotationError(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find annotations")
+			r.logger.Debugf(ctx, "did not find annotations")
 			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil, nil
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "found annotations")
+		r.logger.Debugf(ctx, "found annotations")
 	}
 
 	var service *corev1.Service
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "finding service")
+		r.logger.Debugf(ctx, "finding service")
 
 		service, err = r.k8sClient.CoreV1().Services(pod.GetNamespace()).Get(ctx, serviceName, metav1.GetOptions{})
 		if errors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find service")
+			r.logger.Debugf(ctx, "did not find service")
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found service")
+			r.logger.Debugf(ctx, "found service")
 		}
 	}
 
 	var endpoint *Endpoint
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "finding endpoint")
+		r.logger.Debugf(ctx, "finding endpoint")
 
 		endpoint = &Endpoint{
 			Ports:            serviceToPorts(service),
@@ -65,7 +65,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		if errors.IsNotFound(err) {
 			// In case the endpoint manifest cannot be found in the Kubernetes API we
 			// return the endpoint structure we dispatch without filling any IP.
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find endpoint")
+			r.logger.Debugf(ctx, "did not find endpoint")
 
 			return endpoint, nil
 		} else if err != nil {
@@ -87,13 +87,13 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 		endpoint.Addresses = ipsToAddresses(endpoint.IPs)
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "found endpoint")
+		r.logger.Debugf(ctx, "found endpoint")
 	}
 
 	// Remove master endpoint ip only after pod is fully terminated because we
 	// still need to drain the master before we remove it.
 	if serviceName == key.MasterID && key.IsPodDeleted(pod) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current version of the reconciled pod in the Kubernetes API")
+		r.logger.Debugf(ctx, "finding current version of the reconciled pod in the Kubernetes API")
 
 		currentPod, err := r.k8sClient.CoreV1().Pods(pod.GetNamespace()).Get(ctx, pod.GetName(), metav1.GetOptions{})
 		if errors.IsNotFound(err) {
@@ -101,18 +101,18 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			// informer's watch event is outdated and the pod got already deleted in
 			// the Kubernetes API. This is a normal transition behaviour, so we just
 			// ignore it and continue with endpoint deletion.
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find current version of the reconciled pod in the Kubernetes API")
+			r.logger.Debugf(ctx, "did not find current version of the reconciled pod in the Kubernetes API")
 		} else if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found current version of the reconciled pod in the Kubernetes API")
+			r.logger.Debugf(ctx, "found current version of the reconciled pod in the Kubernetes API")
 
 			if !key.ArePodContainersTerminated(currentPod) {
-				r.logger.LogCtx(ctx, "level", "debug", "message", "pod containers are still running")
-				r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+				r.logger.Debugf(ctx, "pod containers are still running")
+				r.logger.Debugf(ctx, "canceling resource")
 				resourcecanceledcontext.SetCanceled(ctx)
 
-				r.logger.LogCtx(ctx, "level", "debug", "message", "keeping finalizers")
+				r.logger.Debugf(ctx, "keeping finalizers")
 				finalizerskeptcontext.SetKept(ctx)
 
 				return nil, nil

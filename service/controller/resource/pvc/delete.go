@@ -2,7 +2,6 @@ package pvc
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
@@ -24,7 +23,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(pvcsToDelete) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting the PVCs in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleting the PVCs in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, PVC := range pvcsToDelete {
@@ -36,9 +35,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted the PVCs in the Kubernetes API")
+		r.logger.Debugf(ctx, "deleted the PVCs in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the PVCs do not need to be deleted from the Kubernetes API")
+		r.logger.Debugf(ctx, "the PVCs do not need to be deleted from the Kubernetes API")
 	}
 
 	return nil
@@ -66,7 +65,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which PVCs have to be deleted")
+	r.logger.Debugf(ctx, "finding out which PVCs have to be deleted")
 
 	var pvcsToDelete []*corev1.PersistentVolumeClaim
 
@@ -76,7 +75,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d PVCs that have to be deleted", len(pvcsToDelete)))
+	r.logger.Debugf(ctx, "found %d PVCs that have to be deleted", len(pvcsToDelete))
 
 	return pvcsToDelete, nil
 }

@@ -21,14 +21,14 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	if key.IsDeleted(customResource) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "redirecting responsibility of deletion of config maps to namespace termination")
+		r.logger.Debugf(ctx, "redirecting responsibility of deletion of config maps to namespace termination")
 		resourcecanceledcontext.SetCanceled(ctx)
-		r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+		r.logger.Debugf(ctx, "canceling resource")
 
 		return nil, nil
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for a list of config maps in the Kubernetes API")
+	r.logger.Debugf(ctx, "looking for a list of config maps in the Kubernetes API")
 
 	var currentConfigMaps []*corev1.ConfigMap
 	{
@@ -42,7 +42,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found a list of config maps in the Kubernetes API")
+			r.logger.Debugf(ctx, "found a list of config maps in the Kubernetes API")
 
 			for _, item := range configMapList.Items {
 				c := item
@@ -51,7 +51,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found a list of %d config maps in the Kubernetes API", len(currentConfigMaps)))
+	r.logger.Debugf(ctx, "found a list of %d config maps in the Kubernetes API", len(currentConfigMaps))
 
 	return currentConfigMaps, nil
 }

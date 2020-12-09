@@ -23,14 +23,14 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new config maps")
+	r.logger.Debugf(ctx, "computing the new config maps")
 
 	configMaps, err := r.newConfigMaps(ctx, customResource)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed the %d new config maps", len(configMaps)))
+	r.logger.Debugf(ctx, "computed the %d new config maps", len(configMaps))
 
 	return configMaps, nil
 }

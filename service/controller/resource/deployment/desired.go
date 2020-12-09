@@ -20,7 +20,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "reading the release for the deployment")
+	r.logger.Debugf(ctx, "reading the release for the deployment")
 
 	var release *releasev1alpha1.Release
 	{
@@ -32,7 +32,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computing the new deployments")
+	r.logger.Debugf(ctx, "computing the new deployments")
 
 	var deployments []*v1.Deployment
 
@@ -50,7 +50,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		deployments = append(deployments, workerDeployments...)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed the %d new deployments", len(deployments)))
+	r.logger.Debugf(ctx, "computed the %d new deployments", len(deployments))
 
 	return deployments, nil
 }

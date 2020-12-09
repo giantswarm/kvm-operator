@@ -26,7 +26,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if len(deploymentsToUpdate) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updating the deployments in the Kubernetes API")
+		r.logger.Debugf(ctx, "updating the deployments in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customResource)
 		for _, deployment := range deploymentsToUpdate {
@@ -36,9 +36,9 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updated the deployments in the Kubernetes API")
+		r.logger.Debugf(ctx, "updated the deployments in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the deployments do not need to be updated in the Kubernetes API")
+		r.logger.Debugf(ctx, "the deployments do not need to be updated in the Kubernetes API")
 	}
 
 	return nil
@@ -67,24 +67,24 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	r.logger.LogCtx(ctx, "level", "debug", "message", "creating Kubernetes client for tenant cluster")
+	r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
 	tcK8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
 	if tenantcluster.IsTimeout(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
-		r.logger.LogCtx(ctx, "level", "debug", "message", "waiting for certificates timed out")
+		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
+		r.logger.Debugf(ctx, "waiting for certificates timed out")
 
 		return nil, nil
 	} else if tenant.IsAPINotAvailable(err) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "did not create Kubernetes client for tenant cluster")
-		r.logger.LogCtx(ctx, "level", "debug", "message", "tenant cluster is not available")
+		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
+		r.logger.Debugf(ctx, "tenant cluster is not available")
 
 		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "created Kubernetes client for tenant cluster")
+	r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
 
 	return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient)
 }
@@ -99,7 +99,7 @@ func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredS
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out which deployments have to be updated")
+	r.logger.Debugf(ctx, "finding out which deployments have to be updated")
 
 	// Updates can be quite disruptive. We have to be very careful with updating
 	// resources that potentially imply disrupting customer workloads. We have
@@ -132,7 +132,7 @@ DeploymentsLoop:
 		}
 
 		if !isDeploymentModified(desiredDeployment, currentDeployment) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not updating deployment '%s': no changes found", currentDeployment.GetName()))
+			r.logger.Debugf(ctx, "not updating deployment '%s': no changes found", currentDeployment.GetName())
 			continue
 		}
 
@@ -154,7 +154,7 @@ DeploymentsLoop:
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found deployment '%s' that has to be updated", desiredDeployment.GetName()))
+		r.logger.Debugf(ctx, "found deployment '%s' that has to be updated", desiredDeployment.GetName())
 
 		return []*v1.Deployment{desiredDeployment}, nil
 	}

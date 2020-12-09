@@ -21,7 +21,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "looking for a list of deployments in the Kubernetes API")
+	r.logger.Debugf(ctx, "looking for a list of deployments in the Kubernetes API")
 
 	var currentDeployments []*v1.Deployment
 	{
@@ -30,7 +30,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found a list of deployments in the Kubernetes API")
+			r.logger.Debugf(ctx, "found a list of deployments in the Kubernetes API")
 
 			for _, item := range deploymentList.Items {
 				d := item
@@ -41,7 +41,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found a list of %d deployments in the Kubernetes API", len(currentDeployments)))
+	r.logger.Debugf(ctx, "found a list of %d deployments in the Kubernetes API", len(currentDeployments))
 
 	return currentDeployments, nil
 }

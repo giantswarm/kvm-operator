@@ -16,7 +16,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if namespaceToCreate != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating the namespace in the Kubernetes API")
+		r.logger.Debugf(ctx, "creating the namespace in the Kubernetes API")
 
 		_, err = r.k8sClient.CoreV1().Namespaces().Create(ctx, namespaceToCreate, v1.CreateOptions{})
 		if apierrors.IsAlreadyExists(err) {
@@ -25,9 +25,9 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created the namespace in the Kubernetes API")
+		r.logger.Debugf(ctx, "created the namespace in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "the namespace does not need to be created in the Kubernetes API")
+		r.logger.Debugf(ctx, "the namespace does not need to be created in the Kubernetes API")
 	}
 
 	return nil
@@ -43,14 +43,14 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the namespace has to be created")
+	r.logger.Debugf(ctx, "finding out if the namespace has to be created")
 
 	var namespaceToCreate *corev1.Namespace
 	if currentNamespace == nil {
 		namespaceToCreate = desiredNamespace
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "found out if the namespace has to be created")
+	r.logger.Debugf(ctx, "found out if the namespace has to be created")
 
 	return namespaceToCreate, nil
 }

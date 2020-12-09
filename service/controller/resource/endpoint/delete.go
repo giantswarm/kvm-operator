@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
@@ -22,7 +21,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	// gone. We only delete the whole endpoint when it does not contain any IP
 	// anymore. Removing IPs is done on update events.
 	if isEmptyEndpoint(endpointToDelete) {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting endpoint '%s'", endpointToDelete.GetName()))
+		r.logger.Debugf(ctx, "deleting endpoint '%s'", endpointToDelete.GetName())
 
 		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(ctx, endpointToDelete.GetName(), metav1.DeleteOptions{})
 		if errors.IsNotFound(err) {
@@ -31,9 +30,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted endpoint '%s'", endpointToDelete.GetName()))
+		r.logger.Debugf(ctx, "deleted endpoint '%s'", endpointToDelete.GetName())
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("not deleting endpoint '%s'", endpointToDelete.GetName()))
+		r.logger.Debugf(ctx, "not deleting endpoint '%s'", endpointToDelete.GetName())
 	}
 
 	return nil
