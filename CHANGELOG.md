@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Do not drain node pods when cluster is being deleted.
+- Update for Kubernetes 1.19 compatibility.
 
 ## [3.14.0] - 2020-11-25
 

@@ -25,7 +25,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 	release.Spec.Components = []releasev1alpha1.ReleaseSpecComponent{
 		{
 			Name:    "kubernetes",
-			Version: "1.17.9",
+			Version: "1.19.4",
 		},
 		{
 			Name:    "calico",
