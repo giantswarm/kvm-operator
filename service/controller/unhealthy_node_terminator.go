@@ -49,7 +49,7 @@ func NewUnhealthyNodeTerminator(config UnhealthyNodeTerminatorConfig) (*Unhealth
 				label.OperatorVersion: project.Version(),
 			}),
 
-			Name: config.ProjectName + "-unhealthy-nodes-drainer",
+			Name: config.ProjectName + "-unhealthy-nodes-terminator",
 		}
 
 		operatorkitController, err = controller.New(c)
