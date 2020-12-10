@@ -8,27 +8,21 @@ import (
 )
 
 const (
-	// Name is the identifier of the resource.
 	Name = "terminateunhealthynodes"
 )
 
-// Config represents the configuration used to create a new cloud config resource.
 type Config struct {
-	// Dependencies.
 	K8sClient     kubernetes.Interface
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 }
 
-// Resource implements the config map resource.
 type Resource struct {
-	// Dependencies.
 	k8sClient     kubernetes.Interface
 	logger        micrologger.Logger
 	tenantCluster tenantcluster.Interface
 }
 
-// New creates a new configured config map resource.
 func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")

@@ -29,9 +29,9 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return nil
 	}
 
-	var tcK8sClient client.Client
+	var tcCtrlClient client.Client
 	{
-		tcK8sClient, err = key.CreateCtrlClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
+		tcCtrlClient, err = key.CreateCtrlClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -40,7 +40,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var detectorService *detector.Detector
 	{
 		detectorConfig := detector.Config{
-			K8sClient: tcK8sClient,
+			K8sClient: tcCtrlClient,
 			Logger:    r.logger,
 
 			NotReadyTickThreshold: nodeTerminationTickThreshold,

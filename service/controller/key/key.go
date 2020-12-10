@@ -235,7 +235,7 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 }
 
 // CreateCtrlClientForTenantCluster takes the context of the reconciled object
-// and the provided logger and tenant cluster interface and creates a K8s client for the tenant cluster
+// and the provided logger and tenant cluster interface and creates a Ctrl client for the tenant cluster
 func CreateCtrlClientForTenantCluster(ctx context.Context, obj interface{}, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (client.Client, error) {
 	k8sClients, err := createK8sClients(ctx, obj, logger, tenantCluster)
 	if err != nil {
