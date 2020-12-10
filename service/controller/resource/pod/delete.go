@@ -42,6 +42,28 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "checking if cluster is being deleted")
+
+		clusterID, ok := currentPod.Labels[key.LabelCluster]
+		if !ok {
+			return microerror.Maskf(missingClusterLabelError, "pod is missing cluster label")
+		}
+
+		kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(metav1.NamespaceDefault).Get(ctx, clusterID, metav1.GetOptions{})
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		if kvmConfig.DeletionTimestamp != nil {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "cluster is being deleted")
+			resourcecanceledcontext.SetCanceled(ctx)
+			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
+
+			return nil
+		}
+	}
+
+	{
 		isDrained, err := key.IsPodDrained(currentPod)
 		if err != nil {
 			return microerror.Mask(err)
