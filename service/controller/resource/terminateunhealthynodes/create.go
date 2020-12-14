@@ -83,7 +83,7 @@ func (r *Resource) terminateNode(ctx context.Context, clusterID string, node cor
 		return microerror.Mask(err)
 	}
 
-	r.logger.Debugf(ctx, "terminating unhealhty node %s", node.Name)
+	r.logger.Debugf(ctx, "terminating unhealthy node %s", node.Name)
 	err = r.k8sClient.CoreV1().Pods(clusterID).Delete(ctx, pod.Name, metav1.DeleteOptions{})
 	if err != nil {
 		return err
