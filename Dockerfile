@@ -9,7 +9,7 @@ RUN K8SCCPATH=$(go list -m -f '{{.Path}}' github.com/giantswarm/k8scloudconfig/.
     && K8SCCROOT=$(go list -m -f '{{.Dir}}' github.com/giantswarm/k8scloudconfig/...) \
     && mv $K8SCCROOT /opt/k8scloudconfig
 
-FROM alpine:3.12.2
+FROM alpine:3.12.3
 
 RUN apk add --no-cache ca-certificates
 
