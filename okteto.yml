@@ -1,0 +1,21 @@
+name: kvm-operator
+labels:
+  app: kvm-operator
+  app.kubernetes.io/version: $VERSION
+image: okteto/golang:1
+command:
+  - bash
+workdir: /okteto
+forward:
+  - 2345:2345
+  - 8000:8000
+persistentVolume:
+  enabled: false
+resources:
+  limits:
+    cpu: "2"
+    memory: 2Gi
+securityContext:
+  runAsUser: 0
+  runAsGroup: 1000
+  fsGroup: 1000
