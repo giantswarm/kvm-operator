@@ -52,8 +52,8 @@ These are provisioned using [Hashicorp Vault][5] and are managed by our
 
 ## Remote testing and debugging
 
-Using `okteto`, we can synchronize local files (source files and compiled binaries) with a container in a remote 
-Kubernetes cluster to reduce the feedback loop when adding a feature or investigating a bug. Use the following commands 
+Using `okteto`, we can synchronize local files (source files and compiled binaries) with a container in a remote
+Kubernetes cluster to reduce the feedback loop when adding a feature or investigating a bug. Use the following commands
 to get started.
 
 #### Start okteto
@@ -61,7 +61,7 @@ to get started.
 - Download the latest Okteto release from https://github.com/okteto/okteto/releases.
 - Ensure that `architect` is available in your `$PATH` (https://github.com/giantswarm/architect).
 - Run `make okteto-up`.
-- From this point on, you will be in a remote shell. You can modify files on your local machine, and they will be synced 
+- From this point on, you will be in a remote shell. You can modify files on your local machine, and they will be synced
   to the remote pod container.
 
 #### Build and run operator inside remote container
@@ -71,11 +71,11 @@ to get started.
 
 #### Remote debugging with VS Code or Goland
 
-- Install delve debugger in the remote container `go get github.com/go-delve/delve/cmd/dlv`
-- Start delve server in the remote container `dlv debug --headless --listen=:2345 --log --api-version=2 -- <kvm-operator flags from run command above>`.
+- Install delve debugger in the remote container `cd /tmp && go get github.com/go-delve/delve/cmd/dlv && cd /okteto`
+- Start delve server in the remote container `dlv debug --headless --listen=:2345 --log --api-version=2 -- daemon --config.dirs=/var/run/kvm-operator/configmap/ --config.dirs=/var/run/kvm-operator/secret/ --config.files=config --config.files=dockerhub-secret`.
 - Wait until debug server is up (should see `API server listening at: [::]:2345`).
 - Start the local debugger.
-- If you want to edit the code you will need to stop the debugging session, stop the server, and rebuild.
+- If you make any changes to the source code, you will need to stop the debugging session, stop the server, and rebuild.
 
 #### Clean up
 

@@ -1,4 +1,5 @@
 name: kvm-operator
+namespace: giantswarm
 labels:
   app: kvm-operator
   app.kubernetes.io/version: $VERSION
