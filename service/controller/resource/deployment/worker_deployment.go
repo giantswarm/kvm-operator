@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"fmt"
+
 	"k8s.io/utils/pointer"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
@@ -246,7 +247,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									{
 										Name:      "cloud-config",
 										MountPath: "/var/lib/containervmm/ignition",
-										ReadOnly: true,
+										ReadOnly:  true,
 									},
 									{
 										Name:      "images",
