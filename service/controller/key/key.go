@@ -67,7 +67,7 @@ const (
 	K8SKVMContainerName = "k8s-kvm"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.3.0-f05b094cc0fb53e777aa6e126cb6dacbfc217374"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.3.0-3f0ac46f54ac7fb0a9087e6db575e94a95ec500a"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
