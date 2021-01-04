@@ -130,8 +130,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 					},
 					Spec: corev1.PodSpec{
-						Affinity:    newMasterPodAfinity(customResource),
-						HostNetwork: true,
+						Affinity: newMasterPodAfinity(customResource),
 						NodeSelector: map[string]string{
 							"role": key.MasterID,
 						},
