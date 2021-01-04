@@ -107,8 +107,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 					},
 					Spec: corev1.PodSpec{
-						Affinity:    newWorkerPodAfinity(customResource),
-						HostNetwork: true,
+						Affinity: newWorkerPodAfinity(customResource),
 						NodeSelector: map[string]string{
 							"role": key.WorkerID,
 						},
