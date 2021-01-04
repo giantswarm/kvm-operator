@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"fmt"
+	"k8s.io/utils/pointer"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
@@ -106,11 +107,18 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						TerminationGracePeriodSeconds: &podDeletionGracePeriod,
 						Volumes: []corev1.Volume{
 							{
-								Name: "cloud-config",
+								Name: "ignition",
 								VolumeSource: corev1.VolumeSource{
 									ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{
 											Name: key.ConfigMapName(customResource, workerNode, key.WorkerID),
+										},
+										Items: []corev1.KeyToPath{
+											{
+												Key:  "user_data",
+												Path: "ignition",
+												Mode: pointer.Int32Ptr(0420),
+											},
 										},
 									},
 								},
@@ -130,10 +138,18 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								},
 							},
 							{
-								Name: "flannel",
+								Name: "dev-kvm",
 								VolumeSource: corev1.VolumeSource{
 									HostPath: &corev1.HostPathVolumeSource{
-										Path: key.FlannelEnvPathPrefix,
+										Path: "/dev/kvm",
+									},
+								},
+							},
+							{
+								Name: "dev-net-tun",
+								VolumeSource: corev1.VolumeSource{
+									HostPath: &corev1.HostPathVolumeSource{
+										Path: "/dev/net/tun",
 									},
 								},
 							},
@@ -173,40 +189,9 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								SecurityContext: &corev1.SecurityContext{
 									Privileged: &privileged,
 								},
-								Args: []string{
-									key.WorkerID,
-								},
 								Env: []corev1.EnvVar{
 									{
-										Name:  "CORES",
-										Value: fmt.Sprintf("%d", capabilities.CPUs),
-									},
-									{
-										Name:  "FLATCAR_VERSION",
-										Value: containerDistroVersion,
-									},
-									{
-										Name:  "FLATCAR_CHANNEL",
-										Value: key.FlatcarChannel,
-									},
-									{
-										Name:  "DISK_DOCKER",
-										Value: key.DockerVolumeSizeFromNode(capabilities),
-									},
-									{
-										Name:  "DISK_KUBELET",
-										Value: key.KubeletVolumeSizeFromNode(capabilities),
-									},
-									{
-										Name:  "DISK_OS",
-										Value: key.DefaultOSDiskSize,
-									},
-									{
-										Name:  "DNS_SERVERS",
-										Value: dnsServers,
-									},
-									{
-										Name: "HOSTNAME",
+										Name: "GUEST_NAME",
 										ValueFrom: &corev1.EnvVarSource{
 											FieldRef: &corev1.ObjectFieldSelector{
 												APIVersion: "v1",
@@ -215,29 +200,29 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										},
 									},
 									{
-										Name: "MEMORY",
+										Name: "GUEST_MEMORY",
 										// TODO provide memory like disk as float64 and format here.
 										Value: capabilities.Memory,
 									},
 									{
-										Name:  "NETWORK_BRIDGE_NAME",
-										Value: key.NetworkBridgeName(customResource),
+										Name:  "GUEST_CPUS",
+										Value: fmt.Sprintf("%d", capabilities.CPUs),
 									},
 									{
-										Name:  "NETWORK_TAP_NAME",
-										Value: key.NetworkTapName(customResource),
+										Name:  "GUEST_ROOT_DISK_SIZE",
+										Value: key.DefaultOSDiskSize,
 									},
 									{
-										Name:  "NTP_SERVERS",
-										Value: ntpServers,
+										Name:  "FLATCAR_CHANNEL",
+										Value: key.FlatcarChannel,
 									},
 									{
-										Name:  "ROLE",
-										Value: key.WorkerID,
+										Name:  "FLATCAR_VERSION",
+										Value: containerDistroVersion,
 									},
 									{
-										Name:  "CLOUD_CONFIG_PATH",
-										Value: "/cloudconfig/user_data",
+										Name:  "FLATCAR_IGNITION",
+										Value: "/var/lib/containervmm/ignition",
 									},
 								},
 								Lifecycle: &corev1.Lifecycle{
@@ -247,36 +232,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										},
 									},
 								},
-								LivenessProbe: &corev1.Probe{
-									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
-									TimeoutSeconds:      key.TimeoutSeconds,
-									PeriodSeconds:       key.PeriodSeconds,
-									FailureThreshold:    key.FailureThreshold,
-									SuccessThreshold:    key.SuccessThreshold,
-									Handler: corev1.Handler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
-											Host: key.ProbeHost,
-										},
-									},
-								},
-								ReadinessProbe: &corev1.Probe{
-									InitialDelaySeconds: key.ReadinessProbeInitialDelaySeconds,
-									TimeoutSeconds:      key.TimeoutSeconds,
-									PeriodSeconds:       key.PeriodSeconds,
-									FailureThreshold:    key.FailureThreshold,
-									SuccessThreshold:    key.SuccessThreshold,
-									Handler: corev1.Handler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
-											Host: key.ProbeHost,
-										},
-									},
-								},
 								Resources: corev1.ResourceRequirements{
-									Requests: map[corev1.ResourceName]resource.Quantity{
+									Requests: corev1.ResourceList{
 										corev1.ResourceCPU:    cpuQuantity,
 										corev1.ResourceMemory: memoryQuantity,
 									},
@@ -288,15 +245,24 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								VolumeMounts: []corev1.VolumeMount{
 									{
 										Name:      "cloud-config",
-										MountPath: "/cloudconfig/",
+										MountPath: "/var/lib/containervmm/ignition",
+										ReadOnly: true,
 									},
 									{
 										Name:      "images",
-										MountPath: "/usr/code/images/",
+										MountPath: "/var/lib/containervmm/flatcar",
 									},
 									{
 										Name:      "rootfs",
-										MountPath: "/usr/code/rootfs/",
+										MountPath: "/var/lib/containervmm/rootfs",
+									},
+									{
+										Name:      "dev-kvm",
+										MountPath: "/dev/kvm",
+									},
+									{
+										Name:      "dev-net-tun",
+										MountPath: "/dev/net/tun",
 									},
 								},
 							},
@@ -309,19 +275,9 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										Name:  "LISTEN_ADDRESS",
 										Value: key.HealthListenAddress(customResource),
 									},
-									{
-										Name:  "NETWORK_ENV_FILE_PATH",
-										Value: key.NetworkEnvFilePath(customResource),
-									},
 								},
 								SecurityContext: &corev1.SecurityContext{
 									Privileged: &privileged,
-								},
-								VolumeMounts: []corev1.VolumeMount{
-									{
-										Name:      "flannel",
-										MountPath: key.FlannelEnvPathPrefix,
-									},
 								},
 							},
 							{

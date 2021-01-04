@@ -26,6 +26,7 @@ require (
 	k8s.io/api v0.18.9
 	k8s.io/apimachinery v0.18.9
 	k8s.io/client-go v0.18.9
+	k8s.io/utils v0.0.0-20200619165400-6e3d28b6ed19
 )
 
 // v3.3.10 is required by spf13/viper. Can remove this replace when updated.

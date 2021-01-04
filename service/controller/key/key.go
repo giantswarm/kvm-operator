@@ -59,15 +59,13 @@ const (
 	EnvKeyMyPodName      = "MY_POD_NAME"
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
-	FlannelEnvPathPrefix = "/run/flannel"
-
 	ContainerLinuxComponentName = "containerlinux"
 
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
 	FlatcarChannel  = "stable"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.3.0"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.3.0-f05b094cc0fb53e777aa6e126cb6dacbfc217374"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
@@ -292,10 +290,6 @@ func DockerVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
-}
-
-func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
 }
 
 func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
