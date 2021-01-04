@@ -59,8 +59,6 @@ const (
 	EnvKeyMyPodName      = "MY_POD_NAME"
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
-	FlannelEnvPathPrefix = "/run/flannel"
-
 	ContainerLinuxComponentName = "containerlinux"
 
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
@@ -69,7 +67,7 @@ const (
 	K8SKVMContainerName = "k8s-kvm"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.6.2"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.3.0-f05b094cc0fb53e777aa6e126cb6dacbfc217374"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
@@ -508,14 +506,6 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 
 func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("br-%s", ClusterID(customObject))
-}
-
-func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
-}
-
-func NetworkTapName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("tap-%s", ClusterID(customObject))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {
