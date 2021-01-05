@@ -10,6 +10,9 @@ spec:
     containerPolicies:
     - containerName: {{ .Chart.Name }}
       controlledValues: RequestsAndLimits
+      maxAllowed:
+        cpu: "500m"
+        memory: "500Mi"
       mode: Auto
   targetRef:
     apiVersion: apps/v1
