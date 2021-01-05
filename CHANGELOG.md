@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add vertical pod autoscaler for operator pods
+
 ### Changed
 
 - Do not drain node pods when cluster is being deleted.
