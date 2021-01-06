@@ -36,11 +36,12 @@ type Config struct {
 type Service struct {
 	Version *version.Service
 
-	bootOnce                sync.Once
-	clusterController       *controller.Cluster
-	deleterController       *controller.Deleter
-	drainerController       *controller.Drainer
-	statusResourceCollector *statusresource.CollectorSet
+	bootOnce                          sync.Once
+	clusterController                 *controller.Cluster
+	deleterController                 *controller.Deleter
+	drainerController                 *controller.Drainer
+	unhealthyNodeTerminatorController *controller.UnhealthyNodeTerminator
+	statusResourceCollector           *statusresource.CollectorSet
 }
 
 // New creates a new service with given configuration.
@@ -204,6 +205,22 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var unhealthyNodeTerminatorController *controller.UnhealthyNodeTerminator
+	{
+		c := controller.UnhealthyNodeTerminatorConfig{
+			K8sClient:     k8sClient,
+			Logger:        config.Logger,
+			TenantCluster: tenantCluster,
+
+			ProjectName: project.Name(),
+		}
+
+		unhealthyNodeTerminatorController, err = controller.NewUnhealthyNodeTerminator(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var statusResourceCollector *statusresource.CollectorSet
 	{
 		c := statusresource.CollectorSetConfig{
@@ -237,11 +254,12 @@ func New(config Config) (*Service, error) {
 	newService := &Service{
 		Version: versionService,
 
-		bootOnce:                sync.Once{},
-		clusterController:       clusterController,
-		deleterController:       deleterController,
-		drainerController:       drainerController,
-		statusResourceCollector: statusResourceCollector,
+		bootOnce:                          sync.Once{},
+		clusterController:                 clusterController,
+		deleterController:                 deleterController,
+		drainerController:                 drainerController,
+		unhealthyNodeTerminatorController: unhealthyNodeTerminatorController,
+		statusResourceCollector:           statusResourceCollector,
 	}
 
 	return newService, nil
@@ -259,5 +277,6 @@ func (s *Service) Boot() {
 		go s.clusterController.Boot(context.Background())
 		go s.deleterController.Boot(context.Background())
 		go s.drainerController.Boot(context.Background())
+		go s.unhealthyNodeTerminatorController.Boot(context.Background())
 	})
 }

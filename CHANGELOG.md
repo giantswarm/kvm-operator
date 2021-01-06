@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Automatically delete TC node pods when NotReady for too long
+
 ### Changed
 
 - Do not drain node pods when cluster is being deleted.
