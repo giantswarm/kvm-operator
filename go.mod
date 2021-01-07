@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/giantswarm/apiextensions/v3 v3.13.0
+	github.com/giantswarm/badnodedetector v1.0.1
 	github.com/giantswarm/certs/v3 v3.1.0
 	github.com/giantswarm/errors v0.2.3
 	github.com/giantswarm/k8sclient/v5 v5.0.0
@@ -26,6 +27,7 @@ require (
 	k8s.io/api v0.18.9
 	k8s.io/apimachinery v0.18.9
 	k8s.io/client-go v0.18.9
+	sigs.k8s.io/controller-runtime v0.6.3
 )
 
 // v3.3.10 is required by spf13/viper. Can remove this replace when updated.

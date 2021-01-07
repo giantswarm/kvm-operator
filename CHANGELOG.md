@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add vertical pod autoscaler for operator pods
+- Automatically delete TC node pods when NotReady for too long
 
 ### Changed
 
