@@ -12,7 +12,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 	"github.com/giantswarm/kvm-operator/v4/pkg/project"
@@ -238,13 +237,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										Value: "/var/lib/containervmm/ignition",
 									},
 								},
-								Lifecycle: &corev1.Lifecycle{
-									PreStop: &corev1.Handler{
-										Exec: &corev1.ExecAction{
-											Command: []string{"/qemu-shutdown", key.ShutdownDeferrerPollPath(customResource)},
-										},
-									},
-								},
 								Resources: corev1.ResourceRequirements{
 									Requests: corev1.ResourceList{
 										corev1.ResourceCPU:    cpuQuantity,
@@ -276,68 +268,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									{
 										Name:      "dev-net-tun",
 										MountPath: "/dev/net/tun",
-									},
-								},
-							},
-							{
-								Name:            "k8s-kvm-health",
-								Image:           key.K8SKVMHealthDocker,
-								ImagePullPolicy: corev1.PullAlways,
-								Env: []corev1.EnvVar{
-									{
-										Name:  "LISTEN_ADDRESS",
-										Value: key.HealthListenAddress(customResource),
-									},
-								},
-								SecurityContext: &corev1.SecurityContext{
-									Privileged: &privileged,
-								},
-							},
-							{
-								Name:            "shutdown-deferrer",
-								Image:           key.ShutdownDeferrerDocker,
-								ImagePullPolicy: corev1.PullAlways,
-								Args: []string{
-									"daemon",
-									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customResource),
-								},
-								Env: []corev1.EnvVar{
-									{
-										Name: key.EnvKeyMyPodName,
-										ValueFrom: &corev1.EnvVarSource{
-											FieldRef: &corev1.ObjectFieldSelector{
-												FieldPath: "metadata.name",
-											},
-										},
-									},
-									{
-										Name: key.EnvKeyMyPodNamespace,
-										ValueFrom: &corev1.EnvVarSource{
-											FieldRef: &corev1.ObjectFieldSelector{
-												FieldPath: "metadata.namespace",
-											},
-										},
-									},
-								},
-								Lifecycle: &corev1.Lifecycle{
-									PreStop: &corev1.Handler{
-										Exec: &corev1.ExecAction{
-											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(customResource)},
-										},
-									},
-								},
-								LivenessProbe: &corev1.Probe{
-									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
-									TimeoutSeconds:      key.TimeoutSeconds,
-									PeriodSeconds:       key.PeriodSeconds,
-									FailureThreshold:    key.FailureThreshold,
-									SuccessThreshold:    key.SuccessThreshold,
-									Handler: corev1.Handler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: key.HealthEndpoint,
-											Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(customResource))},
-											Host: key.ProbeHost,
-										},
 									},
 								},
 							},
