@@ -3,8 +3,6 @@ package deployment
 import (
 	"fmt"
 
-	"k8s.io/utils/pointer"
-
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -119,20 +117,19 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 						Volumes: []corev1.Volume{
 							{
-								Name: "ignition",
+								Name: "ignition-cm",
 								VolumeSource: corev1.VolumeSource{
 									ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{
 											Name: key.ConfigMapName(customResource, workerNode, key.WorkerID),
 										},
-										Items: []corev1.KeyToPath{
-											{
-												Key:  "user_data",
-												Path: "ignition",
-												Mode: pointer.Int32Ptr(0420),
-											},
-										},
 									},
+								},
+							},
+							{
+								Name: "ignition",
+								VolumeSource: corev1.VolumeSource{
+									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
 							},
 							{
@@ -200,6 +197,11 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								ImagePullPolicy: corev1.PullIfNotPresent,
 								SecurityContext: &corev1.SecurityContext{
 									Privileged: &privileged,
+									Capabilities: &corev1.Capabilities{
+										Add: []corev1.Capability{
+											"NET_ADMIN",
+										},
+									},
 								},
 								Env: []corev1.EnvVar{
 									{
@@ -234,7 +236,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									},
 									{
 										Name:  "FLATCAR_IGNITION",
-										Value: "/var/lib/containervmm/ignition",
+										Value: "/var/lib/containervmm/ignition/ignition",
 									},
 								},
 								Resources: corev1.ResourceRequirements{
@@ -249,9 +251,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								},
 								VolumeMounts: []corev1.VolumeMount{
 									{
-										Name:      "cloud-config",
+										Name:      "ignition",
 										MountPath: "/var/lib/containervmm/ignition",
-										ReadOnly:  true,
 									},
 									{
 										Name:      "images",
@@ -268,6 +269,28 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									{
 										Name:      "dev-net-tun",
 										MountPath: "/dev/net/tun",
+									},
+								},
+							},
+						},
+						InitContainers: []corev1.Container{
+							{
+								Name:            "k8s-kvm",
+								Image:           key.K8SKVMDockerImage,
+								Command: []string{
+									"cp",
+									"/tmp/ignition/user_data",
+									"/var/lib/containervmm/ignition/ignition",
+								},
+								ImagePullPolicy: corev1.PullIfNotPresent,
+								VolumeMounts: []corev1.VolumeMount{
+									{
+										Name:      "ignition",
+										MountPath: "/var/lib/containervmm/ignition",
+									},
+									{
+										Name:      "ignition-cm",
+										MountPath: "/tmp/ignition",
 									},
 								},
 							},
