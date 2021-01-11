@@ -271,7 +271,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 						InitContainers: []corev1.Container{
 							{
-								Name:  "k8s-kvm",
+								Name:  "ignition",
 								Image: key.K8SKVMDockerImage,
 								Command: []string{
 									"cp",
