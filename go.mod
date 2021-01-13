@@ -13,7 +13,7 @@ require (
 	github.com/giantswarm/microerror v0.3.0
 	github.com/giantswarm/microkit v0.2.2
 	github.com/giantswarm/micrologger v0.4.0
-	github.com/giantswarm/operatorkit/v4 v4.0.0
+	github.com/giantswarm/operatorkit/v4 v4.2.0
 	github.com/giantswarm/randomkeys/v2 v2.0.0
 	github.com/giantswarm/statusresource/v3 v3.0.0
 	github.com/giantswarm/tenantcluster/v4 v4.0.0
@@ -23,11 +23,10 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
-	gopkg.in/ini.v1 v1.51.1 // indirect
 	k8s.io/api v0.18.9
 	k8s.io/apimachinery v0.18.9
 	k8s.io/client-go v0.18.9
-	sigs.k8s.io/controller-runtime v0.6.3
+	sigs.k8s.io/controller-runtime v0.6.4
 )
 
 // v3.3.10 is required by spf13/viper. Can remove this replace when updated.
