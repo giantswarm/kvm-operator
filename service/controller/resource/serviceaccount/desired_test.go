@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
@@ -16,8 +17,8 @@ func Test_Resource_ServiceAccount_GetDesiredState(t *testing.T) {
 		ExpectedName string
 	}{
 		{
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
+			Obj: &v1alpha2.KVMCluster{
+				Spec: v1alpha2.KVMClusterSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},
@@ -26,8 +27,8 @@ func Test_Resource_ServiceAccount_GetDesiredState(t *testing.T) {
 			ExpectedName: "al9qy",
 		},
 		{
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
+			Obj: &v1alpha2.KVMCluster{
+				Spec: v1alpha2.KVMClusterSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "my-cluster",
 					},

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
@@ -14,7 +15,7 @@ import (
 
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConfig, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha2.KVMCluster, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
 	var extension *masterExtension
 	{
 		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(cr), masterCertFiles)
@@ -22,9 +23,9 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 			return "", microerror.Mask(err)
 		}
 		extension = &masterExtension{
-			certs:        certFiles,
-			customObject: cr,
-			nodeIndex:    nodeIndex,
+			certs:     certFiles,
+			cr:        cr,
+			nodeIndex: nodeIndex,
 		}
 	}
 
@@ -84,9 +85,9 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 }
 
 type masterExtension struct {
-	certs        []certs.File
-	customObject v1alpha1.KVMConfig
-	nodeIndex    int
+	certs     []certs.File
+	cr        v1alpha2.KVMCluster
+	nodeIndex int
 }
 
 func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
@@ -110,7 +111,7 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 
 	iscsiInitiatorFile := k8scloudconfig.FileMetadata{
-		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.customObject, e.nodeIndex, key.MasterID)),
+		AssetContent: fmt.Sprintf("InitiatorName=%s", key.IscsiInitiatorName(e.cr, e.nodeIndex, key.MasterID)),
 		Path:         IscsiInitiatorNameFilePath,
 		Owner: k8scloudconfig.Owner{
 			User: k8scloudconfig.User{

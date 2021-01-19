@@ -15,7 +15,7 @@ import (
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -26,8 +26,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
-		i := key.ClusterID(customObject)
-		e := key.ClusterAPIEndpoint(customObject)
+		i := key.ClusterID(cr)
+		e := key.ClusterAPIEndpoint(cr)
 
 		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
 		if tenantcluster.IsTimeout(err) {
@@ -79,7 +79,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// against the tenant cluster nodes below.
 	var pods []corev1.Pod
 	{
-		n := key.ClusterID(customObject)
+		n := key.ClusterID(cr)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return microerror.Mask(err)

@@ -1,7 +1,7 @@
 package ingress
 
 import (
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	networkingv1beta1 "k8s.io/api/networking/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func newAPIIngress(customObject v1alpha1.KVMConfig) *networkingv1beta1.Ingress {
+func newAPIIngress(cr v1alpha2.KVMCluster) *networkingv1beta1.Ingress {
 	ingress := &networkingv1beta1.Ingress{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Ingress",
@@ -18,8 +18,8 @@ func newAPIIngress(customObject v1alpha1.KVMConfig) *networkingv1beta1.Ingress {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: APIID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(customObject),
-				"customer": key.ClusterCustomer(customObject),
+				"cluster":  key.ClusterID(cr),
+				"customer": key.ClusterCustomer(cr),
 				"app":      key.MasterID,
 			},
 			Annotations: map[string]string{
@@ -30,13 +30,13 @@ func newAPIIngress(customObject v1alpha1.KVMConfig) *networkingv1beta1.Ingress {
 			TLS: []networkingv1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						customObject.Spec.Cluster.Kubernetes.API.Domain,
+						cr.Spec.Cluster.Kubernetes.API.Domain,
 					},
 				},
 			},
 			Rules: []networkingv1beta1.IngressRule{
 				{
-					Host: customObject.Spec.Cluster.Kubernetes.API.Domain,
+					Host: cr.Spec.Cluster.Kubernetes.API.Domain,
 					IngressRuleValue: networkingv1beta1.IngressRuleValue{
 						HTTP: &networkingv1beta1.HTTPIngressRuleValue{
 							Paths: []networkingv1beta1.HTTPIngressPath{
@@ -44,7 +44,7 @@ func newAPIIngress(customObject v1alpha1.KVMConfig) *networkingv1beta1.Ingress {
 									Path: "/",
 									Backend: networkingv1beta1.IngressBackend{
 										ServiceName: key.MasterID,
-										ServicePort: intstr.FromInt(customObject.Spec.Cluster.Kubernetes.API.SecurePort),
+										ServicePort: intstr.FromInt(cr.Spec.Cluster.Kubernetes.API.SecurePort),
 									},
 								},
 							},

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
@@ -18,6 +19,7 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
 
@@ -155,12 +157,12 @@ func AllocatedNodeIndexes(cr v1alpha1.KVMConfig) []int {
 	return results
 }
 
-func BaseDomain(customObject v1alpha1.KVMConfig) string {
-	return strings.TrimPrefix(customObject.Spec.Cluster.Kubernetes.API.Domain, "api.")
+func BaseDomain(cr v1alpha2.KVMCluster) string {
+	return strings.TrimPrefix(cr.Spec.Cluster.Kubernetes.API.Domain, "api.")
 }
 
-func ClusterAPIEndpoint(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.Cluster.Kubernetes.API.Domain
+func ClusterAPIEndpoint(cr v1alpha2.KVMCluster) string {
+	return cr.Spec.Cluster.Kubernetes.API.Domain
 }
 
 func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {
@@ -175,44 +177,35 @@ func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {
 	return apiEndpoint, nil
 }
 
-func ClusterCustomer(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.Cluster.Customer.ID
+func ClusterCustomer(cr v1alpha2.KVMCluster) string {
+	return cr.Spec.Cluster.Customer.ID
 }
 
-func ClusterEtcdDomain(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s:%d", customObject.Spec.Cluster.Etcd.Domain, EtcdPort)
+func ClusterEtcdDomain(cr v1alpha2.KVMCluster) string {
+	return fmt.Sprintf("%s:%d", cr.Spec.Cluster.Etcd.Domain, EtcdPort)
 }
 
-func ClusterID(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.Cluster.ID
+func ClusterID(cr v1alpha2.KVMCluster) string {
+	return cr.Spec.Cluster.ID
 }
 
-func ClusterIDFromPod(pod *corev1.Pod) string {
-	l, ok := pod.Labels["cluster"]
-	if ok {
-		return l
-	}
-
-	return "n/a"
+func ClusterNamespace(cr v1alpha2.KVMCluster) string {
+	return ClusterID(cr)
 }
 
-func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
-	return ClusterID(customObject)
+func ClusterRoleBindingName(cr v1alpha2.KVMCluster) string {
+	return ClusterID(cr)
 }
 
-func ClusterRoleBindingName(customObject v1alpha1.KVMConfig) string {
-	return ClusterID(customObject)
+func ClusterRoleBindingPSPName(cr v1alpha2.KVMCluster) string {
+	return ClusterID(cr) + "-psp"
 }
 
-func ClusterRoleBindingPSPName(customObject v1alpha1.KVMConfig) string {
-	return ClusterID(customObject) + "-psp"
-}
-
-func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix string) string {
+func ConfigMapName(cr v1alpha2.KVMCluster, node v1alpha1.ClusterNode, prefix string) string {
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
 }
 
-func ContainerDistro(release *releasev1alpha1.Release) (string, error) {
+func ContainerDistro(release releasev1alpha1.Release) (string, error) {
 	for _, component := range release.Spec.Components {
 		if component.Name == ContainerLinuxComponentName {
 			return component.Version, nil
@@ -222,7 +215,7 @@ func ContainerDistro(release *releasev1alpha1.Release) (string, error) {
 	return "", microerror.Mask(missingVersionError)
 }
 
-func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
+func CPUQuantity(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, error) {
 	cpu := strconv.Itoa(n.CPUs)
 	q, err := resource.ParseQuantity(cpu)
 	if err != nil {
@@ -233,18 +226,13 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 
 // CreateK8sClientForTenantCluster takes the context of the reconciled object
 // and the provided logger and tenant cluster interface and creates a K8s client for the tenant cluster
-func CreateK8sClientForTenantCluster(ctx context.Context, obj interface{}, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (kubernetes.Interface, error) {
+func CreateK8sClientForTenantCluster(ctx context.Context, cr v1alpha2.KVMCluster, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (kubernetes.Interface, error) {
 
 	// Create a client for the reconciled tenant cluster
 	var tcK8sClient kubernetes.Interface
 	{
-		customObject, err := ToCustomObject(obj)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		i := ClusterID(customObject)
-		e := ClusterAPIEndpoint(customObject)
+		i := ClusterID(cr)
+		e := ClusterAPIEndpoint(cr)
 
 		restConfig, err := tenantCluster.NewRestConfig(ctx, i, e)
 		if err != nil {
@@ -276,36 +264,16 @@ func DefaultVersions() k8scloudconfig.Versions {
 	}
 }
 
-func DockerVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
-	if node.DockerVolumeSizeGB != 0 {
-		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
-	}
-
-	if node.Disk.Value != 0 {
-		return fmt.Sprintf("%sG", strconv.FormatFloat(node.Disk.Value, 'f', 0, 64))
-	}
-
-	return DefaultDockerDiskSize
-}
-
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
-func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
-	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
+func IscsiInitiatorName(cr v1alpha2.KVMCluster, nodeIndex int, nodeRole string) string {
+	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(cr), nodeRole, nodeIndex)
 }
 
-func IscsiInitiatorName(customObject v1alpha1.KVMConfig, nodeIndex int, nodeRole string) string {
-	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(customObject), nodeRole, nodeIndex)
-}
-
-func IsDeleted(customObject v1alpha1.KVMConfig) bool {
-	return customObject.GetDeletionTimestamp() != nil
-}
-
-func IsPodDeleted(pod *corev1.Pod) bool {
-	return pod.GetDeletionTimestamp() != nil
+func IsDeleted(cr v1.Object) bool {
+	return cr.GetDeletionTimestamp() != nil
 }
 
 // IsPodDrained checks whether the pod status indicates it got drained. The pod
@@ -334,21 +302,6 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 	return b, nil
 }
 
-func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
-	// TODO: https://github.com/giantswarm/giantswarm/issues/4105#issuecomment-421772917
-	// TODO: for now we use same value as for DockerVolumeSizeFromNode, when we have kubelet size in spec we should use that.
-
-	if node.DockerVolumeSizeGB != 0 {
-		return fmt.Sprintf("%dG", node.DockerVolumeSizeGB)
-	}
-
-	if node.Disk.Value != 0 {
-		return fmt.Sprintf("%sG", strconv.FormatFloat(node.Disk.Value, 'f', 0, 64))
-	}
-
-	return DefaultKubeletDiskSize
-}
-
 // ArePodContainersTerminated checks ContainerState for all containers present
 // in given pod. When all containers are in Terminated state, true is returned.
 func ArePodContainersTerminated(pod *corev1.Pod) bool {
@@ -361,12 +314,12 @@ func ArePodContainersTerminated(pod *corev1.Pod) bool {
 	return true
 }
 
-func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
-	return int32(livenessPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
+func LivenessPort(cr v1alpha2.KVMCluster) int32 {
+	return int32(livenessPortBase + cr.Spec.KVM.Network.Flannel.VNI)
 }
 
-func MasterCount(customObject v1alpha1.KVMConfig) int {
-	return len(customObject.Spec.KVM.Masters)
+func MasterCount(cr v1alpha2.KVMCluster) int {
+	return len(cr.Spec.KVM.Masters)
 }
 
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
@@ -375,7 +328,7 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 
 // MemoryQuantity returns a resource.Quantity that represents the memory to be used by the nodes.
 // It adds the memory from the node definition parameter to the additional memory calculated on the node role
-func MemoryQuantityMaster(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
+func MemoryQuantityMaster(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, error) {
 	q, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
 		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from node definition: %s", err)
@@ -392,7 +345,7 @@ func MemoryQuantityMaster(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 
 // MemoryQuantity returns a resource.Quantity that represents the memory to be used by the nodes.
 // It adds the memory from the node definition parameter to the additional memory calculated on the node role
-func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
+func MemoryQuantityWorker(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, error) {
 	mQuantity, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
 		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error calculating memory overhead multiplier: %s", err)
@@ -434,12 +387,12 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	return q, nil
 }
 
-func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("br-%s", ClusterID(customObject))
+func NetworkBridgeName(cr v1alpha2.KVMCluster) string {
+	return fmt.Sprintf("br-%s", ClusterID(cr))
 }
 
-func NetworkTapName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("tap-%s", ClusterID(customObject))
+func NetworkTapName(cr v1alpha2.KVMCluster) string {
+	return fmt.Sprintf("tap-%s", ClusterID(cr))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {
@@ -482,7 +435,7 @@ func NodeIsUnschedulable(node corev1.Node) bool {
 	return false
 }
 
-func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
+func NodeIndex(cr v1alpha2.KVMCluster, nodeID string) (int, bool) {
 	idx, present := cr.Status.KVM.NodeIndexes[nodeID]
 	return idx, present
 }
@@ -498,7 +451,7 @@ func NodeInternalIP(node corev1.Node) (string, error) {
 	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP adress in its status", node.Name)
 }
 
-func OperatorVersion(cr v1alpha1.KVMConfig) string {
+func OperatorVersion(cr v1alpha2.KVMCluster) string {
 	return cr.GetLabels()[label.OperatorVersion]
 }
 
@@ -514,11 +467,11 @@ func PodIsReady(pod corev1.Pod) bool {
 	return podReady
 }
 
-func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
+func PortMappings(cr v1alpha2.KVMCluster) []corev1.ServicePort {
 	var ports []corev1.ServicePort
 
 	// Compatibility mode, if no port mappings specified.
-	if len(customObject.Spec.KVM.PortMappings) == 0 {
+	if len(cr.Spec.KVM.PortMappings) == 0 {
 		ports := []corev1.ServicePort{
 			{
 				Name:       "http",
@@ -534,7 +487,7 @@ func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 		return ports
 	}
 
-	for _, p := range customObject.Spec.KVM.PortMappings {
+	for _, p := range cr.Spec.KVM.PortMappings {
 		port := corev1.ServicePort{
 			Name:       p.Name,
 			NodePort:   int32(p.NodePort),
@@ -547,95 +500,115 @@ func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	return ports
 }
 
-func PVCNames(customObject v1alpha1.KVMConfig) []string {
+func PVCNames(cr v1alpha2.KVMCluster) []string {
 	var names []string
 
-	for i := range customObject.Spec.Cluster.Masters {
-		names = append(names, EtcdPVCName(ClusterID(customObject), VMNumber(i)))
+	for i := range cr.Spec.Cluster.Masters {
+		names = append(names, EtcdPVCName(ClusterID(cr), VMNumber(i)))
 	}
 
 	return names
 }
 
-func ReleaseVersion(cr v1alpha1.KVMConfig) string {
+func ReleaseVersion(cr v1alpha2.KVMCluster) string {
 	return cr.GetLabels()[label.ReleaseVersion]
 }
 
-func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
-	return ClusterID(customObject)
+func ServiceAccountName(cr v1alpha2.KVMCluster) string {
+	return ClusterID(cr)
 }
 
-func ShutdownDeferrerListenPort(customObject v1alpha1.KVMConfig) int {
-	return int(shutdownDeferrerPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
+func ShutdownDeferrerListenPort(cr v1alpha2.KVMCluster) int {
+	return int(shutdownDeferrerPortBase + cr.Spec.KVM.Network.Flannel.VNI)
 }
 
-func ShutdownDeferrerListenAddress(customObject v1alpha1.KVMConfig) string {
-	return "http://" + ProbeHost + ":" + strconv.Itoa(ShutdownDeferrerListenPort(customObject))
+func ShutdownDeferrerListenAddress(cr v1alpha2.KVMCluster) string {
+	return "http://" + ProbeHost + ":" + strconv.Itoa(ShutdownDeferrerListenPort(cr))
 }
 
-func ShutdownDeferrerPollPath(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s/v1/defer/", ShutdownDeferrerListenAddress(customObject))
+func ShutdownDeferrerPollPath(cr v1alpha2.KVMCluster) string {
+	return fmt.Sprintf("%s/v1/defer/", ShutdownDeferrerListenAddress(cr))
 }
 
-func StorageType(customObject v1alpha1.KVMConfig) string {
-	return customObject.Spec.KVM.K8sKVM.StorageType
+func StorageType(cr v1alpha2.KVMCluster) string {
+	return cr.Spec.KVM.K8sKVM.StorageType
 }
 
 func ToClusterEndpoint(v interface{}) (string, error) {
-	customObject, err := ToCustomObject(v)
+	cr, err := ToKVMCluster(v)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
 
-	return ClusterAPIEndpoint(customObject), nil
+	return ClusterAPIEndpoint(cr), nil
 }
 
 func ToClusterID(v interface{}) (string, error) {
-	customObject, err := ToCustomObject(v)
+	cr, err := ToKVMCluster(v)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
 
-	return ClusterID(customObject), nil
+	return ClusterID(cr), nil
 }
 
 func ToClusterStatus(v interface{}) (v1alpha1.StatusCluster, error) {
-	customObject, err := ToCustomObject(v)
+	cr, err := ToKVMCluster(v)
 	if err != nil {
 		return v1alpha1.StatusCluster{}, microerror.Mask(err)
 	}
 
-	return customObject.Status.Cluster, nil
+	return cr.Status.Cluster, nil
 }
 
-func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
-	customObjectPointer, ok := v.(*v1alpha1.KVMConfig)
+func ToKVMConfig(v interface{}) (v1alpha1.KVMConfig, error) {
+	crPointer, ok := v.(*v1alpha1.KVMConfig)
 	if !ok {
 		return v1alpha1.KVMConfig{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.KVMConfig{}, v)
 	}
-	customObject := *customObjectPointer
+	cr := *crPointer
 
-	return customObject, nil
+	return cr, nil
+}
+
+func ToKVMCluster(v interface{}) (v1alpha2.KVMCluster, error) {
+	crPointer, ok := v.(*v1alpha2.KVMCluster)
+	if !ok {
+		return v1alpha2.KVMCluster{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha2.KVMCluster{}, v)
+	}
+	cr := *crPointer
+
+	return cr, nil
+}
+
+func ToKVMMachine(v interface{}) (v1alpha2.KVMMachine, error) {
+	crPointer, ok := v.(*v1alpha2.KVMMachine)
+	if !ok {
+		return v1alpha2.KVMMachine{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha2.KVMMachine{}, v)
+	}
+	cr := *crPointer
+
+	return cr, nil
 }
 
 func ToNodeCount(v interface{}) (int, error) {
-	customObject, err := ToCustomObject(v)
+	cr, err := ToKVMCluster(v)
 	if err != nil {
 		return 0, microerror.Mask(err)
 	}
 
-	nodeCount := MasterCount(customObject) + WorkerCount(customObject)
+	nodeCount := MasterCount(cr) + WorkerCount(cr)
 
 	return nodeCount, nil
 }
 
 func ToOperatorVersion(v interface{}) (string, error) {
-	customObject, err := ToCustomObject(v)
+	cr, err := ToKVMCluster(v)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
 
-	return OperatorVersion(customObject), nil
+	return OperatorVersion(cr), nil
 }
 
 func ToPod(v interface{}) (*corev1.Pod, error) {
@@ -655,6 +628,6 @@ func VMNumber(ID int) string {
 	return fmt.Sprintf("%d", ID)
 }
 
-func WorkerCount(customObject v1alpha1.KVMConfig) int {
-	return len(customObject.Spec.KVM.Workers)
+func WorkerCount(cr v1alpha2.KVMCluster) int {
+	return len(cr.Spec.KVM.Workers)
 }

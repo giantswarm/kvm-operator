@@ -10,17 +10,17 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	var PVCs []*corev1.PersistentVolumeClaim
 
-	if key.StorageType(customObject) == "persistentVolume" {
+	if key.StorageType(cr) == "persistentVolume" {
 		r.logger.Debugf(ctx, "computing the new PVCs")
 
-		PVCs, err = newEtcdPVCs(customObject)
+		PVCs, err = newEtcdPVCs(cr)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

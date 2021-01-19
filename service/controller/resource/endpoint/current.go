@@ -92,7 +92,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	// Remove master endpoint ip only after pod is fully terminated because we
 	// still need to drain the master before we remove it.
-	if serviceName == key.MasterID && key.IsPodDeleted(pod) {
+	if serviceName == key.MasterID && key.IsDeleted(pod) {
 		r.logger.Debugf(ctx, "finding current version of the reconciled pod in the Kubernetes API")
 
 		currentPod, err := r.k8sClient.CoreV1().Pods(pod.GetNamespace()).Get(ctx, pod.GetName(), metav1.GetOptions{})

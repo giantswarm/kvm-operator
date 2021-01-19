@@ -11,7 +11,7 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -24,11 +24,11 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      key.ServiceAccountName(customObject),
-			Namespace: key.ClusterID(customObject),
+			Name:      key.ServiceAccountName(cr),
+			Namespace: key.ClusterID(cr),
 			Labels: map[string]string{
-				"cluster-id":  key.ClusterID(customObject),
-				"customer-id": key.ClusterCustomer(customObject),
+				"cluster-id":  key.ClusterID(cr),
+				"customer-id": key.ClusterCustomer(cr),
 			},
 		},
 	}

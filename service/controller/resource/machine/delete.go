@@ -1,4 +1,4 @@
-package deployment
+package machine
 
 import (
 	"context"
@@ -18,27 +18,45 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
+	for _, master := range cr.Spec.Cluster.Masters {
+		err = r.ensureMachineDeleted(ctx, cr, key.DeploymentName(key.MasterID, master.ID))
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	for _, worker := range cr.Spec.Cluster.Workers {
+		err = r.ensureMachineDeleted(ctx, cr, key.DeploymentName(key.WorkerID, worker.ID))
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	return nil
+}
+
+func (r *Resource) ensureMachineDeleted(ctx context.Context, cr v1alpha2.KVMCluster, name string) error {
 	{
-		cluster := v1alpha2.KVMCluster{
+		cluster := v1alpha2.KVMMachine{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      key.ClusterID(cr),
+				Name:      name,
 				Namespace: key.ClusterNamespace(cr),
 			},
 		}
-		err = r.ctrlClient.Delete(ctx, &cluster)
+		err := r.ctrlClient.Delete(ctx, &cluster)
 		if err != nil && !apierrors.IsNotFound(err) {
 			return microerror.Mask(err)
 		}
 	}
 
 	{
-		cluster := capiv1alpha3.Cluster{
+		cluster := capiv1alpha3.Machine{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      key.ClusterID(cr),
+				Name:      name,
 				Namespace: key.ClusterNamespace(cr),
 			},
 		}
-		err = r.ctrlClient.Delete(ctx, &cluster)
+		err := r.ctrlClient.Delete(ctx, &cluster)
 		if err != nil && !apierrors.IsNotFound(err) {
 			return microerror.Mask(err)
 		}

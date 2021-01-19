@@ -1,15 +1,11 @@
 package controller
 
 import (
-	"time"
-
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -17,27 +13,23 @@ import (
 	"github.com/giantswarm/kvm-operator/pkg/project"
 )
 
-const deleterResyncPeriod = time.Minute * 2
-
-type DeleterConfig struct {
-	CertsSearcher certs.Interface
-	K8sClient     k8sclient.Interface
-	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
+type TransitionConfig struct {
+	K8sClient k8sclient.Interface
+	Logger    micrologger.Logger
 }
 
-type Deleter struct {
+type Transition struct {
 	*controller.Controller
 }
 
-func NewDeleter(config DeleterConfig) (*Deleter, error) {
+func NewTransition(config TransitionConfig) (*Transition, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
 	var err error
 
-	resources, err := newDeleterResources(config)
+	resources, err := newTransitionResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -45,18 +37,17 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			K8sClient:    config.K8sClient,
-			Logger:       config.Logger,
-			Resources:    resources,
-			ResyncPeriod: deleterResyncPeriod,
-			Selector: labels.SelectorFromSet(map[string]string{
-				label.OperatorVersion: project.Version(),
-			}),
+			K8sClient: config.K8sClient,
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(v1alpha1.KVMConfig)
 			},
+			Logger:    config.Logger,
+			Resources: resources,
+			Selector: labels.SelectorFromSet(map[string]string{
+				label.OperatorVersion: project.Version(),
+			}),
 
-			Name: project.Name() + "-deleter",
+			Name: project.Name() + "-transition",
 		}
 
 		operatorkitController, err = controller.New(c)
@@ -65,7 +56,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 		}
 	}
 
-	d := &Deleter{
+	d := &Transition{
 		Controller: operatorkitController,
 	}
 

@@ -14,7 +14,7 @@ import (
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -23,7 +23,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	{
 		r.logger.Debugf(ctx, "finding the namespace in the Kubernetes API")
 
-		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(ctx, key.ClusterNamespace(customObject), metav1.GetOptions{})
+		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(ctx, key.ClusterNamespace(cr), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find the namespace in the Kubernetes API")
 			// fall through
@@ -53,7 +53,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, nil
 	}
 
-	if namespace == nil && key.IsDeleted(customObject) {
+	if namespace == nil && key.IsDeleted(&cr) {
 		r.logger.Debugf(ctx, "resource deletion completed")
 
 		r.logger.Debugf(ctx, "canceling resource")
@@ -69,8 +69,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// resources in it. As soon as the draining was done and the pods got removed
 	// we get an empty list here after the delete event got replayed. Then we just
 	// remove the namespace as usual.
-	if key.IsDeleted(customObject) {
-		n := key.ClusterNamespace(customObject)
+	if key.IsDeleted(&cr) {
+		n := key.ClusterNamespace(cr)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)

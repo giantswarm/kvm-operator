@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
@@ -23,29 +23,6 @@ type ClusterConfig struct {
 
 	ClusterRoleGeneral string
 	ClusterRolePSP     string
-	CRDLabelSelector   string
-	DNSServers         string
-	GuestUpdateEnabled bool
-	IgnitionPath       string
-	NTPServers         string
-	OIDC               ClusterConfigOIDC
-	ProjectName        string
-	SSOPublicKey       string
-
-	DockerhubToken  string
-	RegistryDomain  string
-	RegistryMirrors []string
-}
-
-// ClusterConfigOIDC represents the configuration of the OIDC authorization
-// provider.
-type ClusterConfigOIDC struct {
-	ClientID       string
-	IssuerURL      string
-	UsernameClaim  string
-	UsernamePrefix string
-	GroupsClaim    string
-	GroupsPrefix   string
 }
 
 type Cluster struct {
@@ -71,13 +48,13 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 			Logger:    config.Logger,
 			Resources: resources,
 			NewRuntimeObjectFunc: func() runtime.Object {
-				return new(v1alpha1.KVMConfig)
+				return new(v1alpha2.KVMCluster)
 			},
 			Selector: labels.SelectorFromSet(map[string]string{
 				label.OperatorVersion: project.Version(),
 			}),
 
-			Name: config.ProjectName,
+			Name: project.Name(),
 		}
 
 		operatorkitController, err = controller.New(c)

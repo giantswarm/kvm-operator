@@ -119,6 +119,24 @@ rules:
       - "/healthz"
     verbs:
       - get
+  - apiGroups:
+      - cluster.x-k8s.io
+    resources:
+      - clusters
+      - clusters/status
+      - machines
+      - machines/status
+    verbs:
+      - "*"
+  - apiGroups:
+      - infrastructure.giantswarm.io
+    resources:
+      - kvmclusters
+      - kvmclusters/status
+      - kvmmachines
+      - kvmmachines/status
+    verbs:
+      - "*"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

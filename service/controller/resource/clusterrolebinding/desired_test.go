@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1"
@@ -18,8 +19,8 @@ func Test_Resource_ClusterRoleBinding_GetDesiredState(t *testing.T) {
 	}{
 		// Test 1, check it returns a couple of cluster role bindings
 		{
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
+			Obj: &v1alpha2.KVMCluster{
+				Spec: v1alpha2.KVMClusterSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 					},

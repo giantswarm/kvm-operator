@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"time"
-
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
@@ -17,27 +15,46 @@ import (
 	"github.com/giantswarm/kvm-operator/pkg/project"
 )
 
-const deleterResyncPeriod = time.Minute * 2
-
-type DeleterConfig struct {
+type MachineConfig struct {
 	CertsSearcher certs.Interface
 	K8sClient     k8sclient.Interface
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
+
+	DNSServers   string
+	IgnitionPath string
+	NTPServers   string
+	OIDC         MachineConfigOIDC
+	SSOPublicKey string
+
+	DockerhubToken  string
+	RegistryDomain  string
+	RegistryMirrors []string
 }
 
-type Deleter struct {
+// MachineConfigOIDC represents the configuration of the OIDC authorization
+// provider.
+type MachineConfigOIDC struct {
+	ClientID       string
+	IssuerURL      string
+	UsernameClaim  string
+	UsernamePrefix string
+	GroupsClaim    string
+	GroupsPrefix   string
+}
+
+type Machine struct {
 	*controller.Controller
 }
 
-func NewDeleter(config DeleterConfig) (*Deleter, error) {
+func NewMachine(config MachineConfig) (*Machine, error) {
 	if config.K8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
 	var err error
 
-	resources, err := newDeleterResources(config)
+	resources, err := newMachineResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -45,18 +62,17 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 	var operatorkitController *controller.Controller
 	{
 		c := controller.Config{
-			K8sClient:    config.K8sClient,
-			Logger:       config.Logger,
-			Resources:    resources,
-			ResyncPeriod: deleterResyncPeriod,
+			K8sClient: config.K8sClient,
+			NewRuntimeObjectFunc: func() runtime.Object {
+				return new(v1alpha2.KVMMachine)
+			},
+			Logger:    config.Logger,
+			Resources: resources,
 			Selector: labels.SelectorFromSet(map[string]string{
 				label.OperatorVersion: project.Version(),
 			}),
-			NewRuntimeObjectFunc: func() runtime.Object {
-				return new(v1alpha1.KVMConfig)
-			},
 
-			Name: project.Name() + "-deleter",
+			Name: project.Name() + "-machine",
 		}
 
 		operatorkitController, err = controller.New(c)
@@ -65,7 +81,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 		}
 	}
 
-	d := &Deleter{
+	d := &Machine{
 		Controller: operatorkitController,
 	}
 

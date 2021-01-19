@@ -13,7 +13,7 @@ import (
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -25,7 +25,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(pvcsToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the PVCs in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(cr)
 		for _, PVC := range pvcsToDelete {
 			err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Delete(ctx, PVC.Name, metav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {

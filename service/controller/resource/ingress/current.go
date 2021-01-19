@@ -14,7 +14,7 @@ import (
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -23,7 +23,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var ingresses []*v1beta1.Ingress
 
-	namespace := key.ClusterNamespace(customObject)
+	namespace := key.ClusterNamespace(cr)
 	ingressNames := []string{
 		APIID,
 		EtcdID,
@@ -51,8 +51,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// to the tenant cluster API. As soon as the draining was done and the pods
 	// got removed we get an empty list here after the delete event got replayed.
 	// Then we just remove the ingresses as usual.
-	if key.IsDeleted(customObject) {
-		n := key.ClusterNamespace(customObject)
+	if key.IsDeleted(&cr) {
+		n := key.ClusterNamespace(cr)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)

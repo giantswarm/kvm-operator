@@ -10,7 +10,7 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -19,8 +19,8 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 	var services []*corev1.Service
 
-	services = append(services, newMasterService(customObject))
-	services = append(services, newWorkerService(customObject))
+	services = append(services, newMasterService(cr))
+	services = append(services, newWorkerService(cr))
 
 	r.logger.Debugf(ctx, "computed the %d new services", len(services))
 

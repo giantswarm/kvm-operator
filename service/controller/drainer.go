@@ -17,9 +17,6 @@ import (
 type DrainerConfig struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
-
-	CRDLabelSelector string
-	ProjectName      string
 }
 
 type Drainer struct {
@@ -52,7 +49,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 				label.OperatorVersion: project.Version(),
 			}),
 
-			Name: config.ProjectName + "-drainer",
+			Name: project.Name() + "-drainer",
 		}
 
 		operatorkitController, err = controller.New(c)

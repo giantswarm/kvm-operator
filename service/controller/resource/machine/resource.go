@@ -1,26 +1,23 @@
-package deployment
+package machine
 
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
-	Name = "deployment"
+	Name = "machine"
 )
 
 type Config struct {
-	CtrlClient    client.Client
-	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
+	CtrlClient client.Client
+	Logger     micrologger.Logger
 }
 
 type Resource struct {
-	ctrlClient    client.Client
-	logger        micrologger.Logger
-	tenantCluster tenantcluster.Interface
+	ctrlClient client.Client
+	logger     micrologger.Logger
 }
 
 func New(config Config) (*Resource, error) {

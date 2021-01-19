@@ -12,7 +12,7 @@ import (
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -21,8 +21,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var PVCs []*corev1.PersistentVolumeClaim
 
-	namespace := key.ClusterNamespace(customObject)
-	pvcNames := key.PVCNames(customObject)
+	namespace := key.ClusterNamespace(cr)
+	pvcNames := key.PVCNames(cr)
 
 	for _, name := range pvcNames {
 		manifest, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Get(ctx, name, metav1.GetOptions{})

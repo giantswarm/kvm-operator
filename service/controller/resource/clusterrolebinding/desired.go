@@ -3,7 +3,7 @@ package clusterrolebinding
 import (
 	"context"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/microerror"
 	apiv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -12,14 +12,14 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	r.logger.Debugf(ctx, "computing the new cluster role bindings")
 
-	clusterRoleBindings, err := r.newClusterRoleBindings(customObject)
+	clusterRoleBindings, err := r.newClusterRoleBindings(cr)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -29,7 +29,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return clusterRoleBindings, nil
 }
 
-func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*apiv1.ClusterRoleBinding, error) {
+func (r *Resource) newClusterRoleBindings(cr v1alpha2.KVMCluster) ([]*apiv1.ClusterRoleBinding, error) {
 	var clusterRoleBindings []*apiv1.ClusterRoleBinding
 
 	generalClusterRoleBinding := &apiv1.ClusterRoleBinding{
@@ -38,18 +38,18 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 			APIVersion: apiv1.GroupName,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.ClusterRoleBindingName(customObject),
+			Name: key.ClusterRoleBindingName(cr),
 			Labels: map[string]string{
 				"app":                       "kvm-operator",
-				"giantswarm.io/cluster-id":  key.ClusterID(customObject),
-				"giantswarm.io/customer-id": key.ClusterCustomer(customObject),
+				"giantswarm.io/cluster-id":  key.ClusterID(cr),
+				"giantswarm.io/customer-id": key.ClusterCustomer(cr),
 			},
 		},
 		Subjects: []apiv1.Subject{
 			{
 				Kind:      apiv1.ServiceAccountKind,
-				Namespace: key.ClusterID(customObject),
-				Name:      key.ClusterID(customObject),
+				Namespace: key.ClusterID(cr),
+				Name:      key.ClusterID(cr),
 			},
 		},
 		RoleRef: apiv1.RoleRef{
@@ -67,18 +67,18 @@ func (r *Resource) newClusterRoleBindings(customObject v1alpha1.KVMConfig) ([]*a
 			APIVersion: apiv1.GroupName,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.ClusterRoleBindingPSPName(customObject),
+			Name: key.ClusterRoleBindingPSPName(cr),
 			Labels: map[string]string{
 				"app":                       "kvm-operator",
-				"giantswarm.io/cluster-id":  key.ClusterID(customObject),
-				"giantswarm.io/customer-id": key.ClusterCustomer(customObject),
+				"giantswarm.io/cluster-id":  key.ClusterID(cr),
+				"giantswarm.io/customer-id": key.ClusterCustomer(cr),
 			},
 		},
 		Subjects: []apiv1.Subject{
 			{
 				Kind:      apiv1.ServiceAccountKind,
-				Namespace: key.ClusterID(customObject),
-				Name:      key.ClusterID(customObject),
+				Namespace: key.ClusterID(cr),
+				Name:      key.ClusterID(cr),
 			},
 		},
 		RoleRef: apiv1.RoleRef{

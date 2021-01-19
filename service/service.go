@@ -40,6 +40,8 @@ type Service struct {
 	clusterController       *controller.Cluster
 	deleterController       *controller.Deleter
 	drainerController       *controller.Drainer
+	machineController       *controller.Machine
+	transitionController    *controller.Transition
 	statusResourceCollector *statusresource.CollectorSet
 }
 
@@ -142,26 +144,6 @@ func New(config Config) (*Service, error) {
 
 			ClusterRoleGeneral: config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.General),
 			ClusterRolePSP:     config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.PSP),
-			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
-			ProjectName:        project.Name(),
-
-			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
-			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
-			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
-			OIDC: controller.ClusterConfigOIDC{
-				ClientID:       config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
-				IssuerURL:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
-				UsernameClaim:  config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
-				UsernamePrefix: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix),
-				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
-				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
-			},
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
-
-			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
-			RegistryDomain:  config.Viper.GetString(config.Flag.Service.Registry.Domain),
-			RegistryMirrors: config.Viper.GetStringSlice(config.Flag.Service.Registry.Mirrors),
 		}
 
 		clusterController, err = controller.NewCluster(c)
@@ -177,9 +159,6 @@ func New(config Config) (*Service, error) {
 			K8sClient:     k8sClient,
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
-
-			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      project.Name(),
 		}
 
 		deleterController, err = controller.NewDeleter(c)
@@ -193,12 +172,54 @@ func New(config Config) (*Service, error) {
 		c := controller.DrainerConfig{
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
-
-			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      project.Name(),
 		}
 
 		drainerController, err = controller.NewDrainer(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var machineController *controller.Machine
+	{
+		c := controller.MachineConfig{
+			CertsSearcher: certsSearcher,
+			K8sClient:     k8sClient,
+			Logger:        config.Logger,
+			TenantCluster: tenantCluster,
+
+			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
+			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
+			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
+			OIDC: controller.MachineConfigOIDC{
+				ClientID:       config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
+				IssuerURL:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
+				UsernameClaim:  config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
+				UsernamePrefix: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix),
+				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
+				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
+			},
+			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+
+			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
+			RegistryDomain:  config.Viper.GetString(config.Flag.Service.Registry.Domain),
+			RegistryMirrors: config.Viper.GetStringSlice(config.Flag.Service.Registry.Mirrors),
+		}
+
+		machineController, err = controller.NewMachine(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var transitionController *controller.Transition
+	{
+		c := controller.TransitionConfig{
+			K8sClient: k8sClient,
+			Logger:    config.Logger,
+		}
+
+		transitionController, err = controller.NewTransition(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -241,6 +262,8 @@ func New(config Config) (*Service, error) {
 		clusterController:       clusterController,
 		deleterController:       deleterController,
 		drainerController:       drainerController,
+		machineController:       machineController,
+		transitionController:    transitionController,
 		statusResourceCollector: statusResourceCollector,
 	}
 
@@ -259,5 +282,6 @@ func (s *Service) Boot() {
 		go s.clusterController.Boot(context.Background())
 		go s.deleterController.Boot(context.Background())
 		go s.drainerController.Boot(context.Background())
+		go s.machineController.Boot(context.Background())
 	})
 }

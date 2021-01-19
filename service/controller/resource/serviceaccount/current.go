@@ -14,12 +14,12 @@ import (
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	if key.IsDeleted(customObject) {
+	if key.IsDeleted(&cr) {
 		r.logger.Debugf(ctx, "redirecting responsibility of deletion of service accounts to namespace termination")
 		resourcecanceledcontext.SetCanceled(ctx)
 		r.logger.Debugf(ctx, "canceling resource")
@@ -29,9 +29,9 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.Debugf(ctx, "looking for a service account in the Kubernetes API")
 
-	namespace := key.ClusterNamespace(customObject)
+	namespace := key.ClusterNamespace(cr)
 	var currentServiceAccount *corev1.ServiceAccount
-	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(ctx, key.ServiceAccountName(customObject), metav1.GetOptions{})
+	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(ctx, key.ServiceAccountName(cr), metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		r.logger.Debugf(ctx, "did not find the service account in the Kubernetes API")
 		//When service account is not found api still returning non nil value so it can break create/update/delete

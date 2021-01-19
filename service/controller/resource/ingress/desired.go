@@ -10,7 +10,7 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -19,8 +19,8 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 	var ingresses []*v1beta1.Ingress
 
-	ingresses = append(ingresses, newAPIIngress(customObject))
-	ingresses = append(ingresses, newEtcdIngress(customObject))
+	ingresses = append(ingresses, newAPIIngress(cr))
+	ingresses = append(ingresses, newEtcdIngress(cr))
 
 	r.logger.Debugf(ctx, "computed the %d new ingresses", len(ingresses))
 

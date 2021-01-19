@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/api/networking/v1beta1"
@@ -19,8 +20,8 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 		// Test 1 ensures there is one ingress for master and worker each when there
 		// is one master and one worker node in the custom object.
 		{
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
+			Obj: &v1alpha2.KVMCluster{
+				Spec: v1alpha2.KVMClusterSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []v1alpha1.ClusterNode{
@@ -39,8 +40,8 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 		// Test 2 ensures there is one ingress for master and worker each when there
 		// is one master and three worker nodes in the custom object.
 		{
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
+			Obj: &v1alpha2.KVMCluster{
+				Spec: v1alpha2.KVMClusterSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []v1alpha1.ClusterNode{
@@ -61,8 +62,8 @@ func Test_Resource_Ingress_GetDesiredState(t *testing.T) {
 		// Test 3 ensures there is one ingress for master and worker each when there
 		// are three master and three worker nodes in the custom object.
 		{
-			Obj: &v1alpha1.KVMConfig{
-				Spec: v1alpha1.KVMConfigSpec{
+			Obj: &v1alpha2.KVMCluster{
+				Spec: v1alpha2.KVMClusterSpec{
 					Cluster: v1alpha1.Cluster{
 						ID: "al9qy",
 						Masters: []v1alpha1.ClusterNode{

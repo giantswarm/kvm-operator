@@ -15,7 +15,7 @@ import (
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
+	cr, err := key.ToKVMCluster(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -24,7 +24,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
-	k8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
+	k8sClient, err := key.CreateK8sClientForTenantCluster(ctx, cr, r.logger, r.tenantCluster)
 	if tenantcluster.IsTimeout(err) {
 		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
 		r.logger.Debugf(ctx, "waiting for certificates timed out")
@@ -62,7 +62,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// which in turn run the tenant cluster nodes.
 	var pods []corev1.Pod
 	{
-		n := key.ClusterID(customObject)
+		n := key.ClusterID(cr)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return microerror.Mask(err)
@@ -72,7 +72,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	// Check if all k8s-kvm pods in CP are registered as nodes in the TC.
 	if podsEqualNodes(pods, nodes) {
-		n := key.ClusterID(customObject)
+		n := key.ClusterID(cr)
 
 		{
 			masterEndpoint, err := r.k8sClient.CoreV1().Endpoints(n).Get(ctx, key.MasterID, metav1.GetOptions{})

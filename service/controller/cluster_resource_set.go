@@ -7,15 +7,13 @@ import (
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/retryresource"
-	"github.com/giantswarm/randomkeys/v2"
 	"github.com/giantswarm/statusresource/v3"
 
-	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/cluster"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/clusterrolebinding"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/configmap"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/deployment"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/ingress"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/machine"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/namespace"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/nodeindexstatus"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/pvc"
@@ -25,44 +23,6 @@ import (
 
 func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var err error
-
-	var randomkeysSearcher randomkeys.Interface
-	{
-		c := randomkeys.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
-		}
-
-		randomkeysSearcher, err = randomkeys.NewSearcher(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var cloudConfig *cloudconfig.CloudConfig
-	{
-		c := cloudconfig.Config{
-			Logger: config.Logger,
-
-			DockerhubToken: config.DockerhubToken,
-			IgnitionPath:   config.IgnitionPath,
-			OIDC: cloudconfig.OIDCConfig{
-				ClientID:       config.OIDC.ClientID,
-				IssuerURL:      config.OIDC.IssuerURL,
-				UsernameClaim:  config.OIDC.UsernameClaim,
-				UsernamePrefix: config.OIDC.UsernamePrefix,
-				GroupsClaim:    config.OIDC.GroupsClaim,
-				GroupsPrefix:   config.OIDC.GroupsPrefix,
-			},
-			RegistryMirrors: config.RegistryMirrors,
-			SSOPublicKey:    config.SSOPublicKey,
-		}
-
-		cloudConfig, err = cloudconfig.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	var clusterRoleBindingResource resource.Interface
 	{
@@ -103,6 +63,19 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		}
 	}
 
+	var clusterResource resource.Interface
+	{
+		c := cluster.Config{
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
+		}
+
+		clusterResource, err = cluster.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var serviceAccountResource resource.Interface
 	{
 		c := serviceaccount.Config{
@@ -121,47 +94,14 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		}
 	}
 
-	var configMapResource resource.Interface
+	var machineResource resource.Interface
 	{
-		c := configmap.Config{
-			CertsSearcher:  config.CertsSearcher,
-			CloudConfig:    cloudConfig,
-			G8sClient:      config.K8sClient.G8sClient(),
-			K8sClient:      config.K8sClient.K8sClient(),
-			KeyWatcher:     randomkeysSearcher,
-			Logger:         config.Logger,
-			RegistryDomain: config.RegistryDomain,
-			DockerhubToken: config.DockerhubToken,
+		c := machine.Config{
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
-		ops, err := configmap.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		configMapResource, err = toCRUDResource(config.Logger, ops)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var deploymentResource resource.Interface
-	{
-		c := deployment.Config{
-			DNSServers:    config.DNSServers,
-			G8sClient:     config.K8sClient.G8sClient(),
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			NTPServers:    config.NTPServers,
-			TenantCluster: config.TenantCluster,
-		}
-
-		ops, err := deployment.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		deploymentResource, err = toCRUDResource(config.Logger, ops)
+		machineResource, err = machine.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -258,9 +198,9 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		nodeIndexStatusResource,
 		clusterRoleBindingResource,
 		namespaceResource,
+		clusterResource,
 		serviceAccountResource,
-		configMapResource,
-		deploymentResource,
+		machineResource,
 		ingressResource,
 		pvcResource,
 		serviceResource,
