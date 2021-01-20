@@ -3,7 +3,7 @@ package controller
 import (
 	"time"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
@@ -53,7 +53,7 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 				label.OperatorVersion: project.Version(),
 			}),
 			NewRuntimeObjectFunc: func() runtime.Object {
-				return new(v1alpha1.KVMConfig)
+				return new(v1alpha2.KVMCluster)
 			},
 
 			Name: project.Name() + "-deleter",

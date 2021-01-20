@@ -5,7 +5,10 @@ import (
 	"sync"
 	"time"
 
+	v1alpha12 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8srestconfig"
@@ -17,6 +20,7 @@ import (
 	"github.com/giantswarm/versionbundle"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/kvm-operator/flag"
 	"github.com/giantswarm/kvm-operator/pkg/project"
@@ -92,6 +96,10 @@ func New(config Config) (*Service, error) {
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
 				v1alpha1.AddToScheme,
+				v1alpha2.AddToScheme,
+				capiv1alpha3.AddToScheme,
+				v1alpha12.AddToScheme,
+				releasev1alpha1.AddToScheme,
 			},
 			Logger: config.Logger,
 
@@ -140,7 +148,6 @@ func New(config Config) (*Service, error) {
 			CertsSearcher: certsSearcher,
 			K8sClient:     k8sClient,
 			Logger:        config.Logger,
-			TenantCluster: tenantCluster,
 
 			ClusterRoleGeneral: config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.General),
 			ClusterRolePSP:     config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.PSP),
@@ -207,8 +214,9 @@ func New(config Config) (*Service, error) {
 	var transitionController *controller.Transition
 	{
 		c := controller.TransitionConfig{
-			K8sClient: k8sClient,
-			Logger:    config.Logger,
+			K8sClient:     k8sClient,
+			Logger:        config.Logger,
+			TenantCluster: tenantCluster,
 		}
 
 		transitionController, err = controller.NewTransition(c)

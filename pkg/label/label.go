@@ -11,6 +11,7 @@ const (
 	// in the front-end.
 	Organization   = "giantswarm.io/organization"
 	ReleaseVersion = "release.giantswarm.io/version"
+	ControlPlane   = "cluster.x-k8s.io/control-plane"
 )
 
 const (

@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
@@ -45,10 +46,11 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 			APIVersion: "apps/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.DeploymentName(key.WorkerID, machine.Spec.ProviderID),
+			Name:      key.DeploymentName(machine),
+			Namespace: key.ClusterNamespace(&cluster),
 			Annotations: map[string]string{
-				key.ReleaseVersionAnnotation:       key.ReleaseVersion(cluster),
-				key.VersionBundleVersionAnnotation: key.OperatorVersion(cluster),
+				key.ReleaseVersionAnnotation:       key.ReleaseVersion(&cluster),
+				key.VersionBundleVersionAnnotation: key.OperatorVersion(&cluster),
 			},
 			Labels: map[string]string{
 				key.LabelApp:          key.WorkerID,
@@ -57,7 +59,7 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 				key.LabelCluster:      key.ClusterID(&cluster),
 				key.LabelOrganization: key.ClusterCustomer(&cluster),
 				key.LabelManagedBy:    key.OperatorName,
-				"node":                machine.Spec.ProviderID,
+				"node":                strings.TrimPrefix(machine.Spec.ProviderID, "kvm://"),
 			},
 		},
 		Spec: v1.DeploymentSpec{
@@ -65,7 +67,7 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 				MatchLabels: map[string]string{
 					key.LabelApp: key.WorkerID,
 					"cluster":    key.ClusterID(&cluster),
-					"node":       machine.Spec.ProviderID,
+					"node":       strings.TrimPrefix(machine.Spec.ProviderID, "kvm://"),
 				},
 			},
 			Strategy: v1.DeploymentStrategy{
@@ -79,7 +81,7 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 						key.AnnotationIp:            "",
 						key.AnnotationService:       key.WorkerID,
 						key.AnnotationPodDrained:    "False",
-						key.AnnotationVersionBundle: key.OperatorVersion(cluster),
+						key.AnnotationVersionBundle: key.OperatorVersion(&cluster),
 					},
 					Name: key.WorkerID,
 					Labels: map[string]string{
@@ -88,7 +90,7 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 						"customer":            key.ClusterCustomer(&cluster),
 						key.LabelCluster:      key.ClusterID(&cluster),
 						key.LabelOrganization: key.ClusterCustomer(&cluster),
-						"node":                machine.Spec.ProviderID,
+						"node":                strings.TrimPrefix(machine.Spec.ProviderID, "kvm://"),
 						key.PodWatcherLabel:   key.OperatorName,
 						label.OperatorVersion: project.Version(),
 					},
@@ -105,10 +107,8 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 						{
 							Name: "cloud-config",
 							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: key.ConfigMapName(machine, key.WorkerID),
-									},
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: key.ConfigMapName(machine),
 								},
 							},
 						},

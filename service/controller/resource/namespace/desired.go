@@ -11,7 +11,7 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	cr, err := key.ToKVMCluster(obj)
+	cr, err := key.ToKVMConfig(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -21,15 +21,11 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	// Compute the desired state of the namespace to have a reference of data how
 	// it should be.
 	namespace := &corev1.Namespace{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Namespace",
-			APIVersion: "v1",
-		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.ClusterNamespace(&cr),
+			Name: cr.Spec.Cluster.ID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(&cr),
-				"customer": key.ClusterCustomer(&cr),
+				"cluster":  cr.Spec.Cluster.ID,
+				"customer": cr.Spec.Cluster.Customer.ID,
 			},
 		},
 	}

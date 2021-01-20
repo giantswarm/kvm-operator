@@ -24,12 +24,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
-	clusterID := cr.Namespace
 	var kvmCluster v1alpha2.KVMCluster
 	{
 		err := r.ctrlClient.Get(ctx, client.ObjectKey{
-			Namespace: clusterID,
-			Name:      clusterID,
+			Namespace: key.ClusterNamespace(&cr),
+			Name:      key.ClusterID(&cr),
 		}, &kvmCluster)
 		if err != nil {
 			return microerror.Mask(err)
@@ -38,8 +37,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	var existing v1.Deployment
 	err = r.ctrlClient.Get(ctx, client.ObjectKey{
-		Namespace: clusterID,
-		Name:      clusterID,
+		Name:      key.DeploymentName(cr),
+		Namespace: key.ClusterNamespace(&cr),
 	}, &existing)
 	if apierrors.IsNotFound(err) {
 		toCreate, err := r.newDeployment(ctx, kvmCluster, cr)
@@ -77,7 +76,6 @@ func (r *Resource) newDeployment(ctx context.Context, cluster v1alpha2.KVMCluste
 	var release releasev1alpha1.Release
 	{
 		releaseVersion := machine.Labels[label.ReleaseVersion]
-		var release releasev1alpha1.Release
 		err := r.ctrlClient.Get(ctx, client.ObjectKey{
 			Name: fmt.Sprintf("v%s", releaseVersion),
 		}, &release)
@@ -87,8 +85,7 @@ func (r *Resource) newDeployment(ctx context.Context, cluster v1alpha2.KVMCluste
 	}
 
 	var deployment *v1.Deployment
-	role := machine.Spec.ProviderID
-	if role == "master" {
+	if key.Role(&machine) == key.MasterID {
 		var err error
 		deployment, err = newMasterDeployment(machine, cluster, release, 0, r.dnsServers, r.ntpServers)
 		if err != nil {

@@ -3,6 +3,7 @@ package configmap
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
@@ -25,22 +26,21 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
-	clusterID := cr.Namespace
 	var kvmCluster v1alpha2.KVMCluster
 	{
 		err := r.k8sClient.CtrlClient().Get(ctx, client.ObjectKey{
-			Namespace: clusterID,
-			Name:      clusterID,
+			Namespace: key.ClusterNamespace(&cr),
+			Name:      key.ClusterID(&cr),
 		}, &kvmCluster)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
 
-	var existing corev1.ConfigMap
+	var existing corev1.Secret
 	err = r.k8sClient.CtrlClient().Get(ctx, client.ObjectKey{
-		Namespace: clusterID,
-		Name:      clusterID,
+		Namespace: key.ClusterNamespace(&cr),
+		Name:      key.ConfigMapName(cr),
 	}, &existing)
 	if apierrors.IsNotFound(err) {
 		toCreate, err := r.newConfigMap(ctx, kvmCluster, cr)
@@ -58,7 +58,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	return nil
 }
 
-func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster, machine v1alpha2.KVMMachine) (*corev1.ConfigMap, error) {
+func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster, machine v1alpha2.KVMMachine) (*corev1.Secret, error) {
 	clusterID := machine.Namespace
 	keys, err := r.keyWatcher.SearchCluster(ctx, clusterID)
 	if err != nil {
@@ -68,7 +68,6 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 	var release releasev1alpha1.Release
 	{
 		releaseVersion := machine.Labels[label.ReleaseVersion]
-		var release releasev1alpha1.Release
 		err = r.k8sClient.CtrlClient().Get(ctx, client.ObjectKey{
 			Name: fmt.Sprintf("v%s", releaseVersion),
 		}, &release)
@@ -97,14 +96,9 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 		}
 	}
 
-	role := key.WorkerID
-	if machine.Labels["cluster.x-k8s.io/control-plane"] == "true" {
-		role = key.MasterID
-	}
-
-	nodeIdx, exists := key.NodeIndex(cluster, machine.Spec.ProviderID)
+	nodeIdx, exists := key.NodeIndex(cluster, strings.TrimPrefix(machine.Spec.ProviderID, "kvm://"))
 	if !exists {
-		return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for %s (%q) is not available", role, machine.Spec.ProviderID))
+		return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for %s (%q) is not available", key.Role(&machine), strings.TrimPrefix(machine.Spec.ProviderID, "kvm://")))
 	}
 
 	var commonConfig cloudconfig.Config
@@ -120,15 +114,29 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 				UsernameClaim: cluster.Spec.Cluster.OIDC.Claims.Username,
 				GroupsClaim:   cluster.Spec.Cluster.OIDC.Claims.Groups,
 			},
-			DockerhubToken:  r.dockerhubToken,
-			IgnitionPath:    r.ignitionPath,
-			RegistryDomain:  r.registryDomain,
-			RegistryMirrors: r.registryMirrors,
+			APIExtraArgs:              nil,
+			CalicoCIDR:                26,
+			CalicoMTU:                 1500,
+			CalicoSubnet:              "192.168.100.0/24",
+			ClusterIPRange:            "192.168.100.0/24",
+			DockerDaemonCIDR:          "192.168.100.0/24",
+			DockerhubToken:            r.dockerhubToken,
+			ExternalSNAT:              false,
+			IgnitionPath:              r.ignitionPath,
+			ImagePullProgressDeadline: "1m",
+			KubeletExtraArgs:          nil,
+			ClusterDomain:             cluster.Spec.Cluster.DNS.Domain,
+			NetworkSetupDockerImage:   "giantswarm/k8s-setup-network-environment",
+			PodInfraContainerImage:    "giantswarm/pause",
+			RegistryDomain:            r.registryDomain,
+			RegistryMirrors:           r.registryMirrors,
+			SSHUserList:               "thomas:123",
+			SSOPublicKey:              "456",
 		}
 	}
 
 	var template string
-	if role == "master" {
+	if key.Role(&machine) == key.MasterID {
 		config := cloudconfig.MasterConfig{Config: commonConfig}
 		cloudConfig, err := cloudconfig.NewMaster(config)
 		if err != nil {
@@ -150,9 +158,9 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 		}
 	}
 
-	return &corev1.ConfigMap{
+	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      key.ConfigMapName(machine, role),
+			Name:      key.ConfigMapName(machine),
 			Namespace: key.ClusterNamespace(&cluster),
 			Labels: map[string]string{
 				label.Cluster:      key.ClusterID(&cluster),
@@ -160,8 +168,8 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 				label.Organization: key.ClusterCustomer(&cluster),
 			},
 		},
-		Data: map[string]string{
-			KeyUserData: template,
+		Data: map[string][]byte{
+			KeyUserData: []byte(template),
 		},
 	}, nil
 }

@@ -3,7 +3,7 @@ module github.com/giantswarm/kvm-operator
 go 1.14
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.14.2-0.20210120154844-e31fb81b7f18
+	github.com/giantswarm/apiextensions/v3 v3.14.2-0.20210120174623-428874477105
 	github.com/giantswarm/certs/v3 v3.1.0
 	github.com/giantswarm/errors v0.2.3
 	github.com/giantswarm/k8sclient/v5 v5.0.0

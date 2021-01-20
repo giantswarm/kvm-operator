@@ -4,13 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
-
-	"github.com/giantswarm/kvm-operator/pkg/label"
 )
 
 func Test_Resource_Namespace_GetDesiredState(t *testing.T) {
@@ -19,23 +16,21 @@ func Test_Resource_Namespace_GetDesiredState(t *testing.T) {
 		ExpectedName string
 	}{
 		{
-			Obj: &v1alpha2.KVMCluster{
-				ObjectMeta: v1.ObjectMeta{
-					Labels: map[string]string{
-						label.Cluster: "al9qy",
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "al9qy",
 					},
-					Name: "al9qy",
 				},
 			},
 			ExpectedName: "al9qy",
 		},
 		{
-			Obj: &v1alpha2.KVMCluster{
-				ObjectMeta: v1.ObjectMeta{
-					Labels: map[string]string{
-						label.Cluster: "foobar",
+			Obj: &v1alpha1.KVMConfig{
+				Spec: v1alpha1.KVMConfigSpec{
+					Cluster: v1alpha1.Cluster{
+						ID: "foobar",
 					},
-					Name: "al9qy",
 				},
 			},
 			ExpectedName: "foobar",

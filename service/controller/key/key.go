@@ -166,7 +166,7 @@ func AllocatedNodeIndexes(cr v1alpha1.KVMConfig) []int {
 }
 
 func BaseDomain(cr v1alpha2.KVMCluster) string {
-	return cr.Spec.Cluster.DNS.Domain
+	return strings.TrimPrefix(cr.Spec.ControlPlaneEndpoint.Host, "api.")
 }
 
 func ClusterAPIEndpoint(cr v1alpha2.KVMCluster) string {
@@ -190,7 +190,7 @@ func ClusterCustomer(getter LabelsGetter) string {
 }
 
 func ClusterEtcdDomain(cr v1alpha2.KVMCluster) string {
-	return fmt.Sprintf("%s:%d", BaseDomain(cr), EtcdPort)
+	return fmt.Sprintf("etcd.%s", BaseDomain(cr))
 }
 
 func ClusterID(getter LabelsGetter) string {
@@ -213,12 +213,15 @@ func ClusterRoleBindingPSPName(getter LabelsGetter) string {
 	return ClusterID(getter) + "-psp"
 }
 
-func ConfigMapName(machine v1alpha2.KVMMachine, prefix string) string {
-	return fmt.Sprintf("%s-%s-%s", Role(&machine), ClusterID(&machine), machine.Spec.ProviderID)
+func ConfigMapName(machine v1alpha2.KVMMachine) string {
+	return fmt.Sprintf("%s-%s-%s", Role(&machine), ClusterID(&machine), strings.TrimPrefix(machine.Spec.ProviderID, "kvm://"))
 }
 
 func Role(getter LabelsGetter) string {
-	return getter.GetLabels()[label.Cluster]
+	if getter.GetLabels()[label.ControlPlane] == "true" {
+		return MasterID
+	}
+	return WorkerID
 }
 
 func ContainerDistro(release releasev1alpha1.Release) (string, error) {
@@ -269,8 +272,8 @@ func CreateK8sClientForTenantCluster(ctx context.Context, cr v1alpha2.KVMCluster
 	return tcK8sClient, nil
 }
 
-func DeploymentName(prefix string, nodeID string) string {
-	return fmt.Sprintf("%s-%s", prefix, nodeID)
+func DeploymentName(machine v1alpha2.KVMMachine) string {
+	return fmt.Sprintf("%s-%s", Role(&machine), strings.TrimPrefix(machine.Spec.ProviderID, "kvm://"))
 }
 
 func DefaultVersions() k8scloudconfig.Versions {
@@ -369,8 +372,8 @@ func LivenessPort(cr v1alpha2.KVMCluster) int32 {
 	return int32(livenessPortBase + cr.Spec.Provider.FlannelVNI)
 }
 
-func MasterCount(cr v1alpha2.KVMCluster) int {
-	return 1
+func MasterCount(cr v1alpha1.KVMConfig) int {
+	return len(cr.Spec.Cluster.Masters)
 }
 
 func OIDCClientID(cluster v1alpha2.KVMCluster) string {
@@ -515,8 +518,8 @@ func NodeInternalIP(node corev1.Node) (string, error) {
 	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP adress in its status", node.Name)
 }
 
-func OperatorVersion(cr v1alpha2.KVMCluster) string {
-	return cr.GetLabels()[label.OperatorVersion]
+func OperatorVersion(getter LabelsGetter) string {
+	return getter.GetLabels()[label.OperatorVersion]
 }
 
 // PodIsReady examines the Status Conditions of a Pod
@@ -568,8 +571,8 @@ func PVCNames(cr v1alpha2.KVMCluster) []string {
 	return []string{EtcdPVCName(ClusterID(&cr), VMNumber(0))}
 }
 
-func ReleaseVersion(cr v1alpha2.KVMCluster) string {
-	return cr.GetLabels()[label.ReleaseVersion]
+func ReleaseVersion(getter LabelsGetter) string {
+	return getter.GetLabels()[label.ReleaseVersion]
 }
 
 func ServiceAccountName(cr v1alpha2.KVMCluster) string {
@@ -593,21 +596,21 @@ func StorageType(cr v1alpha2.KVMCluster) string {
 }
 
 func ToClusterEndpoint(v interface{}) (string, error) {
-	cr, err := ToKVMCluster(v)
+	cr, err := ToKVMConfig(v)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
 
-	return ClusterAPIEndpoint(cr), nil
+	return cr.Spec.Cluster.Kubernetes.API.Domain, nil
 }
 
 func ToClusterID(v interface{}) (string, error) {
-	cr, err := ToKVMCluster(v)
+	cr, err := ToKVMConfig(v)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
 
-	return ClusterID(&cr), nil
+	return cr.Spec.Cluster.ID, nil
 }
 
 func ToClusterStatus(v interface{}) (v1alpha1.StatusCluster, error) {
@@ -650,7 +653,7 @@ func ToKVMMachine(v interface{}) (v1alpha2.KVMMachine, error) {
 }
 
 func ToNodeCount(v interface{}) (int, error) {
-	cr, err := ToKVMCluster(v)
+	cr, err := ToKVMConfig(v)
 	if err != nil {
 		return 0, microerror.Mask(err)
 	}
@@ -661,12 +664,12 @@ func ToNodeCount(v interface{}) (int, error) {
 }
 
 func ToOperatorVersion(v interface{}) (string, error) {
-	cr, err := ToKVMCluster(v)
+	cr, err := ToKVMConfig(v)
 	if err != nil {
 		return "", microerror.Mask(err)
 	}
 
-	return OperatorVersion(cr), nil
+	return OperatorVersion(&cr), nil
 }
 
 func ToPod(v interface{}) (*corev1.Pod, error) {
@@ -686,6 +689,6 @@ func VMNumber(ID int) string {
 	return fmt.Sprintf("%d", ID)
 }
 
-func WorkerCount(cr v1alpha2.KVMCluster) int {
-	return 2
+func WorkerCount(cr v1alpha1.KVMConfig) int {
+	return len(cr.Spec.Cluster.Workers)
 }

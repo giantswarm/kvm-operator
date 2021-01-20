@@ -2,6 +2,8 @@ package machine
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
 	"github.com/giantswarm/microerror"
@@ -12,6 +14,8 @@ import (
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -39,16 +43,21 @@ func (r *Resource) ensureMachineCreated(ctx context.Context, cluster v1alpha2.KV
 
 	labels := map[string]string{
 		"cluster.x-k8s.io/cluster-name": key.ClusterID(&cluster),
+		label.OperatorVersion:           project.Version(),
+		label.Cluster:                   key.ClusterID(&cluster),
+		label.ManagedBy:                 project.Name(),
+		label.Organization:              key.ClusterCustomer(&cluster),
+		label.ReleaseVersion:            key.ReleaseVersion(&cluster),
 	}
-	if node.Role == "master" {
-		labels["cluster.x-k8s.io/control-plane"] = "true"
+	if node.Role == key.MasterID {
+		labels[label.ControlPlane] = "true"
 	}
 
 	{
-		var cluster capiv1alpha3.Machine
-		err := r.ctrlClient.Get(ctx, machineKey, &cluster)
+		var existing capiv1alpha3.Machine
+		err := r.ctrlClient.Get(ctx, machineKey, &existing)
 		if apierrors.IsNotFound(err) {
-			cluster = capiv1alpha3.Machine{
+			toCreate := capiv1alpha3.Machine{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      machineKey.Name,
 					Namespace: machineKey.Namespace,
@@ -57,18 +66,18 @@ func (r *Resource) ensureMachineCreated(ctx context.Context, cluster v1alpha2.KV
 				Spec: capiv1alpha3.MachineSpec{
 					ClusterName: key.ClusterID(&cluster),
 					Bootstrap: capiv1alpha3.Bootstrap{
-						DataSecretName: nil,
+						DataSecretName: to.StringP(fmt.Sprintf("%s-%s-%s", node.Role, key.ClusterID(&cluster), node.ID)),
 					},
 					InfrastructureRef: corev1.ObjectReference{
 						Kind:      node.InfrastructureRef.Kind,
 						Namespace: key.ClusterNamespace(&cluster),
 						Name:      node.InfrastructureRef.Name,
 					},
-					ProviderID: to.StringP(node.ID),
+					ProviderID: to.StringP(fmt.Sprintf("kvm://%s", node.ID)),
 				},
 				Status: capiv1alpha3.MachineStatus{},
 			}
-			err = r.ctrlClient.Create(ctx, &cluster)
+			err = r.ctrlClient.Create(ctx, &toCreate)
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -78,26 +87,35 @@ func (r *Resource) ensureMachineCreated(ctx context.Context, cluster v1alpha2.KV
 	}
 
 	{
-		var kvmMachine v1alpha2.KVMMachine
-		err := r.ctrlClient.Get(ctx, machineKey, &kvmMachine)
+		var existing v1alpha2.KVMMachine
+		err := r.ctrlClient.Get(ctx, machineKey, &existing)
 		if apierrors.IsNotFound(err) {
-			kvmMachine = v1alpha2.KVMMachine{
+			toCreate := v1alpha2.KVMMachine{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      machineKey.Name,
 					Namespace: machineKey.Namespace,
 					Labels:    labels,
 				},
 				Spec: v1alpha2.KVMMachineSpec{
-					ProviderID: node.ID,
+					ProviderID: fmt.Sprintf("kvm://%s", node.ID),
 					Size:       node.Size,
 				},
 			}
-			err = r.ctrlClient.Create(ctx, &kvmMachine)
+			err = r.ctrlClient.Create(ctx, &toCreate)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		} else if err != nil {
 			return microerror.Mask(err)
+		}
+
+		needsUpdate := !reflect.DeepEqual(node.Size, existing.Spec.Size)
+		if needsUpdate {
+			existing.Spec.Size = node.Size
+			err = r.ctrlClient.Update(ctx, &existing)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 	}
 

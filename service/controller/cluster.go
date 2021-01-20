@@ -7,7 +7,6 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -19,7 +18,6 @@ type ClusterConfig struct {
 	CertsSearcher certs.Interface
 	K8sClient     k8sclient.Interface
 	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
 
 	ClusterRoleGeneral string
 	ClusterRolePSP     string
@@ -30,12 +28,6 @@ type Cluster struct {
 }
 
 func NewCluster(config ClusterConfig) (*Cluster, error) {
-	var err error
-
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
-	}
-
 	resources, err := newClusterResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)

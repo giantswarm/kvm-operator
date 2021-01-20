@@ -13,7 +13,7 @@ import (
 )
 
 func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
-	cr, err := key.ToKVMCluster(obj)
+	cr, err := key.ToKVMConfig(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -21,8 +21,8 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	{
 		cluster := v1alpha2.KVMCluster{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      key.ClusterID(&cr),
-				Namespace: cr.Namespace,
+				Name:      cr.Spec.Cluster.ID,
+				Namespace: cr.Spec.Cluster.ID,
 			},
 		}
 		err = r.ctrlClient.Delete(ctx, &cluster)
@@ -34,8 +34,8 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	{
 		cluster := capiv1alpha3.Cluster{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      key.ClusterID(&cr),
-				Namespace: cr.Namespace,
+				Name:      cr.Spec.Cluster.ID,
+				Namespace: cr.Spec.Cluster.ID,
 			},
 		}
 		err = r.ctrlClient.Delete(ctx, &cluster)
