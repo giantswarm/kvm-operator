@@ -31,7 +31,6 @@ import (
 const (
 	MasterID = "master"
 	WorkerID = "worker"
-	EtcdPort = 443
 	// livenessPortBase is a baseline for computing the port for liveness probes.
 	livenessPortBase = 23000
 	// shutdownDeferrerPortBase is a baseline for computing the port for
@@ -101,14 +100,12 @@ const (
 	AnnotationService                = "endpoint.kvm.giantswarm.io/service"
 	AnnotationPodDrained             = "endpoint.kvm.giantswarm.io/drained"
 	AnnotationPrometheusCluster      = "giantswarm.io/prometheus-cluster"
-	AnnotationVersionBundle          = "kvm-operator.giantswarm.io/version-bundle"
 
-	LabelApp           = "app"
-	LabelCluster       = "giantswarm.io/cluster"
-	LabelCustomer      = "customer"
-	LabelManagedBy     = "giantswarm.io/managed-by"
-	LabelOrganization  = "giantswarm.io/organization"
-	LabelVersionBundle = "giantswarm.io/version-bundle"
+	LabelApp          = "app"
+	LabelCluster      = "giantswarm.io/cluster"
+	LabelCustomer     = "customer"
+	LabelManagedBy    = "giantswarm.io/managed-by"
+	LabelOrganization = "giantswarm.io/organization"
 
 	LegacyLabelCluster = "cluster"
 )
@@ -135,6 +132,14 @@ const (
 	PodDeletionGracePeriod = 5 * time.Minute
 )
 
+const (
+	EtcdPort                     = 2379
+	EtcdPrefix                   = "giantswarm.io"
+	KubernetesSecurePort         = 443
+	KubernetesApiHealthCheckPort = 8089
+	CloudProvider                = ""
+)
+
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
 	var results []v1alpha1.ClusterNode
 
@@ -158,11 +163,11 @@ func AllocatedNodeIndexes(cr v1alpha1.KVMConfig) []int {
 }
 
 func BaseDomain(cr v1alpha2.KVMCluster) string {
-	return strings.TrimPrefix(cr.Spec.Cluster.Kubernetes.API.Domain, "api.")
+	return cr.Spec.Cluster.DNS.Domain
 }
 
 func ClusterAPIEndpoint(cr v1alpha2.KVMCluster) string {
-	return cr.Spec.Cluster.Kubernetes.API.Domain
+	return fmt.Sprintf("api.%s", ClusterAPIEndpoint(cr))
 }
 
 func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {
@@ -177,32 +182,40 @@ func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {
 	return apiEndpoint, nil
 }
 
-func ClusterCustomer(cr v1alpha2.KVMCluster) string {
-	return cr.Spec.Cluster.Customer.ID
+func ClusterCustomer(getter LabelsGetter) string {
+	return getter.GetLabels()[label.Organization]
 }
 
 func ClusterEtcdDomain(cr v1alpha2.KVMCluster) string {
-	return fmt.Sprintf("%s:%d", cr.Spec.Cluster.Etcd.Domain, EtcdPort)
+	return fmt.Sprintf("%s:%d", BaseDomain(cr), EtcdPort)
 }
 
-func ClusterID(cr v1alpha2.KVMCluster) string {
-	return cr.Spec.Cluster.ID
+func ClusterID(getter LabelsGetter) string {
+	return getter.GetLabels()[label.Cluster]
 }
 
-func ClusterNamespace(cr v1alpha2.KVMCluster) string {
-	return ClusterID(cr)
+func ClusterNamespace(getter LabelsGetter) string {
+	return ClusterID(getter)
 }
 
-func ClusterRoleBindingName(cr v1alpha2.KVMCluster) string {
-	return ClusterID(cr)
+func ClusterKubeletEndpoint(cluster v1alpha2.KVMCluster) string {
+	return fmt.Sprintf("worker.%s", BaseDomain(cluster))
 }
 
-func ClusterRoleBindingPSPName(cr v1alpha2.KVMCluster) string {
-	return ClusterID(cr) + "-psp"
+func ClusterRoleBindingName(getter LabelsGetter) string {
+	return ClusterID(getter)
 }
 
-func ConfigMapName(cr v1alpha2.KVMCluster, node v1alpha1.ClusterNode, prefix string) string {
-	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
+func ClusterRoleBindingPSPName(getter LabelsGetter) string {
+	return ClusterID(getter) + "-psp"
+}
+
+func ConfigMapName(machine v1alpha2.KVMMachine, prefix string) string {
+	return fmt.Sprintf("%s-%s-%s", Role(&machine), ClusterID(&machine), machine.Spec.ProviderID)
+}
+
+func Role(getter LabelsGetter) string {
+	return getter.GetLabels()[label.Cluster]
 }
 
 func ContainerDistro(release releasev1alpha1.Release) (string, error) {
@@ -215,7 +228,7 @@ func ContainerDistro(release releasev1alpha1.Release) (string, error) {
 	return "", microerror.Mask(missingVersionError)
 }
 
-func CPUQuantity(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, error) {
+func CPUQuantity(n v1alpha2.KVMMachineSpecSize) (resource.Quantity, error) {
 	cpu := strconv.Itoa(n.CPUs)
 	q, err := resource.ParseQuantity(cpu)
 	if err != nil {
@@ -231,7 +244,7 @@ func CreateK8sClientForTenantCluster(ctx context.Context, cr v1alpha2.KVMCluster
 	// Create a client for the reconciled tenant cluster
 	var tcK8sClient kubernetes.Interface
 	{
-		i := ClusterID(cr)
+		i := ClusterID(&cr)
 		e := ClusterAPIEndpoint(cr)
 
 		restConfig, err := tenantCluster.NewRestConfig(ctx, i, e)
@@ -269,7 +282,7 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 }
 
 func IscsiInitiatorName(cr v1alpha2.KVMCluster, nodeIndex int, nodeRole string) string {
-	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(cr), nodeRole, nodeIndex)
+	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(&cr), nodeRole, nodeIndex)
 }
 
 func IsDeleted(cr v1.Object) bool {
@@ -315,11 +328,24 @@ func ArePodContainersTerminated(pod *corev1.Pod) bool {
 }
 
 func LivenessPort(cr v1alpha2.KVMCluster) int32 {
-	return int32(livenessPortBase + cr.Spec.KVM.Network.Flannel.VNI)
+	return int32(livenessPortBase + cr.Spec.Provider.FlannelVNI)
 }
 
 func MasterCount(cr v1alpha2.KVMCluster) int {
-	return len(cr.Spec.KVM.Masters)
+	return 1
+}
+
+func OIDCClientID(cluster v1alpha2.KVMCluster) string {
+	return cluster.Spec.Cluster.OIDC.ClientID
+}
+func OIDCIssuerURL(cluster v1alpha2.KVMCluster) string {
+	return cluster.Spec.Cluster.OIDC.IssuerURL
+}
+func OIDCUsernameClaim(cluster v1alpha2.KVMCluster) string {
+	return cluster.Spec.Cluster.OIDC.Claims.Username
+}
+func OIDCGroupsClaim(cluster v1alpha2.KVMCluster) string {
+	return cluster.Spec.Cluster.OIDC.Claims.Groups
 }
 
 func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
@@ -328,7 +354,7 @@ func MasterHostPathVolumeDir(clusterID string, vmNumber string) string {
 
 // MemoryQuantity returns a resource.Quantity that represents the memory to be used by the nodes.
 // It adds the memory from the node definition parameter to the additional memory calculated on the node role
-func MemoryQuantityMaster(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, error) {
+func MemoryQuantityMaster(n v1alpha2.KVMMachineSpecSize) (resource.Quantity, error) {
 	q, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
 		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error creating Memory quantity from node definition: %s", err)
@@ -345,7 +371,7 @@ func MemoryQuantityMaster(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, 
 
 // MemoryQuantity returns a resource.Quantity that represents the memory to be used by the nodes.
 // It adds the memory from the node definition parameter to the additional memory calculated on the node role
-func MemoryQuantityWorker(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, error) {
+func MemoryQuantityWorker(n v1alpha2.KVMMachineSpecSize) (resource.Quantity, error) {
 	mQuantity, err := resource.ParseQuantity(n.Memory)
 	if err != nil {
 		return resource.Quantity{}, microerror.Maskf(invalidMemoryConfigurationError, "error calculating memory overhead multiplier: %s", err)
@@ -388,11 +414,11 @@ func MemoryQuantityWorker(n v1alpha2.KVMClusterSpecKVMNode) (resource.Quantity, 
 }
 
 func NetworkBridgeName(cr v1alpha2.KVMCluster) string {
-	return fmt.Sprintf("br-%s", ClusterID(cr))
+	return fmt.Sprintf("br-%s", ClusterID(&cr))
 }
 
 func NetworkTapName(cr v1alpha2.KVMCluster) string {
-	return fmt.Sprintf("tap-%s", ClusterID(cr))
+	return fmt.Sprintf("tap-%s", ClusterID(&cr))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {
@@ -436,7 +462,7 @@ func NodeIsUnschedulable(node corev1.Node) bool {
 }
 
 func NodeIndex(cr v1alpha2.KVMCluster, nodeID string) (int, bool) {
-	idx, present := cr.Status.KVM.NodeIndexes[nodeID]
+	idx, present := cr.Status.Provider.NodeIndexes[nodeID]
 	return idx, present
 }
 
@@ -471,7 +497,7 @@ func PortMappings(cr v1alpha2.KVMCluster) []corev1.ServicePort {
 	var ports []corev1.ServicePort
 
 	// Compatibility mode, if no port mappings specified.
-	if len(cr.Spec.KVM.PortMappings) == 0 {
+	if len(cr.Spec.Provider.PortMappings) == 0 {
 		ports := []corev1.ServicePort{
 			{
 				Name:       "http",
@@ -487,7 +513,7 @@ func PortMappings(cr v1alpha2.KVMCluster) []corev1.ServicePort {
 		return ports
 	}
 
-	for _, p := range cr.Spec.KVM.PortMappings {
+	for _, p := range cr.Spec.Provider.PortMappings {
 		port := corev1.ServicePort{
 			Name:       p.Name,
 			NodePort:   int32(p.NodePort),
@@ -501,13 +527,7 @@ func PortMappings(cr v1alpha2.KVMCluster) []corev1.ServicePort {
 }
 
 func PVCNames(cr v1alpha2.KVMCluster) []string {
-	var names []string
-
-	for i := range cr.Spec.Cluster.Masters {
-		names = append(names, EtcdPVCName(ClusterID(cr), VMNumber(i)))
-	}
-
-	return names
+	return []string{EtcdPVCName(ClusterID(&cr), VMNumber(0))}
 }
 
 func ReleaseVersion(cr v1alpha2.KVMCluster) string {
@@ -515,11 +535,11 @@ func ReleaseVersion(cr v1alpha2.KVMCluster) string {
 }
 
 func ServiceAccountName(cr v1alpha2.KVMCluster) string {
-	return ClusterID(cr)
+	return ClusterID(&cr)
 }
 
 func ShutdownDeferrerListenPort(cr v1alpha2.KVMCluster) int {
-	return int(shutdownDeferrerPortBase + cr.Spec.KVM.Network.Flannel.VNI)
+	return int(shutdownDeferrerPortBase + cr.Spec.Provider.FlannelVNI)
 }
 
 func ShutdownDeferrerListenAddress(cr v1alpha2.KVMCluster) string {
@@ -531,7 +551,7 @@ func ShutdownDeferrerPollPath(cr v1alpha2.KVMCluster) string {
 }
 
 func StorageType(cr v1alpha2.KVMCluster) string {
-	return cr.Spec.KVM.K8sKVM.StorageType
+	return cr.Spec.Provider.MachineStorageType
 }
 
 func ToClusterEndpoint(v interface{}) (string, error) {
@@ -549,11 +569,11 @@ func ToClusterID(v interface{}) (string, error) {
 		return "", microerror.Mask(err)
 	}
 
-	return ClusterID(cr), nil
+	return ClusterID(&cr), nil
 }
 
 func ToClusterStatus(v interface{}) (v1alpha1.StatusCluster, error) {
-	cr, err := ToKVMCluster(v)
+	cr, err := ToKVMConfig(v)
 	if err != nil {
 		return v1alpha1.StatusCluster{}, microerror.Mask(err)
 	}
@@ -629,5 +649,5 @@ func VMNumber(ID int) string {
 }
 
 func WorkerCount(cr v1alpha2.KVMCluster) int {
-	return len(cr.Spec.KVM.Workers)
+	return 2
 }

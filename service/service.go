@@ -191,14 +191,6 @@ func New(config Config) (*Service, error) {
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
 			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
-			OIDC: controller.MachineConfigOIDC{
-				ClientID:       config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
-				IssuerURL:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
-				UsernameClaim:  config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
-				UsernamePrefix: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix),
-				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
-				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
-			},
 			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 
 			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
@@ -272,16 +264,26 @@ func New(config Config) (*Service, error) {
 
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
+		ctx := context.Background()
+
 		go func() {
-			err := s.statusResourceCollector.Boot(context.Background())
+			err := s.statusResourceCollector.Boot(ctx)
 			if err != nil {
 				panic(microerror.JSON(err))
 			}
 		}()
 
-		go s.clusterController.Boot(context.Background())
-		go s.deleterController.Boot(context.Background())
-		go s.drainerController.Boot(context.Background())
-		go s.machineController.Boot(context.Background())
+		go func() {
+			err := s.storage.Boot(ctx)
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+		}()
+
+		go s.clusterController.Boot(ctx)
+		go s.deleterController.Boot(ctx)
+		go s.drainerController.Boot(ctx)
+		go s.machineController.Boot(ctx)
+		go s.transitionController.Boot(ctx)
 	})
 }

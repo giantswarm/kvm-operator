@@ -26,7 +26,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		r.logger.Debugf(ctx, "deleting the service account in the Kubernetes API")
 
 		// Delete service account in the Kubernetes API.
-		namespace := key.ClusterNamespace(cr)
+		namespace := key.ClusterNamespace(&cr)
 		err := r.k8sClient.CoreV1().ServiceAccounts(namespace).Delete(ctx, serviceAccountToDelete.Name, metav1.DeleteOptions{})
 		if apierrors.IsNotFound(err) {
 		} else if err != nil {

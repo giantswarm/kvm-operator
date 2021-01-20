@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/microerror"
@@ -91,13 +90,13 @@ func (r *Resource) newDeployment(ctx context.Context, cluster v1alpha2.KVMCluste
 	role := machine.Spec.ProviderID
 	if role == "master" {
 		var err error
-		deployment, err = newMasterDeployment(cluster, release, 1, v1alpha1.ClusterNode{})
+		deployment, err = newMasterDeployment(machine, cluster, release, 1)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	} else {
 		var err error
-		deployment, err = newWorkerDeployment(cluster, release, 1, v1alpha1.ClusterNode{})
+		deployment, err = newWorkerDeployment(machine, cluster, release, 1)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

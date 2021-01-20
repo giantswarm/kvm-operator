@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(ingressesToCreate) != 0 {
 		r.logger.Debugf(ctx, "creating the ingresses in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(cr)
+		namespace := key.ClusterNamespace(&cr)
 		for _, ingress := range ingressesToCreate {
 			_, err := r.k8sClient.NetworkingV1beta1().Ingresses(namespace).Create(ctx, ingress, v1.CreateOptions{})
 			if apierrors.IsAlreadyExists(err) {

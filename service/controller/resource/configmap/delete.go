@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +21,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	clusterID := cr.Namespace
 	var kvmCluster v1alpha2.KVMCluster
 	{
-		err := r.ctrlClient.Get(ctx, client.ObjectKey{
+		err := r.k8sClient.CtrlClient().Get(ctx, client.ObjectKey{
 			Namespace: clusterID,
 			Name:      clusterID,
 		}, &kvmCluster)
@@ -31,17 +30,15 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	var node v1alpha1.ClusterNode
-	role := cr.Spec.ProviderID
 	prefix := key.WorkerID
-	if role == "master" {
+	if cr.Labels["cluster.x-k8s.io/control-plane"] == "true" {
 		prefix = key.MasterID
 	}
 
-	err = r.ctrlClient.Delete(ctx, &corev1.ConfigMap{
+	err = r.k8sClient.CtrlClient().Delete(ctx, &corev1.ConfigMap{
 		ObjectMeta: v1.ObjectMeta{
-			Name:      key.ConfigMapName(kvmCluster, node, prefix),
-			Namespace: key.ClusterNamespace(kvmCluster),
+			Name:      key.ConfigMapName(cr, prefix),
+			Namespace: key.ClusterNamespace(&cr),
 		},
 	})
 	if err != nil {

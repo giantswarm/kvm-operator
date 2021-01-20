@@ -25,7 +25,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(servicesToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the services in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(cr)
+		namespace := key.ClusterNamespace(&cr)
 		for _, service := range servicesToDelete {
 			err := r.k8sClient.CoreV1().Services(namespace).Delete(ctx, service.Name, metav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
@@ -44,13 +44,13 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 }
 
 func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*crud.Patch, error) {
-	delete, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
+	deleteChange, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	patch := crud.NewPatch()
-	patch.SetDeleteChange(delete)
+	patch.SetDeleteChange(deleteChange)
 
 	return patch, nil
 }

@@ -18,7 +18,11 @@ const (
 func newEtcdPVCs(cr v1alpha2.KVMCluster) ([]*corev1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []*corev1.PersistentVolumeClaim
 
-	for i, masterNode := range cr.Spec.Cluster.Masters {
+	for i, node := range cr.Spec.Cluster.Nodes {
+		if node.Role != key.MasterID {
+			continue
+		}
+
 		quantity, err := resource.ParseQuantity(EtcdPVSize)
 		if err != nil {
 			return nil, microerror.Mask(err)
@@ -30,12 +34,12 @@ func newEtcdPVCs(cr v1alpha2.KVMCluster) ([]*corev1.PersistentVolumeClaim, error
 				APIVersion: "v1",
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name: key.EtcdPVCName(key.ClusterID(cr), key.VMNumber(i)),
+				Name: key.EtcdPVCName(key.ClusterID(&cr), key.VMNumber(i)),
 				Labels: map[string]string{
 					"app":      key.MasterID,
-					"cluster":  key.ClusterID(cr),
-					"customer": key.ClusterCustomer(cr),
-					"node":     masterNode.ID,
+					"cluster":  key.ClusterID(&cr),
+					"customer": key.ClusterCustomer(&cr),
+					"node":     node.ID,
 				},
 				Annotations: map[string]string{
 					"volume.beta.kubernetes.io/storage-class": StorageClass,

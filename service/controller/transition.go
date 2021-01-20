@@ -23,12 +23,6 @@ type Transition struct {
 }
 
 func NewTransition(config TransitionConfig) (*Transition, error) {
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
-	}
-
-	var err error
-
 	resources, err := newTransitionResources(config)
 	if err != nil {
 		return nil, microerror.Mask(err)

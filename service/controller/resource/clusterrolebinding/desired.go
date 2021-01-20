@@ -38,18 +38,18 @@ func (r *Resource) newClusterRoleBindings(cr v1alpha2.KVMCluster) ([]*apiv1.Clus
 			APIVersion: apiv1.GroupName,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.ClusterRoleBindingName(cr),
+			Name: key.ClusterRoleBindingName(&cr),
 			Labels: map[string]string{
 				"app":                       "kvm-operator",
-				"giantswarm.io/cluster-id":  key.ClusterID(cr),
-				"giantswarm.io/customer-id": key.ClusterCustomer(cr),
+				"giantswarm.io/cluster-id":  key.ClusterID(&cr),
+				"giantswarm.io/customer-id": key.ClusterCustomer(&cr),
 			},
 		},
 		Subjects: []apiv1.Subject{
 			{
 				Kind:      apiv1.ServiceAccountKind,
-				Namespace: key.ClusterID(cr),
-				Name:      key.ClusterID(cr),
+				Namespace: key.ClusterID(&cr),
+				Name:      key.ClusterID(&cr),
 			},
 		},
 		RoleRef: apiv1.RoleRef{
@@ -67,18 +67,18 @@ func (r *Resource) newClusterRoleBindings(cr v1alpha2.KVMCluster) ([]*apiv1.Clus
 			APIVersion: apiv1.GroupName,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.ClusterRoleBindingPSPName(cr),
+			Name: key.ClusterRoleBindingPSPName(&cr),
 			Labels: map[string]string{
 				"app":                       "kvm-operator",
-				"giantswarm.io/cluster-id":  key.ClusterID(cr),
-				"giantswarm.io/customer-id": key.ClusterCustomer(cr),
+				"giantswarm.io/cluster-id":  key.ClusterID(&cr),
+				"giantswarm.io/customer-id": key.ClusterCustomer(&cr),
 			},
 		},
 		Subjects: []apiv1.Subject{
 			{
 				Kind:      apiv1.ServiceAccountKind,
-				Namespace: key.ClusterID(cr),
-				Name:      key.ClusterID(cr),
+				Namespace: key.ClusterID(&cr),
+				Name:      key.ClusterID(&cr),
 			},
 		},
 		RoleRef: apiv1.RoleRef{

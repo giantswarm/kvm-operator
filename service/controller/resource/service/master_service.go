@@ -16,18 +16,17 @@ func newMasterService(cr v1alpha2.KVMCluster) *corev1.Service {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      key.MasterID,
-			Namespace: key.ClusterID(cr),
+			Namespace: key.ClusterID(&cr),
 			Labels: map[string]string{
-				key.LegacyLabelCluster: key.ClusterID(cr),
-				key.LabelCustomer:      key.ClusterCustomer(cr),
+				key.LegacyLabelCluster: key.ClusterID(&cr),
+				key.LabelCustomer:      key.ClusterCustomer(&cr),
 				key.LabelApp:           key.MasterID,
-				key.LabelCluster:       key.ClusterID(cr),
-				key.LabelOrganization:  key.ClusterCustomer(cr),
-				key.LabelVersionBundle: key.OperatorVersion(cr),
+				key.LabelCluster:       key.ClusterID(&cr),
+				key.LabelOrganization:  key.ClusterCustomer(&cr),
 			},
 			Annotations: map[string]string{
 				key.AnnotationEtcdDomain:        key.ClusterEtcdDomain(cr),
-				key.AnnotationPrometheusCluster: key.ClusterID(cr),
+				key.AnnotationPrometheusCluster: key.ClusterID(&cr),
 				"prometheus.io/path":            "/healthz",
 				"prometheus.io/port":            "30010",
 				"prometheus.io/scheme":          "http",
@@ -44,7 +43,7 @@ func newMasterService(cr v1alpha2.KVMCluster) *corev1.Service {
 				},
 				{
 					Name:     "api",
-					Port:     int32(cr.Spec.Cluster.Kubernetes.API.SecurePort),
+					Port:     cr.Spec.ControlPlaneEndpoint.Port,
 					Protocol: "TCP",
 				},
 			},

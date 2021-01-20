@@ -3,7 +3,7 @@ module github.com/giantswarm/kvm-operator
 go 1.14
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.14.2-0.20210119141316-3d33dacd549b
+	github.com/giantswarm/apiextensions/v3 v3.14.2-0.20210120154844-e31fb81b7f18
 	github.com/giantswarm/certs/v3 v3.1.0
 	github.com/giantswarm/errors v0.2.3
 	github.com/giantswarm/k8sclient/v5 v5.0.0
@@ -16,6 +16,7 @@ require (
 	github.com/giantswarm/randomkeys/v2 v2.0.0
 	github.com/giantswarm/statusresource/v3 v3.0.0
 	github.com/giantswarm/tenantcluster/v4 v4.0.0
+	github.com/giantswarm/to v0.3.0
 	github.com/giantswarm/versionbundle v0.2.0
 	github.com/google/go-cmp v0.5.4
 	github.com/prometheus/client_golang v1.9.0

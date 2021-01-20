@@ -25,7 +25,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(pvcsToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the PVCs in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(cr)
+		namespace := key.ClusterNamespace(&cr)
 		for _, PVC := range pvcsToDelete {
 			err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Delete(ctx, PVC.Name, metav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {

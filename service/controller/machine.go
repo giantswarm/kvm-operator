@@ -24,23 +24,11 @@ type MachineConfig struct {
 	DNSServers   string
 	IgnitionPath string
 	NTPServers   string
-	OIDC         MachineConfigOIDC
 	SSOPublicKey string
 
 	DockerhubToken  string
 	RegistryDomain  string
 	RegistryMirrors []string
-}
-
-// MachineConfigOIDC represents the configuration of the OIDC authorization
-// provider.
-type MachineConfigOIDC struct {
-	ClientID       string
-	IssuerURL      string
-	UsernameClaim  string
-	UsernamePrefix string
-	GroupsClaim    string
-	GroupsPrefix   string
 }
 
 type Machine struct {

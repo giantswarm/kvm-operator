@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
 	"github.com/giantswarm/microerror"
@@ -29,7 +28,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	clusterID := cr.Namespace
 	var kvmCluster v1alpha2.KVMCluster
 	{
-		err := r.ctrlClient.Get(ctx, client.ObjectKey{
+		err := r.k8sClient.CtrlClient().Get(ctx, client.ObjectKey{
 			Namespace: clusterID,
 			Name:      clusterID,
 		}, &kvmCluster)
@@ -39,7 +38,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	var existing corev1.ConfigMap
-	err = r.ctrlClient.Get(ctx, client.ObjectKey{
+	err = r.k8sClient.CtrlClient().Get(ctx, client.ObjectKey{
 		Namespace: clusterID,
 		Name:      clusterID,
 	}, &existing)
@@ -48,7 +47,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		err = r.ctrlClient.Create(ctx, toCreate)
+		err = r.k8sClient.CtrlClient().Create(ctx, toCreate)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -70,7 +69,7 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 	{
 		releaseVersion := machine.Labels[label.ReleaseVersion]
 		var release releasev1alpha1.Release
-		err = r.ctrlClient.Get(ctx, client.ObjectKey{
+		err = r.k8sClient.CtrlClient().Get(ctx, client.ObjectKey{
 			Name: fmt.Sprintf("v%s", releaseVersion),
 		}, &release)
 		if err != nil {
@@ -98,23 +97,54 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 		}
 	}
 
-	var node v1alpha1.ClusterNode
-	role := machine.Spec.ProviderID
-	nodeIdx, exists := key.NodeIndex(cluster, node.ID)
+	role := key.WorkerID
+	if machine.Labels["cluster.x-k8s.io/control-plane"] == "true" {
+		role = key.MasterID
+	}
+
+	nodeIdx, exists := key.NodeIndex(cluster, machine.Spec.ProviderID)
 	if !exists {
-		return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for %s (%q) is not available", role, node.ID))
+		return nil, microerror.Maskf(notFoundError, fmt.Sprintf("node index for %s (%q) is not available", role, machine.Spec.ProviderID))
+	}
+
+	var commonConfig cloudconfig.Config
+	{
+		commonConfig = cloudconfig.Config{
+			CertsSearcher:      r.certsSearcher,
+			K8sClient:          r.k8sClient,
+			Logger:             r.logger,
+			RandomKeysSearcher: r.keyWatcher,
+			OIDC: cloudconfig.OIDCConfig{
+				ClientID:      cluster.Spec.Cluster.OIDC.ClientID,
+				IssuerURL:     cluster.Spec.Cluster.OIDC.IssuerURL,
+				UsernameClaim: cluster.Spec.Cluster.OIDC.Claims.Username,
+				GroupsClaim:   cluster.Spec.Cluster.OIDC.Claims.Groups,
+			},
+			DockerhubToken:  r.dockerhubToken,
+			IgnitionPath:    r.ignitionPath,
+			RegistryDomain:  r.registryDomain,
+			RegistryMirrors: r.registryMirrors,
+		}
 	}
 
 	var template string
-	prefix := key.WorkerID
 	if role == "master" {
-		prefix = key.MasterID
-		template, err = r.cloudConfig.NewMasterTemplate(ctx, cluster, data, node, nodeIdx)
+		config := cloudconfig.MasterConfig{Config: commonConfig}
+		cloudConfig, err := cloudconfig.NewMaster(config)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		template, err = cloudConfig.NewTemplate(ctx, cluster, data, nodeIdx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	} else {
-		template, err = r.cloudConfig.NewWorkerTemplate(ctx, cluster, data, node, nodeIdx)
+		config := cloudconfig.WorkerConfig{Config: commonConfig}
+		cloudConfig, err := cloudconfig.NewWorker(config)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		template, err = cloudConfig.NewTemplate(ctx, cluster, data, nodeIdx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -122,12 +152,12 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      key.ConfigMapName(cluster, node, prefix),
-			Namespace: key.ClusterNamespace(cluster),
+			Name:      key.ConfigMapName(machine, role),
+			Namespace: key.ClusterNamespace(&cluster),
 			Labels: map[string]string{
-				label.Cluster:      key.ClusterID(cluster),
+				label.Cluster:      key.ClusterID(&cluster),
 				label.ManagedBy:    project.Name(),
-				label.Organization: key.ClusterCustomer(cluster),
+				label.Organization: key.ClusterCustomer(&cluster),
 			},
 		},
 		Data: map[string]string{

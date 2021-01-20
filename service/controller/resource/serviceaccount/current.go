@@ -29,7 +29,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.Debugf(ctx, "looking for a service account in the Kubernetes API")
 
-	namespace := key.ClusterNamespace(cr)
+	namespace := key.ClusterNamespace(&cr)
 	var currentServiceAccount *corev1.ServiceAccount
 	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(ctx, key.ServiceAccountName(cr), metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {

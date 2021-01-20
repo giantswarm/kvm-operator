@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(pvcsToCreate) != 0 {
 		r.logger.Debugf(ctx, "creating the PVCs in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(cr)
+		namespace := key.ClusterNamespace(&cr)
 		for _, PVC := range pvcsToCreate {
 			_, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Create(ctx, PVC, v1.CreateOptions{})
 			if apierrors.IsAlreadyExists(err) {

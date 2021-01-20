@@ -1,10 +1,11 @@
 package cloudconfig
 
 import (
-	"fmt"
-
+	"github.com/giantswarm/certs/v3/pkg/certs"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/randomkeys/v2"
 )
 
 const (
@@ -58,35 +59,30 @@ echo "Successfully restarted k8s services."`
 
 // Config represents the configuration used to create a cloud config service.
 type Config struct {
-	// Dependencies.
-	Logger micrologger.Logger
+	CertsSearcher      certs.Interface
+	K8sClient          k8sclient.Interface
+	Logger             micrologger.Logger
+	RandomKeysSearcher randomkeys.Interface
 
-	DockerhubToken  string
-	IgnitionPath    string
-	OIDC            OIDCConfig
-	RegistryMirrors []string
-	SSOPublicKey    string
-}
-
-// DefaultConfig provides a default configuration to create a new cloud config
-// service by best effort.
-func DefaultConfig() Config {
-	return Config{
-		// Dependencies.
-		Logger: nil,
-	}
-}
-
-// CloudConfig implements the cloud config service interface.
-type CloudConfig struct {
-	// Dependencies.
-	logger micrologger.Logger
-
-	dockerhubToken  string
-	ignitionPath    string
-	k8sAPIExtraArgs []string
-	registryMirrors []string
-	ssoPublicKey    string
+	OIDC                      OIDCConfig
+	APIExtraArgs              []string
+	CalicoCIDR                int
+	CalicoMTU                 int
+	CalicoSubnet              string
+	ClusterIPRange            string
+	DockerDaemonCIDR          string
+	DockerhubToken            string
+	ExternalSNAT              bool
+	IgnitionPath              string
+	ImagePullProgressDeadline string
+	KubeletExtraArgs          []string
+	ClusterDomain             string
+	NetworkSetupDockerImage   string
+	PodInfraContainerImage    string
+	RegistryDomain            string
+	RegistryMirrors           []string
+	SSHUserList               string
+	SSOPublicKey              string
 }
 
 // OIDCConfig represents the configuration of the OIDC authorization provider
@@ -99,49 +95,60 @@ type OIDCConfig struct {
 	GroupsPrefix   string
 }
 
-// New creates a new configured cloud config service.
-func New(config Config) (*CloudConfig, error) {
-	// Dependencies.
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
+func (c Config) Validate() error {
+	if c.CertsSearcher == nil {
+		return microerror.Maskf(invalidConfigError, "%T.CertsSearcher must not be empty", c)
+	}
+	if c.K8sClient == nil {
+		return microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", c)
+	}
+	if c.Logger == nil {
+		return microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", c)
+	}
+	if c.RandomKeysSearcher == nil {
+		return microerror.Maskf(invalidConfigError, "%T.RandomKeysSearcher must not be empty", c)
 	}
 
-	if config.IgnitionPath == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.IgnitionPath must not be empty", config)
+	if c.CalicoCIDR == 0 {
+		return microerror.Maskf(invalidConfigError, "%T.CalicoCIDR must not be empty", c)
+	}
+	if c.CalicoMTU == 0 {
+		return microerror.Maskf(invalidConfigError, "%T.CalicoMTU must not be empty", c)
+	}
+	if c.CalicoSubnet == "" {
+		return microerror.Maskf(invalidConfigError, "%T.CalicoSubnet must not be empty", c)
+	}
+	if c.ClusterDomain == "" {
+		return microerror.Maskf(invalidConfigError, "%T.ClusterDomain must not be empty", c)
+	}
+	if c.ClusterIPRange == "" {
+		return microerror.Maskf(invalidConfigError, "%T.ClusterIPRange must not be empty", c)
+	}
+	if c.DockerDaemonCIDR == "" {
+		return microerror.Maskf(invalidConfigError, "%T.DockerDaemonCIDR must not be empty", c)
+	}
+	if c.DockerhubToken == "" {
+		return microerror.Maskf(invalidConfigError, "%T.DockerhubToken must not be empty", c)
 	}
 
-	var k8sAPIExtraArgs []string
-	{
-		if config.OIDC.ClientID != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-client-id=%s", config.OIDC.ClientID))
-		}
-		if config.OIDC.IssuerURL != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-issuer-url=%s", config.OIDC.IssuerURL))
-		}
-		if config.OIDC.UsernameClaim != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-username-claim=%s", config.OIDC.UsernameClaim))
-		}
-		if config.OIDC.UsernamePrefix != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("'--oidc-username-prefix=%s'", config.OIDC.UsernamePrefix))
-		}
-		if config.OIDC.GroupsClaim != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-groups-claim=%s", config.OIDC.GroupsClaim))
-		}
-		if config.OIDC.GroupsPrefix != "" {
-			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("'--oidc-groups-prefix=%s'", config.OIDC.GroupsPrefix))
-		}
+	if c.IgnitionPath == "" {
+		return microerror.Maskf(invalidConfigError, "%T.IgnitionPath must not be empty", c)
+	}
+	if c.ImagePullProgressDeadline == "" {
+		return microerror.Maskf(invalidConfigError, "%T.ImagePullProgressDeadline must not be empty", c)
+	}
+	if c.NetworkSetupDockerImage == "" {
+		return microerror.Maskf(invalidConfigError, "%T.NetworkSetupDockerImage must not be empty", c)
+	}
+	if c.RegistryDomain == "" {
+		return microerror.Maskf(invalidConfigError, "%T.RegistryDomain must not be empty", c)
+	}
+	if c.SSHUserList == "" {
+		return microerror.Maskf(invalidConfigError, "%T.SSHUserList must not be empty", c)
+	}
+	if c.SSOPublicKey == "" {
+		return microerror.Maskf(invalidConfigError, "%T.SSOPublicKey must not be empty", c)
 	}
 
-	newCloudConfig := &CloudConfig{
-		// Dependencies.
-		logger: config.Logger,
-
-		dockerhubToken:  config.DockerhubToken,
-		ignitionPath:    config.IgnitionPath,
-		k8sAPIExtraArgs: k8sAPIExtraArgs,
-		registryMirrors: config.RegistryMirrors,
-		ssoPublicKey:    config.SSOPublicKey,
-	}
-
-	return newCloudConfig, nil
+	return nil
 }

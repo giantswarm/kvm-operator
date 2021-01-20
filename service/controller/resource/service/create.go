@@ -24,7 +24,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(servicesToCreate) != 0 {
 		r.logger.Debugf(ctx, "creating the services in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(cr)
+		namespace := key.ClusterNamespace(&cr)
 		for _, service := range servicesToCreate {
 			_, err := r.k8sClient.CoreV1().Services(namespace).Create(ctx, service, v1.CreateOptions{})
 			if apierrors.IsAlreadyExists(err) {

@@ -9,7 +9,6 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/resource/deployment"
 
-	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/configmap"
 )
 
@@ -29,41 +28,17 @@ func newMachineResources(config MachineConfig) ([]resource.Interface, error) {
 		}
 	}
 
-	var cloudConfig *cloudconfig.CloudConfig
-	{
-		c := cloudconfig.Config{
-			Logger: config.Logger,
-
-			DockerhubToken: config.DockerhubToken,
-			IgnitionPath:   config.IgnitionPath,
-			OIDC: cloudconfig.OIDCConfig{
-				ClientID:       config.OIDC.ClientID,
-				IssuerURL:      config.OIDC.IssuerURL,
-				UsernameClaim:  config.OIDC.UsernameClaim,
-				UsernamePrefix: config.OIDC.UsernamePrefix,
-				GroupsClaim:    config.OIDC.GroupsClaim,
-				GroupsPrefix:   config.OIDC.GroupsPrefix,
-			},
-			RegistryMirrors: config.RegistryMirrors,
-			SSOPublicKey:    config.SSOPublicKey,
-		}
-
-		cloudConfig, err = cloudconfig.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var configmapResource resource.Interface
 	{
 		c := configmap.Config{
-			CertsSearcher:  config.CertsSearcher,
-			CloudConfig:    cloudConfig,
-			CtrlClient:     config.K8sClient.CtrlClient(),
-			KeyWatcher:     randomkeysSearcher,
-			Logger:         config.Logger,
-			RegistryDomain: config.RegistryDomain,
-			DockerhubToken: config.DockerhubToken,
+			CertsSearcher:   config.CertsSearcher,
+			K8sClient:       config.K8sClient,
+			KeyWatcher:      randomkeysSearcher,
+			Logger:          config.Logger,
+			DockerhubToken:  config.DockerhubToken,
+			RegistryDomain:  config.RegistryDomain,
+			IgnitionPath:    config.IgnitionPath,
+			RegistryMirrors: config.RegistryMirrors,
 		}
 
 		configmapResource, err = configmap.New(c)

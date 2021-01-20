@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
 	"github.com/giantswarm/microerror"
@@ -13,12 +12,33 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-// NewWorkerTemplate generates a new worker cloud config template and returns it
+type WorkerConfig struct {
+	Config Config
+}
+
+type Worker struct {
+	config Config
+}
+
+func NewWorker(config WorkerConfig) (*Worker, error) {
+	err := config.Config.Validate()
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	t := &Worker{
+		config: config.Config,
+	}
+
+	return t, nil
+}
+
+// NewTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha2.KVMCluster, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *Worker) NewTemplate(ctx context.Context, cr v1alpha2.KVMCluster, data IgnitionTemplateData, nodeIndex int) (string, error) {
 	var extension *workerExtension
 	{
-		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(cr), workerCertFiles)
+		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(&cr), workerCertFiles)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
@@ -32,17 +52,16 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha2.KVMClus
 	var params k8scloudconfig.Params
 	{
 		params.BaseDomain = key.BaseDomain(cr)
-		params.Cluster = cr.Spec.Cluster
+		params.Cluster = clusterToLegacy(c.config, cr, "").Cluster
 		params.Extension = extension
 		params.Images = data.Images
 		params.Versions = data.Versions
-		params.Node = node
-		params.RegistryMirrors = c.registryMirrors
-		params.SSOPublicKey = c.ssoPublicKey
+		params.RegistryMirrors = c.config.RegistryMirrors
+		params.SSOPublicKey = c.config.SSOPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
-		params.DockerhubToken = c.dockerhubToken
+		params.DockerhubToken = c.config.DockerhubToken
 
-		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
+		ignitionPath := k8scloudconfig.GetIgnitionPath(c.config.IgnitionPath)
 		{
 			var err error
 			params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)

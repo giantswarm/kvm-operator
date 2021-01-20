@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
@@ -17,7 +16,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func newWorkerDeployment(cluster v1alpha2.KVMCluster, release releasev1alpha1.Release, i int, workerNode v1alpha1.ClusterNode) (*v1.Deployment, error) {
+func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluster, release releasev1alpha1.Release, i int) (*v1.Deployment, error) {
 	privileged := true
 	replicas := int32(1)
 	podDeletionGracePeriod := int64(key.PodDeletionGracePeriod.Seconds())
@@ -27,7 +26,7 @@ func newWorkerDeployment(cluster v1alpha2.KVMCluster, release releasev1alpha1.Re
 		return nil, microerror.Mask(err)
 	}
 
-	capabilities := cluster.Spec.KVM.Workers[i]
+	capabilities := machine.Spec.Size
 
 	cpuQuantity, err := key.CPUQuantity(capabilities)
 	if err != nil {
@@ -45,25 +44,25 @@ func newWorkerDeployment(cluster v1alpha2.KVMCluster, release releasev1alpha1.Re
 			APIVersion: "apps/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.DeploymentName(key.WorkerID, workerNode.ID),
+			Name: key.DeploymentName(key.WorkerID, machine.Spec.ProviderID),
 			Annotations: map[string]string{
 				key.ReleaseVersionAnnotation:       key.ReleaseVersion(cluster),
 				key.VersionBundleVersionAnnotation: key.OperatorVersion(cluster),
 			},
 			Labels: map[string]string{
 				key.LabelApp:          key.WorkerID,
-				key.LabelCluster:      key.ClusterID(cluster),
-				key.LabelOrganization: key.ClusterCustomer(cluster),
+				key.LabelCluster:      key.ClusterID(&cluster),
+				key.LabelOrganization: key.ClusterCustomer(&cluster),
 				key.LabelManagedBy:    key.OperatorName,
-				"node":                workerNode.ID,
+				"node":                machine.Spec.ProviderID,
 			},
 		},
 		Spec: v1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					key.LabelApp:     key.WorkerID,
-					key.LabelCluster: key.ClusterID(cluster),
-					"node":           workerNode.ID,
+					key.LabelCluster: key.ClusterID(&cluster),
+					"node":           machine.Spec.ProviderID,
 				},
 			},
 			Strategy: v1.DeploymentStrategy{
@@ -73,18 +72,17 @@ func newWorkerDeployment(cluster v1alpha2.KVMCluster, release releasev1alpha1.Re
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
-						key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(cluster),
-						key.AnnotationIp:            "",
-						key.AnnotationService:       key.WorkerID,
-						key.AnnotationPodDrained:    "False",
-						key.AnnotationVersionBundle: key.OperatorVersion(cluster),
+						key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(cluster),
+						key.AnnotationIp:          "",
+						key.AnnotationService:     key.WorkerID,
+						key.AnnotationPodDrained:  "False",
 					},
 					Name: key.WorkerID,
 					Labels: map[string]string{
 						key.LabelApp:          key.WorkerID,
-						key.LabelCluster:      key.ClusterID(cluster),
-						key.LabelOrganization: key.ClusterCustomer(cluster),
-						"node":                workerNode.ID,
+						key.LabelCluster:      key.ClusterID(&cluster),
+						key.LabelOrganization: key.ClusterCustomer(&cluster),
+						"node":                machine.Spec.ProviderID,
 						key.PodWatcherLabel:   key.OperatorName,
 						label.OperatorVersion: project.Version(),
 					},
@@ -102,7 +100,7 @@ func newWorkerDeployment(cluster v1alpha2.KVMCluster, release releasev1alpha1.Re
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
 									LocalObjectReference: corev1.LocalObjectReference{
-										Name: key.ConfigMapName(cluster, workerNode, key.WorkerID),
+										Name: key.ConfigMapName(machine, key.WorkerID),
 									},
 								},
 							},
@@ -258,7 +256,7 @@ func newWorkerDeployment(cluster v1alpha2.KVMCluster, release releasev1alpha1.Re
 	return deployment, nil
 }
 
-func newWorkerPodAfinity(customResource v1alpha2.KVMCluster) *corev1.Affinity {
+func newWorkerPodAfinity(cluster v1alpha2.KVMCluster) *corev1.Affinity {
 	podAffinity := &corev1.Affinity{
 		PodAntiAffinity: &corev1.PodAntiAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: []corev1.PodAffinityTerm{
@@ -277,7 +275,7 @@ func newWorkerPodAfinity(customResource v1alpha2.KVMCluster) *corev1.Affinity {
 					},
 					TopologyKey: "kubernetes.io/hostname",
 					Namespaces: []string{
-						key.ClusterID(customResource),
+						key.ClusterID(&cluster),
 					},
 				},
 			},

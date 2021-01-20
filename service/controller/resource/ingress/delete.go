@@ -25,7 +25,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(ingressesToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the ingresses in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(cr)
+		namespace := key.ClusterNamespace(&cr)
 		for _, ingress := range ingressesToDelete {
 			err := r.k8sClient.NetworkingV1beta1().Ingresses(namespace).Delete(ctx, ingress.Name, metav1.DeleteOptions{})
 			if apierrors.IsNotFound(err) {

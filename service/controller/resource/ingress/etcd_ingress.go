@@ -18,8 +18,8 @@ func newEtcdIngress(cr v1alpha2.KVMCluster) *v1beta1.Ingress {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: EtcdID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(cr),
-				"customer": key.ClusterCustomer(cr),
+				"cluster":  key.ClusterID(&cr),
+				"customer": key.ClusterCustomer(&cr),
 				"app":      key.MasterID,
 			},
 			Annotations: map[string]string{
@@ -30,13 +30,13 @@ func newEtcdIngress(cr v1alpha2.KVMCluster) *v1beta1.Ingress {
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						cr.Spec.Cluster.Etcd.Domain,
+						key.ClusterEtcdDomain(cr),
 					},
 				},
 			},
 			Rules: []v1beta1.IngressRule{
 				{
-					Host: cr.Spec.Cluster.Etcd.Domain,
+					Host: key.ClusterEtcdDomain(cr),
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []v1beta1.HTTPIngressPath{

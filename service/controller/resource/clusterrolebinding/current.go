@@ -30,7 +30,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentClusterRoleBinding []*apiv1.ClusterRoleBinding
 	{
-		clusterRoleBinding, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(ctx, key.ClusterRoleBindingName(cr), metav1.GetOptions{})
+		clusterRoleBinding, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(ctx, key.ClusterRoleBindingName(&cr), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find cluster role binding in the Kubernetes API")
 			// fall through
@@ -42,7 +42,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBinding)
 		}
 
-		clusterRoleBindingPSP, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(ctx, key.ClusterRoleBindingPSPName(cr), metav1.GetOptions{})
+		clusterRoleBindingPSP, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(ctx, key.ClusterRoleBindingPSPName(&cr), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find cluster role binding psp in the Kubernetes API")
 			// fall through

@@ -23,7 +23,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var services []*corev1.Service
 
-	namespace := key.ClusterNamespace(cr)
+	namespace := key.ClusterNamespace(&cr)
 	serviceNames := []string{
 		key.MasterID,
 		key.WorkerID,
@@ -52,7 +52,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// removed we get an empty list here after the delete event got replayed. Then
 	// we just remove the services as usual.
 	if key.IsDeleted(&cr) {
-		n := key.ClusterNamespace(cr)
+		n := key.ClusterNamespace(&cr)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)

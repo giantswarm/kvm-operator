@@ -23,7 +23,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	{
 		r.logger.Debugf(ctx, "finding the namespace in the Kubernetes API")
 
-		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(ctx, key.ClusterNamespace(cr), metav1.GetOptions{})
+		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(ctx, key.ClusterNamespace(&cr), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find the namespace in the Kubernetes API")
 			// fall through
@@ -70,7 +70,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// we get an empty list here after the delete event got replayed. Then we just
 	// remove the namespace as usual.
 	if key.IsDeleted(&cr) {
-		n := key.ClusterNamespace(cr)
+		n := key.ClusterNamespace(&cr)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)

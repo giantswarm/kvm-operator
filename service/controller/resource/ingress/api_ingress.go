@@ -18,8 +18,8 @@ func newAPIIngress(cr v1alpha2.KVMCluster) *networkingv1beta1.Ingress {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: APIID,
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(cr),
-				"customer": key.ClusterCustomer(cr),
+				"cluster":  key.ClusterID(&cr),
+				"customer": key.ClusterCustomer(&cr),
 				"app":      key.MasterID,
 			},
 			Annotations: map[string]string{
@@ -30,13 +30,13 @@ func newAPIIngress(cr v1alpha2.KVMCluster) *networkingv1beta1.Ingress {
 			TLS: []networkingv1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						cr.Spec.Cluster.Kubernetes.API.Domain,
+						cr.Spec.Cluster.DNS.Domain,
 					},
 				},
 			},
 			Rules: []networkingv1beta1.IngressRule{
 				{
-					Host: cr.Spec.Cluster.Kubernetes.API.Domain,
+					Host: cr.Spec.Cluster.DNS.Domain,
 					IngressRuleValue: networkingv1beta1.IngressRuleValue{
 						HTTP: &networkingv1beta1.HTTPIngressRuleValue{
 							Paths: []networkingv1beta1.HTTPIngressPath{
@@ -44,7 +44,7 @@ func newAPIIngress(cr v1alpha2.KVMCluster) *networkingv1beta1.Ingress {
 									Path: "/",
 									Backend: networkingv1beta1.IngressBackend{
 										ServiceName: key.MasterID,
-										ServicePort: intstr.FromInt(cr.Spec.Cluster.Kubernetes.API.SecurePort),
+										ServicePort: intstr.FromInt(int(cr.Spec.ControlPlaneEndpoint.Port)),
 									},
 								},
 							},

@@ -21,7 +21,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	{
 		cluster := v1alpha2.KVMCluster{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      key.ClusterID(cr),
+				Name:      key.ClusterID(&cr),
 				Namespace: cr.Namespace,
 			},
 		}
@@ -34,7 +34,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	{
 		cluster := capiv1alpha3.Cluster{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      key.ClusterID(cr),
+				Name:      key.ClusterID(&cr),
 				Namespace: cr.Namespace,
 			},
 		}

@@ -5,27 +5,26 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/giantswarm/kvm-operator/pkg/label"
 )
 
 func Test_ClusterID(t *testing.T) {
-	expectedID := "test-cluster"
+	expectedID := "abc12"
 
 	cr := v1alpha2.KVMCluster{
-		Spec: v1alpha2.KVMClusterSpec{
-			Cluster: v1alpha1.Cluster{
-				ID: expectedID,
-				Customer: v1alpha1.ClusterCustomer{
-					ID: "test-customer",
-				},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				LabelCluster: "abc12",
 			},
 		},
 	}
 
-	if ClusterID(cr) != expectedID {
-		t.Fatalf("Expected cluster ID %s but was %s", expectedID, ClusterID(cr))
+	if ClusterID(&cr) != expectedID {
+		t.Fatalf("Expected cluster ID %s but was %s", expectedID, ClusterID(&cr))
 	}
 }
 
@@ -33,18 +32,15 @@ func Test_ClusterCustomer(t *testing.T) {
 	expectedID := "test-customer"
 
 	cr := v1alpha2.KVMCluster{
-		Spec: v1alpha2.KVMClusterSpec{
-			Cluster: v1alpha1.Cluster{
-				ID: expectedID,
-				Customer: v1alpha1.ClusterCustomer{
-					ID: "test-customer",
-				},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				label.Organization: "abc-def",
 			},
 		},
 	}
 
-	if ClusterCustomer(cr) != expectedID {
-		t.Fatalf("Expected customer ID %s but was %s", expectedID, ClusterCustomer(cr))
+	if ClusterCustomer(&cr) != expectedID {
+		t.Fatalf("Expected customer ID %s but was %s", expectedID, ClusterCustomer(&cr))
 	}
 }
 
@@ -116,8 +112,8 @@ func Test_NodeClusterIP(t *testing.T) {
 func Test_PortMappings(t *testing.T) {
 	cr := v1alpha2.KVMCluster{
 		Spec: v1alpha2.KVMClusterSpec{
-			KVM: v1alpha2.KVMClusterSpecKVM{
-				PortMappings: []v1alpha2.KVMClusterSpecKVMPortMappings{
+			Provider: v1alpha2.KVMClusterSpecProvider{
+				PortMappings: []v1alpha2.KVMClusterSpecProviderPortMappings{
 					{
 						Name:       "ingress-http",
 						NodePort:   31010,
@@ -160,8 +156,8 @@ func Test_PortMappings(t *testing.T) {
 func Test_PortMappings_CompatibilityMode(t *testing.T) {
 	cr := v1alpha2.KVMCluster{
 		Spec: v1alpha2.KVMClusterSpec{
-			KVM: v1alpha2.KVMClusterSpecKVM{
-				PortMappings: []v1alpha2.KVMClusterSpecKVMPortMappings{},
+			Provider: v1alpha2.KVMClusterSpecProvider{
+				PortMappings: []v1alpha2.KVMClusterSpecProviderPortMappings{},
 			},
 		},
 	}

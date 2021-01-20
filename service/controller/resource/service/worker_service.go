@@ -16,14 +16,13 @@ func newWorkerService(cr v1alpha2.KVMCluster) *corev1.Service {
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      key.WorkerID,
-			Namespace: key.ClusterID(cr),
+			Namespace: key.ClusterID(&cr),
 			Labels: map[string]string{
-				key.LegacyLabelCluster: key.ClusterID(cr),
-				key.LabelCustomer:      key.ClusterCustomer(cr),
+				key.LegacyLabelCluster: key.ClusterID(&cr),
+				key.LabelCustomer:      key.ClusterCustomer(&cr),
 				key.LabelApp:           key.WorkerID,
-				key.LabelCluster:       key.ClusterID(cr),
-				key.LabelOrganization:  key.ClusterCustomer(cr),
-				key.LabelVersionBundle: key.OperatorVersion(cr),
+				key.LabelCluster:       key.ClusterID(&cr),
+				key.LabelOrganization:  key.ClusterCustomer(&cr),
 			},
 			Annotations: map[string]string{
 				"prometheus.io/path":   "/healthz",

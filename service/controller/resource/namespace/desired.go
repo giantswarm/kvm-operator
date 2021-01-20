@@ -26,10 +26,10 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: key.ClusterNamespace(cr),
+			Name: key.ClusterNamespace(&cr),
 			Labels: map[string]string{
-				"cluster":  key.ClusterID(cr),
-				"customer": key.ClusterCustomer(cr),
+				"cluster":  key.ClusterID(&cr),
+				"customer": key.ClusterCustomer(&cr),
 			},
 		},
 	}

@@ -26,12 +26,6 @@ rules:
   - apiGroups:
       - core.giantswarm.io
     resources:
-      - storageconfigs
-    verbs:
-      - "*"
-  - apiGroups:
-      - core.giantswarm.io
-    resources:
       - drainerconfigs
     verbs:
       - create
@@ -47,6 +41,12 @@ rules:
       - patch
       - update
       - watch
+  - apiGroups:
+      - provider.giantswarm.io
+    resources:
+      - kvmclusterconfigs
+    verbs:
+      - get
   - apiGroups:
       - provider.giantswarm.io
     resources:

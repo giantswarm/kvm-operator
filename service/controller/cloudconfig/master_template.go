@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
 	"github.com/giantswarm/microerror"
@@ -13,12 +12,33 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
+type MasterConfig struct {
+	Config Config
+}
+
+type Master struct {
+	config Config
+}
+
+func NewMaster(config MasterConfig) (*Master, error) {
+	err := config.Config.Validate()
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	t := &Master{
+		config: config.Config,
+	}
+
+	return t, nil
+}
+
 // NewMasterTemplate generates a new worker cloud config template and returns it
 // as a base64 encoded string.
-func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha2.KVMCluster, data IgnitionTemplateData, node v1alpha1.ClusterNode, nodeIndex int) (string, error) {
+func (c *Master) NewTemplate(ctx context.Context, cr v1alpha2.KVMCluster, data IgnitionTemplateData, nodeIndex int) (string, error) {
 	var extension *masterExtension
 	{
-		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(cr), masterCertFiles)
+		certFiles, err := fetchCertFiles(ctx, data.CertsSearcher, key.ClusterID(&cr), masterCertFiles)
 		if err != nil {
 			return "", microerror.Mask(err)
 		}
@@ -29,11 +49,29 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha2.KVMClus
 		}
 	}
 
+	var apiExtraArgs []string
+	{
+		if key.OIDCClientID(cr) != "" {
+			apiExtraArgs = append(apiExtraArgs, fmt.Sprintf("--oidc-client-id=%s", key.OIDCClientID(cr)))
+		}
+		if key.OIDCIssuerURL(cr) != "" {
+			apiExtraArgs = append(apiExtraArgs, fmt.Sprintf("--oidc-issuer-url=%s", key.OIDCIssuerURL(cr)))
+		}
+		if key.OIDCUsernameClaim(cr) != "" {
+			apiExtraArgs = append(apiExtraArgs, fmt.Sprintf("--oidc-username-claim=%s", key.OIDCUsernameClaim(cr)))
+		}
+		if key.OIDCGroupsClaim(cr) != "" {
+			apiExtraArgs = append(apiExtraArgs, fmt.Sprintf("--oidc-groups-claim=%s", key.OIDCGroupsClaim(cr)))
+		}
+
+		apiExtraArgs = append(apiExtraArgs, c.config.APIExtraArgs...)
+	}
+
 	var params k8scloudconfig.Params
 	{
 		params.APIServerEncryptionKey = string(data.ClusterKeys.APIServerEncryptionKey)
 		params.BaseDomain = key.BaseDomain(cr)
-		params.Cluster = cr.Spec.Cluster
+		params.Cluster = clusterToLegacy(c.config, cr, "").Cluster
 		// Ingress controller service remains in k8scloudconfig and will be
 		// removed in a later migration.
 		params.DisableIngressControllerService = true
@@ -44,15 +82,14 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha2.KVMClus
 		}
 		params.Extension = extension
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
-		params.Node = node
-		params.Kubernetes.Apiserver.CommandExtraArgs = c.k8sAPIExtraArgs
+		params.Kubernetes.Apiserver.CommandExtraArgs = apiExtraArgs
 		params.Images = data.Images
 		params.Versions = data.Versions
-		params.RegistryMirrors = c.registryMirrors
-		params.SSOPublicKey = c.ssoPublicKey
-		params.DockerhubToken = c.dockerhubToken
+		params.RegistryMirrors = c.config.RegistryMirrors
+		params.SSOPublicKey = c.config.SSOPublicKey
+		params.DockerhubToken = c.config.DockerhubToken
 
-		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
+		ignitionPath := k8scloudconfig.GetIgnitionPath(c.config.IgnitionPath)
 		{
 			var err error
 			params.Files, err = k8scloudconfig.RenderFiles(ignitionPath, params)

@@ -21,7 +21,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var PVCs []*corev1.PersistentVolumeClaim
 
-	namespace := key.ClusterNamespace(cr)
+	namespace := key.ClusterNamespace(&cr)
 	pvcNames := key.PVCNames(cr)
 
 	for _, name := range pvcNames {

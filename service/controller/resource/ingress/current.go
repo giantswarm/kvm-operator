@@ -23,7 +23,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var ingresses []*v1beta1.Ingress
 
-	namespace := key.ClusterNamespace(cr)
+	namespace := key.ClusterNamespace(&cr)
 	ingressNames := []string{
 		APIID,
 		EtcdID,
@@ -52,7 +52,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// got removed we get an empty list here after the delete event got replayed.
 	// Then we just remove the ingresses as usual.
 	if key.IsDeleted(&cr) {
-		n := key.ClusterNamespace(cr)
+		n := key.ClusterNamespace(&cr)
 		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
 		if err != nil {
 			return nil, microerror.Mask(err)
