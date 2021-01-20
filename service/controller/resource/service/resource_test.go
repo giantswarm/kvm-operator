@@ -31,7 +31,6 @@ func Test_toService(t *testing.T) {
 							key.LabelCustomer:      "customer1",
 							key.LabelCluster:       "xy123",
 							key.LabelOrganization:  "org1",
-							key.LabelVersionBundle: "1.2.3",
 						},
 						Annotations: map[string]string{
 							key.AnnotationPrometheusCluster: "xy123",
@@ -60,7 +59,6 @@ func Test_toService(t *testing.T) {
 							key.LabelCustomer:      "customer1",
 							key.LabelCluster:       "xy123",
 							key.LabelOrganization:  "org1",
-							key.LabelVersionBundle: "1.2.3",
 						},
 						Annotations: map[string]string{
 							key.AnnotationPrometheusCluster: "xy123",
@@ -92,7 +90,6 @@ func Test_toService(t *testing.T) {
 							key.LabelCustomer:      "customer1",
 							key.LabelCluster:       "xy123",
 							key.LabelOrganization:  "org1",
-							key.LabelVersionBundle: "1.2.3",
 						},
 						Annotations: map[string]string{
 							key.AnnotationPrometheusCluster: "xy123",
@@ -152,7 +149,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -179,7 +175,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -210,7 +205,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -237,7 +231,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer2",
 						key.LabelCluster:       "xy456",
 						key.LabelOrganization:  "org2",
-						key.LabelVersionBundle: "1.2.4",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -268,7 +261,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -295,7 +287,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy456",
@@ -326,7 +317,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -353,7 +343,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -389,7 +378,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",
@@ -417,7 +405,6 @@ func Test_isServiceModified(t *testing.T) {
 						key.LabelCustomer:      "customer1",
 						key.LabelCluster:       "xy123",
 						key.LabelOrganization:  "org1",
-						key.LabelVersionBundle: "1.2.3",
 					},
 					Annotations: map[string]string{
 						key.AnnotationPrometheusCluster: "xy123",

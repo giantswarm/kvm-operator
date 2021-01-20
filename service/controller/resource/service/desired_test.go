@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/infrastructure/v1alpha2"
-	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/fake"
+
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func Test_Resource_Service_GetDesiredState(t *testing.T) {
@@ -22,13 +23,14 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha2.KVMCluster{
 				Spec: v1alpha2.KVMClusterSpec{
-					Cluster: v1alpha1.Cluster{
-						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
-							{},
-						},
-						Workers: []v1alpha1.ClusterNode{
-							{},
+					Cluster: v1alpha2.KVMClusterSpecCluster{
+						Nodes: []v1alpha2.KVMClusterSpecClusterNode{
+							{
+								Role: key.MasterID,
+							},
+							{
+								Role: key.WorkerID,
+							},
 						},
 					},
 				},
@@ -42,16 +44,24 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha2.KVMCluster{
 				Spec: v1alpha2.KVMClusterSpec{
-					Cluster: v1alpha1.Cluster{
-						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
-							{},
+					Cluster: v1alpha2.KVMClusterSpecCluster{
+						Nodes: []v1alpha2.KVMClusterSpecClusterNode{
+							{
+								Role: key.MasterID,
+							},
+							{
+								Role: key.WorkerID,
+							},
+							{
+								Role: key.WorkerID,
+							},
+							{
+								Role: key.WorkerID,
+							},
 						},
-						Workers: []v1alpha1.ClusterNode{
-							{},
-							{},
-							{},
-						},
+					},
+					Provider: v1alpha2.KVMClusterSpecProvider{
+						MachineStorageType: "persistentVolume",
 					},
 				},
 			},
@@ -64,18 +74,30 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 		{
 			Obj: &v1alpha2.KVMCluster{
 				Spec: v1alpha2.KVMClusterSpec{
-					Cluster: v1alpha1.Cluster{
-						ID: "al9qy",
-						Masters: []v1alpha1.ClusterNode{
-							{},
-							{},
-							{},
+					Cluster: v1alpha2.KVMClusterSpecCluster{
+						Nodes: []v1alpha2.KVMClusterSpecClusterNode{
+							{
+								Role: key.MasterID,
+							},
+							{
+								Role: key.MasterID,
+							},
+							{
+								Role: key.MasterID,
+							},
+							{
+								Role: key.WorkerID,
+							},
+							{
+								Role: key.WorkerID,
+							},
+							{
+								Role: key.WorkerID,
+							},
 						},
-						Workers: []v1alpha1.ClusterNode{
-							{},
-							{},
-							{},
-						},
+					},
+					Provider: v1alpha2.KVMClusterSpecProvider{
+						MachineStorageType: "persistentVolume",
 					},
 				},
 			},

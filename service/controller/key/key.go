@@ -167,7 +167,7 @@ func BaseDomain(cr v1alpha2.KVMCluster) string {
 }
 
 func ClusterAPIEndpoint(cr v1alpha2.KVMCluster) string {
-	return fmt.Sprintf("api.%s", ClusterAPIEndpoint(cr))
+	return fmt.Sprintf("api.%s", BaseDomain(cr))
 }
 
 func ClusterAPIEndpointFromPod(pod *corev1.Pod) (string, error) {

@@ -7,8 +7,8 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
 )
 
-func New() *cloudconfig.CloudConfig {
-	c := cloudconfig.DefaultConfig()
+func New() *cloudconfig.Master {
+	c := cloudconfig.Config{}
 
 	c.Logger = microloggertest.New()
 	c.DockerhubToken = "token"
@@ -19,7 +19,9 @@ func New() *cloudconfig.CloudConfig {
 	}
 	c.IgnitionPath = packagePath
 
-	newCloudConfig, err := cloudconfig.New(c)
+	newCloudConfig, err := cloudconfig.NewMaster(cloudconfig.MasterConfig{
+		Config: c,
+	})
 	if err != nil {
 		panic(err)
 	}

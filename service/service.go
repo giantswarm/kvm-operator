@@ -273,13 +273,6 @@ func (s *Service) Boot() {
 			}
 		}()
 
-		go func() {
-			err := s.storage.Boot(ctx)
-			if err != nil {
-				panic(microerror.JSON(err))
-			}
-		}()
-
 		go s.clusterController.Boot(ctx)
 		go s.deleterController.Boot(ctx)
 		go s.drainerController.Boot(ctx)

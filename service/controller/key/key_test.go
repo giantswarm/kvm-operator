@@ -34,7 +34,7 @@ func Test_ClusterCustomer(t *testing.T) {
 	cr := v1alpha2.KVMCluster{
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				label.Organization: "abc-def",
+				label.Organization: "test-customer",
 			},
 		},
 	}
