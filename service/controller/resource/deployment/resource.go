@@ -15,12 +15,18 @@ type Config struct {
 	CtrlClient    client.Client
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
+
+	DNSServers string
+	NTPServers string
 }
 
 type Resource struct {
 	ctrlClient    client.Client
 	logger        micrologger.Logger
 	tenantCluster tenantcluster.Interface
+
+	dnsServers string
+	ntpServers string
 }
 
 func New(config Config) (*Resource, error) {
@@ -29,6 +35,12 @@ func New(config Config) (*Resource, error) {
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+	}
+	if config.DNSServers == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.DNSServers must not be empty", config)
+	}
+	if config.NTPServers == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.NTPServers must not be empty", config)
 	}
 
 	r := &Resource{

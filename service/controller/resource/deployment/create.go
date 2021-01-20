@@ -90,13 +90,13 @@ func (r *Resource) newDeployment(ctx context.Context, cluster v1alpha2.KVMCluste
 	role := machine.Spec.ProviderID
 	if role == "master" {
 		var err error
-		deployment, err = newMasterDeployment(machine, cluster, release, 1)
+		deployment, err = newMasterDeployment(machine, cluster, release, 0, r.dnsServers, r.ntpServers)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	} else {
 		var err error
-		deployment, err = newWorkerDeployment(machine, cluster, release, 1)
+		deployment, err = newWorkerDeployment(machine, cluster, release, r.dnsServers, r.ntpServers)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -60,6 +60,8 @@ const (
 	EnvKeyMyPodName      = "MY_POD_NAME"
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
+	FlannelEnvPathPrefix = "/run/flannel"
+
 	ContainerLinuxComponentName = "containerlinux"
 
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
@@ -100,6 +102,7 @@ const (
 	AnnotationService                = "endpoint.kvm.giantswarm.io/service"
 	AnnotationPodDrained             = "endpoint.kvm.giantswarm.io/drained"
 	AnnotationPrometheusCluster      = "giantswarm.io/prometheus-cluster"
+	AnnotationVersionBundle          = "kvm-operator.giantswarm.io/version-bundle"
 
 	LabelApp          = "app"
 	LabelCluster      = "giantswarm.io/cluster"
@@ -277,8 +280,28 @@ func DefaultVersions() k8scloudconfig.Versions {
 	}
 }
 
+func DockerVolumeSizeFromNode(capabilities v1alpha2.KVMMachineSpecSize) string {
+	if capabilities.DockerVolumeSizeGB != 0 {
+		return fmt.Sprintf("%dG", capabilities.DockerVolumeSizeGB)
+	}
+
+	if capabilities.Disk.Value != 0 {
+		return fmt.Sprintf("%sG", strconv.FormatFloat(capabilities.Disk.Value, 'f', 0, 64))
+	}
+
+	return DefaultDockerDiskSize
+}
+
 func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
+}
+
+func NetworkEnvFilePath(cluster v1alpha2.KVMCluster) string {
+	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(cluster))
+}
+
+func HealthListenAddress(cluster v1alpha2.KVMCluster) string {
+	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(cluster)))
 }
 
 func IscsiInitiatorName(cr v1alpha2.KVMCluster, nodeIndex int, nodeRole string) string {
@@ -313,6 +336,21 @@ func IsPodDrained(pod *corev1.Pod) (bool, error) {
 	}
 
 	return b, nil
+}
+
+func KubeletVolumeSizeFromNode(capabilities v1alpha2.KVMMachineSpecSize) string {
+	// TODO: https://github.com/giantswarm/giantswarm/issues/4105#issuecomment-421772917
+	// TODO: for now we use same value as for DockerVolumeSizeFromNode, when we have kubelet size in spec we should use that.
+
+	if capabilities.DockerVolumeSizeGB != 0 {
+		return fmt.Sprintf("%dG", capabilities.DockerVolumeSizeGB)
+	}
+
+	if capabilities.Disk.Value != 0 {
+		return fmt.Sprintf("%sG", strconv.FormatFloat(capabilities.Disk.Value, 'f', 0, 64))
+	}
+
+	return DefaultKubeletDiskSize
 }
 
 // ArePodContainersTerminated checks ContainerState for all containers present

@@ -53,6 +53,9 @@ func newMachineResources(config MachineConfig) ([]resource.Interface, error) {
 			CtrlClient:    config.K8sClient.CtrlClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
+
+			DNSServers: config.DNSServers,
+			NTPServers: config.NTPServers,
 		}
 
 		deploymentResource, err = deployment.New(c)

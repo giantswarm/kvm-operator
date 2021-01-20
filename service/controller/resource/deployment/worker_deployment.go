@@ -10,13 +10,14 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluster, release releasev1alpha1.Release, i int) (*v1.Deployment, error) {
+func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluster, release releasev1alpha1.Release, dnsServers string, ntpServers string) (*v1.Deployment, error) {
 	privileged := true
 	replicas := int32(1)
 	podDeletionGracePeriod := int64(key.PodDeletionGracePeriod.Seconds())
@@ -51,6 +52,8 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 			},
 			Labels: map[string]string{
 				key.LabelApp:          key.WorkerID,
+				"cluster":             key.ClusterID(&cluster),
+				"customer":            key.ClusterCustomer(&cluster),
 				key.LabelCluster:      key.ClusterID(&cluster),
 				key.LabelOrganization: key.ClusterCustomer(&cluster),
 				key.LabelManagedBy:    key.OperatorName,
@@ -60,9 +63,9 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 		Spec: v1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					key.LabelApp:     key.WorkerID,
-					key.LabelCluster: key.ClusterID(&cluster),
-					"node":           machine.Spec.ProviderID,
+					key.LabelApp: key.WorkerID,
+					"cluster":    key.ClusterID(&cluster),
+					"node":       machine.Spec.ProviderID,
 				},
 			},
 			Strategy: v1.DeploymentStrategy{
@@ -72,14 +75,17 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Annotations: map[string]string{
-						key.AnnotationAPIEndpoint: key.ClusterAPIEndpoint(cluster),
-						key.AnnotationIp:          "",
-						key.AnnotationService:     key.WorkerID,
-						key.AnnotationPodDrained:  "False",
+						key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(cluster),
+						key.AnnotationIp:            "",
+						key.AnnotationService:       key.WorkerID,
+						key.AnnotationPodDrained:    "False",
+						key.AnnotationVersionBundle: key.OperatorVersion(cluster),
 					},
 					Name: key.WorkerID,
 					Labels: map[string]string{
 						key.LabelApp:          key.WorkerID,
+						"cluster":             key.ClusterID(&cluster),
+						"customer":            key.ClusterCustomer(&cluster),
 						key.LabelCluster:      key.ClusterID(&cluster),
 						key.LabelOrganization: key.ClusterCustomer(&cluster),
 						"node":                machine.Spec.ProviderID,
@@ -88,7 +94,8 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 					},
 				},
 				Spec: corev1.PodSpec{
-					Affinity: newWorkerPodAfinity(cluster),
+					Affinity:    newWorkerPodAfinity(cluster),
+					HostNetwork: true,
 					NodeSelector: map[string]string{
 						"role": key.WorkerID,
 					},
@@ -96,19 +103,13 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 					TerminationGracePeriodSeconds: &podDeletionGracePeriod,
 					Volumes: []corev1.Volume{
 						{
-							Name: "ignition-cm",
+							Name: "cloud-config",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: key.ConfigMapName(machine, key.WorkerID),
 									},
 								},
-							},
-						},
-						{
-							Name: "ignition",
-							VolumeSource: corev1.VolumeSource{
-								EmptyDir: &corev1.EmptyDirVolumeSource{},
 							},
 						},
 						{
@@ -126,38 +127,83 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 							},
 						},
 						{
-							Name: "dev-kvm",
+							Name: "flannel",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/dev/kvm",
-								},
-							},
-						},
-						{
-							Name: "dev-net-tun",
-							VolumeSource: corev1.VolumeSource{
-								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/dev/net/tun",
+									Path: key.FlannelEnvPathPrefix,
 								},
 							},
 						},
 					},
 					Containers: []corev1.Container{
 						{
+							Name:            "k8s-endpoint-updater",
+							Image:           key.K8SEndpointUpdaterDocker,
+							ImagePullPolicy: corev1.PullIfNotPresent,
+							Command: []string{
+								"/opt/k8s-endpoint-updater",
+								"update",
+								"--provider.bridge.name=" + key.NetworkBridgeName(cluster),
+								"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(&cluster),
+								"--service.kubernetes.cluster.service=" + key.WorkerID,
+								"--service.kubernetes.inCluster=true",
+							},
+							SecurityContext: &corev1.SecurityContext{
+								Privileged: &privileged,
+							},
+							Env: []corev1.EnvVar{
+								{
+									Name: "POD_NAME",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.name",
+										},
+									},
+								},
+							},
+						},
+						{
 							Name:            "k8s-kvm",
 							Image:           key.K8SKVMDockerImage,
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							SecurityContext: &corev1.SecurityContext{
 								Privileged: &privileged,
-								Capabilities: &corev1.Capabilities{
-									Add: []corev1.Capability{
-										"NET_ADMIN",
-									},
-								},
+							},
+							Args: []string{
+								key.WorkerID,
 							},
 							Env: []corev1.EnvVar{
 								{
-									Name: "GUEST_NAME",
+									Name:  "CORES",
+									Value: fmt.Sprintf("%d", capabilities.CPUs),
+								},
+								{
+									Name:  "FLATCAR_VERSION",
+									Value: containerDistroVersion,
+								},
+								{
+									Name:  "FLATCAR_CHANNEL",
+									Value: key.FlatcarChannel,
+								},
+								{
+									Name:  "DISK_DOCKER",
+									Value: key.DockerVolumeSizeFromNode(capabilities),
+								},
+								{
+									Name:  "DISK_KUBELET",
+									Value: key.KubeletVolumeSizeFromNode(capabilities),
+								},
+								{
+									Name:  "DISK_OS",
+									Value: key.DefaultOSDiskSize,
+								},
+								{
+									Name:  "DNS_SERVERS",
+									Value: dnsServers,
+								},
+								{
+									Name: "HOSTNAME",
 									ValueFrom: &corev1.EnvVarSource{
 										FieldRef: &corev1.ObjectFieldSelector{
 											APIVersion: "v1",
@@ -166,33 +212,68 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 									},
 								},
 								{
-									Name: "GUEST_MEMORY",
+									Name: "MEMORY",
 									// TODO provide memory like disk as float64 and format here.
 									Value: capabilities.Memory,
 								},
 								{
-									Name:  "GUEST_CPUS",
-									Value: fmt.Sprintf("%d", capabilities.CPUs),
+									Name:  "NETWORK_BRIDGE_NAME",
+									Value: key.NetworkBridgeName(cluster),
 								},
 								{
-									Name:  "GUEST_ROOT_DISK_SIZE",
-									Value: key.DefaultOSDiskSize,
+									Name:  "NETWORK_TAP_NAME",
+									Value: key.NetworkTapName(cluster),
 								},
 								{
-									Name:  "FLATCAR_CHANNEL",
-									Value: key.FlatcarChannel,
+									Name:  "NTP_SERVERS",
+									Value: ntpServers,
 								},
 								{
-									Name:  "FLATCAR_VERSION",
-									Value: containerDistroVersion,
+									Name:  "ROLE",
+									Value: key.WorkerID,
 								},
 								{
-									Name:  "FLATCAR_IGNITION",
-									Value: "/var/lib/containervmm/ignition/ignition",
+									Name:  "CLOUD_CONFIG_PATH",
+									Value: "/cloudconfig/user_data",
+								},
+							},
+							Lifecycle: &corev1.Lifecycle{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{"/qemu-shutdown", key.ShutdownDeferrerPollPath(cluster)},
+									},
+								},
+							},
+							LivenessProbe: &corev1.Probe{
+								InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
+								TimeoutSeconds:      key.TimeoutSeconds,
+								PeriodSeconds:       key.PeriodSeconds,
+								FailureThreshold:    key.FailureThreshold,
+								SuccessThreshold:    key.SuccessThreshold,
+								Handler: corev1.Handler{
+									HTTPGet: &corev1.HTTPGetAction{
+										Path: key.HealthEndpoint,
+										Port: intstr.IntOrString{IntVal: key.LivenessPort(cluster)},
+										Host: key.ProbeHost,
+									},
+								},
+							},
+							ReadinessProbe: &corev1.Probe{
+								InitialDelaySeconds: key.ReadinessProbeInitialDelaySeconds,
+								TimeoutSeconds:      key.TimeoutSeconds,
+								PeriodSeconds:       key.PeriodSeconds,
+								FailureThreshold:    key.FailureThreshold,
+								SuccessThreshold:    key.SuccessThreshold,
+								Handler: corev1.Handler{
+									HTTPGet: &corev1.HTTPGetAction{
+										Path: key.HealthEndpoint,
+										Port: intstr.IntOrString{IntVal: key.LivenessPort(cluster)},
+										Host: key.ProbeHost,
+									},
 								},
 							},
 							Resources: corev1.ResourceRequirements{
-								Requests: corev1.ResourceList{
+								Requests: map[corev1.ResourceName]resource.Quantity{
 									corev1.ResourceCPU:    cpuQuantity,
 									corev1.ResourceMemory: memoryQuantity,
 								},
@@ -203,46 +284,88 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 							},
 							VolumeMounts: []corev1.VolumeMount{
 								{
-									Name:      "ignition",
-									MountPath: "/var/lib/containervmm/ignition",
+									Name:      "cloud-config",
+									MountPath: "/cloudconfig/",
 								},
 								{
 									Name:      "images",
-									MountPath: "/var/lib/containervmm/flatcar",
+									MountPath: "/usr/code/images/",
 								},
 								{
 									Name:      "rootfs",
-									MountPath: "/var/lib/containervmm/rootfs",
-								},
-								{
-									Name:      "dev-kvm",
-									MountPath: "/dev/kvm",
-								},
-								{
-									Name:      "dev-net-tun",
-									MountPath: "/dev/net/tun",
+									MountPath: "/usr/code/rootfs/",
 								},
 							},
 						},
-					},
-					InitContainers: []corev1.Container{
 						{
-							Name:  "ignition",
-							Image: key.K8SKVMDockerImage,
-							Command: []string{
-								"cp",
-								"/tmp/ignition/user_data",
-								"/var/lib/containervmm/ignition/ignition",
-							},
-							ImagePullPolicy: corev1.PullIfNotPresent,
-							VolumeMounts: []corev1.VolumeMount{
+							Name:            "k8s-kvm-health",
+							Image:           key.K8SKVMHealthDocker,
+							ImagePullPolicy: corev1.PullAlways,
+							Env: []corev1.EnvVar{
 								{
-									Name:      "ignition",
-									MountPath: "/var/lib/containervmm/ignition",
+									Name:  "LISTEN_ADDRESS",
+									Value: key.HealthListenAddress(cluster),
 								},
 								{
-									Name:      "ignition-cm",
-									MountPath: "/tmp/ignition",
+									Name:  "NETWORK_ENV_FILE_PATH",
+									Value: key.NetworkEnvFilePath(cluster),
+								},
+							},
+							SecurityContext: &corev1.SecurityContext{
+								Privileged: &privileged,
+							},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "flannel",
+									MountPath: key.FlannelEnvPathPrefix,
+								},
+							},
+						},
+						{
+							Name:            "shutdown-deferrer",
+							Image:           key.ShutdownDeferrerDocker,
+							ImagePullPolicy: corev1.PullAlways,
+							Args: []string{
+								"daemon",
+								"--server.listen.address=" + key.ShutdownDeferrerListenAddress(cluster),
+							},
+							Env: []corev1.EnvVar{
+								{
+									Name: key.EnvKeyMyPodName,
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											FieldPath: "metadata.name",
+										},
+									},
+								},
+								{
+									Name: key.EnvKeyMyPodNamespace,
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											FieldPath: "metadata.namespace",
+										},
+									},
+								},
+							},
+							Lifecycle: &corev1.Lifecycle{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(cluster)},
+									},
+								},
+							},
+							LivenessProbe: &corev1.Probe{
+								InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
+								TimeoutSeconds:      key.TimeoutSeconds,
+								PeriodSeconds:       key.PeriodSeconds,
+								FailureThreshold:    key.FailureThreshold,
+								SuccessThreshold:    key.SuccessThreshold,
+								Handler: corev1.Handler{
+									HTTPGet: &corev1.HTTPGetAction{
+										Path: key.HealthEndpoint,
+										Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(cluster))},
+										Host: key.ProbeHost,
+									},
 								},
 							},
 						},
@@ -251,6 +374,7 @@ func newWorkerDeployment(machine v1alpha2.KVMMachine, cluster v1alpha2.KVMCluste
 			},
 		},
 	}
+
 	addCoreComponentsAnnotations(deployment, release)
 
 	return deployment, nil
