@@ -86,14 +86,22 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		// Dependencies.
-		certsSearcher:   config.CertsSearcher,
-		k8sClient:       config.K8sClient,
-		keyWatcher:      config.KeyWatcher,
-		logger:          config.Logger,
-		registryDomain:  config.RegistryDomain,
-		ignitionPath:    config.IgnitionPath,
-		dockerhubToken:  config.DockerhubToken,
-		registryMirrors: config.RegistryMirrors,
+		certsSearcher:             config.CertsSearcher,
+		k8sClient:                 config.K8sClient,
+		keyWatcher:                config.KeyWatcher,
+		logger:                    config.Logger,
+		dnsServers:                config.DNSServers,
+		ignitionPath:              config.IgnitionPath,
+		ntpServers:                config.NTPServers,
+		ssoPublicKey:              config.SSOPublicKey,
+		dockerhubToken:            config.DockerhubToken,
+		registryDomain:            config.RegistryDomain,
+		registryMirrors:           config.RegistryMirrors,
+		dockerDaemonCIDR:          config.DockerDaemonCIDR,
+		imagePullProgressDeadline: config.ImagePullProgressDeadline,
+		networkSetupDockerImage:   config.NetworkSetupDockerImage,
+		podInfraContainerImage:    config.PodInfraContainerImage,
+		sshUserList:               config.SSHUserList,
 	}
 
 	return newService, nil
