@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"fmt"
-	"net"
 	"reflect"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
@@ -117,11 +116,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				description = clusterConfig.Spec.Guest.Name
 			}
 
-			_, calicoSubnet, err := net.ParseCIDR(cr.Spec.Cluster.Calico.Subnet)
-			if err != nil {
-				return microerror.Mask(err)
-			}
-
 			kvmCluster = v1alpha2.KVMCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      clusterKey.Name,
@@ -142,11 +136,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 						DNS: v1alpha2.KVMClusterSpecClusterDNS{
 							Domain: cr.Spec.Cluster.Kubernetes.Domain,
 						},
-						Calico: v1alpha2.KVMClusterSpecClusterNetwork{
+						Network: v1alpha2.KVMClusterSpecClusterNetwork{
 							MTU:    cr.Spec.Cluster.Calico.MTU,
-							Subnet: *calicoSubnet,
+							Subnet: cr.Spec.Cluster.Calico.Subnet,
+							CIDR:   cr.Spec.Cluster.Calico.MTU,
 						},
-						Nodes:  nodes,
+						Nodes: nodes,
 					},
 					Provider: v1alpha2.KVMClusterSpecProvider{
 						EndpointUpdaterImage: cr.Spec.KVM.EndpointUpdater.Docker.Image,

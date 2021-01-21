@@ -9,9 +9,9 @@ import (
 )
 
 type Tenant struct {
-	Ignition ignition.Ignition
-	SSH      ssh.SSH
-	Update   update.Update
-	Docker docker.Docker
+	Ignition   ignition.Ignition
+	SSH        ssh.SSH
+	Update     update.Update
+	Docker     docker.Docker
 	Kubernetes kubernetes.Kubernetes
 }

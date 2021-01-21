@@ -3,7 +3,7 @@ module github.com/giantswarm/kvm-operator
 go 1.14
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.14.2-0.20210120174623-428874477105
+	github.com/giantswarm/apiextensions/v3 v3.14.2-0.20210121185054-3011a325474a
 	github.com/giantswarm/certs/v3 v3.1.0
 	github.com/giantswarm/errors v0.2.3
 	github.com/giantswarm/k8sclient/v5 v5.0.0
@@ -39,5 +39,3 @@ replace github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3
 
 // keep in sync with giantswarm/apiextensions
 replace sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
-
-replace github.com/giantswarm/apiextensions/v3 => /Users/thomas/Development/giantswarm/apiextensions

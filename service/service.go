@@ -190,10 +190,10 @@ func New(config Config) (*Service, error) {
 	var machineController *controller.Machine
 	{
 		c := controller.MachineConfig{
-			CertsSearcher:             certsSearcher,
-			K8sClient:                 k8sClient,
-			Logger:                    config.Logger,
-			TenantCluster:             tenantCluster,
+			CertsSearcher: certsSearcher,
+			K8sClient:     k8sClient,
+			Logger:        config.Logger,
+			TenantCluster: tenantCluster,
 
 			DNSServers:                config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
 			IgnitionPath:              config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
