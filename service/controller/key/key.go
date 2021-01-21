@@ -189,6 +189,11 @@ func ClusterCustomer(getter LabelsGetter) string {
 	return getter.GetLabels()[label.Organization]
 }
 
+func CIDR(ipNet net.IPNet) int {
+	ones, _ := ipNet.Mask.Size()
+	return ones
+}
+
 func ClusterEtcdDomain(cr v1alpha2.KVMCluster) string {
 	return fmt.Sprintf("etcd.%s", BaseDomain(cr))
 }

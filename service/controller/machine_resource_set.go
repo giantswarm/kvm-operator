@@ -9,7 +9,7 @@ import (
 
 	"github.com/giantswarm/kvm-operator/service/controller/resource/deployment"
 
-	"github.com/giantswarm/kvm-operator/service/controller/resource/configmap"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/ignition"
 )
 
 func newMachineResources(config MachineConfig) ([]resource.Interface, error) {
@@ -30,7 +30,7 @@ func newMachineResources(config MachineConfig) ([]resource.Interface, error) {
 
 	var configmapResource resource.Interface
 	{
-		c := configmap.Config{
+		c := ignition.Config{
 			CertsSearcher:   config.CertsSearcher,
 			K8sClient:       config.K8sClient,
 			KeyWatcher:      randomkeysSearcher,
@@ -41,7 +41,7 @@ func newMachineResources(config MachineConfig) ([]resource.Interface, error) {
 			RegistryMirrors: config.RegistryMirrors,
 		}
 
-		configmapResource, err = configmap.New(c)
+		configmapResource, err = ignition.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -190,19 +190,23 @@ func New(config Config) (*Service, error) {
 	var machineController *controller.Machine
 	{
 		c := controller.MachineConfig{
-			CertsSearcher: certsSearcher,
-			K8sClient:     k8sClient,
-			Logger:        config.Logger,
-			TenantCluster: tenantCluster,
+			CertsSearcher:             certsSearcher,
+			K8sClient:                 k8sClient,
+			Logger:                    config.Logger,
+			TenantCluster:             tenantCluster,
 
-			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
-			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
-			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
-
-			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
-			RegistryDomain:  config.Viper.GetString(config.Flag.Service.Registry.Domain),
-			RegistryMirrors: config.Viper.GetStringSlice(config.Flag.Service.Registry.Mirrors),
+			DNSServers:                config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
+			IgnitionPath:              config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
+			NTPServers:                config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
+			SSOPublicKey:              config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+			DockerhubToken:            config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
+			RegistryDomain:            config.Viper.GetString(config.Flag.Service.Registry.Domain),
+			RegistryMirrors:           config.Viper.GetStringSlice(config.Flag.Service.Registry.Mirrors),
+			DockerDaemonCIDR:          config.Viper.GetString(config.Flag.Service.Tenant.Docker.Daemon.CIDR),
+			ImagePullProgressDeadline: config.Viper.GetString(config.Flag.Service.Tenant.Kubernetes.Kubelet.ImagePullProgressDeadline),
+			NetworkSetupDockerImage:   config.Viper.GetString(config.Flag.Service.Tenant.Kubernetes.NetworkSetup.Image),
+			PodInfraContainerImage:    config.Viper.GetString(config.Flag.Service.Tenant.Kubernetes.Kubelet.PodInfraContainerImage),
+			SSHUserList:               config.Viper.GetString(config.Flag.Service.Tenant.SSH.UserList),
 		}
 
 		machineController, err = controller.NewMachine(c)

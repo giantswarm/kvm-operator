@@ -1,4 +1,4 @@
-package configmap
+package ignition
 
 import (
 	"context"
@@ -114,24 +114,21 @@ func (r *Resource) newConfigMap(ctx context.Context, cluster v1alpha2.KVMCluster
 				UsernameClaim: cluster.Spec.Cluster.OIDC.Claims.Username,
 				GroupsClaim:   cluster.Spec.Cluster.OIDC.Claims.Groups,
 			},
-			APIExtraArgs:              nil,
-			CalicoCIDR:                26,
-			CalicoMTU:                 1500,
-			CalicoSubnet:              "192.168.100.0/24",
-			ClusterIPRange:            "192.168.100.0/24",
-			DockerDaemonCIDR:          "192.168.100.0/24",
+			CalicoCIDR:                key.CIDR(cluster.Spec.Cluster.Calico.Subnet),
+			CalicoMTU:                 cluster.Spec.Cluster.Calico.MTU,
+			CalicoSubnet:              cluster.Spec.Cluster.Calico.Subnet.IP.String(),
+			ClusterIPRange:            cluster.Spec.Cluster.ClusterIPRange,
+			DockerDaemonCIDR:          r.dockerDaemonCIDR,
 			DockerhubToken:            r.dockerhubToken,
-			ExternalSNAT:              false,
 			IgnitionPath:              r.ignitionPath,
-			ImagePullProgressDeadline: "1m",
-			KubeletExtraArgs:          nil,
+			ImagePullProgressDeadline: r.imagePullProgressDeadline,
 			ClusterDomain:             cluster.Spec.Cluster.DNS.Domain,
-			NetworkSetupDockerImage:   "giantswarm/k8s-setup-network-environment",
-			PodInfraContainerImage:    "giantswarm/pause",
+			NetworkSetupDockerImage:   r.networkSetupDockerImage,
+			PodInfraContainerImage:    r.podInfraContainerImage,
 			RegistryDomain:            r.registryDomain,
 			RegistryMirrors:           r.registryMirrors,
-			SSHUserList:               "thomas:123",
-			SSOPublicKey:              "456",
+			SSHUserList:               r.sshUserList,
+			SSOPublicKey:              r.ssoPublicKey,
 		}
 	}
 

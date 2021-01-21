@@ -1,4 +1,4 @@
-package configmap
+package ignition
 
 import (
 	"github.com/giantswarm/certs/v3/pkg/certs"
@@ -10,7 +10,7 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "configmap"
+	Name = "ignition"
 
 	KeyUserData = "user_data"
 )
@@ -18,27 +18,45 @@ const (
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
 	// Dependencies.
-	CertsSearcher   certs.Interface
-	K8sClient       k8sclient.Interface
-	KeyWatcher      randomkeys.Interface
-	Logger          micrologger.Logger
-	DockerhubToken  string
-	RegistryDomain  string
-	IgnitionPath    string
-	RegistryMirrors []string
+	CertsSearcher certs.Interface
+	K8sClient     k8sclient.Interface
+	KeyWatcher    randomkeys.Interface
+	Logger        micrologger.Logger
+
+	DNSServers                string
+	IgnitionPath              string
+	NTPServers                string
+	SSOPublicKey              string
+	DockerhubToken            string
+	RegistryDomain            string
+	RegistryMirrors           []string
+	DockerDaemonCIDR          string
+	ImagePullProgressDeadline string
+	NetworkSetupDockerImage   string
+	PodInfraContainerImage    string
+	SSHUserList               string
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	certsSearcher   certs.Interface
-	k8sClient       k8sclient.Interface
-	keyWatcher      randomkeys.Interface
-	logger          micrologger.Logger
-	registryDomain  string
-	ignitionPath    string
-	dockerhubToken  string
-	registryMirrors []string
+	certsSearcher certs.Interface
+	k8sClient     k8sclient.Interface
+	keyWatcher    randomkeys.Interface
+	logger        micrologger.Logger
+
+	dnsServers                string
+	ignitionPath              string
+	ntpServers                string
+	ssoPublicKey              string
+	dockerhubToken            string
+	registryDomain            string
+	registryMirrors           []string
+	dockerDaemonCIDR          string
+	imagePullProgressDeadline string
+	networkSetupDockerImage   string
+	podInfraContainerImage    string
+	sshUserList               string
 }
 
 // New creates a new configured config map resource.

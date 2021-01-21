@@ -1,4 +1,4 @@
-package configmap
+package ignition
 
 import (
 	"github.com/giantswarm/microerror"

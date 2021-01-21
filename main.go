@@ -129,7 +129,12 @@ func mainError() error {
 
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.Ignition.Path, "/opt/ignition", "Default path for the ignition base directory.")
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")
-	daemonCommand.PersistentFlags().Bool(f.Service.Tenant.Update.Enabled, false, "Whether updates of tenant cluster nodes are allowed to be processed upon reconciliation.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.Docker.Daemon.CIDR, "", "CIDR of the Docker daemon bridge configured in guest clusters.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.Kubernetes.API.ClusterIPRange, "", "Service IP range within guest clusters.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.Kubernetes.Kubelet.ImagePullProgressDeadline, "1m", "If no progress is made before this deadline image pulling is cancelled.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.Kubernetes.Kubelet.PodInfraContainerImage, "giantswarm/pause", "Image to use for the pause container for pods.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.Kubernetes.NetworkSetup.Image, "giantswarm/k8s-network-setup", "Image to use to set up the network environment.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.SSH.UserList, "", "Comma separated list of ssh users and their public key in format `username:publickey`, being installed in the guest cluster nodes.")
 
 	err = newCommand.CobraCommand().Execute()
 	if err != nil {

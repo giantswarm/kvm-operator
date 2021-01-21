@@ -1,4 +1,4 @@
-package configmap
+package ignition
 
 import (
 	"context"

@@ -21,14 +21,18 @@ type MachineConfig struct {
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 
-	DNSServers   string
-	IgnitionPath string
-	NTPServers   string
-	SSOPublicKey string
-
-	DockerhubToken  string
-	RegistryDomain  string
-	RegistryMirrors []string
+	DNSServers                string
+	IgnitionPath              string
+	NTPServers                string
+	SSOPublicKey              string
+	DockerhubToken            string
+	RegistryDomain            string
+	RegistryMirrors           []string
+	DockerDaemonCIDR          string
+	ImagePullProgressDeadline string
+	NetworkSetupDockerImage   string
+	PodInfraContainerImage    string
+	SSHUserList               string
 }
 
 type Machine struct {

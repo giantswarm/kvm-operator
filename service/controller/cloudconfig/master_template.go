@@ -67,6 +67,15 @@ func (c *Master) NewTemplate(ctx context.Context, cr v1alpha2.KVMCluster, data I
 		apiExtraArgs = append(apiExtraArgs, c.config.APIExtraArgs...)
 	}
 
+	var kubeletExtraArgs []string
+	{
+		if c.config.PodInfraContainerImage != "" {
+			kubeletExtraArgs = append(kubeletExtraArgs, fmt.Sprintf("--pod-infra-container-image=%s", c.config.PodInfraContainerImage))
+		}
+
+		kubeletExtraArgs = append(kubeletExtraArgs, c.config.KubeletExtraArgs...)
+	}
+
 	var params k8scloudconfig.Params
 	{
 		params.APIServerEncryptionKey = string(data.ClusterKeys.APIServerEncryptionKey)
@@ -88,6 +97,7 @@ func (c *Master) NewTemplate(ctx context.Context, cr v1alpha2.KVMCluster, data I
 		params.RegistryMirrors = c.config.RegistryMirrors
 		params.SSOPublicKey = c.config.SSOPublicKey
 		params.DockerhubToken = c.config.DockerhubToken
+		params.Kubernetes.Kubelet.CommandExtraArgs = kubeletExtraArgs
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.config.IgnitionPath)
 		{
