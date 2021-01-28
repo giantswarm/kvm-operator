@@ -190,8 +190,8 @@ func removeDeadIPFromEndpoints(endpoints *corev1.Endpoints, nodes []corev1.Node,
 					return len(indexesToDelete), endpoints, microerror.Mask(err)
 				}
 
-				// Check if the CP pod is Ready
-				if key.PodIsReady(cpPod) {
+				// Check if the CP pod and corresponding node are Ready
+				if key.PodIsReady(cpPod) && key.NodeIsReady(node) {
 					// Keep this Pod in our endpoints
 					found = true
 					break

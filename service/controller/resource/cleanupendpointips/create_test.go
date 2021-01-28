@@ -172,9 +172,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.2.3.4",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
@@ -188,9 +194,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.1.1.1",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
@@ -291,9 +303,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.2.3.4",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
@@ -307,9 +325,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.1.1.1",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
@@ -410,9 +434,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.2.3.4",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
@@ -510,9 +540,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.2.3.4",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
@@ -526,9 +562,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.1.1.1",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
@@ -542,9 +584,15 @@ func Test_Resource_CleanupEndpointIPs_removeDeadIPFromEndpoints(t *testing.T) {
 					},
 					Status: corev1.NodeStatus{
 						Addresses: []corev1.NodeAddress{
-							corev1.NodeAddress{
+							{
 								Type:    corev1.NodeInternalIP,
 								Address: "1.1.1.4",
+							},
+						},
+						Conditions: []corev1.NodeCondition{
+							{
+								Type:   corev1.NodeReady,
+								Status: corev1.ConditionTrue,
 							},
 						},
 					},
