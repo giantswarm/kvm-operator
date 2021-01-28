@@ -522,17 +522,6 @@ func OperatorVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.OperatorVersion]
 }
 
-// NodeIsReady examines the Status Conditions of a Node
-// and returns true if the NodeReady Condition is true.
-func NodeIsReady(node corev1.Node) bool {
-	for _, c := range node.Status.Conditions {
-		if c.Type == corev1.NodeReady && c.Status == corev1.ConditionTrue {
-			return true
-		}
-	}
-	return false
-}
-
 // PodIsReady examines the Status Conditions of a Pod
 // and returns true if the PodReady Condition is true.
 func PodIsReady(pod corev1.Pod) bool {
