@@ -6,39 +6,65 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
-	pod, ok := obj.(*corev1.Pod)
-	if !ok {
-		return microerror.Mask(invalidConfigError)
-	}
-
-	nodeIP, ok := pod.Annotations["endpoint.kvm.giantswarm.io/ip"]
-	if !ok || nodeIP == "" {
-		return nil
-	}
-
-	statusAnnotation, ok := pod.Annotations["kvm-operator.giantswarm.io/node-status"]
-	if !ok || statusAnnotation == "" {
-		return nil
-	}
-
-	endpointsName, ok := pod.Annotations["endpoint.kvm.giantswarm.io/service"]
-	if !ok || endpointsName == "" {
-		return nil
-	}
-
-	endpoints, err := r.k8sClient.CoreV1().Endpoints(pod.Namespace).Get(ctx, endpointsName, v1.GetOptions{})
+	pod, err := key.ToPod(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
+	var nodeIP string
+	var serviceName string
+	{
+		var ok bool
+		nodeIP, ok = pod.Annotations[key.AnnotationIp]
+		if !ok || nodeIP == "" {
+			r.logger.Debugf(ctx, "node pod %s/%s has no ip annotation %#q, skipping", pod.Namespace, pod.Name, key.AnnotationIp)
+			return nil
+		}
+
+		serviceName, ok = pod.Annotations[key.AnnotationService]
+		if !ok || serviceName == "" {
+			r.logger.Debugf(ctx, "node pod %s/%s has no service annotation %#q, skipping", pod.Namespace, pod.Name, key.AnnotationService)
+			return nil
+		} else if serviceName == key.MasterID {
+			r.logger.Debugf(ctx, "node pod %s/%s contains a workload cluster master node, skipping", pod.Namespace, pod.Name)
+			return nil
+		}
+	}
+
+	var readyForTraffic bool
+	{
+		for _, condition := range pod.Status.Conditions {
+			if condition.Type == corev1.PodReady {
+				readyForTraffic = condition.Status == corev1.ConditionTrue
+				break
+			}
+		}
+
+		statusAnnotation, hasStatusAnnotation := pod.Annotations[key.AnnotationPodNodeStatus]
+		if hasStatusAnnotation && statusAnnotation != "" {
+			readyForTraffic = readyForTraffic && statusAnnotation == key.PodNodeStatusReady
+		}
+	}
+
+	var endpoints *corev1.Endpoints
+	{
+		var err error
+		endpoints, err = r.k8sClient.CoreV1().Endpoints(pod.Namespace).Get(ctx, serviceName, v1.GetOptions{})
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
 	var updated bool
 	addresses := endpoints.Subsets[0].Addresses
-	if statusAnnotation == "not-ready" {
+	if !readyForTraffic {
 		addresses, updated = removeFromEndpoints(addresses, nodeIP)
-	} else if statusAnnotation == "ready" {
+	} else if !readyForTraffic {
 		addresses, updated = addToEndpoints(addresses, nodeIP)
 	}
 

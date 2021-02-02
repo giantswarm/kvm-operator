@@ -35,6 +35,11 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		}
 	}
 
+	statusAnnotation, hasStatusAnnotation := pod.Annotations[key.AnnotationPodNodeStatus]
+	if hasStatusAnnotation && statusAnnotation != "" {
+		podIsReady = podIsReady && statusAnnotation == key.PodNodeStatusReady
+	}
+
 	// If the pod is not ready we should not add the ip to the endpoint list.
 	if !podIsReady && serviceName == key.WorkerID {
 		desiredEndpoint.IPs = []string{}
