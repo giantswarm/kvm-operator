@@ -62,10 +62,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	var updated bool
 	addresses := endpoints.Subsets[0].Addresses
-	if !readyForTraffic {
-		addresses, updated = removeFromEndpoints(addresses, nodeIP)
-	} else if !readyForTraffic {
+	if readyForTraffic {
 		addresses, updated = addToEndpoints(addresses, nodeIP)
+	} else {
+		addresses, updated = removeFromEndpoints(addresses, nodeIP)
 	}
 
 	if updated {
