@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -24,23 +25,27 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
-	k8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
-	if tenantcluster.IsTimeout(err) {
-		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
-		r.logger.Debugf(ctx, "waiting for certificates timed out")
-		r.logger.Debugf(ctx, "canceling resource")
+	var k8sClient kubernetes.Interface
+	{
+		k8sClients, err := key.CreateK8sClientForWorkloadCluster(ctx, obj, r.logger, r.tenantCluster)
+		if tenantcluster.IsTimeout(err) {
+			r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
+			r.logger.Debugf(ctx, "waiting for certificates timed out")
+			r.logger.Debugf(ctx, "canceling resource")
 
-		return nil
-	} else if tenant.IsAPINotAvailable(err) {
-		r.logger.Debugf(ctx, "tenant cluster is not available")
-		r.logger.Debugf(ctx, "canceling resource")
+			return nil
+		} else if tenant.IsAPINotAvailable(err) {
+			r.logger.Debugf(ctx, "tenant cluster is not available")
+			r.logger.Debugf(ctx, "canceling resource")
 
-		return nil
-	} else if err != nil {
-		return microerror.Mask(err)
+			return nil
+		} else if err != nil {
+			return microerror.Mask(err)
+		}
+
+		r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
+		k8sClient = k8sClients.K8sClient()
 	}
-
-	r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
 
 	// We need to fetch the nodes being registered within the tenant cluster's
 	// Kubernetes API.

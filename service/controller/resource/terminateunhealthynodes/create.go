@@ -31,10 +31,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	var tcCtrlClient client.Client
 	{
-		tcCtrlClient, err = key.CreateCtrlClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
+		tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, obj, r.logger, r.tenantCluster)
 		if err != nil {
 			return microerror.Mask(err)
 		}
+		tcCtrlClient = tcK8sClient.CtrlClient()
 	}
 
 	var detectorService *detector.Detector
@@ -86,7 +87,7 @@ func (r *Resource) terminateNode(ctx context.Context, clusterID string, node cor
 	r.logger.Debugf(ctx, "terminating unhealthy node %s", node.Name)
 	err = r.k8sClient.CoreV1().Pods(clusterID).Delete(ctx, pod.Name, metav1.DeleteOptions{})
 	if err != nil {
-		return err
+		return microerror.Mask(err)
 	}
 
 	r.logger.Debugf(ctx, "terminated unhealhty node %s", node.Name)

@@ -123,7 +123,6 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							key.LabelCluster:      key.ClusterID(customResource),
 							key.LabelOrganization: key.ClusterCustomer(customResource),
 							"node":                masterNode.ID,
-							key.PodWatcherLabel:   key.OperatorName,
 							label.OperatorVersion: project.Version(),
 						},
 					},
