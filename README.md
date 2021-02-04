@@ -22,6 +22,24 @@ https://quay.io/repository/giantswarm/kvm-operator
 go build github.com/giantswarm/kvm-operator
 ```
 
+### Pre-commit Hooks
+
+`kvm-operator` uses [pre-commit](https://pre-commit.com/) to ensure that only good commits are pushed to the git
+repository. It will have no effect unless `pre-commit` hooks have been installed after cloning the repository on your
+develpoment machine. First, ensure that it is installed with `pip install pre-commit` or `brew install pre-commit`
+(macOS). Then, install the git hooks in the root of the kvm-operator directory with `pre-commit install`. Any future
+`git commit`s will automatically run the automated checks which include the following:
+
+- `end-of-file-fixer`: Adds a final newline to any files missing one.
+- `trailing-whitespace`: Removes trailing whitespace from all committed files.
+- `no-commit-to-branch`: Prevents committing to `master`, `main`, and `release-*` branches.
+- `check-merge-conflict`: Ensures that no merge conflict markers are found in source files.
+- `go-test-repo-mod`: Ensures that all tests pass (`go test ./...`).
+- `go-imports`: Ensures that imports are correctly sorted.
+- `golangci-lint`: Ensure that `golangci-lint run` finds no problems.
+- `go-build`: Ensures that `go build` returns no errors.
+- `go-mod-tidy`: Ensures that `go mod tidy` doesn't change `go.sum`.
+
 ## Architecture
 
 The operator uses our [operatorkit][1] framework. It watches `KVMConfig`
