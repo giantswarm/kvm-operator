@@ -31,7 +31,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	var tcCtrlClient client.Client
 	{
-		tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, obj, r.logger, r.tenantCluster)
+		tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, customResource, r.logger, r.tenantCluster)
 		if err != nil {
 			return microerror.Mask(err)
 		}

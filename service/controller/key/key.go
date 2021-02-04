@@ -232,14 +232,9 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 
 // CreateK8sClientForWorkloadCluster takes the context of the reconciled object
 // and the provided logger and tenant cluster interface and creates a K8s client for the workload cluster
-func CreateK8sClientForWorkloadCluster(ctx context.Context, obj interface{}, logger micrologger.Logger, workloadCluster tenantcluster.Interface) (*k8sclient.Clients, error) {
-	customObject, err := ToCustomObject(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	i := ClusterID(customObject)
-	e := ClusterAPIEndpoint(customObject)
+func CreateK8sClientForWorkloadCluster(ctx context.Context, cluster v1alpha1.KVMConfig, logger micrologger.Logger, workloadCluster tenantcluster.Interface) (*k8sclient.Clients, error) {
+	i := ClusterID(cluster)
+	e := ClusterAPIEndpoint(cluster)
 
 	restConfig, err := workloadCluster.NewRestConfig(ctx, i, e)
 	if err != nil {

@@ -67,9 +67,14 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
+	cr, err := key.ToCustomObject(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
-	tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, obj, r.logger, r.tenantCluster)
+	tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.tenantCluster)
 	if tenantcluster.IsTimeout(err) {
 		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
 		r.logger.Debugf(ctx, "waiting for certificates timed out")
