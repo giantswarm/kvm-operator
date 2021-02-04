@@ -86,14 +86,14 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	if updated {
-		r.logger.Debugf(ctx, "updating endpoints", pod.Namespace, pod.Name)
+		r.logger.Debugf(ctx, "updating endpoints")
 		endpoints.Subsets[0].Addresses = addresses
 		_, err := r.k8sClient.CoreV1().Endpoints(pod.Namespace).Update(ctx, endpoints, v1.UpdateOptions{})
 		if err != nil {
-			r.logger.Debugf(ctx, "error updating endpoints", pod.Namespace, pod.Name)
+			r.logger.Debugf(ctx, "error updating endpoints")
 			return microerror.Mask(err)
 		}
-		r.logger.Debugf(ctx, "updated endpoints", pod.Namespace, pod.Name)
+		r.logger.Debugf(ctx, "updated endpoints")
 	} else {
 		r.logger.Debugf(ctx, "not updating endpoints")
 	}
