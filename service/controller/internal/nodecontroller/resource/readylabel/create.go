@@ -5,7 +5,6 @@ import (
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -32,13 +31,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		patch.value = key.PodNodeStatusNotReady
 	}
 
-	managementPod := corev1.Pod{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      workloadNode.Name,
-			Namespace: key.ClusterNamespace(r.cluster),
-		},
+	var managementPod corev1.Pod
+	err := r.managementK8sClient.Get(ctx, key.NodePodKey(r.cluster, *workloadNode), &managementPod)
+	if err != nil {
+		return microerror.Mask(err)
 	}
-	err := r.managementK8sClient.Patch(ctx, &managementPod, patch)
+	err = r.managementK8sClient.Patch(ctx, &managementPod, patch)
 	if err != nil {
 		return microerror.Mask(err)
 	}

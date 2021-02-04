@@ -20,6 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 )
@@ -197,6 +198,13 @@ func ClusterIDFromPod(pod *corev1.Pod) string {
 
 func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
+}
+
+func NodePodKey(cluster v1alpha1.KVMConfig, node corev1.Node) client.ObjectKey {
+	return client.ObjectKey{
+		Namespace: ClusterNamespace(cluster),
+		Name:      node.Name,
+	}
 }
 
 func ClusterRoleBindingName(customObject v1alpha1.KVMConfig) string {
