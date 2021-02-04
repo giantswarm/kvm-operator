@@ -19,7 +19,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	if controller, ok := r.controllers[nodeControllerKey(cr)]; ok {
 		r.logger.Debugf(ctx, "node controller found, shutting down")
 
-		controller.Shutdown()
+		controller.Stop(ctx)
 
 		r.controllerMutex.Lock()
 		delete(r.controllers, nodeControllerKey(cr))
