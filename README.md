@@ -40,6 +40,8 @@ develpoment machine. First, ensure that it is installed with `pip install pre-co
 - `go-build`: Ensures that `go build` returns no errors.
 - `go-mod-tidy`: Ensures that `go mod tidy` doesn't change `go.sum`.
 
+Note: `goimports` and `golangci-lint` should be available in your `$PATH` for these to run.
+
 ## Architecture
 
 The operator uses our [operatorkit][1] framework. It watches `KVMConfig`
