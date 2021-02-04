@@ -19,9 +19,14 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
+	r.logger.Debugf(ctx, "ensuring node controller is running for workload cluster")
+
 	if _, ok := r.controllers[nodeControllerKey(cr)]; !ok {
+		r.logger.Debugf(ctx, "node controller not found, creating")
+
 		controller, err := r.newNodeController(ctx, cr)
 		if err != nil {
+			r.logger.Debugf(ctx, "error during node controller creation")
 			return microerror.Mask(err)
 		}
 
@@ -31,7 +36,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		r.controllerMutex.Lock()
 		r.controllers[nodeControllerKey(cr)] = controller
 		r.controllerMutex.Unlock()
+
+		r.logger.Debugf(ctx, "node controller booted and registered")
 	}
+
+	r.logger.Debugf(ctx, "ensured node controller is running for workload cluster")
 
 	return nil
 }
