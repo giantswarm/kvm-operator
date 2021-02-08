@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
 )
@@ -23,12 +24,19 @@ type Config struct {
 	WorkloadCluster workloadcluster.Interface
 }
 
+type controllerWithConfig struct {
+	cluster    v1alpha1.KVMConfig
+	restConfig *rest.Config
+	*nodecontroller.Controller
+}
+
 type Resource struct {
 	k8sClient       k8sclient.Interface
 	logger          micrologger.Logger
 	workloadCluster workloadcluster.Interface
-	controllerMutex sync.Mutex
-	controllers     map[types.NamespacedName]*nodecontroller.Controller
+
+	controllerMutex sync.Mutex // Used to protect controllers map from concurrent access
+	controllers     map[types.NamespacedName]controllerWithConfig
 }
 
 func New(config Config) (*Resource, error) {
@@ -46,7 +54,8 @@ func New(config Config) (*Resource, error) {
 		k8sClient:       config.K8sClient,
 		logger:          config.Logger,
 		workloadCluster: config.WorkloadCluster,
-		controllers:     map[types.NamespacedName]*nodecontroller.Controller{},
+
+		controllers: map[types.NamespacedName]controllerWithConfig{},
 	}
 
 	return r, nil
@@ -56,7 +65,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func nodeControllerKey(cluster v1alpha1.KVMConfig) types.NamespacedName {
+func controllerMapKey(cluster v1alpha1.KVMConfig) types.NamespacedName {
 	return types.NamespacedName{
 		Namespace: cluster.Namespace,
 		Name:      cluster.Name,

@@ -16,17 +16,16 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 	r.logger.Debugf(ctx, "ensuring node controller is shut down")
 
-	if controller, ok := r.controllers[nodeControllerKey(cr)]; ok {
-		r.logger.Debugf(ctx, "node controller found, shutting down")
-
+	controllerKey := controllerMapKey(cr)
+	r.controllerMutex.Lock()
+	if controller, ok := r.controllers[controllerKey]; ok {
 		controller.Stop(ctx)
-
-		r.controllerMutex.Lock()
-		delete(r.controllers, nodeControllerKey(cr))
-		r.controllerMutex.Unlock()
-
-		r.logger.Debugf(ctx, "node controller shut down and unregistered")
+		delete(r.controllers, controllerKey)
+		r.logger.Debugf(ctx, "controller stopped and deleted")
+	} else {
+		r.logger.Debugf(ctx, "controller not found")
 	}
+	r.controllerMutex.Unlock()
 
 	r.logger.Debugf(ctx, "ensured node controller is shut down")
 
