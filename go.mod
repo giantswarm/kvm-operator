@@ -1,9 +1,9 @@
 module github.com/giantswarm/kvm-operator
 
-go 1.14
+go 1.15
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.16.1
+	github.com/giantswarm/apiextensions/v3 v3.17.0
 	github.com/giantswarm/badnodedetector v1.0.1
 	github.com/giantswarm/certs/v3 v3.1.0
 	github.com/giantswarm/errors v0.2.3
@@ -36,4 +36,4 @@ replace github.com/coreos/etcd v3.3.10+incompatible => github.com/coreos/etcd v3
 replace github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3.3.25+incompatible
 
 // keep in sync with giantswarm/apiextensions
-replace sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.10-gs
+replace sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.13-gs
