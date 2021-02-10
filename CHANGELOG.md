@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update k8s-kvm to v0.4.0 with QEMU v5.2.0.
+
 ## [3.14.0] - 2020-11-25
 
 ### Added
