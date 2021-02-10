@@ -257,7 +257,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var nodeControllerResource resource.Interface
 	{
 		c := nodecontroller.Config{
-			K8sClient:       config.K8sClient,
+			K8sClient:       config.K8sClient.CtrlClient(),
 			Logger:          config.Logger,
 			WorkloadCluster: config.TenantCluster,
 		}

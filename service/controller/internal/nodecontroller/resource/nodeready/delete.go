@@ -1,4 +1,4 @@
-package readylabel
+package nodeready
 
 import (
 	"context"

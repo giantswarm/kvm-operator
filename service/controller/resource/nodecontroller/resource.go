@@ -4,12 +4,12 @@ import (
 	"sync"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
 )
@@ -19,7 +19,7 @@ const (
 )
 
 type Config struct {
-	K8sClient       k8sclient.Interface
+	K8sClient       client.Client
 	Logger          micrologger.Logger
 	WorkloadCluster workloadcluster.Interface
 }
@@ -31,7 +31,7 @@ type controllerWithConfig struct {
 }
 
 type Resource struct {
-	k8sClient       k8sclient.Interface
+	k8sClient       client.Client
 	logger          micrologger.Logger
 	workloadCluster workloadcluster.Interface
 

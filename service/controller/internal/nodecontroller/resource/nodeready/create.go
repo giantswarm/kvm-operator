@@ -1,4 +1,4 @@
-package readylabel
+package nodeready
 
 import (
 	"context"
@@ -31,12 +31,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		patch.value = key.PodNodeStatusNotReady
 	}
 
-	var managementPod corev1.Pod
-	err := r.managementK8sClient.Get(ctx, key.NodePodKey(r.cluster, *workloadNode), &managementPod)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-	err = r.managementK8sClient.Patch(ctx, &managementPod, patch)
+	managementPod := corev1.Pod{ObjectMeta: key.NodePodObjectMeta(r.cluster, *workloadNode)}
+	err := r.managementK8sClient.Patch(ctx, &managementPod, patch)
 	if err != nil {
 		return microerror.Mask(err)
 	}

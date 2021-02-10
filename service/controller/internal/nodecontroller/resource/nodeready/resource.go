@@ -1,22 +1,21 @@
-package readylabel
+package nodeready
 
 import (
 	"reflect"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
-	Name = "readylabel"
+	Name = "nodeready"
 )
 
 type Config struct {
 	Cluster             v1alpha1.KVMConfig
-	ManagementK8sClient k8sclient.Interface
+	ManagementK8sClient client.Client
 	Logger              micrologger.Logger
 }
 
@@ -39,7 +38,7 @@ func New(config Config) (*Resource, error) {
 
 	r := &Resource{
 		cluster:             config.Cluster,
-		managementK8sClient: config.ManagementK8sClient.CtrlClient(),
+		managementK8sClient: config.ManagementK8sClient,
 		logger:              config.Logger,
 	}
 

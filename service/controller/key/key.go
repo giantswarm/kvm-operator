@@ -19,6 +19,7 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -204,6 +205,13 @@ func NodePodKey(cluster v1alpha1.KVMConfig, node corev1.Node) client.ObjectKey {
 	return client.ObjectKey{
 		Namespace: ClusterNamespace(cluster),
 		Name:      node.Name,
+	}
+}
+
+func NodePodObjectMeta(cluster v1alpha1.KVMConfig, node corev1.Node) v1.ObjectMeta {
+	return v1.ObjectMeta{
+		Name:      node.Name,
+		Namespace: ClusterNamespace(cluster),
 	}
 }
 

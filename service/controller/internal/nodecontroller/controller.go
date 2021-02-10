@@ -13,15 +13,16 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller/resource/readylabel"
+	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller/resource/nodeready"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 type Config struct {
 	Cluster             v1alpha1.KVMConfig
-	ManagementK8sClient k8sclient.Interface
+	ManagementK8sClient client.Client
 	WorkloadK8sClient   k8sclient.Interface
 	Logger              micrologger.Logger
 }
@@ -68,14 +69,14 @@ func New(config Config) (*Controller, error) {
 func newResources(config Config) ([]resource.Interface, error) {
 	var readyLabelResource resource.Interface
 	{
-		c := readylabel.Config{
+		c := nodeready.Config{
 			Cluster:             config.Cluster,
 			ManagementK8sClient: config.ManagementK8sClient,
 			Logger:              config.Logger,
 		}
 
 		var err error
-		readyLabelResource, err = readylabel.New(c)
+		readyLabelResource, err = nodeready.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
