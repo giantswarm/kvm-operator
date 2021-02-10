@@ -66,7 +66,7 @@ func (r *Resource) applyCreateChangeAsync(ctx context.Context, desired controlle
 // and returns a value indicating if the desired controller should be started (because the existing one was
 // stopped or there was no existing one).
 func (r *Resource) applyUpdateChange(ctx context.Context, desired controllerWithConfig) bool {
-	r.controllerMutex.Lock() // Exclude access from other goroutines
+	r.controllerMutex.Lock()         // Exclude access from other goroutines
 	defer r.controllerMutex.Unlock() // Ensure this is run for all function returns
 
 	controllerKey := controllerMapKey(desired.cluster)
