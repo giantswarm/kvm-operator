@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Do not drain node pods when cluster is being deleted.
-- Update for Kubernetes 1.19 compatibility.
+- Update for Kubernetes v1.19 compatibility.
+- Update k8s-kvm to v0.4.0 with QEMU v5.2.0.
 
 ## [3.14.0] - 2020-11-25
 
