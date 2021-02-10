@@ -45,9 +45,6 @@ func NewUnhealthyNodeTerminator(config UnhealthyNodeTerminatorConfig) (*Unhealth
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(v1alpha1.KVMConfig)
 			},
-			NewRuntimeObjectListFunc: func() runtime.Object {
-				return new(v1alpha1.KVMConfigList)
-			},
 			Selector: labels.SelectorFromSet(map[string]string{
 				label.OperatorVersion: project.Version(),
 			}),

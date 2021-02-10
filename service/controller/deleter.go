@@ -58,9 +58,6 @@ func NewDeleter(config DeleterConfig) (*Deleter, error) {
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(v1alpha1.KVMConfig)
 			},
-			NewRuntimeObjectListFunc: func() runtime.Object {
-				return new(v1alpha1.KVMConfigList)
-			},
 
 			Name: config.ProjectName + "-deleter",
 		}

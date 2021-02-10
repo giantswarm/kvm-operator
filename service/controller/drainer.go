@@ -45,9 +45,6 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(corev1.Pod)
 			},
-			NewRuntimeObjectListFunc: func() runtime.Object {
-				return new(corev1.PodList)
-			},
 			Logger:    config.Logger,
 			Resources: resources,
 			Selector: labels.SelectorFromSet(map[string]string{
