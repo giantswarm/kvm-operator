@@ -125,6 +125,10 @@ const (
 )
 
 const (
+	PodWatcherLabel = "kvm-operator.giantswarm.io/pod-watcher"
+)
+
+const (
 	OperatorName = "kvm-operator"
 )
 

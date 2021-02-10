@@ -9,6 +9,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/giantswarm/kvm-operator/service/controller/key"
+
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
 )
@@ -47,6 +49,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			Logger:    config.Logger,
 			Resources: resources,
 			Selector: labels.SelectorFromSet(map[string]string{
+				key.PodWatcherLabel:   project.Name(),
 				label.OperatorVersion: project.Version(),
 			}),
 
