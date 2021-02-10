@@ -19,7 +19,6 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -133,7 +132,7 @@ const (
 )
 
 const (
-	PodDeletionGracePeriod = 5 * time.Minute
+	PodDeletionGracePeriod = 15 * time.Minute
 	PodNodeStatusReady     = "ready"
 	PodNodeStatusNotReady  = "not-ready"
 )
@@ -192,28 +191,12 @@ func ClusterID(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.ID
 }
 
-func ClusterIDFromPod(pod *corev1.Pod) string {
-	l, ok := pod.Labels["cluster"]
-	if ok {
-		return l
-	}
-
-	return "n/a"
-}
-
 func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
 
-func NodePodKey(cluster v1alpha1.KVMConfig, node corev1.Node) client.ObjectKey {
+func NodePodObjectKey(cluster v1alpha1.KVMConfig, node corev1.Node) client.ObjectKey {
 	return client.ObjectKey{
-		Namespace: ClusterNamespace(cluster),
-		Name:      node.Name,
-	}
-}
-
-func NodePodObjectMeta(cluster v1alpha1.KVMConfig, node corev1.Node) v1.ObjectMeta {
-	return v1.ObjectMeta{
 		Name:      node.Name,
 		Namespace: ClusterNamespace(cluster),
 	}
@@ -315,7 +298,7 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 	return customObject.GetDeletionTimestamp() != nil
 }
 
-func IsPodDeleted(pod *corev1.Pod) bool {
+func IsPodDeleted(pod corev1.Pod) bool {
 	return pod.GetDeletionTimestamp() != nil
 }
 
@@ -465,16 +448,15 @@ func NetworkDNSBlock(servers []net.IP) string {
 	return dnsBlock
 }
 
-func NetworkNTPBlock(servers []net.IP) string {
-	var ntpBlockParts []string
-
-	for _, s := range servers {
-		ntpBlockParts = append(ntpBlockParts, fmt.Sprintf("NTP=%s", s.String()))
+// NodeIsReady examines the Status Conditions of a Pod
+// and returns true if the NodeReady Condition is true.
+func NodeIsReady(node corev1.Node) bool {
+	for _, condition := range node.Status.Conditions {
+		if condition.Type == corev1.NodeReady {
+			return condition.Status == corev1.ConditionTrue
+		}
 	}
-
-	ntpBlock := strings.Join(ntpBlockParts, "\n")
-
-	return ntpBlock
+	return false
 }
 
 // NodeIsUnschedulable examines a Node and returns true if the Node is marked Unschedulable or has a NoSchedule/NoExecute taint.
@@ -498,7 +480,7 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	return idx, present
 }
 
-// NodeInternalIP examines the Status Adresses of a Node
+// NodeInternalIP examines the Status Addresses of a Node
 // and returns its InternalIP..
 func NodeInternalIP(node corev1.Node) (string, error) {
 	for _, a := range node.Status.Addresses {
@@ -506,7 +488,7 @@ func NodeInternalIP(node corev1.Node) (string, error) {
 			return a.Address, nil
 		}
 	}
-	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP adress in its status", node.Name)
+	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP address in its status", node.Name)
 }
 
 func OperatorVersion(cr v1alpha1.KVMConfig) string {
@@ -516,13 +498,12 @@ func OperatorVersion(cr v1alpha1.KVMConfig) string {
 // PodIsReady examines the Status Conditions of a Pod
 // and returns true if the PodReady Condition is true.
 func PodIsReady(pod corev1.Pod) bool {
-	podReady := false
 	for _, c := range pod.Status.Conditions {
 		if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
-			podReady = true
+			return true
 		}
 	}
-	return podReady
+	return false
 }
 
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
@@ -629,6 +610,19 @@ func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	return customObject, nil
 }
 
+func ToNode(v interface{}) (corev1.Node, error) {
+	if v == nil {
+		return corev1.Node{}, nil
+	}
+
+	node, ok := v.(*corev1.Node)
+	if !ok {
+		return corev1.Node{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", corev1.Node{}, v)
+	}
+
+	return *node.DeepCopy(), nil
+}
+
 func ToNodeCount(v interface{}) (int, error) {
 	customObject, err := ToCustomObject(v)
 	if err != nil {
@@ -649,17 +643,17 @@ func ToOperatorVersion(v interface{}) (string, error) {
 	return OperatorVersion(customObject), nil
 }
 
-func ToPod(v interface{}) (*corev1.Pod, error) {
+func ToPod(v interface{}) (corev1.Pod, error) {
 	if v == nil {
-		return nil, nil
+		return corev1.Pod{}, nil
 	}
 
 	pod, ok := v.(*corev1.Pod)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &corev1.Pod{}, v)
+		return corev1.Pod{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &corev1.Pod{}, v)
 	}
 
-	return pod, nil
+	return *pod.DeepCopy(), nil
 }
 
 func VMNumber(ID int) string {

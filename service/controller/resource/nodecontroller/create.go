@@ -40,11 +40,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 // if it boots successfully. It should be run as a goroutine to avoid blocking reconciliation of
 // other resources.
 func (r *Resource) applyCreateChangeAsync(ctx context.Context, desired controllerWithConfig) {
-	r.logger.Debugf(ctx, "DELETEME before boot")
-	desired.Boot(ctx)
-	r.logger.Debugf(ctx, "DELETEME after boot")
+	go desired.Boot(ctx)
 	<-desired.Booted() // Wait for the controller to be booted
-	r.logger.Debugf(ctx, "DELETEME after booted")
 
 	r.controllerMutex.Lock()
 	controllerKey := controllerMapKey(desired.cluster)
@@ -127,13 +124,13 @@ func (r *Resource) calculateDesiredController(ctx context.Context, cluster v1alp
 func (r *Resource) controllersEqual(ctx context.Context, left controllerWithConfig, right controllerWithConfig) bool {
 	if !restConfigsEqual(left.restConfig, right.restConfig) {
 		r.logger.Debugf(ctx, "rest configs changed")
-		return true
+		return false
 	}
 	if !clusterSpecsEqual(left.cluster.Spec, right.cluster.Spec) {
 		r.logger.Debugf(ctx, "cluster spec changed")
-		return true
+		return false
 	}
-	return false
+	return true
 }
 
 // clusterSpecsEqual returns true if there is no difference which would require a new Kubernetes client to be created.

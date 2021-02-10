@@ -1,8 +1,6 @@
 package endpoint
 
-import (
-	"github.com/giantswarm/microerror"
-)
+import "github.com/giantswarm/microerror"
 
 var invalidConfigError = &microerror.Error{
 	Kind: "invalidConfigError",
@@ -13,18 +11,20 @@ func IsInvalidConfig(err error) bool {
 	return microerror.Cause(err) == invalidConfigError
 }
 
-var missingAnnotationError = &microerror.Error{
-	Kind: "missingAnnotationError",
+var missingClusterLabelError = &microerror.Error{
+	Kind: "missingClusterLabelError",
 }
 
-func IsMissingAnnotationError(err error) bool {
-	return microerror.Cause(err) == missingAnnotationError
+// IsMissingClusterLabel asserts  missingClusterLabelError.
+func IsMissingClusterLabel(err error) bool {
+	return microerror.Cause(err) == missingClusterLabelError
 }
 
 var wrongTypeError = &microerror.Error{
 	Kind: "wrongTypeError",
 }
 
+// IsWrongTypeError asserts wrongTypeError.
 func IsWrongTypeError(err error) bool {
 	return microerror.Cause(err) == wrongTypeError
 }
