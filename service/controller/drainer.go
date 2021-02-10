@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller"
@@ -47,6 +48,7 @@ func NewDrainer(config DrainerConfig) (*Drainer, error) {
 			Logger:    config.Logger,
 			Resources: resources,
 			Selector: labels.SelectorFromSet(map[string]string{
+				key.PodWatcherLabel:   project.Name(),
 				label.OperatorVersion: project.Version(),
 			}),
 
