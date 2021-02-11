@@ -15,8 +15,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller/resource/nodeready"
+	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller/resource/podcondition"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -48,7 +49,10 @@ func New(config Config) (*Controller, error) {
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(corev1.Node)
 			},
-			Selector: labels.Everything(),
+			Selector: labels.SelectorFromSet(map[string]string{
+				label.OperatorVersion: project.Version(),
+				"role": key.WorkerID,
+			}),
 
 			Name: fmt.Sprintf("%s-%s-nodes", project.Name(), key.ClusterID(config.Cluster)),
 		}
@@ -67,23 +71,23 @@ func New(config Config) (*Controller, error) {
 }
 
 func newResources(config Config) ([]resource.Interface, error) {
-	var readyLabelResource resource.Interface
+	var podConditionResource resource.Interface
 	{
-		c := nodeready.Config{
+		c := podcondition.Config{
 			Cluster:             config.Cluster,
 			ManagementK8sClient: config.ManagementK8sClient,
 			Logger:              config.Logger,
 		}
 
 		var err error
-		readyLabelResource, err = nodeready.New(c)
+		podConditionResource, err = podcondition.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	resources := []resource.Interface{
-		readyLabelResource,
+		podConditionResource,
 	}
 
 	{

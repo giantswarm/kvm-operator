@@ -99,7 +99,6 @@ const (
 	AnnotationIp                     = "endpoint.kvm.giantswarm.io/ip"
 	AnnotationService                = "endpoint.kvm.giantswarm.io/service"
 	AnnotationPodDrained             = "endpoint.kvm.giantswarm.io/drained"
-	AnnotationPodNodeStatus          = "kvm-operator.giantswarm.io/node-status"
 	AnnotationPrometheusCluster      = "giantswarm.io/prometheus-cluster"
 	AnnotationVersionBundle          = "kvm-operator.giantswarm.io/version-bundle"
 
@@ -133,8 +132,7 @@ const (
 
 const (
 	PodDeletionGracePeriod = 15 * time.Minute
-	PodNodeStatusReady     = "ready"
-	PodNodeStatusNotReady  = "not-ready"
+	WorkloadClusterNodeReady corev1.PodConditionType = "kvm-operator.giantswarm.io/workload-cluster-node-ready"
 )
 
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
@@ -448,15 +446,24 @@ func NetworkDNSBlock(servers []net.IP) string {
 	return dnsBlock
 }
 
-// NodeIsReady examines the Status Conditions of a Pod
-// and returns true if the NodeReady Condition is true.
-func NodeIsReady(node corev1.Node) bool {
+// FindNodeCondition returns the condition of the given type from the node. The second return value indicates if the condition was found.
+func FindNodeCondition(node corev1.Node, conditionType corev1.NodeConditionType) (corev1.NodeCondition, bool) {
 	for _, condition := range node.Status.Conditions {
 		if condition.Type == corev1.NodeReady {
-			return condition.Status == corev1.ConditionTrue
+			return condition, true
 		}
 	}
-	return false
+	return corev1.NodeCondition{}, false
+}
+
+// FindNodeCondition returns the condition of the given type from the pod. The second return value indicates if the condition was found.
+func FindPodCondition(pod corev1.Pod, conditionType corev1.PodConditionType) (corev1.PodCondition, bool) {
+	for _, condition := range pod.Status.Conditions {
+		if condition.Type == corev1.PodReady {
+			return condition, true
+		}
+	}
+	return corev1.PodCondition{}, false
 }
 
 // NodeIsUnschedulable examines a Node and returns true if the Node is marked Unschedulable or has a NoSchedule/NoExecute taint.
@@ -500,6 +507,17 @@ func OperatorVersion(cr v1alpha1.KVMConfig) string {
 func PodIsReady(pod corev1.Pod) bool {
 	for _, c := range pod.Status.Conditions {
 		if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
+			return true
+		}
+	}
+	return false
+}
+
+// PodNodeIsReady examines the Status Conditions of a Pod
+// and returns true if the WorkloadClusterNodeReady Condition is true.
+func PodNodeIsReady(pod corev1.Pod) bool {
+	for _, c := range pod.Status.Conditions {
+		if c.Type == WorkloadClusterNodeReady && c.Status == corev1.ConditionTrue {
 			return true
 		}
 	}

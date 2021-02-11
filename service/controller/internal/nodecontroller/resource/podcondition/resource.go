@@ -1,4 +1,4 @@
-package nodeready
+package podcondition
 
 import (
 	"reflect"
@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	Name = "nodeready"
+	Name = "podcondition"
 )
 
 type Config struct {

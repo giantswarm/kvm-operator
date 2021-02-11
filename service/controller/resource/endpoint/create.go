@@ -34,9 +34,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if !ok || serviceNameAnnotation == "" {
 			r.logger.Debugf(ctx, "node pod has no service annotation %#q, skipping", key.AnnotationService)
 			return nil
-		} else if serviceNameAnnotation == key.MasterID {
-			r.logger.Debugf(ctx, "node pod contains a workload cluster master node, skipping")
-			return nil
 		}
 
 		serviceName = types.NamespacedName{
@@ -45,9 +42,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	readyForTraffic := key.PodIsReady(pod)
-	if annotation := pod.Annotations[key.AnnotationPodNodeStatus]; annotation != "" {
-		readyForTraffic = readyForTraffic && annotation == key.PodNodeStatusReady
+	var readyForTraffic bool
+	if serviceName.Name == key.MasterID {
+		readyForTraffic = true
+	} else {
+		readyForTraffic = key.PodIsReady(pod) && key.PodNodeIsReady(pod)
 	}
 
 	if readyForTraffic {
@@ -60,11 +59,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var endpoints *corev1.Endpoints
 	{
 		r.logger.Debugf(ctx, "retrieving endpoints %#q", serviceName)
-		var err error
 		endpoints, err = r.k8sClient.CoreV1().Endpoints(serviceName.Namespace).Get(ctx, serviceName.Name, v1.GetOptions{})
 		if errors.IsNotFound(err) {
 			needCreate = true
-		} else {
+		} else if err != nil {
 			r.logger.Debugf(ctx, "error retrieving endpoints")
 			return microerror.Mask(err)
 		}

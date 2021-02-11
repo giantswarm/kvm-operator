@@ -1,4 +1,4 @@
-package nodeready
+package podcondition
 
 import (
 	"github.com/giantswarm/microerror"

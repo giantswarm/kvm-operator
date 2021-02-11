@@ -5,8 +5,10 @@ import (
 	"reflect"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
@@ -22,7 +24,13 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	r.logger.Debugf(ctx, "ensuring controller is running for workload cluster")
 
 	desired, err := r.calculateDesiredController(ctx, cr)
-	if err != nil {
+	if tenantcluster.IsTimeout(err) {
+		r.logger.Debugf(ctx, "waiting for certificates timed out")
+		return nil
+	} else if tenant.IsAPINotAvailable(err) {
+		r.logger.Debugf(ctx, "tenant cluster is not available")
+		return nil
+	} else if err != nil {
 		return microerror.Mask(err)
 	}
 
@@ -45,15 +53,16 @@ func (r *Resource) applyCreateChangeAsync(ctx context.Context, desired controlle
 
 	r.controllerMutex.Lock()
 	controllerKey := controllerMapKey(desired.cluster)
-	if existing, ok := r.controllers[controllerKey]; ok {
+	if _, ok := r.controllers[controllerKey]; ok {
 		// There's a small chance for a race if two goroutines are booting controllers for the same clusters
 		// because, for example, several changes were made to a cluster CR in a short amount of time and booting
-		// of controllers takes a non-zero amount of time. By stopping the existing controller within the mutex,
+		// of controllers takes a non-zero amount of time. By stopping the desired controller within the mutex,
 		// we ensure that only one controller is running at a time and we don't have dangling controllers causing
 		// a memory leak.
-		existing.Stop(ctx)
+		desired.Stop(ctx)
+	} else {
+		r.controllers[controllerKey] = desired
 	}
-	r.controllers[controllerKey] = desired
 	r.controllerMutex.Unlock()
 
 	r.logger.Debugf(ctx, "controller booted and registered")
