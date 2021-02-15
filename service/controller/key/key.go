@@ -193,13 +193,6 @@ func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
 
-func NodePodObjectKey(cluster v1alpha1.KVMConfig, node corev1.Node) client.ObjectKey {
-	return client.ObjectKey{
-		Name:      node.Name,
-		Namespace: ClusterNamespace(cluster),
-	}
-}
-
 func ClusterRoleBindingName(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
@@ -280,8 +273,24 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
-func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
+// FindNodeCondition returns the condition of the given type from the node. The second return value indicates if the condition was found.
+func FindNodeCondition(node corev1.Node, conditionType corev1.NodeConditionType) (corev1.NodeCondition, bool) {
+	for _, condition := range node.Status.Conditions {
+		if condition.Type == conditionType {
+			return condition, true
+		}
+	}
+	return corev1.NodeCondition{}, false
+}
+
+// FindNodeCondition returns the condition of the given type from the pod. The second return value indicates if the condition was found.
+func FindPodCondition(pod corev1.Pod, conditionType corev1.PodConditionType) (corev1.PodCondition, bool) {
+	for _, condition := range pod.Status.Conditions {
+		if condition.Type == conditionType {
+			return condition, true
+		}
+	}
+	return corev1.PodCondition{}, false
 }
 
 func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
@@ -294,10 +303,6 @@ func IscsiInitiatorName(customObject v1alpha1.KVMConfig, nodeIndex int, nodeRole
 
 func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 	return customObject.GetDeletionTimestamp() != nil
-}
-
-func IsPodDeleted(pod corev1.Pod) bool {
-	return pod.GetDeletionTimestamp() != nil
 }
 
 // IsPodDrained checks whether the pod status indicates it got drained. The pod
@@ -430,6 +435,10 @@ func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("br-%s", ClusterID(customObject))
 }
 
+func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
+	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
+}
+
 func NetworkTapName(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("tap-%s", ClusterID(customObject))
 }
@@ -446,24 +455,11 @@ func NetworkDNSBlock(servers []net.IP) string {
 	return dnsBlock
 }
 
-// FindNodeCondition returns the condition of the given type from the node. The second return value indicates if the condition was found.
-func FindNodeCondition(node corev1.Node, conditionType corev1.NodeConditionType) (corev1.NodeCondition, bool) {
-	for _, condition := range node.Status.Conditions {
-		if condition.Type == corev1.NodeReady {
-			return condition, true
-		}
-	}
-	return corev1.NodeCondition{}, false
-}
-
-// FindNodeCondition returns the condition of the given type from the pod. The second return value indicates if the condition was found.
-func FindPodCondition(pod corev1.Pod, conditionType corev1.PodConditionType) (corev1.PodCondition, bool) {
-	for _, condition := range pod.Status.Conditions {
-		if condition.Type == corev1.PodReady {
-			return condition, true
-		}
-	}
-	return corev1.PodCondition{}, false
+// NodeIsReady examines the Status Conditions of a Node
+// and returns true if the NodeReady Condition is true.
+func NodeIsReady(node corev1.Node) bool {
+	condition, _ := FindNodeCondition(node, corev1.NodeReady)
+	return condition.Status == corev1.ConditionTrue
 }
 
 // NodeIsUnschedulable examines a Node and returns true if the Node is marked Unschedulable or has a NoSchedule/NoExecute taint.
@@ -498,6 +494,13 @@ func NodeInternalIP(node corev1.Node) (string, error) {
 	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP address in its status", node.Name)
 }
 
+func NodePodObjectKey(cluster v1alpha1.KVMConfig, node corev1.Node) client.ObjectKey {
+	return client.ObjectKey{
+		Name:      node.Name,
+		Namespace: ClusterNamespace(cluster),
+	}
+}
+
 func OperatorVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.OperatorVersion]
 }
@@ -505,23 +508,15 @@ func OperatorVersion(cr v1alpha1.KVMConfig) string {
 // PodIsReady examines the Status Conditions of a Pod
 // and returns true if the PodReady Condition is true.
 func PodIsReady(pod corev1.Pod) bool {
-	for _, c := range pod.Status.Conditions {
-		if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
-			return true
-		}
-	}
-	return false
+	condition, _ := FindPodCondition(pod, corev1.PodReady)
+	return condition.Status == corev1.ConditionTrue
 }
 
 // PodNodeIsReady examines the Status Conditions of a Pod
 // and returns true if the WorkloadClusterNodeReady Condition is true.
 func PodNodeIsReady(pod corev1.Pod) bool {
-	for _, c := range pod.Status.Conditions {
-		if c.Type == WorkloadClusterNodeReady && c.Status == corev1.ConditionTrue {
-			return true
-		}
-	}
-	return false
+	condition, _ := FindPodCondition(pod, WorkloadClusterNodeReady)
+	return condition.Status == corev1.ConditionTrue
 }
 
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {

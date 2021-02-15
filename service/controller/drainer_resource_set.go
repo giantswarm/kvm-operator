@@ -16,9 +16,9 @@ func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 	var endpointResource resource.Interface
 	{
 		c := endpoint.Config{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			G8sClient:  config.K8sClient.G8sClient(),
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
 		endpointResource, err = endpoint.New(c)

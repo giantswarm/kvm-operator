@@ -37,30 +37,26 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 }
 
 func calculatePodNodeCondition(node corev1.Node, pod corev1.Pod) (corev1.PodCondition, bool) {
-	nodeReadyCondition, nodeReadyFound := key.FindNodeCondition(node, corev1.NodeReady)
-	podReadyCondition, podReadyFound := key.FindPodCondition(pod, key.WorkloadClusterNodeReady)
+	nodeCondition, _ := key.FindNodeCondition(node, corev1.NodeReady)
+	currentPodCondition, currentPodConditionFound := key.FindPodCondition(pod, key.WorkloadClusterNodeReady)
 
-	condition := podReadyCondition
-	condition.Type = key.WorkloadClusterNodeReady // In case FindPodCondition returned an empty object
-	condition.Message = nodeReadyCondition.Message
-	condition.Reason = nodeReadyCondition.Reason
-
-	if nodeReadyFound {
-		if nodeReadyCondition.Status == corev1.ConditionTrue {
-			condition.Status = corev1.ConditionTrue
-		} else if nodeReadyCondition.Status == corev1.ConditionFalse {
-			condition.Status = corev1.ConditionFalse
-		} else {
-			condition.Status = corev1.ConditionUnknown
-		}
-	} else {
-		condition.Status = corev1.ConditionUnknown
+	desiredPodCondition := corev1.PodCondition{
+		Type:    key.WorkloadClusterNodeReady,
+		Reason:  nodeCondition.Reason,
+		Message: nodeCondition.Message,
 	}
 
-	transition := !podReadyFound || condition.Status != podReadyCondition.Status
+	switch nodeCondition.Status {
+	case corev1.ConditionTrue, corev1.ConditionFalse:
+		desiredPodCondition.Status = nodeCondition.Status
+	default:
+		desiredPodCondition.Status = corev1.ConditionUnknown
+	}
+
+	transition := !currentPodConditionFound || desiredPodCondition.Status != currentPodCondition.Status
 	if transition {
-		condition.LastTransitionTime = metav1.Now()
+		desiredPodCondition.LastTransitionTime = metav1.Now()
 	}
 
-	return condition, transition
+	return desiredPodCondition, transition
 }
