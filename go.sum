@@ -182,7 +182,6 @@ github.com/giantswarm/errors v0.2.3 h1:gE1dDSD0RNwYUah5hG6oUQh0unPyZ74tVwR1/PW3Z
 github.com/giantswarm/errors v0.2.3/go.mod h1:Oj1LIWs9Uoj6JGtK5HxTb50iZuqe9f60LDI0nLXA5vU=
 github.com/giantswarm/exporterkit v0.2.0 h1:+HTGl4fmT/1OkTox8HbV3JXeavmsZv94+2CDW8cSrq0=
 github.com/giantswarm/exporterkit v0.2.0/go.mod h1:b4fuHVjsvZgznC9OEPfn0y5zvN8SnEKTiI5zTTfck94=
-github.com/giantswarm/k8sclient/v5 v5.0.0 h1:+Qs75jAphCC6ddlpjyGqXG9525rABUb160gVsJq2uHg=
 github.com/giantswarm/k8sclient/v5 v5.0.0/go.mod h1:OhlknCs1Wgc0ErjWBgeZDGe4Y6aThus21nQOXPAq4rQ=
 github.com/giantswarm/k8sclient/v5 v5.10.0 h1:ZgiteFkbU0yuSv/b+3rw/VQZIBE7mZsBJcT16bKEDhA=
 github.com/giantswarm/k8sclient/v5 v5.10.0/go.mod h1:HHSHvERGfLhNqTsqKBUQSQ5VXGhLfVRojplYwio6jDU=
