@@ -57,7 +57,7 @@ func (r *Resource) podEndpointData(ctx context.Context, pod corev1.Pod) (nodeIP 
 	nodeIP = pod.Annotations[key.AnnotationIp]
 	if nodeIP == "" {
 		r.logger.Debugf(ctx, "node pod has no ip annotation %#q, skipping", key.AnnotationIp)
-		err = microerror.Mask(invalidConfigError)
+		err = microerror.Mask(missingAnnotationError)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (r *Resource) podEndpointData(ctx context.Context, pod corev1.Pod) (nodeIP 
 	}
 	if serviceName.Name == "" {
 		r.logger.Debugf(ctx, "node pod has no service annotation %#q, skipping", key.AnnotationService)
-		err = microerror.Mask(invalidConfigError)
+		err = microerror.Mask(missingAnnotationError)
 		return
 	}
 
