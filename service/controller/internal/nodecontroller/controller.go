@@ -51,7 +51,7 @@ func New(config Config) (*Controller, error) {
 			},
 			Selector: labels.SelectorFromSet(map[string]string{
 				label.OperatorVersion: project.Version(),
-				"role": key.WorkerID,
+				"role":                key.WorkerID,
 			}),
 
 			Name: fmt.Sprintf("%s-%s-nodes", project.Name(), key.ClusterID(config.Cluster)),

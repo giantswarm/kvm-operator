@@ -131,7 +131,7 @@ const (
 )
 
 const (
-	PodDeletionGracePeriod = 15 * time.Minute
+	PodDeletionGracePeriod                           = 5 * time.Minute
 	WorkloadClusterNodeReady corev1.PodConditionType = "kvm-operator.giantswarm.io/workload-cluster-node-ready"
 )
 
