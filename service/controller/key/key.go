@@ -314,7 +314,7 @@ func IsDeleted(customObject v1alpha1.KVMConfig) bool {
 //
 // TODO(xh3b4sd) handle pod status via the runtime object status primitives
 // and not via annotations.
-func IsPodDrained(pod *corev1.Pod) (bool, error) {
+func IsPodDrained(pod corev1.Pod) (bool, error) {
 	a := pod.GetAnnotations()
 	if a == nil {
 		return false, microerror.Mask(missingAnnotationError)

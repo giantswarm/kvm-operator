@@ -3,7 +3,6 @@ package endpoint
 import (
 	"context"
 
-	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
@@ -18,21 +17,16 @@ const (
 )
 
 type Config struct {
-	G8sClient  versioned.Interface
 	CtrlClient client.Client
 	Logger     micrologger.Logger
 }
 
 type Resource struct {
-	g8sClient  versioned.Interface
 	ctrlClient client.Client
 	logger     micrologger.Logger
 }
 
 func New(config Config) (*Resource, error) {
-	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
-	}
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
 	}
@@ -41,7 +35,6 @@ func New(config Config) (*Resource, error) {
 	}
 
 	r := &Resource{
-		g8sClient:  config.G8sClient,
 		ctrlClient: config.CtrlClient,
 		logger:     config.Logger,
 	}

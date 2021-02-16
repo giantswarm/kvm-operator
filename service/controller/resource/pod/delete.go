@@ -64,7 +64,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		isDrained, err := key.IsPodDrained(currentPod)
+		isDrained, err := key.IsPodDrained(*currentPod)
 		if err != nil {
 			return microerror.Mask(err)
 		}

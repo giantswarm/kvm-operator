@@ -28,3 +28,12 @@ var wrongTypeError = &microerror.Error{
 func IsWrongTypeError(err error) bool {
 	return microerror.Cause(err) == wrongTypeError
 }
+
+var missingClusterLabelError = &microerror.Error{
+	Kind: "missingClusterLabelError",
+}
+
+// IsMissingClusterLabel asserts  missingClusterLabelError.
+func IsMissingClusterLabel(err error) bool {
+	return microerror.Cause(err) == missingClusterLabelError
+}
