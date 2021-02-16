@@ -51,7 +51,7 @@ func New(config Config) (*Controller, error) {
 			},
 			Selector: labels.SelectorFromSet(map[string]string{
 				label.OperatorVersion: project.Version(),
-				// When managing endpoints, e only consider node- and pod-readiness for workers. Master endpoint IPs
+				// When managing endpoints, we only consider node- and pod-readiness for workers. Master endpoint IPs
 				// are always present in the master endpoints object. This may change when we implement HA for KVM.
 				"role": key.WorkerID,
 			}),
