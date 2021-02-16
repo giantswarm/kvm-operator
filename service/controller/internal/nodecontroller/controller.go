@@ -79,7 +79,7 @@ func New(config Config) (*Controller, error) {
 		lastReconciled: time.Time{},
 		name:           config.Name,
 		selector:       config.Selector,
-		cluster:        v1alpha1.KVMConfig{},
+		cluster:        config.Cluster,
 	}
 
 	return c, nil

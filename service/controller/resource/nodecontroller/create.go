@@ -2,6 +2,7 @@ package nodecontroller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -36,7 +37,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if tenantcluster.IsTimeout(err) {
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
 			shouldStop = true
-		} else if tenant.IsAPINotAvailable(err) || isServerError(err) {
+		} else if tenant.IsAPINotAvailable(err) || isServerError(err) || errors.Is(err, context.DeadlineExceeded) {
 			r.logger.Debugf(ctx, "tenant cluster is not available")
 			shouldStop = true
 		} else if err != nil {
@@ -63,8 +64,27 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			RestConfig: restConfig,
 		}
 		k8sClient, err = k8sclient.NewClients(config)
-		if err != nil {
+		var shouldStop bool
+		if tenantcluster.IsTimeout(err) {
+			r.logger.Debugf(ctx, "waiting for certificates timed out")
+			shouldStop = true
+		} else if tenant.IsAPINotAvailable(err) || isServerError(err) || errors.Is(err, context.DeadlineExceeded) {
+			r.logger.Debugf(ctx, "tenant cluster is not available")
+			shouldStop = true
+		} else if err != nil {
 			return microerror.Mask(err)
+		}
+
+		if shouldStop {
+			r.controllerMutex.Lock()
+			if current, ok := r.controllers[controllerKey]; ok {
+				r.logger.Debugf(ctx, "stopping controller")
+				current.Stop()
+				delete(r.controllers, controllerKey)
+			}
+			r.controllerMutex.Unlock()
+			// Return early and wait for the next loop as there's no reason to watch an inaccessible Kubernetes API.
+			return nil
 		}
 	}
 

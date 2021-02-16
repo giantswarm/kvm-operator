@@ -20,5 +20,8 @@ func IsInvalidConfig(err error) bool {
 
 // isServerError return true if the error represents an arbitrary internal error from a Kubernetes API server.
 func isServerError(err error) bool {
+	if err == nil {
+		return false
+	}
 	return serverErrorPattern.MatchString(err.Error())
 }
