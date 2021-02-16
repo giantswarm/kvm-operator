@@ -2,14 +2,12 @@ package nodecontroller
 
 import (
 	"context"
-	"reflect"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
-	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -83,7 +81,7 @@ func (r *Resource) applyUpdateChange(ctx context.Context, desired controllerWith
 		return true
 	}
 
-	if !r.controllersEqual(ctx, current, desired) {
+	if !current.equal(desired) {
 		r.logger.Debugf(ctx, "existing controller needs to be replaced, stopping and deleting")
 		current.Stop(ctx) // This is just closing a channel, should be almost instant
 		delete(r.controllers, controllerKey)
@@ -126,31 +124,4 @@ func (r *Resource) calculateDesiredController(ctx context.Context, cluster v1alp
 		Controller: nodeController,
 	}
 	return withConfig, nil
-}
-
-// controllersEqual returns true when the given controllers are equal as it relates to watching the workload
-// cluster Kubernetes APIs.
-func (r *Resource) controllersEqual(ctx context.Context, left controllerWithConfig, right controllerWithConfig) bool {
-	if !restConfigsEqual(left.restConfig, right.restConfig) {
-		r.logger.Debugf(ctx, "rest configs changed")
-		return false
-	}
-	if !clusterSpecsEqual(left.cluster.Spec, right.cluster.Spec) {
-		r.logger.Debugf(ctx, "cluster spec changed")
-		return false
-	}
-	return true
-}
-
-// clusterSpecsEqual returns true if there is no difference which would require a new Kubernetes client to be created.
-func clusterSpecsEqual(left v1alpha1.KVMConfigSpec, right v1alpha1.KVMConfigSpec) bool {
-	return reflect.DeepEqual(left, right)
-}
-
-// restConfigsEqual returns true if there is no difference which would require a new Kubernetes client to be created.
-func restConfigsEqual(left *rest.Config, right *rest.Config) bool {
-	if left.Host != right.Host {
-		return false
-	}
-	return reflect.DeepEqual(left.TLSClientConfig, right.TLSClientConfig)
 }
