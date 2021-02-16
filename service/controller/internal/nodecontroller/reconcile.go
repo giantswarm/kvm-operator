@@ -1,39 +1,45 @@
-package podcondition
+package nodecontroller
 
 import (
 	"context"
+	"time"
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
-	workloadNode, err := key.ToNode(obj)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
+func (c *Controller) ensureConditions(ctx context.Context, workloadNode corev1.Node) (reconcile.Result, error) {
 	var managementPod corev1.Pod
-	err = r.managementK8sClient.Get(ctx, key.NodePodObjectKey(r.cluster, workloadNode), &managementPod)
-	if err != nil {
-		return microerror.Mask(err)
+	err := c.managementK8sClient.Get(ctx, key.NodePodObjectKey(c.cluster, workloadNode), &managementPod)
+	if errors.IsNotFound(err) {
+		return reconcile.Result{Requeue: false}, microerror.Mask(err)
+	} else if err != nil {
+		return reconcile.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 10,
+		}, microerror.Mask(err)
 	}
 
 	condition, shouldUpdate := calculatePodNodeCondition(workloadNode, managementPod)
 	if !shouldUpdate {
-		return nil
+		return reconcile.Result{Requeue: false}, nil
 	}
 
-	r.logger.Debugf(ctx, "patching pod node status condition to %#v", condition)
-	err = r.managementK8sClient.Status().Patch(ctx, &managementPod, podConditionPatch{PodCondition: condition})
+	c.logger.Debugf(ctx, "patching pod node status condition to %#v", condition)
+	err = c.managementK8sClient.Status().Patch(ctx, &managementPod, podConditionPatch{PodCondition: condition})
 	if err != nil {
-		return microerror.Mask(err)
+		return reconcile.Result{
+			Requeue:      true,
+			RequeueAfter: time.Second * 10,
+		}, microerror.Mask(err)
 	}
 
-	return nil
+	return reconcile.Result{}, nil
 }
 
 func calculatePodNodeCondition(node corev1.Node, pod corev1.Pod) (corev1.PodCondition, bool) {

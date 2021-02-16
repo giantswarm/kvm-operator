@@ -1,4 +1,4 @@
-package podcondition
+package nodecontroller
 
 import (
 	"fmt"

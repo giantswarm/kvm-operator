@@ -17,6 +17,7 @@ require (
 	github.com/giantswarm/randomkeys/v2 v2.0.0
 	github.com/giantswarm/statusresource/v3 v3.0.0
 	github.com/giantswarm/tenantcluster/v4 v4.0.0
+	github.com/giantswarm/to v0.3.0
 	github.com/giantswarm/versionbundle v0.2.0
 	github.com/google/go-cmp v0.5.4
 	github.com/prometheus/client_golang v1.9.0
