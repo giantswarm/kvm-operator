@@ -93,7 +93,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// associated control plane pod, we delete it from the tenant cluster's
 	// Kubernetes API.
 	for _, n := range nodes {
-		if isNodeReady(&n) {
+		if key.NodeIsReady(n) {
 			r.logger.Debugf(ctx, "not deleting node '%s' because it is in state 'Ready'", n.GetName())
 			continue
 		}
@@ -119,17 +119,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	return nil
-}
-
-// taken from https://github.com/kubernetes/kubernetes/pull/73656/files
-// isNodeReady returns true if a node is ready; false otherwise.
-func isNodeReady(node *corev1.Node) bool {
-	for _, c := range node.Status.Conditions {
-		if c.Type == corev1.NodeReady {
-			return c.Status == corev1.ConditionTrue
-		}
-	}
-	return false
 }
 
 func doesNodeExistAsPod(pods []corev1.Pod, n corev1.Node) bool {

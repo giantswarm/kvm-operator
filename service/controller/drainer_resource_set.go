@@ -13,6 +13,19 @@ import (
 func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 	var err error
 
+	var endpointResource resource.Interface
+	{
+		c := endpoint.Config{
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
+		}
+
+		endpointResource, err = endpoint.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var podResource resource.Interface
 	{
 		c := pod.Config{
@@ -22,25 +35,6 @@ func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 		}
 
 		podResource, err = pod.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var endpointResource resource.Interface
-	{
-		c := endpoint.Config{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
-		}
-
-		ops, err := endpoint.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		endpointResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -11,7 +11,7 @@ import (
 
 func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) ([]resource.Interface, error) {
 	var err error
-	var terminateUnhealthyNodesResouce resource.Interface
+	var terminateUnhealthyNodesResource resource.Interface
 	{
 		c := terminateunhealthynodes.Config{
 			K8sClient:     config.K8sClient.K8sClient(),
@@ -19,14 +19,14 @@ func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) (
 			TenantCluster: config.TenantCluster,
 		}
 
-		terminateUnhealthyNodesResouce, err = terminateunhealthynodes.New(c)
+		terminateUnhealthyNodesResource, err = terminateunhealthynodes.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	resources := []resource.Interface{
-		terminateUnhealthyNodesResouce,
+		terminateUnhealthyNodesResource,
 	}
 
 	{

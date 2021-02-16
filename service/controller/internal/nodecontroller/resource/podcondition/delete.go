@@ -1,4 +1,4 @@
-package cleanupendpointips
+package podcondition
 
 import (
 	"context"

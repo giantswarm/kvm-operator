@@ -104,6 +104,11 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 						ServiceAccountName:            key.ServiceAccountName(customResource),
 						TerminationGracePeriodSeconds: &podDeletionGracePeriod,
+						ReadinessGates: []corev1.PodReadinessGate{
+							{
+								ConditionType: key.WorkloadClusterNodeReady,
+							},
+						},
 						Volumes: []corev1.Volume{
 							{
 								Name: "cloud-config",

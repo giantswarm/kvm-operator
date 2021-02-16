@@ -17,6 +17,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/resource/deployment"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/ingress"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/namespace"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/nodecontroller"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/nodeindexstatus"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/pvc"
 	"github.com/giantswarm/kvm-operator/service/controller/resource/service"
@@ -253,6 +254,20 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		}
 	}
 
+	var nodeControllerResource resource.Interface
+	{
+		c := nodecontroller.Config{
+			K8sClient:       config.K8sClient.CtrlClient(),
+			Logger:          config.Logger,
+			WorkloadCluster: config.TenantCluster,
+		}
+
+		nodeControllerResource, err = nodecontroller.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resources := []resource.Interface{
 		statusResource,
 		nodeIndexStatusResource,
@@ -264,6 +279,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		ingressResource,
 		pvcResource,
 		serviceResource,
+		nodeControllerResource,
 	}
 
 	{
