@@ -78,7 +78,9 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	nodeIP, serviceName, err := r.podEndpointData(ctx, currentPod)
-	if err != nil {
+	if IsMissingAnnotation(err) {
+		return nil
+	} else if err != nil {
 		return microerror.Mask(err)
 	}
 

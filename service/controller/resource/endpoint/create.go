@@ -21,7 +21,9 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	r.logger.Debugf(ctx, "determining readiness for node pod")
 
 	nodeIP, serviceName, err := r.podEndpointData(ctx, pod)
-	if err != nil {
+	if IsMissingAnnotation(err) {
+		return nil
+	} else if err != nil {
 		return microerror.Mask(err)
 	}
 
