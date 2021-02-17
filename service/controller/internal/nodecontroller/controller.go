@@ -162,7 +162,7 @@ func (c *Controller) Equal(other *Controller) bool {
 	if thisRestConfig.Host != otherRestConfig.Host {
 		return false
 	}
-	if reflect.DeepEqual(thisRestConfig.TLSClientConfig, otherRestConfig.TLSClientConfig) {
+	if !reflect.DeepEqual(thisRestConfig.TLSClientConfig, otherRestConfig.TLSClientConfig) {
 		return false
 	}
 	if !reflect.DeepEqual(c.cluster.Spec, other.cluster.Spec) {
