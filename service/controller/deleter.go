@@ -25,7 +25,7 @@ type DeleterConfig struct {
 	Logger          micrologger.Logger
 	WorkloadCluster workloadcluster.Interface
 
-	ProjectName      string
+	ProjectName string
 }
 
 type Deleter struct {
