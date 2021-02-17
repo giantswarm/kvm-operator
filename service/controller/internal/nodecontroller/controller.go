@@ -27,7 +27,7 @@ import (
 
 const (
 	DisableMetricsServing = "0"
-	ResyncPeriod = 10 * time.Minute
+	ResyncPeriod          = 10 * time.Minute
 )
 
 type Config struct {
@@ -120,7 +120,7 @@ func (c *Controller) Boot() error {
 			For(&corev1.Node{}).
 			WithEventFilter(predicate.Funcs{
 				CreateFunc:  func(e event.CreateEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels())) },
-				DeleteFunc:  func(e event.DeleteEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels()))  },
+				DeleteFunc:  func(e event.DeleteEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels())) },
 				UpdateFunc:  func(e event.UpdateEvent) bool { return c.selector.Matches(labels.Set(e.MetaNew.GetLabels())) },
 				GenericFunc: func(e event.GenericEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels())) },
 			}).

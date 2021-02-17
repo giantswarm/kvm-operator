@@ -49,7 +49,7 @@ func calculateDeletedPodNodeCondition(pod corev1.Pod) (corev1.PodCondition, bool
 		Type:    key.WorkloadClusterNodeReady,
 		Reason:  "NodeDeleted",
 		Message: "node deleted in workload cluster",
-		Status: corev1.ConditionFalse,
+		Status:  corev1.ConditionFalse,
 	}
 
 	transition := !currentPodConditionFound || desiredPodCondition.Status != currentPodCondition.Status
