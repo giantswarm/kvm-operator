@@ -2,6 +2,8 @@ package nodecontroller
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"reflect"
 	"time"
 
@@ -15,13 +17,17 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
+)
+
+const (
+	DisableMetricsServing = "0"
+	ResyncPeriod = 10 * time.Minute
 )
 
 type Config struct {
@@ -34,14 +40,8 @@ type Config struct {
 	Selector labels.Selector
 }
 
-const (
-	ResyncPeriod = 10 * time.Minute
-)
-
-const (
-	DisableMetricsServing = "0"
-)
-
+// This controller is based on the operatorkit controller but cuts out metrics collectors, Sentry, and other undesirable
+// features for a dynamic workload cluster controller.
 type Controller struct {
 	managementK8sClient client.Client
 	workloadK8sClient   k8sclient.Interface
@@ -56,19 +56,25 @@ type Controller struct {
 	cluster  v1alpha1.KVMConfig
 }
 
-// New creates a new configured operator controller.
+// New creates a new configured workload cluster node controller.
 func New(config Config) (*Controller, error) {
-	if config.ManagementK8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ManagementK8sClient must not be empty", config)
-	}
-	if config.WorkloadK8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.WorkloadK8sClient must not be empty", config)
+	if reflect.DeepEqual(config.Cluster, v1alpha1.KVMConfig{}) {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Cluster must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
+	if config.ManagementK8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.ManagementK8sClient must not be empty", config)
+	}
 	if config.Name == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Name must not be empty", config)
+	}
+	if config.Selector == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Selector must not be empty", config)
+	}
+	if config.WorkloadK8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.WorkloadK8sClient must not be empty", config)
 	}
 
 	c := &Controller{
@@ -112,13 +118,9 @@ func (c *Controller) Boot() error {
 		err := builder.
 			ControllerManagedBy(mgr).
 			For(&corev1.Node{}).
-			WithOptions(controller.Options{
-				MaxConcurrentReconciles: 1,
-				Reconciler:              c,
-			}).
 			WithEventFilter(predicate.Funcs{
 				CreateFunc:  func(e event.CreateEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels())) },
-				DeleteFunc:  func(e event.DeleteEvent) bool { return false },
+				DeleteFunc:  func(e event.DeleteEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels()))  },
 				UpdateFunc:  func(e event.UpdateEvent) bool { return c.selector.Matches(labels.Set(e.MetaNew.GetLabels())) },
 				GenericFunc: func(e event.GenericEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels())) },
 			}).
@@ -135,11 +137,12 @@ func (c *Controller) Boot() error {
 			close(c.booted)
 		}
 
+		// Start in goroutine so we don't block caller
 		go func() {
 			// mgr.Start() blocks the boot process until it ends gracefully or fails.
 			err = mgr.Start(c.stopped)
 			if err != nil {
-				panic(microerror.JSON(err))
+				_, _ = fmt.Fprintf(os.Stderr, "error stopping manager: %s", microerror.Mask(err).Error())
 			}
 		}()
 	}
@@ -187,12 +190,15 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 	}
 
 	if key.IsDeleted(&node) {
-		return reconcile.Result{Requeue: false}, nil
-	}
-
-	result, err := c.ensureConditions(ctx, node)
-	if err != nil {
-		return result, microerror.Mask(err)
+		result, err := c.ensureDeleted(ctx, node)
+		if err != nil {
+			return result, microerror.Mask(err)
+		}
+	} else {
+		result, err := c.ensureCreated(ctx, node)
+		if err != nil {
+			return result, microerror.Mask(err)
+		}
 	}
 
 	c.lastReconciled = time.Now()

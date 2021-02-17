@@ -13,7 +13,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func (c *Controller) ensureConditions(ctx context.Context, workloadNode corev1.Node) (reconcile.Result, error) {
+func (c *Controller) ensureDeleted(ctx context.Context, workloadNode corev1.Node) (reconcile.Result, error) {
 	var managementPod corev1.Pod
 	err := c.managementK8sClient.Get(ctx, key.NodePodObjectKey(c.cluster, workloadNode), &managementPod)
 	if errors.IsNotFound(err) {
@@ -25,7 +25,7 @@ func (c *Controller) ensureConditions(ctx context.Context, workloadNode corev1.N
 		}, microerror.Mask(err)
 	}
 
-	condition, shouldUpdate := calculatePodNodeCondition(workloadNode, managementPod)
+	condition, shouldUpdate := calculateDeletedPodNodeCondition(managementPod)
 	if !shouldUpdate {
 		return reconcile.Result{Requeue: false}, nil
 	}
@@ -42,21 +42,14 @@ func (c *Controller) ensureConditions(ctx context.Context, workloadNode corev1.N
 	return reconcile.Result{}, nil
 }
 
-func calculatePodNodeCondition(node corev1.Node, pod corev1.Pod) (corev1.PodCondition, bool) {
-	nodeCondition, _ := key.FindNodeCondition(node, corev1.NodeReady)
+func calculateDeletedPodNodeCondition(pod corev1.Pod) (corev1.PodCondition, bool) {
 	currentPodCondition, currentPodConditionFound := key.FindPodCondition(pod, key.WorkloadClusterNodeReady)
 
 	desiredPodCondition := corev1.PodCondition{
 		Type:    key.WorkloadClusterNodeReady,
-		Reason:  nodeCondition.Reason,
-		Message: nodeCondition.Message,
-	}
-
-	switch nodeCondition.Status {
-	case corev1.ConditionTrue, corev1.ConditionFalse:
-		desiredPodCondition.Status = nodeCondition.Status
-	default:
-		desiredPodCondition.Status = corev1.ConditionUnknown
+		Reason:  "NodeDeleted",
+		Message: "node deleted in workload cluster",
+		Status: corev1.ConditionFalse,
 	}
 
 	transition := !currentPodConditionFound || desiredPodCondition.Status != currentPodCondition.Status
