@@ -80,7 +80,6 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	nodeIP, serviceName, err := r.podEndpointData(ctx, currentPod)
 	if IsMissingAnnotation(err) {
 		r.logger.Debugf(ctx, "missing annotations")
-		finalizerskeptcontext.SetKept(ctx)
 		return nil
 	} else if err != nil {
 		return microerror.Mask(err)
