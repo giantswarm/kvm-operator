@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update `k8s-kvm` to mitigate DNS issues affecting node booting.
+
 ## [3.14.0] - 2020-11-25
 
 ### Added
