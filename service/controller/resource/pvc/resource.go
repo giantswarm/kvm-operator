@@ -4,7 +4,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -18,32 +18,22 @@ const (
 // Config represents the configuration used to create a new PVC resource.
 type Config struct {
 	// Dependencies.
-	K8sClient kubernetes.Interface
+	CtrlClient client.Client
 	Logger    micrologger.Logger
-}
-
-// DefaultConfig provides a default configuration to create a new PVC
-// resource by best effort.
-func DefaultConfig() Config {
-	return Config{
-		// Dependencies.
-		K8sClient: nil,
-		Logger:    nil,
-	}
 }
 
 // Resource implements the PVC resource.
 type Resource struct {
 	// Dependencies.
-	k8sClient kubernetes.Interface
+	ctrlClient client.Client
 	logger    micrologger.Logger
 }
 
 // New creates a new configured PVC resource.
 func New(config Config) (*Resource, error) {
 	// Dependencies.
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
+	if config.CtrlClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.CtrlClient must not be empty")
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
@@ -51,7 +41,7 @@ func New(config Config) (*Resource, error) {
 
 	newResource := &Resource{
 		// Dependencies.
-		k8sClient: config.K8sClient,
+		ctrlClient: config.CtrlClient,
 		logger:    config.Logger,
 	}
 

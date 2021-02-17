@@ -1,10 +1,9 @@
 package pod
 
 import (
-	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -12,31 +11,25 @@ const (
 )
 
 type Config struct {
-	G8sClient versioned.Interface
-	K8sClient kubernetes.Interface
+	CtrlClient client.Client
 	Logger    micrologger.Logger
 }
 
 type Resource struct {
-	g8sClient versioned.Interface
-	k8sClient kubernetes.Interface
+	ctrlClient client.Client
 	logger    micrologger.Logger
 }
 
 func New(config Config) (*Resource, error) {
-	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
-	}
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
+	if config.CtrlClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
 	r := &Resource{
-		g8sClient: config.G8sClient,
-		k8sClient: config.K8sClient,
+		ctrlClient: config.CtrlClient,
 		logger:    config.Logger,
 	}
 

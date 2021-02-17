@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -19,8 +20,7 @@ const (
 // Config represents the configuration used to create a new deployment resource.
 type Config struct {
 	DNSServers    string
-	G8sClient     versioned.Interface
-	K8sClient     kubernetes.Interface
+	CtrlClient    client.Client
 	Logger        micrologger.Logger
 	NTPServers    string
 	TenantCluster tenantcluster.Interface
@@ -29,8 +29,7 @@ type Config struct {
 // Resource implements the deployment resource.
 type Resource struct {
 	dnsServers    string
-	g8sClient     versioned.Interface
-	k8sClient     kubernetes.Interface
+	ctrlClient    client.Client
 	logger        micrologger.Logger
 	ntpServers    string
 	tenantCluster tenantcluster.Interface

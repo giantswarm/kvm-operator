@@ -89,7 +89,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var namespaceResource resource.Interface
 	{
 		c := namespace.Config{
-			K8sClient: config.K8sClient.K8sClient(),
+			CtrlClient: config.K8sClient.CtrlClient(),
 			Logger:    config.Logger,
 		}
 

@@ -4,7 +4,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
-	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -12,20 +12,20 @@ const (
 )
 
 type Config struct {
-	K8sClient     kubernetes.Interface
+	CtrlClient client.Client
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 }
 
 type Resource struct {
-	k8sClient     kubernetes.Interface
+	ctrlClient client.Client
 	logger        micrologger.Logger
 	tenantCluster tenantcluster.Interface
 }
 
 func New(config Config) (*Resource, error) {
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
+	if config.CtrlClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "config.CtrlClient must not be empty")
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
@@ -35,7 +35,7 @@ func New(config Config) (*Resource, error) {
 	}
 
 	newService := &Resource{
-		k8sClient:     config.K8sClient,
+		ctrlClient:     config.CtrlClient,
 		logger:        config.Logger,
 		tenantCluster: config.TenantCluster,
 	}

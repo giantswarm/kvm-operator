@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -23,7 +23,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	{
 		r.logger.Debugf(ctx, "finding the namespace in the Kubernetes API")
 
-		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(ctx, key.ClusterNamespace(customObject), metav1.GetOptions{})
+		var retrieved corev1.Namespace
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{Name: key.ClusterNamespace(customObject)}, &retrieved)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find the namespace in the Kubernetes API")
 			// fall through
@@ -31,7 +32,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		} else {
 			r.logger.Debugf(ctx, "found the namespace in the Kubernetes API")
-			namespace = manifest
+			namespace = &retrieved
 		}
 	}
 
@@ -70,8 +71,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// we get an empty list here after the delete event got replayed. Then we just
 	// remove the namespace as usual.
 	if key.IsDeleted(customObject) {
-		n := key.ClusterNamespace(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
+		var list corev1.PodList
+		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
+			Namespace: key.ClusterNamespace(customObject),
+		})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

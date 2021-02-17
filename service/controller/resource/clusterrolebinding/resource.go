@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	apiv1 "k8s.io/api/rbac/v1"
-	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
-	K8sClient kubernetes.Interface
+	CtrlClient    client.Client
 	Logger    micrologger.Logger
 
 	ClusterRoleGeneral string
@@ -25,7 +25,7 @@ type Config struct {
 
 // Resource implements the config map resource.
 type Resource struct {
-	k8sClient kubernetes.Interface
+	ctrlClient    client.Client
 	logger    micrologger.Logger
 
 	clusterRoleGeneral string
@@ -34,8 +34,8 @@ type Resource struct {
 
 // New creates a new configured config map resource.
 func New(config Config) (*Resource, error) {
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
+	if config.CtrlClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
@@ -48,7 +48,7 @@ func New(config Config) (*Resource, error) {
 	}
 
 	newService := &Resource{
-		k8sClient: config.K8sClient,
+		ctrlClient: config.CtrlClient,
 		logger:    config.Logger,
 
 		clusterRoleGeneral: config.ClusterRoleGeneral,

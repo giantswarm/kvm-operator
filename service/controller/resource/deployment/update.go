@@ -11,6 +11,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -91,10 +92,10 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
 
-	return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient.K8sClient())
+	return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient.CtrlClient())
 }
 
-func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredState interface{}, tcK8sClient kubernetes.Interface) (interface{}, error) {
+func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredState interface{}, tcK8sClient client.Client) (interface{}, error) {
 	currentDeployments, err := toDeployments(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
