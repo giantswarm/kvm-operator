@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
@@ -30,8 +30,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	r.logger.Debugf(ctx, "looking for a service account in the Kubernetes API")
 
 	namespace := key.ClusterNamespace(customObject)
-	var currentServiceAccount *corev1.ServiceAccount
-	currentServiceAccount, err = r.k8sClient.CoreV1().ServiceAccounts(namespace).Get(ctx, key.ServiceAccountName(customObject), metav1.GetOptions{})
+	var currentServiceAccount corev1.ServiceAccount
+	err = r.ctrlClient.Get(ctx, client.ObjectKey{
+		Name:      key.ServiceAccountName(customObject),
+		Namespace: namespace,
+	}, &currentServiceAccount)
 	if apierrors.IsNotFound(err) {
 		r.logger.Debugf(ctx, "did not find the service account in the Kubernetes API")
 		//When service account is not found api still returning non nil value so it can break create/update/delete
@@ -43,5 +46,5 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		r.logger.Debugf(ctx, "found a service account in the Kubernetes API")
 	}
 
-	return currentServiceAccount, nil
+	return &currentServiceAccount, nil
 }

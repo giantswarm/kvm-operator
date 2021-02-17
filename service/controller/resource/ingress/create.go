@@ -6,16 +6,9 @@ import (
 	"github.com/giantswarm/microerror"
 	"k8s.io/api/networking/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return microerror.Mask(err)
-	}
 	ingressesToCreate, err := toIngresses(createChange)
 	if err != nil {
 		return microerror.Mask(err)
@@ -23,10 +16,8 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 	if len(ingressesToCreate) != 0 {
 		r.logger.Debugf(ctx, "creating the ingresses in the Kubernetes API")
-
-		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToCreate {
-			_, err := r.k8sClient.NetworkingV1beta1().Ingresses(namespace).Create(ctx, ingress, v1.CreateOptions{})
+			err := r.ctrlClient.Create(ctx, ingress)
 			if apierrors.IsAlreadyExists(err) {
 				// fall through
 			} else if err != nil {

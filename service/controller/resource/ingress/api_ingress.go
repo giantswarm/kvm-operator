@@ -16,7 +16,8 @@ func newAPIIngress(customObject v1alpha1.KVMConfig) *networkingv1beta1.Ingress {
 			APIVersion: "networking/v1beta",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: APIID,
+			Name:      APIID,
+			Namespace: key.ClusterNamespace(customObject),
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),
 				"customer": key.ClusterCustomer(customObject),

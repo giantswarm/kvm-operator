@@ -12,12 +12,12 @@ const (
 
 type Config struct {
 	CtrlClient client.Client
-	Logger    micrologger.Logger
+	Logger     micrologger.Logger
 }
 
 type Resource struct {
 	ctrlClient client.Client
-	logger    micrologger.Logger
+	logger     micrologger.Logger
 }
 
 func New(config Config) (*Resource, error) {
@@ -30,7 +30,7 @@ func New(config Config) (*Resource, error) {
 
 	r := &Resource{
 		ctrlClient: config.CtrlClient,
-		logger:    config.Logger,
+		logger:     config.Logger,
 	}
 
 	return r, nil

@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -25,7 +25,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	pvcNames := key.PVCNames(customObject)
 
 	for _, name := range pvcNames {
-		manifest, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Get(ctx, name, metav1.GetOptions{})
+		var manifest corev1.PersistentVolumeClaim
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{
+			Namespace: namespace,
+			Name:      name,
+		}, &manifest)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find a PVC in the Kubernetes API")
 			// fall through
@@ -33,7 +37,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		} else {
 			r.logger.Debugf(ctx, "found a PVC in the Kubernetes API")
-			PVCs = append(PVCs, manifest)
+			PVCs = append(PVCs, &manifest)
 		}
 	}
 

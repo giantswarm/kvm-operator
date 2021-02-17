@@ -2,12 +2,12 @@ package configmap
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
@@ -32,13 +32,13 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentConfigMaps []*corev1.ConfigMap
 	{
-		namespace := key.ClusterNamespace(customResource)
-
-		lo := metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, project.Name()),
+		lo := client.ListOptions{
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				label.ManagedBy: project.Name(),
+			}),
 		}
-
-		configMapList, err := r.k8sClient.CoreV1().ConfigMaps(namespace).List(ctx, lo)
+		var configMapList corev1.ConfigMapList
+		err := r.ctrlClient.List(ctx, &configMapList, &lo)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {

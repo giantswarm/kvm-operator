@@ -16,8 +16,8 @@ const (
 
 // Config represents the configuration used to create a new config map resource.
 type Config struct {
-	CtrlClient    client.Client
-	Logger    micrologger.Logger
+	CtrlClient client.Client
+	Logger     micrologger.Logger
 
 	ClusterRoleGeneral string
 	ClusterRolePSP     string
@@ -25,8 +25,8 @@ type Config struct {
 
 // Resource implements the config map resource.
 type Resource struct {
-	ctrlClient    client.Client
-	logger    micrologger.Logger
+	ctrlClient client.Client
+	logger     micrologger.Logger
 
 	clusterRoleGeneral string
 	clusterRolePSP     string
@@ -49,7 +49,7 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		ctrlClient: config.CtrlClient,
-		logger:    config.Logger,
+		logger:     config.Logger,
 
 		clusterRoleGeneral: config.ClusterRoleGeneral,
 		clusterRolePSP:     config.ClusterRolePSP,

@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -30,7 +30,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	for _, name := range serviceNames {
-		manifest, err := r.k8sClient.CoreV1().Services(namespace).Get(ctx, name, metav1.GetOptions{})
+		var manifest corev1.Service
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{
+			Name:      name,
+			Namespace: namespace,
+		}, &manifest)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find a service in the Kubernetes API")
 			// fall through
@@ -38,7 +42,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		} else {
 			r.logger.Debugf(ctx, "found a service in the Kubernetes API")
-			services = append(services, manifest)
+			services = append(services, &manifest)
 		}
 	}
 
@@ -52,8 +56,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// removed we get an empty list here after the delete event got replayed. Then
 	// we just remove the services as usual.
 	if key.IsDeleted(customObject) {
-		n := key.ClusterNamespace(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
+		var list corev1.PodList
+		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
+			Namespace: key.ClusterNamespace(customObject),
+		})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -6,9 +6,10 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/api/networking/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -30,7 +31,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	for _, name := range ingressNames {
-		manifest, err := r.k8sClient.NetworkingV1beta1().Ingresses(namespace).Get(ctx, name, metav1.GetOptions{})
+		var manifest v1beta1.Ingress
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{
+			Namespace: namespace,
+			Name:      name,
+		}, &manifest)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find a ingress in the Kubernetes API")
 			// fall through
@@ -38,7 +43,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		} else {
 			r.logger.Debugf(ctx, "found a ingress in the Kubernetes API")
-			ingresses = append(ingresses, manifest)
+			ingresses = append(ingresses, &manifest)
 		}
 	}
 
@@ -52,8 +57,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// got removed we get an empty list here after the delete event got replayed.
 	// Then we just remove the ingresses as usual.
 	if key.IsDeleted(customObject) {
-		n := key.ClusterNamespace(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
+		var list v1.PodList
+		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
+			Namespace: key.ClusterNamespace(customObject),
+		})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

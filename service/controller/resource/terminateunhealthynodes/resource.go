@@ -12,13 +12,13 @@ const (
 )
 
 type Config struct {
-	CtrlClient client.Client
+	CtrlClient    client.Client
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 }
 
 type Resource struct {
-	ctrlClient client.Client
+	ctrlClient    client.Client
 	logger        micrologger.Logger
 	tenantCluster tenantcluster.Interface
 }
@@ -35,7 +35,7 @@ func New(config Config) (*Resource, error) {
 	}
 
 	newService := &Resource{
-		ctrlClient:     config.CtrlClient,
+		ctrlClient:    config.CtrlClient,
 		logger:        config.Logger,
 		tenantCluster: config.TenantCluster,
 	}

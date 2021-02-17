@@ -7,16 +7,9 @@ import (
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	"k8s.io/api/networking/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return microerror.Mask(err)
-	}
 	ingressesToDelete, err := toIngresses(deleteChange)
 	if err != nil {
 		return microerror.Mask(err)
@@ -25,9 +18,8 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(ingressesToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the ingresses in the Kubernetes API")
 
-		namespace := key.ClusterNamespace(customObject)
 		for _, ingress := range ingressesToDelete {
-			err := r.k8sClient.NetworkingV1beta1().Ingresses(namespace).Delete(ctx, ingress.Name, metav1.DeleteOptions{})
+			err := r.ctrlClient.Delete(ctx, ingress)
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {

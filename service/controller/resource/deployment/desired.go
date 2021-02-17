@@ -6,7 +6,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	v1 "k8s.io/api/apps/v1"
-	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 
@@ -25,8 +25,10 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	var release *releasev1alpha1.Release
 	{
 		releaseVersion := customResource.Labels[label.ReleaseVersion]
-		releaseName := fmt.Sprintf("v%s", releaseVersion)
-		release, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(ctx, releaseName, apismetav1.GetOptions{})
+		var release releasev1alpha1.Release
+		err = r.ctrlClient.Get(ctx, client.ObjectKey{
+			Name: fmt.Sprintf("v%s", releaseVersion),
+		}, &release)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

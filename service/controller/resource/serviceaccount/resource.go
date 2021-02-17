@@ -15,15 +15,15 @@ const (
 // Config represents the configuration used to create a new cloud config resource.
 type Config struct {
 	// Dependencies.
-	CtrlClient    client.Client
-	Logger    micrologger.Logger
+	CtrlClient client.Client
+	Logger     micrologger.Logger
 }
 
 // Resource implements the config map resource.
 type Resource struct {
 	// Dependencies.
-	ctrlClient    client.Client
-	logger    micrologger.Logger
+	ctrlClient client.Client
+	logger     micrologger.Logger
 }
 
 // New creates a new configured config map resource.
@@ -37,7 +37,7 @@ func New(config Config) (*Resource, error) {
 
 	newService := &Resource{
 		ctrlClient: config.CtrlClient,
-		logger:    config.Logger,
+		logger:     config.Logger,
 	}
 
 	return newService, nil

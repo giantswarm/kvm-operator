@@ -19,14 +19,14 @@ const (
 type Config struct {
 	// Dependencies.
 	CtrlClient client.Client
-	Logger    micrologger.Logger
+	Logger     micrologger.Logger
 }
 
 // Resource implements the PVC resource.
 type Resource struct {
 	// Dependencies.
 	ctrlClient client.Client
-	logger    micrologger.Logger
+	logger     micrologger.Logger
 }
 
 // New creates a new configured PVC resource.
@@ -42,7 +42,7 @@ func New(config Config) (*Resource, error) {
 	newResource := &Resource{
 		// Dependencies.
 		ctrlClient: config.CtrlClient,
-		logger:    config.Logger,
+		logger:     config.Logger,
 	}
 
 	return newResource, nil

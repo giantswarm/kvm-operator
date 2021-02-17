@@ -6,13 +6,13 @@ import (
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/v3/pkg/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/v2/randomkeystest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/kubernetes/scheme"
+	fake2 "sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig/cloudconfigtest"
@@ -35,7 +35,6 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 			Version: "3.3.15",
 		},
 	}
-	clientset := apiextfake.NewSimpleClientset(release)
 
 	testCases := []struct {
 		Obj                    interface{}
@@ -330,8 +329,7 @@ func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {
 		resourceConfig := Config{}
 		resourceConfig.CertsSearcher = certstest.NewSearcher(certstest.Config{})
 		resourceConfig.CloudConfig = cloudconfigtest.New()
-		resourceConfig.G8sClient = clientset
-		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.CtrlClient = fake2.NewFakeClientWithScheme(scheme.Scheme, release)
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
 		resourceConfig.RegistryDomain = "example.net"

@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
@@ -19,7 +19,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 		r.logger.Debugf(ctx, "updating services")
 
 		for _, serviceToUpdate := range servicesToUpdate {
-			_, err := r.k8sClient.CoreV1().Services(serviceToUpdate.Namespace).Update(ctx, serviceToUpdate, metav1.UpdateOptions{})
+			err := r.ctrlClient.Update(ctx, serviceToUpdate)
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -74,7 +74,11 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		}
 
 		if isServiceModified(desiredService, currentService) {
-			latest, err := r.k8sClient.CoreV1().Services(desiredService.GetNamespace()).Get(ctx, desiredService.GetName(), metav1.GetOptions{})
+			var latest corev1.Service
+			err := r.ctrlClient.Get(ctx, client.ObjectKey{
+				Namespace: desiredService.Namespace,
+				Name:      desiredService.Name,
+			}, &latest)
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}

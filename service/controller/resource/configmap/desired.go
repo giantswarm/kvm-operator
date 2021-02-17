@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
@@ -43,11 +44,11 @@ func (r *Resource) newConfigMaps(ctx context.Context, customResource v1alpha1.KV
 		return nil, microerror.Mask(err)
 	}
 
-	var release *releasev1alpha1.Release
+	var release releasev1alpha1.Release
 	{
 		releaseVersion := customResource.Labels[label.ReleaseVersion]
 		releaseName := fmt.Sprintf("v%s", releaseVersion)
-		release, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(ctx, releaseName, metav1.GetOptions{})
+		err = r.ctrlClient.Get(ctx, client.ObjectKey{Name: releaseName}, &release)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

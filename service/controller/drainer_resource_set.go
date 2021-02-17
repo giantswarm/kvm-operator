@@ -29,9 +29,8 @@ func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 	var podResource resource.Interface
 	{
 		c := pod.Config{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
 		podResource, err = pod.New(c)

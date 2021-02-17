@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	apiv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -30,7 +30,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentClusterRoleBinding []*apiv1.ClusterRoleBinding
 	{
-		clusterRoleBinding, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(ctx, key.ClusterRoleBindingName(customObject), metav1.GetOptions{})
+		var clusterRoleBinding apiv1.ClusterRoleBinding
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{Name: key.ClusterRoleBindingName(customObject)}, &clusterRoleBinding)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find cluster role binding in the Kubernetes API")
 			// fall through
@@ -39,10 +40,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else {
 			r.logger.Debugf(ctx, "found a list of cluster role binding in the Kubernetes API")
 
-			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBinding)
+			currentClusterRoleBinding = append(currentClusterRoleBinding, &clusterRoleBinding)
 		}
 
-		clusterRoleBindingPSP, err := r.k8sClient.RbacV1().ClusterRoleBindings().Get(ctx, key.ClusterRoleBindingPSPName(customObject), metav1.GetOptions{})
+		var clusterRoleBindingPSP apiv1.ClusterRoleBinding
+		err = r.ctrlClient.Get(ctx, client.ObjectKey{Name: key.ClusterRoleBindingPSPName(customObject)}, &clusterRoleBinding)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find cluster role binding psp in the Kubernetes API")
 			// fall through
@@ -51,7 +53,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		} else {
 			r.logger.Debugf(ctx, "found a list of cluster role binding psp in the Kubernetes API")
 
-			currentClusterRoleBinding = append(currentClusterRoleBinding, clusterRoleBindingPSP)
+			currentClusterRoleBinding = append(currentClusterRoleBinding, &clusterRoleBindingPSP)
 		}
 	}
 

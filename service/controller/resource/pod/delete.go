@@ -4,12 +4,14 @@ import (
 	"context"
 
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -24,7 +26,11 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.Debugf(ctx, "looking for the current version of the reconciled pod in the Kubernetes API")
 
-		currentPod, err = r.k8sClient.CoreV1().Pods(reconciledPod.GetNamespace()).Get(ctx, reconciledPod.Name, metav1.GetOptions{})
+		var pod corev1.Pod
+		err = r.ctrlClient.Get(ctx, client.ObjectKey{
+			Namespace: reconciledPod.Namespace,
+			Name:      reconciledPod.Name,
+		}, &pod)
 		if apierrors.IsNotFound(err) {
 			// In case we reconcile a pod we cannot find anymore this means the
 			// informer's watch event is outdated and the pod got already deleted in
@@ -39,6 +45,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 		r.logger.Debugf(ctx, "found the current version of the reconciled pod in the Kubernetes API")
+		currentPod = &pod
 	}
 
 	{
@@ -49,7 +56,11 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			return microerror.Maskf(missingClusterLabelError, "pod is missing cluster label")
 		}
 
-		kvmConfig, err := r.g8sClient.ProviderV1alpha1().KVMConfigs(metav1.NamespaceDefault).Get(ctx, clusterID, metav1.GetOptions{})
+		var kvmConfig v1alpha1.KVMConfig
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{
+			Namespace: metav1.NamespaceDefault,
+			Name:      clusterID,
+		}, &kvmConfig)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -80,11 +91,11 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.Debugf(ctx, "looking for the drainer config for the tenant cluster")
 
-		n := currentPod.GetNamespace()
-		p := currentPod.GetName()
-		o := metav1.GetOptions{}
-
-		drainerConfig, err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Get(ctx, p, o)
+		var drainerConfig corev1alpha1.DrainerConfig
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{
+			Namespace: currentPod.Namespace,
+			Name:      currentPod.Name,
+		}, &drainerConfig)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find drainer config for tenant cluster node")
 
@@ -109,14 +120,14 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		if drainerConfig.Status.HasDrainedCondition() {
 			r.logger.Debugf(ctx, "drainer config of tenant cluster has drained condition")
 
-			err := r.finishDraining(ctx, currentPod, drainerConfig)
+			err := r.finishDraining(ctx, currentPod, &drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
 		} else if drainerConfig.Status.HasTimeoutCondition() {
 			r.logger.Debugf(ctx, "drainer config of tenant cluster has timeout condition")
 
-			err := r.finishDraining(ctx, currentPod, drainerConfig)
+			err := r.finishDraining(ctx, currentPod, &drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -124,7 +135,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			r.logger.Debugf(ctx, "pod is treated as drained")
 			r.logger.Debugf(ctx, "all pod's containers are terminated")
 
-			err := r.finishDraining(ctx, currentPod, drainerConfig)
+			err := r.finishDraining(ctx, currentPod, &drainerConfig)
 			if err != nil {
 				return microerror.Mask(err)
 			}
@@ -150,10 +161,10 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 		return microerror.Mask(err)
 	}
 
-	n := pod.GetNamespace()
 	c := &corev1alpha1.DrainerConfig{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: pod.GetName(),
+			Name:      pod.Name,
+			Namespace: pod.Namespace,
 		},
 		Spec: corev1alpha1.DrainerConfigSpec{
 			Guest: corev1alpha1.DrainerConfigSpecGuest{
@@ -173,7 +184,7 @@ func (r *Resource) createDrainerConfig(ctx context.Context, pod *corev1.Pod) err
 		},
 	}
 
-	_, err = r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Create(ctx, c, metav1.CreateOptions{})
+	err = r.ctrlClient.Create(ctx, c)
 	if apierrors.IsAlreadyExists(err) {
 		r.logger.LogCtx(ctx, "level", "warning", "message", "drainer config for tenant cluster node already exists")
 	} else if err != nil {
@@ -190,12 +201,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 
 	{
 		r.logger.Debugf(ctx, "deleting drainer config for tenant cluster node")
-
-		n := currentPod.GetNamespace()
-		i := currentPod.GetName()
-		o := metav1.DeleteOptions{}
-
-		err := r.g8sClient.CoreV1alpha1().DrainerConfigs(n).Delete(ctx, i, o)
+		err := r.ctrlClient.Delete(ctx, drainerConfig)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "drainer config for tenant cluster node already deleted")
 		} else if err != nil {
@@ -217,7 +223,7 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 	{
 		r.logger.Debugf(ctx, "updating the pod in the Kubernetes API")
 
-		_, err := r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Update(ctx, podToDelete, metav1.UpdateOptions{})
+		err := r.ctrlClient.Update(ctx, podToDelete)
 		if apierrors.IsConflict(err) {
 			// The reconciled pod may be updated by other processes or even humans
 			// meanwhile. In case the resource version we currently know does not
@@ -241,10 +247,10 @@ func (r *Resource) finishDraining(ctx context.Context, currentPod *corev1.Pod, d
 		r.logger.Debugf(ctx, "deleting the pod in the Kubernetes API")
 
 		gracePeriodSeconds := int64(0)
-		options := metav1.DeleteOptions{
+		options := client.DeleteOptions{
 			GracePeriodSeconds: &gracePeriodSeconds,
 		}
-		err = r.k8sClient.CoreV1().Pods(podToDelete.Namespace).Delete(ctx, podToDelete.Name, options)
+		err = r.ctrlClient.Delete(ctx, podToDelete, &options)
 		if err != nil {
 			return microerror.Mask(err)
 		}

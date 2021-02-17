@@ -8,7 +8,6 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -80,8 +79,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// against the tenant cluster nodes below.
 	var pods []corev1.Pod
 	{
-		n := key.ClusterID(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
+		var list corev1.PodList
+		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
+			Namespace: key.ClusterID(customObject),
+		})
 		if err != nil {
 			return microerror.Mask(err)
 		}

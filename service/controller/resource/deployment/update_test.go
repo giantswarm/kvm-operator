@@ -8,7 +8,6 @@ import (
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
@@ -17,6 +16,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/kubernetes/scheme"
+	fake2 "sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -39,7 +40,6 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			Version: "3.3.15",
 		},
 	}
-	clientset := apiextfake.NewSimpleClientset(release)
 
 	testCases := []struct {
 		Ctx                         context.Context
@@ -1642,8 +1642,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 	{
 		resourceConfig := Config{
 			DNSServers:    "dnsserver1,dnsserver2",
-			G8sClient:     clientset,
-			K8sClient:     fake.NewSimpleClientset(),
+			CtrlClient:    fake2.NewFakeClientWithScheme(scheme.Scheme, release),
 			Logger:        microloggertest.New(),
 			TenantCluster: tenantCluster,
 		}
@@ -1654,9 +1653,8 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-
 		// This tenant client is actually used during the test.
-		tenantK8sClient := fake.NewSimpleClientset(tc.FakeTCObjects...) // Pass in any fake TC objects
+		tenantK8sClient := fake2.NewFakeClientWithScheme(scheme.Scheme, tc.FakeTCObjects...) // Pass in any fake TC objects
 
 		updateState, err := newResource.updateDeployments(tc.Ctx, tc.CurrentState, tc.DesiredState, tenantK8sClient)
 		if err != nil {

@@ -8,15 +8,10 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customResource, err := key.ToCustomObject(obj)
-	if err != nil {
-		return microerror.Mask(err)
-	}
 	deploymentsToDelete, err := toDeployments(deleteChange)
 	if err != nil {
 		return microerror.Mask(err)
@@ -26,8 +21,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		r.logger.Debugf(ctx, "deleting the deployments in the Kubernetes API")
 
 		for _, deployment := range deploymentsToDelete {
-			n := key.ClusterNamespace(customResource)
-			err := r.k8sClient.AppsV1().Deployments(n).Delete(ctx, deployment.Name, newDeleteOptions())
+			err := r.ctrlClient.Delete(ctx, deployment, newDeleteOptions())
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -109,12 +103,12 @@ func (r *Resource) newDeleteChangeForUpdatePatch(ctx context.Context, obj, curre
 	return deploymentsToDelete, nil
 }
 
-func newDeleteOptions() metav1.DeleteOptions {
+func newDeleteOptions() *client.DeleteOptions {
 	propagation := metav1.DeletePropagationForeground
 
-	options := metav1.DeleteOptions{
+	options := client.DeleteOptions{
 		PropagationPolicy: &propagation,
 	}
 
-	return options
+	return &options
 }

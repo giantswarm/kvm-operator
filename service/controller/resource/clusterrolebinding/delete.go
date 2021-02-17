@@ -7,7 +7,6 @@ import (
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	apiv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
@@ -21,7 +20,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 
 		// Delete the cluster role bindings in the Kubernetes API.
 		for _, clusterRoleBinding := range clusterRoleBindingsToDelete {
-			err := r.k8sClient.RbacV1beta1().ClusterRoleBindings().Delete(ctx, clusterRoleBinding.Name, metav1.DeleteOptions{})
+			err := r.ctrlClient.Delete(ctx, clusterRoleBinding)
 			if apierrors.IsNotFound(err) {
 			} else if err != nil {
 				return microerror.Mask(err)

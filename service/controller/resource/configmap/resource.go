@@ -24,7 +24,7 @@ type Config struct {
 	// Dependencies.
 	CertsSearcher  certs.Interface
 	CloudConfig    *cloudconfig.CloudConfig
-	CtrlClient    client.Client
+	CtrlClient     client.Client
 	KeyWatcher     randomkeys.Interface
 	Logger         micrologger.Logger
 	DockerhubToken string
@@ -36,7 +36,7 @@ type Resource struct {
 	// Dependencies.
 	certsSearcher  certs.Interface
 	cloudConfig    *cloudconfig.CloudConfig
-	ctrlClient    client.Client
+	ctrlClient     client.Client
 	keyWatcher     randomkeys.Interface
 	logger         micrologger.Logger
 	registryDomain string
@@ -54,7 +54,7 @@ func New(config Config) (*Resource, error) {
 	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.CtrlClient must not be empty")
 	}
-		if config.KeyWatcher == nil {
+	if config.KeyWatcher == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.KeyWatcher must not be empty")
 	}
 	if config.Logger == nil {
@@ -71,7 +71,7 @@ func New(config Config) (*Resource, error) {
 		// Dependencies.
 		certsSearcher:  config.CertsSearcher,
 		cloudConfig:    config.CloudConfig,
-		ctrlClient:      config.CtrlClient,
+		ctrlClient:     config.CtrlClient,
 		keyWatcher:     config.KeyWatcher,
 		logger:         config.Logger,
 		registryDomain: config.RegistryDomain,

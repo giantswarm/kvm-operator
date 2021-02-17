@@ -8,7 +8,8 @@ import (
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/kubernetes/scheme"
+	fake2 "sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
 
 func Test_Resource_ClusterRoleBinding_newDeleteChange(t *testing.T) {
@@ -263,8 +264,8 @@ func Test_Resource_ClusterRoleBinding_newDeleteChange(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			K8sClient: fake.NewSimpleClientset(),
-			Logger:    microloggertest.New(),
+			CtrlClient: fake2.NewFakeClientWithScheme(scheme.Scheme),
+			Logger:     microloggertest.New(),
 
 			ClusterRoleGeneral: "test-role",
 			ClusterRolePSP:     "test-role-psp",

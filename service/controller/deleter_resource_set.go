@@ -15,7 +15,7 @@ func newDeleterResources(config DeleterConfig) ([]resource.Interface, error) {
 	var nodeResource resource.Interface
 	{
 		c := node.Config{
-			K8sClient:     config.K8sClient.K8sClient(),
+			CtrlClient:    config.K8sClient.CtrlClient(),
 			Logger:        config.Logger,
 			TenantCluster: config.TenantCluster,
 		}

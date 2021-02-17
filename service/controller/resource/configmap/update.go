@@ -6,16 +6,9 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
-	customResource, err := key.ToCustomObject(obj)
-	if err != nil {
-		return microerror.Mask(err)
-	}
 	configMapsToUpdate, err := toConfigMaps(updateChange)
 	if err != nil {
 		return microerror.Mask(err)
@@ -24,10 +17,8 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	if len(configMapsToUpdate) != 0 {
 		r.logger.Debugf(ctx, "updating the config maps in the Kubernetes API")
 
-		// Create the config maps in the Kubernetes API.
-		namespace := key.ClusterNamespace(customResource)
 		for _, configMap := range configMapsToUpdate {
-			_, err := r.k8sClient.CoreV1().ConfigMaps(namespace).Update(ctx, configMap, v1.UpdateOptions{})
+			err := r.ctrlClient.Update(ctx, configMap)
 			if err != nil {
 				return microerror.Mask(err)
 			}

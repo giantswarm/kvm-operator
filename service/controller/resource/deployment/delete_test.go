@@ -7,13 +7,14 @@ import (
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/kubernetes/scheme"
+	fake2 "sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
 
 func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
@@ -34,7 +35,6 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 			Version: "3.3.15",
 		},
 	}
-	clientset := apiextfake.NewSimpleClientset(release)
 
 	testCases := []struct {
 		Obj                     interface{}
@@ -318,8 +318,7 @@ func Test_Resource_Deployment_newDeleteChange(t *testing.T) {
 	{
 		resourceConfig := Config{
 			DNSServers:    "dnsserver1,dnsserver2",
-			G8sClient:     clientset,
-			K8sClient:     fake.NewSimpleClientset(),
+			CtrlClient:    fake2.NewFakeClientWithScheme(scheme.Scheme, release),
 			Logger:        logger,
 			TenantCluster: tenantCluster,
 		}

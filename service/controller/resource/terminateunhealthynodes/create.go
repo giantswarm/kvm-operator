@@ -7,7 +7,6 @@ import (
 	"github.com/giantswarm/badnodedetector/pkg/detector"
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -79,13 +78,17 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 func (r *Resource) terminateNode(ctx context.Context, clusterID string, node corev1.Node) error {
 	r.logger.Debugf(ctx, "getting corresponding CP pod for node %s", node.Name)
-	pod, err := r.k8sClient.CoreV1().Pods(clusterID).Get(ctx, node.Name, metav1.GetOptions{})
+	var pod corev1.Pod
+	err := r.ctrlClient.Get(ctx, client.ObjectKey{
+		Namespace: clusterID,
+		Name:      node.Name,
+	}, &pod)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
 	r.logger.Debugf(ctx, "terminating unhealthy node %s", node.Name)
-	err = r.k8sClient.CoreV1().Pods(clusterID).Delete(ctx, pod.Name, metav1.DeleteOptions{})
+	err = r.ctrlClient.Delete(ctx, &pod)
 	if err != nil {
 		return microerror.Mask(err)
 	}

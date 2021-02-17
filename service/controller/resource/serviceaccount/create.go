@@ -6,16 +6,9 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return microerror.Mask(err)
-	}
 	serviceAccountToCreate, err := toServiceAccount(createChange)
 	if err != nil {
 		return microerror.Mask(err)
@@ -24,9 +17,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	// Create the service account in the Kubernetes API.
 	if serviceAccountToCreate != nil {
 		r.logger.Debugf(ctx, "creating the service account in the Kubernetes API")
-
-		namespace := key.ClusterNamespace(customObject)
-		_, err := r.k8sClient.CoreV1().ServiceAccounts(namespace).Create(ctx, serviceAccountToCreate, v1.CreateOptions{})
+		err := r.ctrlClient.Create(ctx, serviceAccountToCreate)
 		if apierrors.IsAlreadyExists(err) {
 		} else if err != nil {
 			return microerror.Mask(err)

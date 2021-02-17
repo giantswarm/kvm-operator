@@ -1,12 +1,10 @@
 package deployment
 
 import (
-	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
-	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -40,11 +38,8 @@ func New(config Config) (*Resource, error) {
 	if config.DNSServers == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.DNSServers must not be empty", config)
 	}
-	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
-	}
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
+	if config.CtrlClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.CtrlClient must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
@@ -55,8 +50,7 @@ func New(config Config) (*Resource, error) {
 
 	newResource := &Resource{
 		dnsServers:    config.DNSServers,
-		g8sClient:     config.G8sClient,
-		k8sClient:     config.K8sClient,
+		ctrlClient:    config.CtrlClient,
 		logger:        config.Logger,
 		ntpServers:    config.NTPServers,
 		tenantCluster: config.TenantCluster,
