@@ -3,10 +3,10 @@ package node
 import (
 	"context"
 
-	"github.com/giantswarm/errors/tenant"
+	workloaderrors "github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -20,18 +20,18 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
-	// At first we need to create a Kubernetes client for the reconciled tenant
+	// At first we need to create a Kubernetes client for the reconciled workload
 	// cluster.
 	var k8sClient kubernetes.Interface
 	{
-		r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
+		r.logger.Debugf(ctx, "creating Kubernetes client for workload cluster")
 
 		i := key.ClusterID(customObject)
 		e := key.ClusterAPIEndpoint(customObject)
 
-		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
-		if tenantcluster.IsTimeout(err) {
-			r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
+		restConfig, err := r.workloadCluster.NewRestConfig(ctx, i, e)
+		if workloadcluster.IsTimeout(err) {
+			r.logger.Debugf(ctx, "did not create Kubernetes client for workload cluster")
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
 			r.logger.Debugf(ctx, "canceling resource")
 
@@ -44,8 +44,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			RestConfig: restConfig,
 		}
 		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if tenant.IsAPINotAvailable(err) {
-			r.logger.Debugf(ctx, "tenant cluster is not available")
+		if workloaderrors.IsAPINotAvailable(err) {
+			r.logger.Debugf(ctx, "workload cluster is not available")
 			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil
@@ -54,17 +54,17 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		k8sClient = k8sClients.K8sClient()
-		r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
+		r.logger.Debugf(ctx, "created Kubernetes client for workload cluster")
 	}
 
-	// We need to fetch the nodes being registered within the tenant cluster's
+	// We need to fetch the nodes being registered within the workload cluster's
 	// Kubernetes API. The list of nodes is used below to sort out which ones have
 	// to be deleted if there does no associated control plane pod exist.
 	var nodes []corev1.Node
 	{
 		list, err := k8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
-		if tenant.IsAPINotAvailable(err) {
-			r.logger.Debugf(ctx, "tenant cluster is not available")
+		if workloaderrors.IsAPINotAvailable(err) {
+			r.logger.Debugf(ctx, "workload cluster is not available")
 			r.logger.Debugf(ctx, "canceling resource")
 
 			return nil
@@ -75,8 +75,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	// Fetch the list of pods running on the control plane. These pods serve VMs
-	// which in turn run the tenant cluster nodes. We use the pods to compare them
-	// against the tenant cluster nodes below.
+	// which in turn run the workload cluster nodes. We use the pods to compare them
+	// against the workload cluster nodes below.
 	var pods []corev1.Pod
 	{
 		n := key.ClusterID(customObject)
@@ -89,8 +89,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	// Iterate through all nodes and compare them against the pods of the control
 	// plane. Nodes being in a Ready state are fine. Nodes that belong to control
-	// plane pods are also ok. If a tenant cluster node does not have an
-	// associated control plane pod, we delete it from the tenant cluster's
+	// plane pods are also ok. If a workload cluster node does not have an
+	// associated control plane pod, we delete it from the workload cluster's
 	// Kubernetes API.
 	for _, n := range nodes {
 		if key.NodeIsReady(n) {
@@ -108,14 +108,14 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			continue
 		}
 
-		r.logger.Debugf(ctx, "deleting node '%s' in the tenant cluster's Kubernetes API", n.GetName())
+		r.logger.Debugf(ctx, "deleting node '%s' in the workload cluster's Kubernetes API", n.GetName())
 
 		err = k8sClient.CoreV1().Nodes().Delete(ctx, n.GetName(), metav1.DeleteOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.Debugf(ctx, "deleted node '%s' in the tenant cluster's Kubernetes API", n.GetName())
+		r.logger.Debugf(ctx, "deleted node '%s' in the workload cluster's Kubernetes API", n.GetName())
 	}
 
 	return nil

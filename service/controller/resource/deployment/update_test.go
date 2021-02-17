@@ -11,7 +11,7 @@ import (
 	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -1478,7 +1478,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			},
 		},
 
-		// Test 13: if update is allowed but a tenant cluster master is unschedulable, do not update the worker deployment
+		// Test 13: if update is allowed but a workload cluster master is unschedulable, do not update the worker deployment
 		{
 			Ctx: func() context.Context {
 				return context.Background()
@@ -1623,17 +1623,17 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		}
 	}
 
-	// This tenantcluster is not actually used. It exists to avoid errors when it is nil.
-	// Each test case creates a new client for the tenant cluster and uses that for the test.
-	var tenantCluster tenantcluster.Interface
+	// This workloadcluster is not actually used. It exists to avoid errors when it is nil.
+	// Each test case creates a new client for the workload cluster and uses that for the test.
+	var workloadCluster workloadcluster.Interface
 	{
-		c := tenantcluster.Config{
+		c := workloadcluster.Config{
 			CertsSearcher: certsSearcher,
 			Logger:        logger,
 			CertID:        certs.APICert,
 		}
 
-		tenantCluster, err = tenantcluster.New(c)
+		workloadCluster, err = workloadcluster.New(c)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
@@ -1641,11 +1641,11 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			DNSServers:    "dnsserver1,dnsserver2",
-			G8sClient:     clientset,
-			K8sClient:     fake.NewSimpleClientset(),
-			Logger:        microloggertest.New(),
-			TenantCluster: tenantCluster,
+			DNSServers:      "dnsserver1,dnsserver2",
+			G8sClient:       clientset,
+			K8sClient:       fake.NewSimpleClientset(),
+			Logger:          microloggertest.New(),
+			WorkloadCluster: workloadCluster,
 		}
 		newResource, err = New(resourceConfig)
 		if err != nil {
@@ -1655,10 +1655,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 
 	for _, tc := range testCases {
 
-		// This tenant client is actually used during the test.
-		tenantK8sClient := fake.NewSimpleClientset(tc.FakeTCObjects...) // Pass in any fake TC objects
+		// This workload client is actually used during the test.
+		workloadK8sClient := fake.NewSimpleClientset(tc.FakeTCObjects...) // Pass in any fake TC objects
 
-		updateState, err := newResource.updateDeployments(tc.Ctx, tc.CurrentState, tc.DesiredState, tenantK8sClient)
+		updateState, err := newResource.updateDeployments(tc.Ctx, tc.CurrentState, tc.DesiredState, workloadK8sClient)
 		if err != nil {
 			t.Fatalf("expected %#v got %#v", nil, err)
 		}

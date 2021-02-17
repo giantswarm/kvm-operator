@@ -105,16 +105,15 @@ func mainError() error {
 	daemonCommand.PersistentFlags().String(f.Service.Installation.DNS.Servers, "", "Comma separated list of DNS servers.")
 	daemonCommand.PersistentFlags().String(f.Service.Installation.NTP.Servers, "", "Comma separated list of NTPservers.")
 
-	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID, "", "OIDC authorization provider ClientID.")
-	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL, "", "OIDC authorization provider IssuerURL.")
-	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim, "", "OIDC authorization provider UsernameClaim.")
-	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix, "", "OIDC authorization provider UsernamePrefix.")
-	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim, "", "OIDC authorization provider GroupsClaim.")
-	daemonCommand.PersistentFlags().String(f.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix, "", "OIDC authorization provider GroupsPrefix.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.ClientID, "", "OIDC authorization provider ClientID.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.IssuerURL, "", "OIDC authorization provider IssuerURL.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim, "", "OIDC authorization provider UsernameClaim.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix, "", "OIDC authorization provider UsernamePrefix.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim, "", "OIDC authorization provider GroupsClaim.")
+	daemonCommand.PersistentFlags().String(f.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix, "", "OIDC authorization provider GroupsPrefix.")
 
-	daemonCommand.PersistentFlags().String(f.Service.CRD.LabelSelector, "", "Label selector for CRD informer ListOptions.")
-	daemonCommand.PersistentFlags().String(f.Service.RBAC.ClusterRole.General, "", "Name of existing general ClusterRole to be used for tenant cluster node pods.")
-	daemonCommand.PersistentFlags().String(f.Service.RBAC.ClusterRole.PSP, "", "Name of existing ClusterRole with PSP to be used for tenant cluster node pods.")
+	daemonCommand.PersistentFlags().String(f.Service.RBAC.ClusterRole.General, "", "Name of existing general ClusterRole to be used for workload cluster node pods.")
+	daemonCommand.PersistentFlags().String(f.Service.RBAC.ClusterRole.PSP, "", "Name of existing ClusterRole with PSP to be used for workload cluster node pods.")
 
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.Address, "http://127.0.0.1:6443", "Address used to connect to Kubernetes. When empty in-cluster config is created.")
 	daemonCommand.PersistentFlags().Bool(f.Service.Kubernetes.InCluster, false, "Whether to use the in-cluster config to authenticate with Kubernetes.")
@@ -127,9 +126,8 @@ func mainError() error {
 	daemonCommand.PersistentFlags().String(f.Service.Registry.Domain, "docker.io", "Image registry domain.")
 	daemonCommand.PersistentFlags().StringSlice(f.Service.Registry.Mirrors, []string{}, `Image registry mirror domains. Can be set only if registry domain is "docker.io".`)
 
-	daemonCommand.PersistentFlags().String(f.Service.Tenant.Ignition.Path, "/opt/ignition", "Default path for the ignition base directory.")
-	daemonCommand.PersistentFlags().String(f.Service.Tenant.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")
-	daemonCommand.PersistentFlags().Bool(f.Service.Tenant.Update.Enabled, false, "Whether updates of tenant cluster nodes are allowed to be processed upon reconciliation.")
+	daemonCommand.PersistentFlags().String(f.Service.Workload.Ignition.Path, "/opt/ignition", "Default path for the ignition base directory.")
+	daemonCommand.PersistentFlags().String(f.Service.Workload.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")
 
 	err = newCommand.CobraCommand().Execute()
 	if err != nil {

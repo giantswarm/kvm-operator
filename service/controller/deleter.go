@@ -9,7 +9,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -20,12 +20,11 @@ import (
 const deleterResyncPeriod = time.Minute * 2
 
 type DeleterConfig struct {
-	CertsSearcher certs.Interface
-	K8sClient     k8sclient.Interface
-	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
+	CertsSearcher   certs.Interface
+	K8sClient       k8sclient.Interface
+	Logger          micrologger.Logger
+	WorkloadCluster workloadcluster.Interface
 
-	CRDLabelSelector string
 	ProjectName      string
 }
 

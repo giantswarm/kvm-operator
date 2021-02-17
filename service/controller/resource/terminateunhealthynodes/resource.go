@@ -3,7 +3,7 @@ package terminateunhealthynodes
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -12,15 +12,15 @@ const (
 )
 
 type Config struct {
-	K8sClient     kubernetes.Interface
-	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
+	K8sClient       kubernetes.Interface
+	Logger          micrologger.Logger
+	WorkloadCluster workloadcluster.Interface
 }
 
 type Resource struct {
-	k8sClient     kubernetes.Interface
-	logger        micrologger.Logger
-	tenantCluster tenantcluster.Interface
+	k8sClient       kubernetes.Interface
+	logger          micrologger.Logger
+	workloadCluster workloadcluster.Interface
 }
 
 func New(config Config) (*Resource, error) {
@@ -30,14 +30,14 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
-	if config.TenantCluster == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
+	if config.WorkloadCluster == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.WorkloadCluster must not be empty", config)
 	}
 
 	newService := &Resource{
-		k8sClient:     config.K8sClient,
-		logger:        config.Logger,
-		tenantCluster: config.TenantCluster,
+		k8sClient:       config.K8sClient,
+		logger:          config.Logger,
+		workloadCluster: config.WorkloadCluster,
 	}
 
 	return newService, nil

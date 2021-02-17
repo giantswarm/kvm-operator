@@ -149,12 +149,12 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var deploymentResource resource.Interface
 	{
 		c := deployment.Config{
-			DNSServers:    config.DNSServers,
-			G8sClient:     config.K8sClient.G8sClient(),
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			NTPServers:    config.NTPServers,
-			TenantCluster: config.TenantCluster,
+			DNSServers:      config.DNSServers,
+			G8sClient:       config.K8sClient.G8sClient(),
+			K8sClient:       config.K8sClient.K8sClient(),
+			Logger:          config.Logger,
+			NTPServers:      config.NTPServers,
+			WorkloadCluster: config.WorkloadCluster,
 		}
 
 		ops, err := deployment.New(c)
@@ -244,7 +244,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 			NodeCountFunc:            key.ToNodeCount,
 			Logger:                   config.Logger,
 			RESTClient:               config.K8sClient.G8sClient().ProviderV1alpha1().RESTClient(),
-			TenantCluster:            config.TenantCluster,
+			TenantCluster:            config.WorkloadCluster,
 			VersionBundleVersionFunc: key.ToOperatorVersion,
 		}
 
@@ -259,7 +259,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		c := nodecontroller.Config{
 			K8sClient:       config.K8sClient.CtrlClient(),
 			Logger:          config.Logger,
-			WorkloadCluster: config.TenantCluster,
+			WorkloadCluster: config.WorkloadCluster,
 		}
 
 		nodeControllerResource, err = nodecontroller.New(c)

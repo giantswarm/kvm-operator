@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -15,9 +15,9 @@ import (
 )
 
 type UnhealthyNodeTerminatorConfig struct {
-	K8sClient     k8sclient.Interface
-	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
+	K8sClient       k8sclient.Interface
+	Logger          micrologger.Logger
+	WorkloadCluster workloadcluster.Interface
 
 	ProjectName string
 }

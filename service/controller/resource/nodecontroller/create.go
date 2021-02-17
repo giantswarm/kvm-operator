@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
-	"github.com/giantswarm/errors/tenant"
+	workloaderrors "github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 
 	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -22,11 +22,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	r.logger.Debugf(ctx, "ensuring controller is running for workload cluster")
 
 	desired, err := r.calculateDesiredController(ctx, cr)
-	if tenantcluster.IsTimeout(err) {
+	if workloadcluster.IsTimeout(err) {
 		r.logger.Debugf(ctx, "waiting for certificates timed out")
 		return nil
-	} else if tenant.IsAPINotAvailable(err) {
-		r.logger.Debugf(ctx, "tenant cluster is not available")
+	} else if workloaderrors.IsAPINotAvailable(err) {
+		r.logger.Debugf(ctx, "workload cluster is not available")
 		return nil
 	} else if err != nil {
 		return microerror.Mask(err)
