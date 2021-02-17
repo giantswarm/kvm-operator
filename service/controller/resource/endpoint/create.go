@@ -7,7 +7,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
@@ -40,6 +39,17 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		r.logger.Debugf(ctx, "determined node pod is not ready")
 	}
 
+	var service corev1.Service
+	{
+		err := r.ctrlClient.Get(ctx, serviceName, &service)
+		if errors.IsNotFound(err) {
+			r.logger.Debugf(ctx, "service not found")
+			return nil
+		} else if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
 	var needCreate bool
 	var endpoints corev1.Endpoints
 	{
@@ -55,8 +65,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	if needCreate {
-		err := r.createEndpoints(ctx, serviceName, readyForTraffic, nodeIP)
-		if err != nil {
+		err := r.createEndpoints(ctx, service, readyForTraffic, nodeIP)
+		if errors.IsNotFound(err) {
+			r.logger.Debugf(ctx, "service not found")
+			return nil
+		} else if err != nil {
 			return microerror.Mask(err)
 		}
 	} else {
@@ -69,13 +82,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	return nil
 }
 
-func (r *Resource) createEndpoints(ctx context.Context, serviceName types.NamespacedName, readyForTraffic bool, nodeIP string) error {
-	var service corev1.Service
-	err := r.ctrlClient.Get(ctx, serviceName, &service)
-	if err != nil {
-		return microerror.Mask(err)
-	}
-
+func (r *Resource) createEndpoints(ctx context.Context, service corev1.Service, readyForTraffic bool, nodeIP string) error {
 	var endpoints corev1.Endpoints
 	{
 		var ports []corev1.EndpointPort
@@ -99,8 +106,8 @@ func (r *Resource) createEndpoints(ctx context.Context, serviceName types.Namesp
 
 		endpoints = corev1.Endpoints{
 			ObjectMeta: v1.ObjectMeta{
-				Name:      serviceName.Name,
-				Namespace: serviceName.Namespace,
+				Name:      service.Name,
+				Namespace: service.Namespace,
 			},
 			Subsets: []corev1.EndpointSubset{
 				{
@@ -112,7 +119,7 @@ func (r *Resource) createEndpoints(ctx context.Context, serviceName types.Namesp
 		}
 	}
 
-	err = r.ctrlClient.Create(ctx, &endpoints)
+	err := r.ctrlClient.Create(ctx, &endpoints)
 	if err != nil {
 		return microerror.Mask(err)
 	}

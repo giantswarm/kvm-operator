@@ -2,11 +2,11 @@ package nodecontroller
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/giantswarm/errors/tenant"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
@@ -35,8 +35,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if tenantcluster.IsTimeout(err) {
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
 			shouldStop = true
-		} else if tenant.IsAPINotAvailable(err) || isServerError(err) || errors.Is(err, context.DeadlineExceeded) {
-			r.logger.Debugf(ctx, "tenant cluster is not available")
+		} else if tenant.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
+			r.logger.Debugf(ctx, "workload cluster is not available")
 			shouldStop = true
 		} else if err != nil {
 			return microerror.Mask(err)
