@@ -353,23 +353,23 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 func AnyPodContainerRunning(pod corev1.Pod) bool {
 	for _, cs := range pod.Status.ContainerStatuses {
 		if cs.State.Running != nil {
-			return false
+			return true
 		}
 	}
 
 	for _, cs := range pod.Status.InitContainerStatuses {
 		if cs.State.Running != nil {
-			return false
+			return true
 		}
 	}
 
 	for _, cs := range pod.Status.EphemeralContainerStatuses {
 		if cs.State.Running != nil {
-			return false
+			return true
 		}
 	}
 
-	return true
+	return false
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
