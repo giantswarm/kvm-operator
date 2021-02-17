@@ -348,9 +348,9 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 	return DefaultKubeletDiskSize
 }
 
-// PodContainersNotRunning checks ContainerState for all containers present
-// in given pod. When all containers are not in Running state, true is returned.
-func PodContainersNotRunning(pod corev1.Pod) bool {
+// AnyPodContainerRunning checks ContainerState for all containers present
+// in given pod. If any container is in Running state, true is returned.
+func AnyPodContainerRunning(pod corev1.Pod) bool {
 	for _, cs := range pod.Status.ContainerStatuses {
 		if cs.State.Running != nil {
 			return false

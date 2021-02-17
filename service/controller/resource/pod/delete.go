@@ -113,9 +113,9 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-		} else if key.PodContainersNotRunning(*currentPod) {
+		} else if !key.AnyPodContainerRunning(*currentPod) {
 			r.logger.Debugf(ctx, "pod is treated as drained")
-			r.logger.Debugf(ctx, "all pod's containers are not running")
+			r.logger.Debugf(ctx, "no pod containers are running")
 
 			err := r.finishDraining(ctx, currentPod, drainerConfig)
 			if err != nil {

@@ -86,8 +86,8 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	}
 
 	if serviceName.Name == key.MasterID {
-		if key.PodContainersNotRunning(currentPod) {
-			r.logger.Debugf(ctx, "one or more master pod containers are still running")
+		if key.AnyPodContainerRunning(currentPod) {
+			r.logger.Debugf(ctx, "some pod containers are still running")
 			finalizerskeptcontext.SetKept(ctx)
 
 			return nil

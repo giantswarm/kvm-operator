@@ -17,6 +17,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return microerror.Mask(err)
 	}
 
+	r.logger.Debugf(ctx, "determining readiness for node pod")
+
 	nodeIP, serviceName, err := r.podEndpointData(ctx, pod)
 	if IsMissingAnnotation(err) {
 		return nil
@@ -31,13 +33,16 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		readyForTraffic = key.PodIsReady(pod) && key.PodNodeIsReady(pod)
 	}
 
+	if readyForTraffic {
+		r.logger.Debugf(ctx, "determined node pod is ready")
+	} else {
+		r.logger.Debugf(ctx, "determined node pod is not ready")
+	}
+
 	var service corev1.Service
 	{
 		err := r.ctrlClient.Get(ctx, serviceName, &service)
-		if errors.IsNotFound(err) {
-			r.logger.Debugf(ctx, "service not found")
-			return nil
-		} else if err != nil {
+		if err != nil {
 			return microerror.Mask(err)
 		}
 	}
@@ -45,12 +50,16 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var needCreate bool
 	var endpoints corev1.Endpoints
 	{
+		r.logger.Debugf(ctx, "retrieving endpoints %#q", serviceName)
 		err = r.ctrlClient.Get(ctx, serviceName, &endpoints)
 		if errors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "endpoints not found, creating")
 			needCreate = true
 		} else if err != nil {
+			r.logger.Debugf(ctx, "error retrieving endpoints")
 			return microerror.Mask(err)
+		} else {
+			r.logger.Debugf(ctx, "retrieved endpoints")
 		}
 	}
 

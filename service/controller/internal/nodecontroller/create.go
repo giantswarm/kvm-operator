@@ -14,6 +14,8 @@ import (
 )
 
 func (c *Controller) ensureCreated(ctx context.Context, workloadNode corev1.Node) (reconcile.Result, error) {
+	c.logger.Debugf(ctx, "determining pod readiness gate based on node status")
+
 	var managementPod corev1.Pod
 	err := c.managementK8sClient.Get(ctx, key.NodePodObjectKey(c.cluster, workloadNode), &managementPod)
 	if errors.IsNotFound(err) {
