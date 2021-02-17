@@ -89,6 +89,9 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if shouldStop {
 			r.logger.Debugf(ctx, "stopping controller")
 			current.Stop()
+		} else {
+			// Current controller matches expected and is reconciling, do nothing
+			return nil
 		}
 	}
 

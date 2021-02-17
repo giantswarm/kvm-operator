@@ -59,6 +59,12 @@ func calculateCreatedPodNodeCondition(node corev1.Node, pod corev1.Pod) (corev1.
 		desiredPodCondition.Status = corev1.ConditionUnknown
 	}
 
+	if node.Spec.Unschedulable && desiredPodCondition.Status != corev1.ConditionFalse {
+		desiredPodCondition.Status = corev1.ConditionFalse
+		desiredPodCondition.Reason = "NodeUnschedulable"
+		desiredPodCondition.Message = "node is unschedulable"
+	}
+
 	transition := !currentPodConditionFound || desiredPodCondition.Status != currentPodCondition.Status
 	if transition {
 		desiredPodCondition.LastTransitionTime = metav1.Now()

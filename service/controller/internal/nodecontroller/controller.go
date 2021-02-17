@@ -5,18 +5,21 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/micrologger/loggermeta"
 	"github.com/giantswarm/to"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -28,6 +31,11 @@ import (
 const (
 	DisableMetricsServing = "0"
 	ResyncPeriod          = 10 * time.Minute
+
+	loggerKeyController = "controller"
+	loggerKeyEvent      = "event"
+	loggerKeyObject     = "object"
+	loggerKeyVersion    = "version"
 )
 
 type Config struct {
@@ -47,7 +55,7 @@ type Controller struct {
 	workloadK8sClient   k8sclient.Interface
 	logger              micrologger.Logger
 
-	booted         chan struct{}
+	stopOnce       sync.Once
 	stopped        chan struct{}
 	lastReconciled time.Time
 
@@ -82,7 +90,6 @@ func New(config Config) (*Controller, error) {
 		workloadK8sClient:   config.WorkloadK8sClient,
 		logger:              config.Logger,
 
-		booted:         make(chan struct{}),
 		stopped:        make(chan struct{}),
 		lastReconciled: time.Time{},
 		name:           config.Name,
@@ -118,6 +125,10 @@ func (c *Controller) Boot() error {
 		err := builder.
 			ControllerManagedBy(mgr).
 			For(&corev1.Node{}).
+			WithOptions(controller.Options{
+				MaxConcurrentReconciles: 1,
+				Reconciler:              c,
+			}).
 			WithEventFilter(predicate.Funcs{
 				CreateFunc:  func(e event.CreateEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels())) },
 				DeleteFunc:  func(e event.DeleteEvent) bool { return c.selector.Matches(labels.Set(e.Meta.GetLabels())) },
@@ -127,14 +138,6 @@ func (c *Controller) Boot() error {
 			Complete(c)
 		if err != nil {
 			return microerror.Mask(err)
-		}
-
-		// We put the controller into a booted state by closing its booted
-		// channel once so users know when to go ahead.
-		select {
-		case <-c.booted:
-		default:
-			close(c.booted)
 		}
 
 		// Start in goroutine so we don't block caller
@@ -148,10 +151,6 @@ func (c *Controller) Boot() error {
 	}
 
 	return nil
-}
-
-func (c *Controller) Booted() chan struct{} {
-	return c.booted
 }
 
 // Equal returns true when the given controllers are equal as it relates to watching the workload
@@ -175,8 +174,21 @@ func (c *Controller) LastReconciled() time.Time {
 	return c.lastReconciled
 }
 
+func setLoggerCtxValue(ctx context.Context, key, value string) context.Context {
+	m, ok := loggermeta.FromContext(ctx)
+	if !ok {
+		m = loggermeta.New()
+		ctx = loggermeta.NewContext(ctx, m)
+	}
+
+	m.KeyVals[key] = value
+
+	return ctx
+}
+
 func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) {
 	ctx := context.Background()
+	ctx = setLoggerCtxValue(ctx, loggerKeyController, c.name)
 
 	var node corev1.Node
 	err := c.workloadK8sClient.CtrlClient().Get(ctx, req.NamespacedName, &node)
@@ -189,12 +201,17 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 		}, microerror.Mask(err)
 	}
 
+	ctx = setLoggerCtxValue(ctx, loggerKeyObject, node.GetSelfLink())
+	ctx = setLoggerCtxValue(ctx, loggerKeyVersion, node.GetResourceVersion())
+
 	if key.IsDeleted(&node) {
+		ctx = setLoggerCtxValue(ctx, loggerKeyEvent, "delete")
 		result, err := c.ensureDeleted(ctx, node)
 		if err != nil {
 			return result, microerror.Mask(err)
 		}
 	} else {
+		ctx = setLoggerCtxValue(ctx, loggerKeyEvent, "create")
 		result, err := c.ensureCreated(ctx, node)
 		if err != nil {
 			return result, microerror.Mask(err)
@@ -207,5 +224,7 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 }
 
 func (c *Controller) Stop() {
-	close(c.stopped)
+	c.stopOnce.Do(func() {
+		close(c.stopped)
+	})
 }
