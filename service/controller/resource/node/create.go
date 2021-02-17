@@ -59,7 +59,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	// We need to fetch the nodes being registered within the workload cluster's
 	// Kubernetes API. The list of nodes is used below to sort out which ones have
-	// to be deleted if there does no associated control plane pod exist.
+	// to be deleted if no associated management cluster pod exists.
 	var nodes []corev1.Node
 	{
 		list, err := k8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
@@ -74,7 +74,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		nodes = list.Items
 	}
 
-	// Fetch the list of pods running on the control plane. These pods serve VMs
+	// Fetch the list of pods running on the management cluster. These pods serve VMs
 	// which in turn run the workload cluster nodes. We use the pods to compare them
 	// against the workload cluster nodes below.
 	var pods []corev1.Pod
@@ -87,10 +87,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		pods = list.Items
 	}
 
-	// Iterate through all nodes and compare them against the pods of the control
-	// plane. Nodes being in a Ready state are fine. Nodes that belong to control
-	// plane pods are also ok. If a workload cluster node does not have an
-	// associated control plane pod, we delete it from the workload cluster's
+	// Iterate through all nodes and compare them against the pods of the management
+	// cluster. Nodes being in a Ready state are fine. Nodes that belong to management
+	// cluster pods are also ok. If a workload cluster node does not have an
+	// associated management cluster pod, we delete it from the workload cluster's
 	// Kubernetes API.
 	for _, n := range nodes {
 		if key.NodeIsReady(n) {
@@ -99,12 +99,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		if doesNodeExistAsPod(pods, n) {
-			r.logger.Debugf(ctx, "not deleting node '%s' because its control plane pod does exist", n.GetName())
+			r.logger.Debugf(ctx, "not deleting node '%s' because its management cluster pod does exist", n.GetName())
 			continue
 		}
 
 		if isPodOfNodeRunning(pods, n) {
-			r.logger.Debugf(ctx, "not deleting node '%s' because its control plane pod is running", n.GetName())
+			r.logger.Debugf(ctx, "not deleting node '%s' because its management cluster pod is running", n.GetName())
 			continue
 		}
 
