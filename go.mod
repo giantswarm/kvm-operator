@@ -6,8 +6,8 @@ require (
 	github.com/giantswarm/apiextensions/v3 v3.18.1
 	github.com/giantswarm/badnodedetector v1.0.1
 	github.com/giantswarm/certs/v3 v3.1.0
-	github.com/giantswarm/errors v0.2.4-0.20210217165313-8009cda37993
-	github.com/giantswarm/k8sclient/v5 v5.10.1-0.20210217170022-c9e247185fe6
+	github.com/giantswarm/errors v0.3.0
+	github.com/giantswarm/k8sclient/v5 v5.11.0
 	github.com/giantswarm/k8scloudconfig/v10 v10.0.0
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.3.0
@@ -15,7 +15,7 @@ require (
 	github.com/giantswarm/micrologger v0.5.0
 	github.com/giantswarm/operatorkit/v4 v4.2.1-0.20210216224902-9c3d17405b64
 	github.com/giantswarm/randomkeys/v2 v2.0.0
-	github.com/giantswarm/statusresource/v3 v3.0.1-0.20210217221536-ee4b9671fb1d
+	github.com/giantswarm/statusresource/v3 v3.0.1-0.20210218183708-67a91811e76a
 	github.com/giantswarm/tenantcluster/v4 v4.0.0
 	github.com/giantswarm/to v0.3.0
 	github.com/giantswarm/versionbundle v0.2.0
