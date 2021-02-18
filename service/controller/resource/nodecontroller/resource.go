@@ -34,7 +34,7 @@ type controllerWithConfig struct {
 // equal returns true when the given controllers are equal as it relates to watching the workload
 // cluster Kubernetes APIs.
 func (left controllerWithConfig) equal(right controllerWithConfig) bool {
-	restConfigsEqual := left.restConfig.Host != right.restConfig.Host && reflect.DeepEqual(left.restConfig.TLSClientConfig, right.restConfig.TLSClientConfig)
+	restConfigsEqual := left.restConfig.Host == right.restConfig.Host && reflect.DeepEqual(left.restConfig.TLSClientConfig, right.restConfig.TLSClientConfig)
 	clusterSpecsEqual := reflect.DeepEqual(left.cluster.Spec, right.cluster.Spec)
 	return restConfigsEqual && clusterSpecsEqual
 }
