@@ -28,10 +28,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	clusterID := key.ClusterID(cr)
 	controllerKey := controllerMapKey(cr)
 
-	var desiredController *nodecontroller.Controller
+	var shouldStop bool
+	var k8sClient k8sclient.Interface
 	{
-		k8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.workloadCluster)
-		var shouldStop bool
+		k8sClient, err = key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.workloadCluster)
 		if tenantcluster.IsTimeout(err) {
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
 			shouldStop = true
@@ -41,19 +41,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
+	}
 
-		if shouldStop {
-			r.controllerMutex.Lock()
-			if current, ok := r.controllers[controllerKey]; ok {
-				r.logger.Debugf(ctx, "stopping controller")
-				current.Stop()
-				delete(r.controllers, controllerKey)
-			}
-			r.controllerMutex.Unlock()
-			// Return early and wait for the next loop as there's no reason to watch an inaccessible Kubernetes API.
-			return nil
-		}
-
+	var desiredController *nodecontroller.Controller
+	if k8sClient != nil {
 		config := nodecontroller.Config{
 			Cluster:             cr,
 			ManagementK8sClient: r.k8sClient,
@@ -73,11 +64,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 	}
 
+	// Defer all changes to the controller map until the end of this function so we can wrap in a mutex
 	r.controllerMutex.Lock()
 	defer r.controllerMutex.Unlock()
 
 	if current, ok := r.controllers[controllerKey]; ok {
-		var shouldStop bool
 		if !current.Equal(desiredController) {
 			r.logger.Debugf(ctx, "controllers don't match")
 			shouldStop = true
@@ -87,22 +78,25 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		if shouldStop {
-			r.logger.Debugf(ctx, "stopping controller")
+			r.logger.Debugf(ctx, "stopping existing controller")
 			current.Stop()
+			delete(r.controllers, controllerKey)
 		} else {
 			// Current controller matches expected and is reconciling, do nothing
 			return nil
 		}
 	}
 
-	r.logger.Debugf(ctx, "booting new controller")
-	err = desiredController.Boot()
-	if err != nil {
-		return microerror.Mask(err)
-	}
+	if desiredController != nil {
+		r.logger.Debugf(ctx, "booting new controller")
+		err = desiredController.Boot()
+		if err != nil {
+			return microerror.Mask(err)
+		}
 
-	r.controllers[controllerKey] = desiredController
-	r.logger.Debugf(ctx, "controller booted and registered")
+		r.controllers[controllerKey] = desiredController
+		r.logger.Debugf(ctx, "controller booted and registered")
+	}
 
 	return nil
 }

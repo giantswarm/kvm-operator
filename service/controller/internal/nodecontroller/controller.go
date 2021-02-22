@@ -2,8 +2,6 @@ package nodecontroller
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"reflect"
 	"sync"
 	"time"
@@ -145,7 +143,7 @@ func (c *Controller) Boot() error {
 			// mgr.Start() blocks the boot process until it ends gracefully or fails.
 			err = mgr.Start(c.stopped)
 			if err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "error stopping manager: %s", microerror.Mask(err).Error())
+				panic(microerror.JSON(err))
 			}
 		}()
 	}
@@ -156,6 +154,13 @@ func (c *Controller) Boot() error {
 // Equal returns true when the given controllers are equal as it relates to watching the workload
 // cluster Kubernetes APIs.
 func (c *Controller) Equal(other *Controller) bool {
+	// avoid nil pointer dereference panic
+	if c != nil && other == nil {
+		return false
+	}
+
+	// compare rest configs
+	// rest.Config equality based on setup function here https://github.com/giantswarm/tenantcluster/blob/3531fb3d3698c0a69ab51f42c95207cb80761529/pkg/tenantcluster/tenantcluster.go#L72-L82
 	thisRestConfig := c.workloadK8sClient.RESTConfig()
 	otherRestConfig := other.workloadK8sClient.RESTConfig()
 	if thisRestConfig.Host != otherRestConfig.Host {
@@ -164,9 +169,22 @@ func (c *Controller) Equal(other *Controller) bool {
 	if !reflect.DeepEqual(thisRestConfig.TLSClientConfig, otherRestConfig.TLSClientConfig) {
 		return false
 	}
+
+	// compare kvmconfigs
 	if !reflect.DeepEqual(c.cluster.Spec, other.cluster.Spec) {
 		return false
 	}
+
+	// compare selectors
+	if c.selector.String() != other.selector.String() {
+		return false
+	}
+
+	// compare names
+	if c.name != other.name {
+		return false
+	}
+
 	return true
 }
 
