@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.1] - 2021-02-22
+
 ### Fixed
 
 - Update `k8s-kvm` to mitigate DNS issues affecting node booting.
@@ -79,7 +81,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.14.1...HEAD
+[3.14.1]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...v3.14.1
 [3.14.0]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/giantswarm/kvm-operator/compare/v3.12.2...v3.13.0
 [3.12.2]: https://github.com/giantswarm/kvm-operator/compare/v3.12.1...v3.12.2
