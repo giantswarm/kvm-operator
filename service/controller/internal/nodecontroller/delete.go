@@ -2,7 +2,6 @@ package nodecontroller
 
 import (
 	"context"
-	"time"
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
@@ -17,29 +16,25 @@ func (c *Controller) ensureDeleted(ctx context.Context, workloadNode corev1.Node
 	var managementPod corev1.Pod
 	err := c.managementK8sClient.Get(ctx, key.NodePodObjectKey(c.cluster, workloadNode), &managementPod)
 	if errors.IsNotFound(err) {
-		return reconcile.Result{Requeue: false}, microerror.Mask(err)
+		// assume the pod is already deleted
+		c.logger.Debugf(ctx, "node pod not found")
+		return key.RequeueNone, nil
 	} else if err != nil {
-		return reconcile.Result{
-			Requeue:      true,
-			RequeueAfter: time.Second * 10,
-		}, microerror.Mask(err)
+		return key.RequeueShort, microerror.Mask(err)
 	}
 
 	condition, shouldUpdate := calculateDeletedPodNodeCondition(managementPod)
 	if !shouldUpdate {
-		return reconcile.Result{Requeue: false}, nil
+		return key.RequeueNone, nil
 	}
 
 	c.logger.Debugf(ctx, "patching pod node status condition to %#v", condition)
 	err = c.managementK8sClient.Status().Patch(ctx, &managementPod, podConditionPatch{PodCondition: condition})
 	if err != nil {
-		return reconcile.Result{
-			Requeue:      true,
-			RequeueAfter: time.Second * 10,
-		}, microerror.Mask(err)
+		return key.RequeueShort, microerror.Mask(err)
 	}
 
-	return reconcile.Result{}, nil
+	return key.RequeueNone, nil
 }
 
 func calculateDeletedPodNodeCondition(pod corev1.Pod) (corev1.PodCondition, bool) {

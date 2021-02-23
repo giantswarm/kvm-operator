@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/micrologger/loggermeta"
+	operatorkitcontroller "github.com/giantswarm/operatorkit/v4/pkg/controller"
 	"github.com/giantswarm/to"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -27,8 +28,7 @@ import (
 )
 
 const (
-	DisableMetricsServing = "0"
-	ResyncPeriod          = 10 * time.Minute
+	ResyncPeriod = operatorkitcontroller.DefaultResyncPeriod
 
 	loggerKeyController = "controller"
 	loggerKeyEvent      = "event"
@@ -105,7 +105,7 @@ func (c *Controller) Boot() error {
 		o := manager.Options{
 			// MetricsBindAddress is set to 0 in order to disable it. We do this
 			// ourselves.
-			MetricsBindAddress: DisableMetricsServing,
+			MetricsBindAddress: operatorkitcontroller.DisableMetricsServing,
 			SyncPeriod:         to.DurationP(ResyncPeriod),
 		}
 
@@ -211,12 +211,9 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 	var node corev1.Node
 	err := c.workloadK8sClient.CtrlClient().Get(ctx, req.NamespacedName, &node)
 	if errors.IsNotFound(err) {
-		return reconcile.Result{Requeue: false}, nil
+		return key.RequeueNone, nil
 	} else if err != nil {
-		return reconcile.Result{
-			Requeue:      true,
-			RequeueAfter: time.Second * 30,
-		}, microerror.Mask(err)
+		return key.RequeueLong, microerror.Mask(err)
 	}
 
 	ctx = setLoggerCtxValue(ctx, loggerKeyObject, node.GetSelfLink())
@@ -238,7 +235,7 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 
 	c.lastReconciled = time.Now()
 
-	return reconcile.Result{Requeue: false}, nil
+	return key.RequeueNone, nil
 }
 
 func (c *Controller) Stop() {
