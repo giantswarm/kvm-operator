@@ -17,11 +17,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
-	"k8s.io/client-go/kubernetes/scheme"
-	fake2 "sigs.k8s.io/controller-runtime/pkg/client/fake"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
+	ctrlfake "sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/pkg/test"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -446,7 +446,7 @@ func buildResource() (*Resource, error) {
 	var certsSearcher certs.Interface
 	{
 		c := certs.Config{
-			K8sClient:    fake.NewSimpleClientset(),
+			K8sClient:    k8sfake.NewSimpleClientset(),
 			Logger:       logger,
 			WatchTimeout: 5 * time.Second,
 		}
@@ -475,7 +475,7 @@ func buildResource() (*Resource, error) {
 	{
 		resourceConfig := Config{
 			DNSServers:    "dnsserver1,dnsserver2",
-			CtrlClient:    fake2.NewFakeClientWithScheme(scheme.Scheme, release),
+			CtrlClient:    ctrlfake.NewFakeClientWithScheme(test.Scheme, release),
 			Logger:        logger,
 			TenantCluster: tenantCluster,
 		}

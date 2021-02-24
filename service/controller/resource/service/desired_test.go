@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/scheme"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes/scheme"
-	fake2 "sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
 
 func Test_Resource_Service_GetDesiredState(t *testing.T) {
@@ -88,7 +88,7 @@ func Test_Resource_Service_GetDesiredState(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			CtrlClient: fake2.NewFakeClientWithScheme(scheme.Scheme),
+			CtrlClient: fake.NewFakeClientWithScheme(scheme.Scheme),
 			Logger:     microloggertest.New(),
 		}
 		newResource, err = New(resourceConfig)

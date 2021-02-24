@@ -17,7 +17,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
+func newWorkerDeployments(customResource v1alpha1.KVMConfig, release releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
 	var deployments []*v1.Deployment
 
 	privileged := true

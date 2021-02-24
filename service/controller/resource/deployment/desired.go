@@ -22,10 +22,9 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.Debugf(ctx, "reading the release for the deployment")
 
-	var release *releasev1alpha1.Release
+	var release releasev1alpha1.Release
 	{
 		releaseVersion := customResource.Labels[label.ReleaseVersion]
-		var release releasev1alpha1.Release
 		err = r.ctrlClient.Get(ctx, client.ObjectKey{
 			Name: fmt.Sprintf("v%s", releaseVersion),
 		}, &release)

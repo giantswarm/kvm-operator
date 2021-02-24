@@ -8,8 +8,9 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes/scheme"
-	fake2 "sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	"github.com/giantswarm/kvm-operator/pkg/test"
 )
 
 func Test_Resource_PVC_GetDesiredState(t *testing.T) {
@@ -180,13 +181,13 @@ func Test_Resource_PVC_GetDesiredState(t *testing.T) {
 		},
 	}
 
-	var err error
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			CtrlClient: fake2.NewFakeClientWithScheme(scheme.Scheme),
+			CtrlClient: fake.NewFakeClientWithScheme(test.Scheme),
 			Logger:     microloggertest.New(),
 		}
+		var err error
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)

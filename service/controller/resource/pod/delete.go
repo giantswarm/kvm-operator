@@ -65,11 +65,8 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 
-		if kvmConfig.DeletionTimestamp != nil {
+		if key.IsDeleted(&kvmConfig) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "cluster is being deleted")
-			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
-
 			return nil
 		}
 	}
@@ -81,9 +78,6 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 		}
 		if isDrained {
 			r.logger.Debugf(ctx, "pod is already drained")
-			resourcecanceledcontext.SetCanceled(ctx)
-			r.logger.Debugf(ctx, "canceling resource")
-
 			return nil
 		}
 	}
@@ -104,7 +98,6 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 				return microerror.Mask(err)
 			}
 
-			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
 			r.logger.Debugf(ctx, "canceling reconciliation for pod")
 			return nil
@@ -131,9 +124,9 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-		} else if key.ArePodContainersTerminated(currentPod) {
+		} else if !key.AnyPodContainerRunning(*currentPod) {
 			r.logger.Debugf(ctx, "pod is treated as drained")
-			r.logger.Debugf(ctx, "all pod's containers are terminated")
+			r.logger.Debugf(ctx, "no pod containers are running")
 
 			err := r.finishDraining(ctx, currentPod, &drainerConfig)
 			if err != nil {
@@ -143,9 +136,6 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			r.logger.Debugf(ctx, "node termination is still in progress")
 		}
 	}
-
-	r.logger.Debugf(ctx, "canceling reconciliation")
-	resourcecanceledcontext.SetCanceled(ctx)
 
 	r.logger.Debugf(ctx, "keeping finalizers")
 	finalizerskeptcontext.SetKept(ctx)

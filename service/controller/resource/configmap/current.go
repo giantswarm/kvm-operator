@@ -20,7 +20,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	if key.IsDeleted(customResource) {
+	if key.IsDeleted(&customResource) {
 		r.logger.Debugf(ctx, "redirecting responsibility of deletion of config maps to namespace termination")
 		resourcecanceledcontext.SetCanceled(ctx)
 		r.logger.Debugf(ctx, "canceling resource")
