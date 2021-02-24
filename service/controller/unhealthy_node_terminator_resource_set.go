@@ -6,43 +6,27 @@ import (
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/kvm-operator/service/controller/resource/endpoint"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/pod"
+	"github.com/giantswarm/kvm-operator/service/controller/resource/terminateunhealthynodes"
 )
 
-func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
+func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) ([]resource.Interface, error) {
 	var err error
-
-	var endpointResource resource.Interface
+	var terminateUnhealthyNodesResource resource.Interface
 	{
-		c := endpoint.Config{
-			CtrlClient: config.K8sClient.CtrlClient(),
-			Logger:     config.Logger,
+		c := terminateunhealthynodes.Config{
+			K8sClient:     config.K8sClient.K8sClient(),
+			Logger:        config.Logger,
+			TenantCluster: config.TenantCluster,
 		}
 
-		endpointResource, err = endpoint.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var podResource resource.Interface
-	{
-		c := pod.Config{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
-		}
-
-		podResource, err = pod.New(c)
+		terminateUnhealthyNodesResource, err = terminateunhealthynodes.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	resources := []resource.Interface{
-		endpointResource,
-		podResource,
+		terminateUnhealthyNodesResource,
 	}
 
 	{

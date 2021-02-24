@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/errors/tenant"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
@@ -67,15 +68,20 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
+	cr, err := key.ToCustomObject(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
 
-	tcK8sClient, err := key.CreateK8sClientForTenantCluster(ctx, obj, r.logger, r.tenantCluster)
+	tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.tenantCluster)
 	if tenantcluster.IsTimeout(err) {
 		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
 		r.logger.Debugf(ctx, "waiting for certificates timed out")
 
 		return nil, nil
-	} else if tenant.IsAPINotAvailable(err) {
+	} else if tenant.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
 		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
 		r.logger.Debugf(ctx, "tenant cluster is not available")
 
@@ -86,7 +92,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
 
-	return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient)
+	return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient.K8sClient())
 }
 
 func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredState interface{}, tcK8sClient kubernetes.Interface) (interface{}, error) {

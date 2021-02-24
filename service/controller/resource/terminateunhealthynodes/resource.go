@@ -1,4 +1,4 @@
-package cleanupendpointips
+package terminateunhealthynodes
 
 import (
 	"github.com/giantswarm/microerror"
@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Name = "cleanupendpointips"
+	Name = "terminateunhealthynodes"
 )
 
 type Config struct {
@@ -25,22 +25,22 @@ type Resource struct {
 
 func New(config Config) (*Resource, error) {
 	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
+		return nil, microerror.Maskf(invalidConfigError, "config.K8sClient must not be empty")
 	}
 	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
 	if config.TenantCluster == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
 	}
 
-	r := &Resource{
+	newService := &Resource{
 		k8sClient:     config.K8sClient,
 		logger:        config.Logger,
 		tenantCluster: config.TenantCluster,
 	}
 
-	return r, nil
+	return newService, nil
 }
 
 func (r *Resource) Name() string {

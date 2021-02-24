@@ -3,97 +3,139 @@ package endpoint
 import (
 	"context"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
+	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	endpointToDelete, err := toK8sEndpoint(deleteChange)
+func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
+	reconciledPod, err := key.ToPod(obj)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	// The endpoint resource is reconciled by watching pods. Pods get deleted at
-	// times. We do not want to delete the whole endpoint only because one pod is
-	// gone. We only delete the whole endpoint when it does not contain any IP
-	// anymore. Removing IPs is done on update events.
-	if isEmptyEndpoint(endpointToDelete) {
-		r.logger.Debugf(ctx, "deleting endpoint '%s'", endpointToDelete.GetName())
+	var currentPod corev1.Pod
+	{
+		r.logger.Debugf(ctx, "looking for the current version of the reconciled pod in the Kubernetes API")
 
-		err = r.k8sClient.CoreV1().Endpoints(endpointToDelete.Namespace).Delete(ctx, endpointToDelete.GetName(), metav1.DeleteOptions{})
-		if errors.IsNotFound(err) {
-			// fall through
+		err = r.ctrlClient.Get(ctx, client.ObjectKey{
+			Namespace: reconciledPod.Namespace,
+			Name:      reconciledPod.Name,
+		}, &currentPod)
+		if apierrors.IsNotFound(err) {
+			// In case we reconcile a pod we cannot find anymore this means the
+			// informer's watch event is outdated and the pod got already deleted in
+			// the Kubernetes API. This is a normal transition behaviour, so we just
+			// ignore it and assume we are done.
+			r.logger.Debugf(ctx, "cannot find the current version of the reconciled pod in the Kubernetes API")
+
+			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
+		r.logger.Debugf(ctx, "found the current version of the reconciled pod in the Kubernetes API")
+	}
 
-		r.logger.Debugf(ctx, "deleted endpoint '%s'", endpointToDelete.GetName())
-	} else {
-		r.logger.Debugf(ctx, "not deleting endpoint '%s'", endpointToDelete.GetName())
+	{
+		clusterID, ok := currentPod.Labels[key.LabelCluster]
+		if !ok {
+			return microerror.Maskf(missingClusterLabelError, "pod is missing cluster label")
+		}
+
+		var kvmConfig v1alpha1.KVMConfig
+		err = r.ctrlClient.Get(ctx, client.ObjectKey{
+			Namespace: metav1.NamespaceDefault,
+			Name:      clusterID,
+		}, &kvmConfig)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		if key.IsDeleted(&kvmConfig) {
+			r.logger.LogCtx(ctx, "level", "debug", "message", "cluster is being deleted")
+			// Endpoints deletion will be handled when the namespace is deleted
+			return nil
+		}
+	}
+
+	{
+		isDrained, err := key.IsPodDrained(currentPod)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+		if !isDrained {
+			r.logger.Debugf(ctx, "pod is not yet drained, not removing finalizer")
+			finalizerskeptcontext.SetKept(ctx)
+
+			return nil
+		}
+	}
+
+	nodeIP, serviceName, err := r.podEndpointData(ctx, currentPod)
+	if IsMissingAnnotation(err) {
+		r.logger.Debugf(ctx, "missing annotations")
+		return nil
+	} else if err != nil {
+		return microerror.Mask(err)
+	}
+
+	if serviceName.Name == key.MasterID {
+		if key.AnyPodContainerRunning(currentPod) {
+			r.logger.Debugf(ctx, "some pod containers are still running")
+			finalizerskeptcontext.SetKept(ctx)
+
+			return nil
+		}
+	}
+
+	var endpoints corev1.Endpoints
+	{
+		r.logger.Debugf(ctx, "retrieving endpoints %#q", serviceName)
+		err := r.ctrlClient.Get(ctx, serviceName, &endpoints)
+		if apierrors.IsNotFound(err) {
+			r.logger.Debugf(ctx, "endpoints not found")
+			// There's nothing to be updated/removed so we can return early and drop the finalizer
+			return nil
+		} else if err != nil {
+			r.logger.Debugf(ctx, "error retrieving endpoints")
+			return microerror.Mask(err)
+		}
+	}
+
+	var needUpdate bool
+	{
+		addresses, updated := removeFromAddresses(endpoints.Subsets[0].Addresses, nodeIP)
+		if updated {
+			needUpdate = true
+			endpoints.Subsets[0].Addresses = addresses
+		}
+	}
+
+	{
+		addresses, updated := removeFromAddresses(endpoints.Subsets[0].NotReadyAddresses, nodeIP)
+		if updated {
+			needUpdate = true
+			endpoints.Subsets[0].NotReadyAddresses = addresses
+		}
+	}
+
+	if needUpdate && len(endpoints.Subsets[0].NotReadyAddresses) == 0 && len(endpoints.Subsets[0].Addresses) == 0 {
+		err := r.ctrlClient.Delete(ctx, &endpoints)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	} else if needUpdate {
+		err := r.ctrlClient.Update(ctx, &endpoints)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
 	return nil
-}
-
-func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*crud.Patch, error) {
-	deleteChange, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	patch := crud.NewPatch()
-	patch.SetDeleteChange(deleteChange)
-	patch.SetUpdateChange(deleteChange)
-
-	return patch, nil
-}
-
-func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (*corev1.Endpoints, error) {
-	currentEndpoint, err := toEndpoint(currentState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	desiredEndpoint, err := toEndpoint(desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	var deleteChange *corev1.Endpoints
-	{
-		ips := ipsForDeleteChange(currentEndpoint.IPs, desiredEndpoint.IPs)
-
-		e := &Endpoint{
-			Addresses:        ipsToAddresses(ips),
-			IPs:              ips,
-			Ports:            currentEndpoint.Ports,
-			ResourceVersion:  currentEndpoint.ResourceVersion,
-			ServiceName:      currentEndpoint.ServiceName,
-			ServiceNamespace: currentEndpoint.ServiceNamespace,
-		}
-
-		deleteChange = r.newK8sEndpoint(e)
-	}
-
-	return deleteChange, nil
-}
-
-func ipsForDeleteChange(currentIPs []string, desiredIPs []string) []string {
-	var ips []string
-
-	for _, ip := range currentIPs {
-		if !containsIP(ips, ip) {
-			ips = append(ips, ip)
-		}
-	}
-
-	for _, ip := range desiredIPs {
-		if containsIP(ips, ip) {
-			ips = removeIP(ips, ip)
-		}
-	}
-
-	return ips
 }

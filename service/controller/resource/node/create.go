@@ -24,30 +24,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// cluster.
 	var k8sClient kubernetes.Interface
 	{
-		r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
-
-		i := key.ClusterID(customObject)
-		e := key.ClusterAPIEndpoint(customObject)
-
-		restConfig, err := r.tenantCluster.NewRestConfig(ctx, i, e)
+		k8sClients, err := key.CreateK8sClientForWorkloadCluster(ctx, customObject, r.logger, r.tenantCluster)
 		if tenantcluster.IsTimeout(err) {
-			r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
-			r.logger.Debugf(ctx, "canceling resource")
-
 			return nil
-		} else if err != nil {
-			return microerror.Mask(err)
-		}
-		clientsConfig := k8sclient.ClientsConfig{
-			Logger:     r.logger,
-			RestConfig: restConfig,
-		}
-		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if tenant.IsAPINotAvailable(err) {
+		} else if tenant.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
 			r.logger.Debugf(ctx, "tenant cluster is not available")
-			r.logger.Debugf(ctx, "canceling resource")
-
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)
@@ -93,7 +75,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// associated control plane pod, we delete it from the tenant cluster's
 	// Kubernetes API.
 	for _, n := range nodes {
-		if isNodeReady(&n) {
+		if key.NodeIsReady(n) {
 			r.logger.Debugf(ctx, "not deleting node '%s' because it is in state 'Ready'", n.GetName())
 			continue
 		}
@@ -119,17 +101,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	return nil
-}
-
-// taken from https://github.com/kubernetes/kubernetes/pull/73656/files
-// isNodeReady returns true if a node is ready; false otherwise.
-func isNodeReady(node *corev1.Node) bool {
-	for _, c := range node.Status.Conditions {
-		if c.Type == corev1.NodeReady {
-			return c.Status == corev1.ConditionTrue
-		}
-	}
-	return false
 }
 
 func doesNodeExistAsPod(pods []corev1.Pod, n corev1.Node) bool {

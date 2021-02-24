@@ -7,10 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add vertical pod autoscaler for operator pods.
+- Automatically delete TC node pods when NotReady for too long.
+
 ### Changed
 
 - Do not drain node pods when cluster is being deleted.
 - Update for Kubernetes 1.19 compatibility.
+- Update k8s-kvm to v0.4.1 with QEMU v5.2.0 and Flatcar DNS fix.
+
+### Fixed
+
+- Remove IPs from endpoints when the corresponding workload cluster node is not ready.
 
 ## [3.14.0] - 2020-11-25
 

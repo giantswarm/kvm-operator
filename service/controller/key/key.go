@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
 	"github.com/giantswarm/microerror"
@@ -18,10 +19,9 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/client-go/kubernetes"
-
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 )
@@ -130,7 +130,9 @@ const (
 )
 
 const (
-	PodDeletionGracePeriod = 5 * time.Minute
+	// Keep in sync with https://github.com/giantswarm/node-operator/blob/e8f8250f7d518d7af0acfdb1b0934a1174c22d7d/service/controller/v2/resource/drainer/create.go#L50
+	PodDeletionGracePeriod                           = 10 * time.Minute
+	WorkloadClusterNodeReady corev1.PodConditionType = "kvm-operator.giantswarm.io/workload-cluster-node-ready"
 )
 
 func AllNodes(cr v1alpha1.KVMConfig) []v1alpha1.ClusterNode {
@@ -187,15 +189,6 @@ func ClusterID(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.Cluster.ID
 }
 
-func ClusterIDFromPod(pod *corev1.Pod) string {
-	l, ok := pod.Labels["cluster"]
-	if ok {
-		return l
-	}
-
-	return "n/a"
-}
-
 func ClusterNamespace(customObject v1alpha1.KVMConfig) string {
 	return ClusterID(customObject)
 }
@@ -231,38 +224,26 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 	return q, nil
 }
 
-// CreateK8sClientForTenantCluster takes the context of the reconciled object
-// and the provided logger and tenant cluster interface and creates a K8s client for the tenant cluster
-func CreateK8sClientForTenantCluster(ctx context.Context, obj interface{}, logger micrologger.Logger, tenantCluster tenantcluster.Interface) (kubernetes.Interface, error) {
+// CreateK8sClientForWorkloadCluster takes the context of the reconciled object
+// and the provided logger and tenant cluster interface and creates a K8s client for the workload cluster
+func CreateK8sClientForWorkloadCluster(ctx context.Context, cluster v1alpha1.KVMConfig, logger micrologger.Logger, workloadCluster tenantcluster.Interface) (*k8sclient.Clients, error) {
+	i := ClusterID(cluster)
+	e := ClusterAPIEndpoint(cluster)
 
-	// Create a client for the reconciled tenant cluster
-	var tcK8sClient kubernetes.Interface
-	{
-		customObject, err := ToCustomObject(obj)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		i := ClusterID(customObject)
-		e := ClusterAPIEndpoint(customObject)
-
-		restConfig, err := tenantCluster.NewRestConfig(ctx, i, e)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		clientsConfig := k8sclient.ClientsConfig{
-			Logger:     logger,
-			RestConfig: restConfig,
-		}
-		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		tcK8sClient = k8sClients.K8sClient()
+	restConfig, err := workloadCluster.NewRestConfig(ctx, i, e)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	clientsConfig := k8sclient.ClientsConfig{
+		Logger:     logger,
+		RestConfig: restConfig,
+	}
+	k8sClients, err := k8sclient.NewClients(clientsConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
-	return tcK8sClient, nil
+	return k8sClients, nil
 }
 
 func DeploymentName(prefix string, nodeID string) string {
@@ -292,6 +273,26 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
+// FindNodeCondition returns the condition of the given type from the node. The second return value indicates if the condition was found.
+func FindNodeCondition(node corev1.Node, conditionType corev1.NodeConditionType) (corev1.NodeCondition, bool) {
+	for _, condition := range node.Status.Conditions {
+		if condition.Type == conditionType {
+			return condition, true
+		}
+	}
+	return corev1.NodeCondition{}, false
+}
+
+// FindNodeCondition returns the condition of the given type from the pod. The second return value indicates if the condition was found.
+func FindPodCondition(pod corev1.Pod, conditionType corev1.PodConditionType) (corev1.PodCondition, bool) {
+	for _, condition := range pod.Status.Conditions {
+		if condition.Type == conditionType {
+			return condition, true
+		}
+	}
+	return corev1.PodCondition{}, false
+}
+
 func HealthListenAddress(customObject v1alpha1.KVMConfig) string {
 	return "http://" + ProbeHost + ":" + strconv.Itoa(int(LivenessPort(customObject)))
 }
@@ -300,12 +301,8 @@ func IscsiInitiatorName(customObject v1alpha1.KVMConfig, nodeIndex int, nodeRole
 	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(customObject), nodeRole, nodeIndex)
 }
 
-func IsDeleted(customObject v1alpha1.KVMConfig) bool {
-	return customObject.GetDeletionTimestamp() != nil
-}
-
-func IsPodDeleted(pod *corev1.Pod) bool {
-	return pod.GetDeletionTimestamp() != nil
+func IsDeleted(object v1.Object) bool {
+	return object.GetDeletionTimestamp() != nil
 }
 
 // IsPodDrained checks whether the pod status indicates it got drained. The pod
@@ -317,7 +314,7 @@ func IsPodDeleted(pod *corev1.Pod) bool {
 //
 // TODO(xh3b4sd) handle pod status via the runtime object status primitives
 // and not via annotations.
-func IsPodDrained(pod *corev1.Pod) (bool, error) {
+func IsPodDrained(pod corev1.Pod) (bool, error) {
 	a := pod.GetAnnotations()
 	if a == nil {
 		return false, microerror.Mask(missingAnnotationError)
@@ -349,16 +346,28 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 	return DefaultKubeletDiskSize
 }
 
-// ArePodContainersTerminated checks ContainerState for all containers present
-// in given pod. When all containers are in Terminated state, true is returned.
-func ArePodContainersTerminated(pod *corev1.Pod) bool {
+// AnyPodContainerRunning checks ContainerState for all containers present
+// in given pod. If any container is in Running state, true is returned.
+func AnyPodContainerRunning(pod corev1.Pod) bool {
 	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Terminated == nil {
-			return false
+		if cs.State.Running != nil {
+			return true
 		}
 	}
 
-	return true
+	for _, cs := range pod.Status.InitContainerStatuses {
+		if cs.State.Running != nil {
+			return true
+		}
+	}
+
+	for _, cs := range pod.Status.EphemeralContainerStatuses {
+		if cs.State.Running != nil {
+			return true
+		}
+	}
+
+	return false
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
@@ -454,16 +463,11 @@ func NetworkDNSBlock(servers []net.IP) string {
 	return dnsBlock
 }
 
-func NetworkNTPBlock(servers []net.IP) string {
-	var ntpBlockParts []string
-
-	for _, s := range servers {
-		ntpBlockParts = append(ntpBlockParts, fmt.Sprintf("NTP=%s", s.String()))
-	}
-
-	ntpBlock := strings.Join(ntpBlockParts, "\n")
-
-	return ntpBlock
+// NodeIsReady examines the Status Conditions of a Node
+// and returns true if the NodeReady Condition is true.
+func NodeIsReady(node corev1.Node) bool {
+	condition, _ := FindNodeCondition(node, corev1.NodeReady)
+	return condition.Status == corev1.ConditionTrue
 }
 
 // NodeIsUnschedulable examines a Node and returns true if the Node is marked Unschedulable or has a NoSchedule/NoExecute taint.
@@ -487,7 +491,7 @@ func NodeIndex(cr v1alpha1.KVMConfig, nodeID string) (int, bool) {
 	return idx, present
 }
 
-// NodeInternalIP examines the Status Adresses of a Node
+// NodeInternalIP examines the Status Addresses of a Node
 // and returns its InternalIP..
 func NodeInternalIP(node corev1.Node) (string, error) {
 	for _, a := range node.Status.Addresses {
@@ -495,7 +499,14 @@ func NodeInternalIP(node corev1.Node) (string, error) {
 			return a.Address, nil
 		}
 	}
-	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP adress in its status", node.Name)
+	return "", microerror.Maskf(missingNodeInternalIP, "node %s does not have an InternalIP address in its status", node.Name)
+}
+
+func NodePodObjectKey(cluster v1alpha1.KVMConfig, node corev1.Node) client.ObjectKey {
+	return client.ObjectKey{
+		Name:      node.Name,
+		Namespace: ClusterNamespace(cluster),
+	}
 }
 
 func OperatorVersion(cr v1alpha1.KVMConfig) string {
@@ -505,13 +516,15 @@ func OperatorVersion(cr v1alpha1.KVMConfig) string {
 // PodIsReady examines the Status Conditions of a Pod
 // and returns true if the PodReady Condition is true.
 func PodIsReady(pod corev1.Pod) bool {
-	podReady := false
-	for _, c := range pod.Status.Conditions {
-		if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
-			podReady = true
-		}
-	}
-	return podReady
+	condition, _ := FindPodCondition(pod, corev1.PodReady)
+	return condition.Status == corev1.ConditionTrue
+}
+
+// PodNodeIsReady examines the Status Conditions of a Pod
+// and returns true if the WorkloadClusterNodeReady Condition is true.
+func PodNodeIsReady(pod corev1.Pod) bool {
+	condition, _ := FindPodCondition(pod, WorkloadClusterNodeReady)
+	return condition.Status == corev1.ConditionTrue
 }
 
 func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
@@ -618,6 +631,19 @@ func ToCustomObject(v interface{}) (v1alpha1.KVMConfig, error) {
 	return customObject, nil
 }
 
+func ToNode(v interface{}) (corev1.Node, error) {
+	if v == nil {
+		return corev1.Node{}, nil
+	}
+
+	node, ok := v.(*corev1.Node)
+	if !ok {
+		return corev1.Node{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", corev1.Node{}, v)
+	}
+
+	return *node.DeepCopy(), nil
+}
+
 func ToNodeCount(v interface{}) (int, error) {
 	customObject, err := ToCustomObject(v)
 	if err != nil {
@@ -638,17 +664,17 @@ func ToOperatorVersion(v interface{}) (string, error) {
 	return OperatorVersion(customObject), nil
 }
 
-func ToPod(v interface{}) (*corev1.Pod, error) {
+func ToPod(v interface{}) (corev1.Pod, error) {
 	if v == nil {
-		return nil, nil
+		return corev1.Pod{}, nil
 	}
 
 	pod, ok := v.(*corev1.Pod)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &corev1.Pod{}, v)
+		return corev1.Pod{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &corev1.Pod{}, v)
 	}
 
-	return pod, nil
+	return *pod.DeepCopy(), nil
 }
 
 func VMNumber(ID int) string {
