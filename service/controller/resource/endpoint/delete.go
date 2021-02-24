@@ -57,7 +57,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 
-		if kvmConfig.DeletionTimestamp != nil {
+		if key.IsDeleted(&kvmConfig) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "cluster is being deleted")
 			// Endpoints deletion will be handled when the namespace is deleted
 			return nil
@@ -79,9 +79,19 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 
 	nodeIP, serviceName, err := r.podEndpointData(ctx, currentPod)
 	if IsMissingAnnotation(err) {
+		r.logger.Debugf(ctx, "missing annotations")
 		return nil
 	} else if err != nil {
 		return microerror.Mask(err)
+	}
+
+	if serviceName.Name == key.MasterID {
+		if key.AnyPodContainerRunning(currentPod) {
+			r.logger.Debugf(ctx, "some pod containers are still running")
+			finalizerskeptcontext.SetKept(ctx)
+
+			return nil
+		}
 	}
 
 	var endpoints corev1.Endpoints

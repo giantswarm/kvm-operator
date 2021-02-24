@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/errors/tenant"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
@@ -80,7 +81,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		r.logger.Debugf(ctx, "waiting for certificates timed out")
 
 		return nil, nil
-	} else if tenant.IsAPINotAvailable(err) {
+	} else if tenant.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
 		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
 		r.logger.Debugf(ctx, "tenant cluster is not available")
 

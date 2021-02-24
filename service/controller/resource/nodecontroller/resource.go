@@ -1,15 +1,16 @@
 package nodecontroller
 
 import (
-	"reflect"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
@@ -25,27 +26,13 @@ type Config struct {
 	WorkloadCluster workloadcluster.Interface
 }
 
-type controllerWithConfig struct {
-	cluster    v1alpha1.KVMConfig
-	restConfig *rest.Config
-	*nodecontroller.Controller
-}
-
-// equal returns true when the given controllers are equal as it relates to watching the workload
-// cluster Kubernetes APIs.
-func (left controllerWithConfig) equal(right controllerWithConfig) bool {
-	restConfigsEqual := left.restConfig.Host == right.restConfig.Host && reflect.DeepEqual(left.restConfig.TLSClientConfig, right.restConfig.TLSClientConfig)
-	clusterSpecsEqual := reflect.DeepEqual(left.cluster.Spec, right.cluster.Spec)
-	return restConfigsEqual && clusterSpecsEqual
-}
-
 type Resource struct {
 	k8sClient       client.Client
 	logger          micrologger.Logger
 	workloadCluster workloadcluster.Interface
 
 	controllerMutex sync.Mutex // Used to protect controllers map from concurrent access
-	controllers     map[types.NamespacedName]controllerWithConfig
+	controllers     map[types.NamespacedName]*nodecontroller.Controller
 }
 
 func New(config Config) (*Resource, error) {
@@ -64,14 +51,29 @@ func New(config Config) (*Resource, error) {
 		logger:          config.Logger,
 		workloadCluster: config.WorkloadCluster,
 
-		controllers: map[types.NamespacedName]controllerWithConfig{},
+		controllers: map[types.NamespacedName]*nodecontroller.Controller{},
 	}
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		r.Stop()
+	}()
 
 	return r, nil
 }
 
 func (r *Resource) Name() string {
 	return Name
+}
+
+func (r *Resource) Stop() {
+	r.controllerMutex.Lock()
+	for _, controller := range r.controllers {
+		controller.Stop()
+	}
+	r.controllerMutex.Unlock()
 }
 
 func controllerMapKey(cluster v1alpha1.KVMConfig) types.NamespacedName {
