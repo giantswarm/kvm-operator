@@ -11,7 +11,7 @@ import (
 
 var Scheme = runtime.NewScheme()
 var localSchemeBuilder = runtime.SchemeBuilder{
-	k8sscheme.AddToScheme, // adds all kubernetes GVKs (Pod, Node, etc.)
+	k8sscheme.AddToScheme,        // adds all kubernetes GVKs (Pod, Node, etc.)
 	giantswarmscheme.AddToScheme, // adds all giantswarm GVKs (Release, App, etc.)
 }
 
