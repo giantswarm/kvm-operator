@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	workloaderrors "github.com/giantswarm/errors/tenant"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
@@ -80,7 +81,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		r.logger.Debugf(ctx, "waiting for certificates timed out")
 
 		return nil, nil
-	} else if workloaderrors.IsAPINotAvailable(err) {
+	} else if workloaderrors.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
 		r.logger.Debugf(ctx, "did not create Kubernetes client for workload cluster")
 		r.logger.Debugf(ctx, "workload cluster is not available")
 

@@ -26,28 +26,12 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.Debugf(ctx, "creating Kubernetes client for workload cluster")
 
-		i := key.ClusterID(customObject)
-		e := key.ClusterAPIEndpoint(customObject)
-
-		restConfig, err := r.workloadCluster.NewRestConfig(ctx, i, e)
+		k8sClients, err := key.CreateK8sClientForWorkloadCluster(ctx, customObject, r.logger, r.workloadCluster)
 		if workloadcluster.IsTimeout(err) {
-			r.logger.Debugf(ctx, "did not create Kubernetes client for workload cluster")
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
-			r.logger.Debugf(ctx, "canceling resource")
-
 			return nil
-		} else if err != nil {
-			return microerror.Mask(err)
-		}
-		clientsConfig := k8sclient.ClientsConfig{
-			Logger:     r.logger,
-			RestConfig: restConfig,
-		}
-		k8sClients, err := k8sclient.NewClients(clientsConfig)
-		if workloaderrors.IsAPINotAvailable(err) {
+		} else if workloaderrors.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
 			r.logger.Debugf(ctx, "workload cluster is not available")
-			r.logger.Debugf(ctx, "canceling resource")
-
 			return nil
 		} else if err != nil {
 			return microerror.Mask(err)

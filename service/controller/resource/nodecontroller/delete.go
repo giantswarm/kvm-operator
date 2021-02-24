@@ -19,7 +19,7 @@ func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	controllerKey := controllerMapKey(cr)
 	r.controllerMutex.Lock()
 	if controller, ok := r.controllers[controllerKey]; ok {
-		controller.Stop(ctx)
+		controller.Stop()
 		delete(r.controllers, controllerKey)
 		r.logger.Debugf(ctx, "controller stopped and deleted")
 	} else {

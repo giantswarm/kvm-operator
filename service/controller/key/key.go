@@ -19,6 +19,7 @@ import (
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -131,7 +132,8 @@ const (
 )
 
 const (
-	PodDeletionGracePeriod                           = 5 * time.Minute
+	// Keep in sync with https://github.com/giantswarm/node-operator/blob/e8f8250f7d518d7af0acfdb1b0934a1174c22d7d/service/controller/v2/resource/drainer/create.go#L50
+	PodDeletionGracePeriod                           = 10 * time.Minute
 	WorkloadClusterNodeReady corev1.PodConditionType = "kvm-operator.giantswarm.io/workload-cluster-node-ready"
 )
 
@@ -301,8 +303,8 @@ func IscsiInitiatorName(customObject v1alpha1.KVMConfig, nodeIndex int, nodeRole
 	return fmt.Sprintf("iqn.2016-04.com.coreos.iscsi:giantswarm-%s-%s-%d", ClusterID(customObject), nodeRole, nodeIndex)
 }
 
-func IsDeleted(customObject v1alpha1.KVMConfig) bool {
-	return customObject.GetDeletionTimestamp() != nil
+func IsDeleted(object v1.Object) bool {
+	return object.GetDeletionTimestamp() != nil
 }
 
 // IsPodDrained checks whether the pod status indicates it got drained. The pod
@@ -346,16 +348,28 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 	return DefaultKubeletDiskSize
 }
 
-// ArePodContainersTerminated checks ContainerState for all containers present
-// in given pod. When all containers are in Terminated state, true is returned.
-func ArePodContainersTerminated(pod *corev1.Pod) bool {
+// AnyPodContainerRunning checks ContainerState for all containers present
+// in given pod. If any container is in Running state, true is returned.
+func AnyPodContainerRunning(pod corev1.Pod) bool {
 	for _, cs := range pod.Status.ContainerStatuses {
-		if cs.State.Terminated == nil {
-			return false
+		if cs.State.Running != nil {
+			return true
 		}
 	}
 
-	return true
+	for _, cs := range pod.Status.InitContainerStatuses {
+		if cs.State.Running != nil {
+			return true
+		}
+	}
+
+	for _, cs := range pod.Status.EphemeralContainerStatuses {
+		if cs.State.Running != nil {
+			return true
+		}
+	}
+
+	return false
 }
 
 func LivenessPort(customObject v1alpha1.KVMConfig) int32 {
