@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.13.2] - 2021-02-25
+
 ### Changed
 
 - Use `k8s-kvm:0.4.1` with QEMU 5.2.0.
@@ -72,7 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.13.1...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.13.2...HEAD
+[3.13.2]: https://github.com/giantswarm/kvm-operator/compare/v3.13.1...v3.13.2
 [3.13.1]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/giantswarm/kvm-operator/compare/v3.12.2...v3.13.0
 [3.12.2]: https://github.com/giantswarm/kvm-operator/compare/v3.12.1...v3.12.2
