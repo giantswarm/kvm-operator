@@ -79,12 +79,12 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, project.Name()),
 		}
 
-		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, lo)
+		list, err := r.k8sClient.AppsV1().Deployments(n).List(ctx, lo)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		if len(list.Items) != 0 {
-			r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing pods")
+			r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing deployments")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
 			r.logger.Debugf(ctx, "canceling resource")
