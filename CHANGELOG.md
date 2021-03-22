@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Checking deployments in the cluster namespace using labels.
+- Use managed-by label to check node deployments are deleted before cluster namespace.
 - Remove IPs from endpoints when the corresponding workload cluster node is not ready.
 
 ## [3.14.0] - 2020-11-25
