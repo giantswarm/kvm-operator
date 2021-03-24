@@ -12,7 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -76,7 +75,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		n := key.ClusterNamespace(customObject)
 
 		lo := metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, project.Name()),
+			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
 		}
 
 		list, err := r.k8sClient.AppsV1().Deployments(n).List(ctx, lo)
