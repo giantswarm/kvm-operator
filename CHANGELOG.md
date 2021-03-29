@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.15.0] - 2021-03-29
+
 ### Added
 
 - Add vertical pod autoscaler for operator pods.
@@ -91,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.15.0...HEAD
+[3.15.0]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...v3.15.0
 [3.14.0]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/giantswarm/kvm-operator/compare/v3.12.2...v3.13.0
 [3.12.2]: https://github.com/giantswarm/kvm-operator/compare/v3.12.1...v3.12.2
