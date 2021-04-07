@@ -51,6 +51,6 @@ data:
         mirrors: '{{ range $i, $e := .Values.registry.mirrors }}{{ if $i }},{{end}}{{ $e }}{{end}}'
       tenant:
         ssh:
-          ssoPublicKey: '{{ .Values.Installation.V1.Guest.SSH.SSOPublicKey }}'
+          ssoPublicKey: '{{ .Values.ssh.ssoPublicKey }}'
         update:
           enabled: true
