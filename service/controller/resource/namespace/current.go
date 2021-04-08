@@ -2,6 +2,7 @@ package namespace
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
@@ -10,6 +11,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -71,12 +73,17 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// remove the namespace as usual.
 	if key.IsDeleted(&customObject) {
 		n := key.ClusterNamespace(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
+
+		lo := metav1.ListOptions{
+			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
+		}
+
+		list, err := r.k8sClient.AppsV1().Deployments(n).List(ctx, lo)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		if len(list.Items) != 0 {
-			r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing pods")
+			r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing deployments")
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
 			r.logger.Debugf(ctx, "canceling resource")
