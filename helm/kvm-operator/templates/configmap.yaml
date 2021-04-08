@@ -15,7 +15,7 @@ data:
         address: 'http://0.0.0.0:8000'
     service:
       crd:
-        labelSelector: '{{ .Values.Installation.V1.GiantSwarm.KVMOperator.CRD.LabelSelector }}'
+        labelSelector: ''
       rbac:
         clusterRole:
           general: {{ include "resource.default.name" . }}
@@ -29,28 +29,28 @@ data:
           keyFile: ''
       installation:
         dns:
-          servers: {{ .Values.Installation.V1.Provider.KVM.DNS.Servers }}
+          servers: {{ .Values.dns.servers }}
         ntp:
-          servers: {{ .Values.Installation.V1.Provider.KVM.NTP.Servers }}
-        {{- if .Values.Installation.V1.Guest }}
+          servers: {{ .Values.ntp.servers }}
+        {{- if .Values.oidc.enabled }}
         tenant:
           kubernetes:
             api:
               auth:
                 provider:
                   oidc:
-                    clientID: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.ClientID }}'
-                    issuerURL: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.IssuerURL }}'
-                    usernameClaim: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim }}'
-                    usernamePrefix: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix }}'
-                    groupsClaim: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim }}'
-                    groupsPrefix: '{{ .Values.Installation.V1.Guest.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix }}'
+                    clientID: '{{ .Values.oidc.clientID }}'
+                    issuerURL: '{{ .Values.oidc.issuerURL }}'
+                    usernameClaim: '{{ .Values.oidc.usernameClaim }}'
+                    usernamePrefix: '{{ .Values.oidc.usernamePrefix }}'
+                    groupsClaim: '{{ .Values.oidc.groupsClaim }}'
+                    groupsPrefix: '{{ .Values.oidc.groupsPrefix }}'
         {{- end }}
       registry:
-        domain: 'docker.io'
-        mirrors: 'giantswarm.azurecr.io'
+        domain: '{{ .Values.registry.domain }}'
+        mirrors: '{{ range $i, $e := .Values.registry.mirrors }}{{ if $i }},{{end}}{{ $e }}{{end}}'
       tenant:
         ssh:
-          ssoPublicKey: '{{ .Values.Installation.V1.Guest.SSH.SSOPublicKey }}'
+          ssoPublicKey: '{{ .Values.ssh.ssoPublicKey }}'
         update:
-          enabled: {{ .Values.Installation.V1.Guest.Update.Enabled }}
+          enabled: true
