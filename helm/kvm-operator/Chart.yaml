@@ -6,4 +6,4 @@ version: "[[ .Version ]]"
 appVersion: "[[ .AppVersion ]]"
 annotations:
   application.giantswarm.io/team: "rocket"
-  config.giantswarm.io/version: add-kvm-operator
+  config.giantswarm.io/version: 1.x.x
