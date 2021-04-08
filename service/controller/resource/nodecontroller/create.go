@@ -44,7 +44,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	var desiredController *nodecontroller.Controller
-	if k8sClient != nil {
+	{
 		config := nodecontroller.Config{
 			Cluster:             cr,
 			ManagementK8sClient: r.k8sClient,
