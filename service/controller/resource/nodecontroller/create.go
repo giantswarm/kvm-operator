@@ -29,9 +29,9 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	controllerKey := controllerMapKey(cr)
 
 	var shouldStop bool
-	var k8sClient k8sclient.Interface
+	var k8sClient *k8sclient.Clients
 	{
-		k8sClient, err = key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.workloadCluster) //nolint
+		k8sClient, err = key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.workloadCluster)
 		if tenantcluster.IsTimeout(err) {
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
 			shouldStop = true
