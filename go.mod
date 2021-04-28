@@ -8,7 +8,7 @@ require (
 	github.com/giantswarm/certs/v3 v3.1.1
 	github.com/giantswarm/errors v0.3.0
 	github.com/giantswarm/k8sclient/v5 v5.11.0
-	github.com/giantswarm/k8scloudconfig/v10 v10.2.0
+	github.com/giantswarm/k8scloudconfig/v10 v10.2.2-0.20210428143312-5743a9c4fa66
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.3.0
 	github.com/giantswarm/microkit v0.2.2
@@ -36,6 +36,9 @@ replace (
 
 	// v3.3.13 is required by bketelsen/crypt. Can remove this replace when updated.
 	github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3.3.25+incompatible
+
+	// keep in sync with giantswarm/k8scloudconfig
+	github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+incompatible
 
 	// Use v1.3.2 of gogo/protobuf to fix nancy alert.
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
