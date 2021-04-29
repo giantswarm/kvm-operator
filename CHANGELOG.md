@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.16.0] - 2021-04-29
+
+### Changed
+
+- Update k8scloudconfig to use calico-crd-installer.
+
 ## [3.15.0] - 2021-03-29
 
 ### Added
@@ -93,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.15.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.16.0...HEAD
+[3.16.0]: https://github.com/giantswarm/kvm-operator/compare/v3.15.0...v3.16.0
 [3.15.0]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...v3.15.0
 [3.14.0]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/giantswarm/kvm-operator/compare/v3.12.2...v3.13.0
