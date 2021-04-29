@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.16.0] - 2021-04-29
 
+### Changed
+
+- Update k8scloudconfig to use calico-crd-installer.
+
 ## [3.15.0] - 2021-03-29
 
 ### Added
