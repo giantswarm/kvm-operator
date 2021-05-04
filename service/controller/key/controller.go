@@ -11,11 +11,11 @@ var (
 		Requeue:      false,
 		RequeueAfter: 0,
 	}
-	RequeueShort = reconcile.Result{
+	RequeueErrorShort = reconcile.Result{
 		Requeue:      true,
 		RequeueAfter: time.Second * 10,
 	}
-	RequeueLong = reconcile.Result{
+	RequeueErrorLong = reconcile.Result{
 		Requeue:      true,
 		RequeueAfter: time.Second * 30,
 	}
