@@ -3,6 +3,7 @@ package cloudconfig
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/certs/v3/pkg/certs"
@@ -40,6 +41,14 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.SSOPublicKey = c.ssoPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 		params.DockerhubToken = c.dockerhubToken
+
+		if httpProxy := os.Getenv("HTTP_PROXY"); httpProxy != "" {
+			params.Proxy.HTTP = httpProxy
+		}
+
+		if httpsProxy := os.Getenv("HTTPS_PROXY"); httpsProxy != "" {
+			params.Proxy.HTTP = httpsProxy
+		}
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
 		{
