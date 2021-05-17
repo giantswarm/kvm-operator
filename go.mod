@@ -3,7 +3,7 @@ module github.com/giantswarm/kvm-operator
 go 1.15
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.22.0
+	github.com/giantswarm/apiextensions/v3 v3.23.0
 	github.com/giantswarm/badnodedetector v1.0.1
 	github.com/giantswarm/certs/v3 v3.1.1
 	github.com/giantswarm/errors v0.3.0
