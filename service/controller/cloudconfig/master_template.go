@@ -52,13 +52,9 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.SSOPublicKey = c.ssoPublicKey
 		params.DockerhubToken = c.dockerhubToken
 
-		if httpProxy := os.Getenv("HTTP_PROXY"); httpProxy != "" {
-			params.Proxy.HTTP = httpProxy
-		}
-
-		if httpsProxy := os.Getenv("HTTPS_PROXY"); httpsProxy != "" {
-			params.Proxy.HTTP = httpsProxy
-		}
+		params.Proxy.HTTP = os.Getenv("HTTP_PROXY")
+		params.Proxy.HTTPS = os.Getenv("HTTPS_PROXY")
+		params.Proxy.NoProxy = os.Getenv("NO_PROXY")
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
 		{
