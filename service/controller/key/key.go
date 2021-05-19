@@ -350,7 +350,7 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 	return DefaultKubeletDiskSize
 }
 
-func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) (corev1.EnvVar) {
+func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) corev1.EnvVar {
 	var lastElemIndex = len(hostVolumes) - 1
 
 	hostVolumesEnvVar := corev1.EnvVar{
