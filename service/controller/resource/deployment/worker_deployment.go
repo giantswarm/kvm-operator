@@ -42,6 +42,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: %s", err)
 		}
 
+		// TODO: https://github.com/giantswarm/giantswarm/issues/17340
+		//       https://github.com/giantswarm/kvm-operator/pull/1208#discussion_r636067919
 		for _, hostVolume := range capabilities.HostVolumes {
 			if hostVolume.MountTag == "" || hostVolume.HostPath == "" {
 				return nil, microerror.Maskf(invalidConfigError, "error defining host volume config. both mount tag and host path has to be defined")
