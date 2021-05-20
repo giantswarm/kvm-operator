@@ -164,8 +164,8 @@ github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeME
 github.com/giantswarm/apiextensions/v3 v3.4.0/go.mod h1:MMLkRJta4mbTbrikP9LewADiCL+55LmsagyhdTU7XAY=
 github.com/giantswarm/apiextensions/v3 v3.17.0/go.mod h1:N4SS083wjVR3GEL/pqWycva4yUtYrlU5lUKhRtZJ7EY=
 github.com/giantswarm/apiextensions/v3 v3.18.1/go.mod h1:N4SS083wjVR3GEL/pqWycva4yUtYrlU5lUKhRtZJ7EY=
-github.com/giantswarm/apiextensions/v3 v3.23.0 h1:kbzkkB+xpw6l0wGp7pRtAg3e33DZVnykDgz8i7EbM+A=
-github.com/giantswarm/apiextensions/v3 v3.23.0/go.mod h1:JpgKjjHgdrrgj3QhwJdyCYbO5fqfsRWIul6A6UaiyFk=
+github.com/giantswarm/apiextensions/v3 v3.26.0 h1:DKmvJHDeKWYQN+VjoBqWaDuEthsXyYw5tMPsv2io6QQ=
+github.com/giantswarm/apiextensions/v3 v3.26.0/go.mod h1:JpgKjjHgdrrgj3QhwJdyCYbO5fqfsRWIul6A6UaiyFk=
 github.com/giantswarm/backoff v0.2.0 h1:kdfAf83pZ/l8X0KiA2dJ2Wq19nS9hISijVn7ZRdFhfU=
 github.com/giantswarm/backoff v0.2.0/go.mod h1:Z3WRsFilSJ5H5VlFa4XhraoPr+9pmZgYasoY2OSfNOk=
 github.com/giantswarm/badnodedetector v1.0.1 h1:5rKD7SOErceMStnCkiop2nVj1PPiWVnuWE8v/6mE2tA=
@@ -184,8 +184,8 @@ github.com/giantswarm/k8sclient/v5 v5.0.0/go.mod h1:OhlknCs1Wgc0ErjWBgeZDGe4Y6aT
 github.com/giantswarm/k8sclient/v5 v5.10.0/go.mod h1:HHSHvERGfLhNqTsqKBUQSQ5VXGhLfVRojplYwio6jDU=
 github.com/giantswarm/k8sclient/v5 v5.11.0 h1:LZwtscRz53Wz+hf0Sc7L1PEJdeUTDzgUjai4+9EbNjY=
 github.com/giantswarm/k8sclient/v5 v5.11.0/go.mod h1:3if9oaz3gwTKMuVNxU8vJfrzADyTuExOj+uu8N0+LsM=
-github.com/giantswarm/k8scloudconfig/v10 v10.6.0 h1:CbOg60XDvK1sGTX40UUe2BKnlHeJmqluWHEvEX1b7KQ=
-github.com/giantswarm/k8scloudconfig/v10 v10.6.0/go.mod h1:W8yTuL33S5EslFIL8ZUhzlGkESln+Md3LNjhNjOt6Yc=
+github.com/giantswarm/k8scloudconfig/v10 v10.7.0 h1:Dr4XtPKYyYTWFdoFQsl0PbTj5B/4lfsueGjhO9hyVxY=
+github.com/giantswarm/k8scloudconfig/v10 v10.7.0/go.mod h1:W3pW11pdDzetqc2+3KApphjgFPOFuZOVCjSvsLORHu0=
 github.com/giantswarm/microendpoint v0.2.0 h1:xCAqAVRjTw/4ifEuBeNavALdbQsLk6+k/ukzdy0GWZE=
 github.com/giantswarm/microendpoint v0.2.0/go.mod h1:SSkSp4Q4iSW7vwkil+/E3IXy9Q8To8vXmT5VCg24RDg=
 github.com/giantswarm/microerror v0.2.0/go.mod h1:1YtJq/m7Vlq1Y6NP7B+SODOKCGlG7e5wctV2OoE9n34=
