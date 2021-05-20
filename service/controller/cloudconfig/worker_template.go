@@ -43,12 +43,15 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.SSOPublicKey = c.ssoPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 		params.DockerhubToken = c.dockerhubToken
-		params.KVMWorkerMountTags = []string{}
 
 		// TODO(mazzy89): for the moment all the workers will mount the
 		// same mountpoints as the first worker node
-		for _, hostVolume := range cr.Spec.KVM.Workers[0].HostVolumes {
-			params.KVMWorkerMountTags = append(params.KVMWorkerMountTags, hostVolume.MountTag)
+		if len(cr.Spec.KVM.Workers) > 0 {
+			params.KVMWorkerMountTags = []string{}
+
+			for _, hostVolume := range cr.Spec.KVM.Workers[0].HostVolumes {
+				params.KVMWorkerMountTags = append(params.KVMWorkerMountTags, hostVolume.MountTag)
+			}
 		}
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
