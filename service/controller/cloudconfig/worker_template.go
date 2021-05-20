@@ -43,13 +43,11 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.SSOPublicKey = c.ssoPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 		params.DockerhubToken = c.dockerhubToken
-
-		// TODO(mazzy89): for the moment all the workers will mount the
-		// same mountpoints as the first worker node
+		params.KVMWorkerMountTags = []string{}
+		
 		if len(cr.Spec.KVM.Workers) > 0 {
-			params.KVMWorkerMountTags = []string{}
 
-			for _, hostVolume := range cr.Spec.KVM.Workers[0].HostVolumes {
+			for _, hostVolume := range cr.Spec.KVM.Workers[nodeIndex].HostVolumes {
 				params.KVMWorkerMountTags = append(params.KVMWorkerMountTags, hostVolume.MountTag)
 			}
 		}
