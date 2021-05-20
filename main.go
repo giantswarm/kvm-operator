@@ -128,6 +128,9 @@ func mainError() error {
 	daemonCommand.PersistentFlags().StringSlice(f.Service.Registry.Mirrors, []string{}, `Image registry mirror domains. Can be set only if registry domain is "docker.io".`)
 
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.Ignition.Path, "/opt/ignition", "Default path for the ignition base directory.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.Proxy.HTTP, "", "Where to proxy HTTP trafic to.")
+	daemonCommand.PersistentFlags().String(f.Service.Tenant.Proxy.HTTPS, "", "Where to proxy HTTPS trafic to.")
+	daemonCommand.PersistentFlags().StringSlice(f.Service.Tenant.Proxy.NoProxy, []string{}, "List of addresses that need not to go through the proxy.")
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")
 	daemonCommand.PersistentFlags().Bool(f.Service.Tenant.Update.Enabled, false, "Whether updates of tenant cluster nodes are allowed to be processed upon reconciliation.")
 

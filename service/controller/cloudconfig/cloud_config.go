@@ -2,6 +2,7 @@ package cloudconfig
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -64,6 +65,7 @@ type Config struct {
 	DockerhubToken  string
 	IgnitionPath    string
 	OIDC            OIDCConfig
+	Proxy           ProxyConfig
 	RegistryMirrors []string
 	SSOPublicKey    string
 }
@@ -85,8 +87,15 @@ type CloudConfig struct {
 	dockerhubToken  string
 	ignitionPath    string
 	k8sAPIExtraArgs []string
+	proxy           proxyConfig
 	registryMirrors []string
 	ssoPublicKey    string
+}
+
+type proxyConfig struct {
+	http    string
+	https   string
+	noProxy string
 }
 
 // OIDCConfig represents the configuration of the OIDC authorization provider
@@ -97,6 +106,13 @@ type OIDCConfig struct {
 	UsernamePrefix string
 	GroupsClaim    string
 	GroupsPrefix   string
+}
+
+// ProxyConfig represents the configuration of the proxy
+type ProxyConfig struct {
+	HTTP    string
+	HTTPS   string
+	NoProxy []string
 }
 
 // New creates a new configured cloud config service.
@@ -139,6 +155,11 @@ func New(config Config) (*CloudConfig, error) {
 		dockerhubToken:  config.DockerhubToken,
 		ignitionPath:    config.IgnitionPath,
 		k8sAPIExtraArgs: k8sAPIExtraArgs,
+		proxy: proxyConfig{
+			http:    config.Proxy.HTTP,
+			https:   config.Proxy.HTTPS,
+			noProxy: strings.Join(config.Proxy.NoProxy, ","),
+		},
 		registryMirrors: config.RegistryMirrors,
 		ssoPublicKey:    config.SSOPublicKey,
 	}

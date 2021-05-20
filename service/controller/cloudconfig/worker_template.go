@@ -36,6 +36,9 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.Images = data.Images
 		params.Versions = data.Versions
 		params.Node = node
+		params.Proxy.HTTP = c.proxy.http
+		params.Proxy.HTTPS = c.proxy.https
+		params.Proxy.NoProxy = c.proxy.noProxy
 		params.RegistryMirrors = c.registryMirrors
 		params.SSOPublicKey = c.ssoPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline

@@ -50,6 +50,8 @@ data:
         domain: '{{ .Values.registry.domain }}'
         mirrors: '{{ range $i, $e := .Values.registry.mirrors }}{{ if $i }},{{end}}{{ $e }}{{end}}'
       tenant:
+        proxy:
+          noProxy: '{{ range $i, $e := .Values.proxy.noProxy }}{{ if $i }},{{end}}{{ $e }}{{end}}'
         ssh:
           ssoPublicKey: '{{ .Values.ssh.ssoPublicKey }}'
         update:
