@@ -46,7 +46,6 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.KVMWorkerMountTags = []string{}
 
 		if len(cr.Spec.KVM.Workers) > 0 {
-
 			for _, hostVolume := range cr.Spec.KVM.Workers[nodeIndex].HostVolumes {
 				params.KVMWorkerMountTags = append(params.KVMWorkerMountTags, hostVolume.MountTag)
 			}
