@@ -399,9 +399,10 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 }
 
 func addConditionalEnvVarsToK8SKVMContainer(deployment *v1.Deployment, envVars []corev1.EnvVar) {
-	for _, container := range deployment.Spec.Template.Spec.Containers {
+	for i, container := range deployment.Spec.Template.Spec.Containers {
 		if container.Name == key.K8SKVMContainerName {
 			container.Env = append(container.Env, envVars...)
+			deployment.Spec.Template.Spec.Containers[i] = container
 		}
 	}
 }
