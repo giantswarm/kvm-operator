@@ -27,6 +27,11 @@ oidc:
   groupsClaim: ""
   groupsPrefix: ""
 
+proxy:
+  http: ""
+  https: ""
+  no_proxy: []
+
 registry:
   domain: docker.io
   mirrors:
