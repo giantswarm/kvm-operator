@@ -8,7 +8,7 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/scheme"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"k8s.io/api/networking/v1beta1"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 )
 
 func Test_Resource_Ingress_GetDesiredState(t *testing.T) {

@@ -2,13 +2,13 @@ package namespace
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
@@ -75,8 +75,10 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	if key.IsDeleted(&customObject) {
 		var list corev1.PodList
 		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
-			Namespace: key.ClusterNamespace(customObject),
-      LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
+			Namespace:     key.ClusterNamespace(customObject),
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				label.ManagedBy: key.OperatorName,
+			}),
 		})
 		if err != nil {
 			return nil, microerror.Mask(err)
