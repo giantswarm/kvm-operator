@@ -43,12 +43,21 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.SSOPublicKey = c.ssoPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 		params.DockerhubToken = c.dockerhubToken
-		params.KVMWorkerMountTags = []string{}
 
-		if len(cr.Spec.KVM.Workers) > 0 {
-			for _, hostVolume := range cr.Spec.KVM.Workers[nodeIndex].HostVolumes {
-				params.KVMWorkerMountTags = append(params.KVMWorkerMountTags, hostVolume.MountTag)
+		var workerFound bool
+		// Find index of worker in cr.Spec.Cluster.Workers to match it with the corresponding cr.Spec.KVM.Workers
+		for i, worker := range cr.Spec.Cluster.Workers {
+			if worker.ID == node.ID {
+				workerFound = true
+				for _, hostVolume := range cr.Spec.KVM.Workers[i].HostVolumes {
+					params.KVMWorkerMountTags = append(params.KVMWorkerMountTags, hostVolume.MountTag)
+				}
+				break
 			}
+		}
+
+		if !workerFound {
+			return "", microerror.Maskf(notFoundError, "node with id %#q not found in .Spec.Cluster.Workers", node.ID)
 		}
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
