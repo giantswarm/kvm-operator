@@ -55,6 +55,11 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 				GroupsClaim:    config.OIDC.GroupsClaim,
 				GroupsPrefix:   config.OIDC.GroupsPrefix,
 			},
+			Proxy: cloudconfig.ProxyConfig{
+				HTTP:    config.Proxy.HTTP,
+				HTTPS:   config.Proxy.HTTPS,
+				NoProxy: config.Proxy.NoProxy,
+			},
 			RegistryMirrors: config.RegistryMirrors,
 			SSOPublicKey:    config.SSOPublicKey,
 		}

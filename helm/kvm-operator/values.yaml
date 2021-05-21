@@ -4,12 +4,43 @@ project:
 image:
   name: "giantswarm/kvm-operator"
   tag: "[[ .Version ]]"
-Installation:
-  V1:
-    Registry:
-      Domain: quay.io
+
 pod:
   user:
     id: 1000
   group:
     id: 1000
+
+dns:
+  # comma-separated list of DNS servers
+  servers: ""
+ntp:
+  # comma-separated list of NTP servers
+  servers: ""
+
+oidc:
+  enabled: false
+  clientID: ""
+  issuerURL: ""
+  usernameClaim: ""
+  usernamePrefix: ""
+  groupsClaim: ""
+  groupsPrefix: ""
+
+proxy:
+  http: ""
+  https: ""
+  no_proxy: []
+
+registry:
+  domain: docker.io
+  mirrors:
+  - giantswarm.azurecr.io
+  pullSecret:
+    dockerConfigJSON: ""
+
+  dockerhub:
+    token: token
+
+ssh:
+  sshPublicKey: ""

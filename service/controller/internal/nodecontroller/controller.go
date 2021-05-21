@@ -213,7 +213,7 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 	if errors.IsNotFound(err) {
 		return key.RequeueNone, nil
 	} else if err != nil {
-		return key.RequeueLong, microerror.Mask(err)
+		return key.RequeueErrorLong, microerror.Mask(err)
 	}
 
 	ctx = setLoggerCtxValue(ctx, loggerKeyObject, node.GetSelfLink())
@@ -235,7 +235,10 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 
 	c.lastReconciled = time.Now()
 
-	return key.RequeueNone, nil
+	return reconcile.Result{
+		Requeue:      true,
+		RequeueAfter: ResyncPeriod,
+	}, nil
 }
 
 func (c *Controller) Stop() {
