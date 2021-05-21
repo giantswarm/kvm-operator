@@ -354,7 +354,7 @@ func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes)
 	var lastElemIndex = len(hostVolumes) - 1
 
 	hostVolumesEnvVar := corev1.EnvVar{
-		Name:  "HOST_DATA_VOLUME_CONFIG",
+		Name:  "HOST_DATA_VOLUME_PATHS",
 		Value: "",
 	}
 
