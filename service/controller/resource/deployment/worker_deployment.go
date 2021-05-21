@@ -393,6 +393,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 		addCoreComponentsAnnotations(deployment, release)
 		// in case of adding additional env vars
 		addConditionalEnvVarsToK8SKVMContainer(deployment, []corev1.EnvVar{key.HostVolumesToEnvVar(capabilities.HostVolumes)})
+		addConditionalVolumeMounts(deployment, key.HostVolumesToVolumeMounts(capabilities.HostVolumes))
 
 		deployments = append(deployments, deployment)
 	}
@@ -404,6 +405,15 @@ func addConditionalEnvVarsToK8SKVMContainer(deployment *v1.Deployment, envVars [
 	for i, container := range deployment.Spec.Template.Spec.Containers {
 		if container.Name == key.K8SKVMContainerName {
 			container.Env = append(container.Env, envVars...)
+			deployment.Spec.Template.Spec.Containers[i] = container
+		}
+	}
+}
+
+func addConditionalVolumeMounts(deployment *v1.Deployment, volumeMounts []corev1.VolumeMount) {
+	for i, container := range deployment.Spec.Template.Spec.Containers {
+		if container.Name == key.K8SKVMContainerName {
+			container.VolumeMounts = append(container.VolumeMounts, volumeMounts...)
 			deployment.Spec.Template.Spec.Containers[i] = container
 		}
 	}
