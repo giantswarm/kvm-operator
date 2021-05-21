@@ -158,6 +158,11 @@ func New(config Config) (*Service, error) {
 				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
 				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
 			},
+			Proxy: controller.Proxy{
+				HTTP:    config.Viper.GetString(config.Flag.Service.Tenant.Proxy.HTTP),
+				HTTPS:   config.Viper.GetString(config.Flag.Service.Tenant.Proxy.HTTPS),
+				NoProxy: config.Viper.GetStringSlice(config.Flag.Service.Tenant.Proxy.NoProxy),
+			},
 			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
 
 			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),

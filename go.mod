@@ -3,12 +3,12 @@ module github.com/giantswarm/kvm-operator
 go 1.15
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.22.0
+	github.com/giantswarm/apiextensions/v3 v3.26.0
 	github.com/giantswarm/badnodedetector v1.0.1
 	github.com/giantswarm/certs/v3 v3.1.1
 	github.com/giantswarm/errors v0.3.0
 	github.com/giantswarm/k8sclient/v5 v5.11.0
-	github.com/giantswarm/k8scloudconfig/v10 v10.3.0
+	github.com/giantswarm/k8scloudconfig/v10 v10.7.0
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.3.0
 	github.com/giantswarm/microkit v0.2.2
@@ -24,9 +24,9 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
-	k8s.io/api v0.18.9
-	k8s.io/apimachinery v0.18.9
-	k8s.io/client-go v0.18.9
+	k8s.io/api v0.18.18
+	k8s.io/apimachinery v0.18.18
+	k8s.io/client-go v0.18.18
 	sigs.k8s.io/controller-runtime v0.6.4
 )
 

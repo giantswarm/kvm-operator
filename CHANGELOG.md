@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add flags for proxy settings and propagate them to ignition
+
 ## [3.16.0] - 2021-04-29
 
 ### Changed
