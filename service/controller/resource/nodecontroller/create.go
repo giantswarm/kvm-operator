@@ -73,7 +73,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			r.logger.Debugf(ctx, "controllers don't match")
 			shouldStop = true
 		} else if time.Since(current.LastReconciled()) > 2*nodecontroller.ResyncPeriod {
-			r.logger.Debugf(ctx, "controller hasn't reconciled in more than %d minutes", nodecontroller.ResyncPeriod.Minutes())
+			r.logger.Debugf(ctx, "controller hasn't reconciled in more than %d minutes", int(2*nodecontroller.ResyncPeriod.Minutes()))
 			shouldStop = true
 		}
 

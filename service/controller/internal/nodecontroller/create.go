@@ -20,7 +20,7 @@ func (c *Controller) ensureCreated(ctx context.Context, workloadNode corev1.Node
 		c.logger.Debugf(ctx, "node pod not found")
 		return key.RequeueNone, nil
 	} else if err != nil {
-		return key.RequeueShort, microerror.Mask(err)
+		return key.RequeueErrorShort, microerror.Mask(err)
 	}
 
 	condition, shouldUpdate := calculateCreatedPodNodeCondition(workloadNode, managementPod)
@@ -31,7 +31,7 @@ func (c *Controller) ensureCreated(ctx context.Context, workloadNode corev1.Node
 	c.logger.Debugf(ctx, "patching pod node status condition to %#v", condition)
 	err = c.managementK8sClient.Status().Patch(ctx, &managementPod, podConditionPatch{PodCondition: condition})
 	if err != nil {
-		return key.RequeueShort, microerror.Mask(err)
+		return key.RequeueErrorShort, microerror.Mask(err)
 	}
 
 	return key.RequeueNone, nil
