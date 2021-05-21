@@ -370,7 +370,7 @@ func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes)
 }
 
 func HostVolumesToVolumeMounts(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.VolumeMount {
-	volumeMounts := []corev1.VolumeMount{}
+	var volumeMounts []corev1.VolumeMount
 
 	for _, hostVolume := range hostVolumes {
 		vm := corev1.VolumeMount{
