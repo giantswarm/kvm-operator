@@ -75,7 +75,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	if key.IsDeleted(&customObject) {
 		var list corev1.PodList
 		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
-			Namespace:     key.ClusterNamespace(customObject),
+			Namespace: key.ClusterNamespace(customObject),
 			LabelSelector: labels.SelectorFromSet(map[string]string{
 				label.ManagedBy: key.OperatorName,
 			}),
