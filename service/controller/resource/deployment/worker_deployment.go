@@ -41,6 +41,14 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: %s", err)
 		}
 
+		// TODO: https://github.com/giantswarm/giantswarm/issues/17340
+		//       https://github.com/giantswarm/kvm-operator/pull/1208#discussion_r636067919
+		for _, hostVolume := range capabilities.HostVolumes {
+			if hostVolume.MountTag == "" || hostVolume.HostPath == "" {
+				return nil, microerror.Maskf(invalidConfigError, "error defining host volume config. both mount tag and host path has to be defined")
+			}
+		}
+
 		deployment := &v1.Deployment{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "deployment",
@@ -157,7 +165,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 						Containers: []corev1.Container{
 							{
-								Name:            "k8s-kvm",
+								Name:            key.K8SKVMContainerName,
 								Image:           key.K8SKVMDockerImage,
 								ImagePullPolicy: corev1.PullIfNotPresent,
 								SecurityContext: &corev1.SecurityContext{
@@ -265,9 +273,20 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			},
 		}
 		addCoreComponentsAnnotations(deployment, release)
+		// in case of adding additional env vars
+		addConditionalEnvVarsToK8SKVMContainer(deployment, []corev1.EnvVar{key.HostVolumesToEnvVar(capabilities.HostVolumes)})
 
 		deployments = append(deployments, deployment)
 	}
 
 	return deployments, nil
+}
+
+func addConditionalEnvVarsToK8SKVMContainer(deployment *v1.Deployment, envVars []corev1.EnvVar) {
+	for i, container := range deployment.Spec.Template.Spec.Containers {
+		if container.Name == key.K8SKVMContainerName {
+			container.Env = append(container.Env, envVars...)
+			deployment.Spec.Template.Spec.Containers[i] = container
+		}
+	}
 }

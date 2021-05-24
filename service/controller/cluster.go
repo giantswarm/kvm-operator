@@ -29,6 +29,7 @@ type ClusterConfig struct {
 	IgnitionPath       string
 	NTPServers         string
 	OIDC               ClusterConfigOIDC
+	Proxy              Proxy
 	ProjectName        string
 	SSOPublicKey       string
 
@@ -46,6 +47,12 @@ type ClusterConfigOIDC struct {
 	UsernamePrefix string
 	GroupsClaim    string
 	GroupsPrefix   string
+}
+
+type Proxy struct {
+	HTTP    string
+	HTTPS   string
+	NoProxy []string
 }
 
 type Cluster struct {

@@ -64,8 +64,10 @@ const (
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
 	FlatcarChannel  = "stable"
 
+	K8SKVMContainerName = "k8s-kvm"
+
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.3.0-413c10442fd5026c52efd79ca136a461fff52548"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.4.1-5170cbdda509f3c89e5ea283f785f833202c9415"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
@@ -344,6 +346,25 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 	}
 
 	return DefaultKubeletDiskSize
+}
+
+func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) corev1.EnvVar {
+	var lastElemIndex = len(hostVolumes) - 1
+
+	hostVolumesEnvVar := corev1.EnvVar{
+		Name:  "HOST_DATA_VOLUME_CONFIG",
+		Value: "",
+	}
+
+	for idx, hostVolume := range hostVolumes {
+		hostVolumesEnvVar.Value += fmt.Sprintf("%s:%s", hostVolume.MountTag, hostVolume.HostPath)
+
+		if idx != lastElemIndex {
+			hostVolumesEnvVar.Value += ","
+		}
+	}
+
+	return hostVolumesEnvVar
 }
 
 // AnyPodContainerRunning checks ContainerState for all containers present
