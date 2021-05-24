@@ -384,6 +384,25 @@ func HostVolumesToVolumeMounts(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVo
 	return volumeMounts
 }
 
+func HostVolumesToVolumes(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.Volume {
+	var volumes []corev1.Volume
+
+	for _, hostVolume := range hostVolumes {
+		v := corev1.Volume{
+			Name: hostVolume.MountTag,
+			VolumeSource: corev1.VolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: hostVolume.HostPath,
+				},
+			},
+		}
+
+		volumes = append(volumes, v)
+	}
+
+	return volumes
+}
+
 // AnyPodContainerRunning checks ContainerState for all containers present
 // in given pod. If any container is in Running state, true is returned.
 func AnyPodContainerRunning(pod corev1.Pod) bool {
