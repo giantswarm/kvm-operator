@@ -94,7 +94,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		r.logger.Debugf(ctx, "deleting node '%s' in the tenant cluster's Kubernetes API", n.GetName())
 
-		err = ctrlClient.Delete(ctx, &n)
+		err = ctrlClient.Delete(ctx, &n) //nolint:gosec
 		if err != nil {
 			return microerror.Mask(err)
 		}
