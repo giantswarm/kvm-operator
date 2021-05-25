@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/metricsresource"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/retryresource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/retryresource"
 
 	"github.com/giantswarm/kvm-operator/service/controller/resource/terminateunhealthynodes"
 )
