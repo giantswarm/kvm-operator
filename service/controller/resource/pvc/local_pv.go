@@ -15,7 +15,7 @@ func newLocalPVs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolume, e
 
 	filesystemVolumeMode := corev1.PersistentVolumeFilesystem
 
-	for i, workerNode := range customObject.Spec.KVM.Workers {
+	for _, workerNode := range customObject.Spec.KVM.Workers {
 		for _, hostVolume := range workerNode.HostVolumes {
 			var persistentVolume = &corev1.PersistentVolume{
 				TypeMeta: metav1.TypeMeta{
@@ -23,7 +23,7 @@ func newLocalPVs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolume, e
 					APIVersion: "v1",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name: key.LocalPVCName(key.ClusterID(customObject), key.VMNumber(i)),
+					Name: key.LocalPVCName(key.ClusterID(customObject), hostVolume.MountTag),
 					Labels: map[string]string{
 						"app":      key.WorkerID,
 						"cluster":  key.ClusterID(customObject),
