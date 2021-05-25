@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/micrologger/loggermeta"
-	operatorkitcontroller "github.com/giantswarm/operatorkit/v4/pkg/controller"
+	operatorkitcontroller "github.com/giantswarm/operatorkit/v5/pkg/controller"
 	"github.com/giantswarm/to"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"

@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/crud"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

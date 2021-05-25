@@ -157,13 +157,13 @@ github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWo
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/gavv/httpexpect v2.0.0+incompatible/go.mod h1:x+9tiU1YnrOvnB725RkpoLv1M62hOWzwo5OXotisrKc=
 github.com/getsentry/sentry-go v0.7.0/go.mod h1:pLFpD2Y5RHIKF9Bw3KH6/68DeN2K/XBJd8awjdPnUwg=
-github.com/getsentry/sentry-go v0.9.0 h1:KIfpY/D9hX3gWAEd3d8z6ImuHNWtqEsjlpdF8zXFsHM=
-github.com/getsentry/sentry-go v0.9.0/go.mod h1:kELm/9iCblqUYh+ZRML7PNdCvEuw24wBvJPYyi86cws=
+github.com/getsentry/sentry-go v0.10.0 h1:6gwY+66NHKqyZrdi6O2jGdo7wGdo9b3B69E01NFgT5g=
+github.com/getsentry/sentry-go v0.10.0/go.mod h1:kELm/9iCblqUYh+ZRML7PNdCvEuw24wBvJPYyi86cws=
 github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/giantswarm/apiextensions/v3 v3.4.0/go.mod h1:MMLkRJta4mbTbrikP9LewADiCL+55LmsagyhdTU7XAY=
-github.com/giantswarm/apiextensions/v3 v3.17.0/go.mod h1:N4SS083wjVR3GEL/pqWycva4yUtYrlU5lUKhRtZJ7EY=
 github.com/giantswarm/apiextensions/v3 v3.18.1/go.mod h1:N4SS083wjVR3GEL/pqWycva4yUtYrlU5lUKhRtZJ7EY=
+github.com/giantswarm/apiextensions/v3 v3.22.0/go.mod h1:6KBexBTOZJ+amkorxw722t2HS57f+rf/8LeSSFfQNmo=
 github.com/giantswarm/apiextensions/v3 v3.26.0 h1:DKmvJHDeKWYQN+VjoBqWaDuEthsXyYw5tMPsv2io6QQ=
 github.com/giantswarm/apiextensions/v3 v3.26.0/go.mod h1:JpgKjjHgdrrgj3QhwJdyCYbO5fqfsRWIul6A6UaiyFk=
 github.com/giantswarm/backoff v0.2.0 h1:kdfAf83pZ/l8X0KiA2dJ2Wq19nS9hISijVn7ZRdFhfU=
@@ -181,7 +181,6 @@ github.com/giantswarm/exporterkit v0.2.0/go.mod h1:b4fuHVjsvZgznC9OEPfn0y5zvN8Sn
 github.com/giantswarm/exporterkit v0.2.1 h1:M/Avqdg6O+NdyGtY+LSy5cCpJzhG15WRHQRkhOY/dKs=
 github.com/giantswarm/exporterkit v0.2.1/go.mod h1:LkZNK+2qTcbHspbizA6JBBXpQW99u7u7UisUaWrSoVY=
 github.com/giantswarm/k8sclient/v5 v5.0.0/go.mod h1:OhlknCs1Wgc0ErjWBgeZDGe4Y6aThus21nQOXPAq4rQ=
-github.com/giantswarm/k8sclient/v5 v5.10.0/go.mod h1:HHSHvERGfLhNqTsqKBUQSQ5VXGhLfVRojplYwio6jDU=
 github.com/giantswarm/k8sclient/v5 v5.11.0 h1:LZwtscRz53Wz+hf0Sc7L1PEJdeUTDzgUjai4+9EbNjY=
 github.com/giantswarm/k8sclient/v5 v5.11.0/go.mod h1:3if9oaz3gwTKMuVNxU8vJfrzADyTuExOj+uu8N0+LsM=
 github.com/giantswarm/k8scloudconfig/v10 v10.7.0 h1:Dr4XtPKYyYTWFdoFQsl0PbTj5B/4lfsueGjhO9hyVxY=
@@ -199,9 +198,10 @@ github.com/giantswarm/micrologger v0.3.1/go.mod h1:PjAgtcJ922ZMX/Aa05IPi0bdYvOj2
 github.com/giantswarm/micrologger v0.3.3/go.mod h1:fkzQdDBC6HjJq4nllBDt6XB4t4yeVyhdHKblFX6QoMQ=
 github.com/giantswarm/micrologger v0.5.0 h1:/f2knkyf4bZw3L5F48R7VENiEKPb3Sjnzrg46+Ja5vk=
 github.com/giantswarm/micrologger v0.5.0/go.mod h1:J/jbt7A8eixqE40yq4JY8Hdbs/qeboe2FjHlq05UWjA=
+github.com/giantswarm/operatorkit/v4 v4.0.0 h1:rC3MZGA6Rg2HeEbn5poPH/EWHpJk6NpnbpBWc6t7w7Y=
 github.com/giantswarm/operatorkit/v4 v4.0.0/go.mod h1:9VLDXCofhooOPbRt3XCZQmMZJ0tW7X3x7G/2Sz3kb5o=
-github.com/giantswarm/operatorkit/v4 v4.3.1 h1:YOF1R4LnbDWe2cC6jhPUX5UXjucoo5RdlYwtKIjVctQ=
-github.com/giantswarm/operatorkit/v4 v4.3.1/go.mod h1:3qAcrnajddL8y8SnIPPVXI3wnn3ImQTF8z097Mccy4Y=
+github.com/giantswarm/operatorkit/v5 v5.0.0 h1:Perhu+PbZ62GGw3m5U5lDlZuHUOerSkcADQmzgFjI6w=
+github.com/giantswarm/operatorkit/v5 v5.0.0/go.mod h1:0mGvJR6LnflVo1RHGSC+dXnCXENPVUsQ8eib405eiYU=
 github.com/giantswarm/randomkeys/v2 v2.1.0 h1:fweYUtK9Vaa8CP+9nyyj8eM3qB4yaySy6AeCa03qZWc=
 github.com/giantswarm/randomkeys/v2 v2.1.0/go.mod h1:0jAWR4s12tY4BMX6BhsGKdSonFplJZnzwH7jP25T8bo=
 github.com/giantswarm/statusresource/v3 v3.1.0 h1:Qk92/tIekpRiwQf0Ec0oZvm/6MHsvI6HwqyAXdcZ3sc=
@@ -1018,6 +1018,7 @@ k8s.io/apimachinery v0.17.0/go.mod h1:b9qmWdKlLuU9EBh+06BtLcSf/Mu89rWL33naRxs1uZ
 k8s.io/apimachinery v0.18.5/go.mod h1:OaXp26zu/5J7p0f92ASynJa1pZo06YlV9fG7BoWbCko=
 k8s.io/apimachinery v0.18.6/go.mod h1:OaXp26zu/5J7p0f92ASynJa1pZo06YlV9fG7BoWbCko=
 k8s.io/apimachinery v0.18.9/go.mod h1:PF5taHbXgTEJLU+xMypMmYTXTWPJ5LaW8bfsisxnEXk=
+k8s.io/apimachinery v0.18.18/go.mod h1:z3HWT24PKvOWfgF+z68R7+Jj761mphku1J34CGG9NDc=
 k8s.io/apimachinery v0.18.19 h1:94g2jZjpfW2+qbphHe8WQIwj95qrjhrq8RU9jQknSgk=
 k8s.io/apimachinery v0.18.19/go.mod h1:70HIRzSveORLKbatTlXzI2B2UUhbWzbq8Vqyf+HbdUQ=
 k8s.io/apiserver v0.18.6/go.mod h1:Zt2XvTHuaZjBz6EFYzpp+X4hTmgWGy8AthNVnTdm3Wg=
