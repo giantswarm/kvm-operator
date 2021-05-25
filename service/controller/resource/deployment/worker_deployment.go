@@ -391,8 +391,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			},
 		}
 		addCoreComponentsAnnotations(deployment, release)
-		// in case of adding additional env vars
-		addConditionalEnvVarsToK8SKVMContainer(deployment, []corev1.EnvVar{key.HostVolumesToEnvVar(capabilities.HostVolumes)})
+		// in case of adding additional properties to the worker deployment
+		addConditionalPropsToWorkerDeployment(deployment, capabilities)
 
 		deployments = append(deployments, deployment)
 	}
@@ -400,11 +400,18 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 	return deployments, nil
 }
 
-func addConditionalEnvVarsToK8SKVMContainer(deployment *v1.Deployment, envVars []corev1.EnvVar) {
+func addConditionalPropsToWorkerDeployment(deployment *v1.Deployment, caps v1alpha1.KVMConfigSpecKVMNode) {
 	for i, container := range deployment.Spec.Template.Spec.Containers {
 		if container.Name == key.K8SKVMContainerName {
+			envVars := []corev1.EnvVar{key.HostVolumesToEnvVar(caps.HostVolumes)}
 			container.Env = append(container.Env, envVars...)
+
+			volumeMounts := key.HostVolumesToVolumeMounts(caps.HostVolumes)
+			container.VolumeMounts = append(container.VolumeMounts, volumeMounts...)
+
 			deployment.Spec.Template.Spec.Containers[i] = container
 		}
 	}
+
+	deployment.Spec.Template.Spec.Volumes = append(deployment.Spec.Template.Spec.Volumes, key.HostVolumesToVolumes(caps.HostVolumes)...)
 }

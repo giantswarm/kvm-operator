@@ -69,7 +69,7 @@ const (
 	K8SKVMContainerName = "k8s-kvm"
 
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.6.0"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.6.2"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
@@ -354,7 +354,7 @@ func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes)
 	var lastElemIndex = len(hostVolumes) - 1
 
 	hostVolumesEnvVar := corev1.EnvVar{
-		Name:  "HOST_DATA_VOLUME_CONFIG",
+		Name:  "HOST_DATA_VOLUME_PATHS",
 		Value: "",
 	}
 
@@ -367,6 +367,40 @@ func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes)
 	}
 
 	return hostVolumesEnvVar
+}
+
+func HostVolumesToVolumeMounts(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.VolumeMount {
+	var volumeMounts []corev1.VolumeMount
+
+	for _, hostVolume := range hostVolumes {
+		vm := corev1.VolumeMount{
+			Name:      hostVolume.MountTag,
+			MountPath: hostVolume.HostPath,
+		}
+
+		volumeMounts = append(volumeMounts, vm)
+	}
+
+	return volumeMounts
+}
+
+func HostVolumesToVolumes(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.Volume {
+	var volumes []corev1.Volume
+
+	for _, hostVolume := range hostVolumes {
+		v := corev1.Volume{
+			Name: hostVolume.MountTag,
+			VolumeSource: corev1.VolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: hostVolume.HostPath,
+				},
+			},
+		}
+
+		volumes = append(volumes, v)
+	}
+
+	return volumes
 }
 
 // AnyPodContainerRunning checks ContainerState for all containers present
