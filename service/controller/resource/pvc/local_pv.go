@@ -46,8 +46,8 @@ func newLocalPVs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolume, e
 					Capacity: map[corev1.ResourceName]resource.Quantity{
 						corev1.ResourceStorage: "",
 					},
-					NodeAffinity: corev1.NodeAffinity{
-						RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+					NodeAffinity: &corev1.VolumeNodeAffinity{
+						Required: &corev1.NodeSelector{
 							NodeSelectorTerms: []corev1.NodeSelectorTerm{
 								{
 									MatchExpressions: []corev1.NodeSelectorRequirement{
