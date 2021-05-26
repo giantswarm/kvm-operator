@@ -391,7 +391,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			},
 		}
 		addCoreComponentsAnnotations(deployment, release)
-		addConditionalPropsToWorkerDeployment(deployment, customResource, i)
+		addHostVolumes(deployment, customResource, i)
 
 		deployments = append(deployments, deployment)
 	}
@@ -399,7 +399,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 	return deployments, nil
 }
 
-func addConditionalPropsToWorkerDeployment(deployment *v1.Deployment, customObject v1alpha1.KVMConfig, workerIndex int) {
+func addHostVolumes(deployment *v1.Deployment, customObject v1alpha1.KVMConfig, workerIndex int) {
 	caps := customObject.Spec.KVM.Workers[workerIndex]
 
 	for i, container := range deployment.Spec.Template.Spec.Containers {
