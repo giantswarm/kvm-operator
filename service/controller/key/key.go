@@ -277,8 +277,8 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
-func LocalWorkerPVCName(clusterID string, vmNumber string) string {
-	return fmt.Sprintf("%s-%s-%s", "local-pvc-worker", clusterID, vmNumber)
+func LocalWorkerPVCName(clusterID string, vmNumber, mountTag string) string {
+	return fmt.Sprintf("%s-%s-%s-%s", "local-pvc-worker", clusterID, vmNumber, mountTag)
 }
 
 // FindNodeCondition returns the condition of the given type from the node. The second return value indicates if the condition was found.

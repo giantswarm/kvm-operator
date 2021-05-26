@@ -27,7 +27,7 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 
 			persistentVolumeClaim := &corev1.PersistentVolumeClaim{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: key.LocalWorkerPVCName(key.ClusterID(customObject), key.VMNumber(i)),
+					Name: key.LocalWorkerPVCName(key.ClusterID(customObject), key.VMNumber(i), hostVolume.MountTag),
 					Labels: map[string]string{
 						key.LegacyLabelCluster: key.ClusterID(customObject),
 						key.LabelCustomer:      key.ClusterCustomer(customObject),
