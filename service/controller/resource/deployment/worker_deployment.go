@@ -414,6 +414,5 @@ func addHostVolumes(deployment *v1.Deployment, customObject v1alpha1.KVMConfig, 
 		}
 	}
 
-	claimName := key.LocalWorkerPVCName(key.ClusterID(customObject), key.VMNumber(workerIndex))
-	deployment.Spec.Template.Spec.Volumes = append(deployment.Spec.Template.Spec.Volumes, key.HostVolumesToVolumes(caps.HostVolumes, claimName)...)
+	deployment.Spec.Template.Spec.Volumes = append(deployment.Spec.Template.Spec.Volumes, key.HostVolumesToVolumes(customObject, workerIndex)...)
 }

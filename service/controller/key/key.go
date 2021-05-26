@@ -388,15 +388,16 @@ func HostVolumesToVolumeMounts(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVo
 	return volumeMounts
 }
 
-func HostVolumesToVolumes(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes, claimName string) []corev1.Volume {
+func HostVolumesToVolumes(customObject v1alpha1.KVMConfig, nodeIndex int) []corev1.Volume {
 	var volumes []corev1.Volume
 
-	for _, hostVolume := range hostVolumes {
+	workerNode := customObject.Spec.KVM.Workers[nodeIndex]
+	for _, hostVolume := range workerNode.HostVolumes {
 		v := corev1.Volume{
 			Name: hostVolume.MountTag,
 			VolumeSource: corev1.VolumeSource{
 				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					ClaimName: claimName,
+					ClaimName: LocalWorkerPVCName(ClusterID(customObject), VMNumber(nodeIndex), hostVolume.MountTag),
 				},
 			},
 		}
