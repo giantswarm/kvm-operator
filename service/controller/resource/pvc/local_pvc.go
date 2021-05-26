@@ -30,10 +30,12 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 						ObjectMeta: metav1.ObjectMeta{
 							Name: key.LocalWorkerPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 							Labels: map[string]string{
-								"app":      key.WorkerID,
-								"cluster":  key.ClusterID(customObject),
-								"customer": key.ClusterCustomer(customObject),
-								"node":     workerNode.ID,
+								key.LegacyLabelCluster: key.ClusterID(customObject),
+								key.LabelCustomer:      key.ClusterCustomer(customObject),
+								key.LabelApp:           key.WorkerID,
+								key.LabelCluster:       key.ClusterID(customObject),
+								key.LabelOrganization:  key.ClusterCustomer(customObject),
+								key.LabelVersionBundle: key.OperatorVersion(customObject),
 							},
 						},
 						Spec: corev1.PersistentVolumeClaimSpec{
