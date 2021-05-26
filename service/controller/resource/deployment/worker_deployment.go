@@ -392,7 +392,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 		}
 		addCoreComponentsAnnotations(deployment, release)
 		// in case of adding additional properties to the worker deployment
-		addConditionalPropsToWorkerDeployment(deployment, capabilities)
+		addConditionalPropsToWorkerDeployment(deployment, customResource, i)
 
 		deployments = append(deployments, deployment)
 	}
@@ -400,7 +400,9 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 	return deployments, nil
 }
 
-func addConditionalPropsToWorkerDeployment(deployment *v1.Deployment, caps v1alpha1.KVMConfigSpecKVMNode) {
+func addConditionalPropsToWorkerDeployment(deployment *v1.Deployment, customObject v1alpha1.KVMConfig, workerIndex int) {
+	caps := customObject.Spec.KVM.Workers[workerIndex]
+
 	for i, container := range deployment.Spec.Template.Spec.Containers {
 		if container.Name == key.K8SKVMContainerName {
 			envVars := []corev1.EnvVar{key.HostVolumesToEnvVar(caps.HostVolumes)}
@@ -413,5 +415,6 @@ func addConditionalPropsToWorkerDeployment(deployment *v1.Deployment, caps v1alp
 		}
 	}
 
-	deployment.Spec.Template.Spec.Volumes = append(deployment.Spec.Template.Spec.Volumes, key.HostVolumesToVolumes(caps.HostVolumes)...)
+	claimName := key.LocalWorkerPVCName(key.ClusterID(customObject), key.VMNumber(workerIndex))
+	deployment.Spec.Template.Spec.Volumes = append(deployment.Spec.Template.Spec.Volumes, key.HostVolumesToVolumes(caps.HostVolumes, claimName)...)
 }

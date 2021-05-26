@@ -12,7 +12,8 @@ const (
 	Name = "pvc"
 	// StorageClass is the storage class annotation persistent volume claims are
 	// configured with.
-	StorageClass = "g8s-storage"
+	StorageClass      = "g8s-storage"
+	LocalStorageClass = "local-storage"
 )
 
 // Config represents the configuration used to create a new PVC resource.
