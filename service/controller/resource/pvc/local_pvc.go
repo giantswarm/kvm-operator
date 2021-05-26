@@ -8,13 +8,17 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
+const (
+	LabelMountTag = "mount-tag"
+)
+
 func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVolumeList) ([]*corev1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []*corev1.PersistentVolumeClaim
 
 	for i, workerKVM := range customObject.Spec.KVM.Workers {
 		for _, hostVolume := range workerKVM.HostVolumes {
 			for _, pv := range pvsList.Items {
-				if pv.ObjectMeta.Labels["mount-tag"] == hostVolume.MountTag {
+				if pv.ObjectMeta.Labels[LabelMountTag] == hostVolume.MountTag {
 					persistentVolumeClaim := &corev1.PersistentVolumeClaim{
 						TypeMeta: metav1.TypeMeta{
 							Kind:       "PersistentVolumeClaim",

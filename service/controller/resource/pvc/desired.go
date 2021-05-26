@@ -38,7 +38,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 		// Retrieve the existing Persistent Volume in the management cluster to get the storage size
 		// and create the Persistent Volume Claims for the workload cluster's workers
-		pvsList, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
+		pvsList, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{LabelSelector: LabelMountTag})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
