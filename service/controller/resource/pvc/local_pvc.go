@@ -16,6 +16,8 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 	var persistentVolumeClaims []*corev1.PersistentVolumeClaim
 
 	for i, workerKVM := range customObject.Spec.KVM.Workers {
+		workerNode := customObject.Spec.Cluster.Workers[i]
+
 		for _, hostVolume := range workerKVM.HostVolumes {
 			for _, pv := range pvsList.Items {
 				if pv.ObjectMeta.Labels[LabelMountTag] == hostVolume.MountTag {
@@ -30,7 +32,7 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 								"app":      key.WorkerID,
 								"cluster":  key.ClusterID(customObject),
 								"customer": key.ClusterCustomer(customObject),
-								"node":     "",
+								"node":     workerNode.ID,
 							},
 							Annotations: map[string]string{
 								"volume.beta.kubernetes.io/storage-class": LocalStorageClass,
