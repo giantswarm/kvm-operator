@@ -22,7 +22,7 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 
 			pv := findPV(pvsList, hostVolume.MountTag)
 			if pv == nil {
-				return nil, microerror.Maskf(notFoundError, "mount tag %s is not available", hostVolume.MountTag)
+				return nil, microerror.Maskf(notFoundError, "mount tag %s is not available. the mount tag does not exist or is already bound to an existing claim", hostVolume.MountTag)
 			}
 
 			persistentVolumeClaim := &corev1.PersistentVolumeClaim{
@@ -64,6 +64,11 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 func findPV(pvsList *corev1.PersistentVolumeList, mountTag string) *corev1.PersistentVolume {
 	for _, pv := range pvsList.Items {
 		if pv.ObjectMeta.Labels[LabelMountTag] != mountTag {
+			continue
+		}
+
+		// discard the PV if is already bound to an existing PV
+		if pv.Spec.ClaimRef != nil {
 			continue
 		}
 

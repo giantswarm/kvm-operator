@@ -28,3 +28,12 @@ var notFoundError = &microerror.Error{
 func IsNotFound(err error) bool {
 	return microerror.Cause(err) == notFoundError
 }
+
+var isAlreadyBound = &microerror.Error{
+	Kind: "isAlreadyBound",
+}
+
+// IsAlreadyBound asserts isAlreadyBound.
+func IsAlreadyBound(err error) bool {
+	return microerror.Cause(err) == isAlreadyBound
+}
