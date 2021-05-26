@@ -391,7 +391,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			},
 		}
 		addCoreComponentsAnnotations(deployment, release)
-		// in case of adding additional properties to the worker deployment
 		addConditionalPropsToWorkerDeployment(deployment, customResource, i)
 
 		deployments = append(deployments, deployment)
