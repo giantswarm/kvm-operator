@@ -19,7 +19,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	var PVCs []*corev1.PersistentVolumeClaim
 
 	if key.StorageType(customObject) == "persistentVolume" {
-		r.logger.Debugf(ctx, "computing the new PVCs")
+		r.logger.Debugf(ctx, "computing the new master PVCs")
 
 		etcdPVCs, err := newEtcdPVCs(customObject)
 		if err != nil {
