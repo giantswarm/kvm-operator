@@ -12,7 +12,7 @@ const (
 	LabelMountTag = "mount-tag"
 )
 
-func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVolumeList) ([]*corev1.PersistentVolumeClaim, error) {
+func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVolumeList) []*corev1.PersistentVolumeClaim {
 	var persistentVolumeClaims []*corev1.PersistentVolumeClaim
 
 	for i, workerKVM := range customObject.Spec.KVM.Workers {
@@ -59,5 +59,5 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 		}
 	}
 
-	return persistentVolumeClaims, nil
+	return persistentVolumeClaims
 }

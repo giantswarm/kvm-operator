@@ -43,10 +43,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		}
 
-		localPVCs, err := newLocalPVCs(customObject, pvsList)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
+		localPVCs := newLocalPVCs(customObject, pvsList)
 
 		PVCs = append(PVCs, localPVCs...)
 
