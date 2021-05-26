@@ -47,7 +47,7 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 					},
 					Selector: &metav1.LabelSelector{
 						MatchLabels: map[string]string{
-							"mount-tag": hostVolume.MountTag,
+							LabelMountTag: hostVolume.MountTag,
 						},
 					},
 					StorageClassName: &localStorageClass,
