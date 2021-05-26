@@ -47,7 +47,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 		PVCs = append(PVCs, localPVCs...)
 
-		r.logger.Debugf(ctx, "computed the %d new PVCs", len(PVCs))
+		r.logger.Debugf(ctx, "computed the %d new worker PVCs", len(PVCs))
 	} else {
 		r.logger.Debugf(ctx, "not computing the new PVCs because no worker has defined host volumes")
 	}
