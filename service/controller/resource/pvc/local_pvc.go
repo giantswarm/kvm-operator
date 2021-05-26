@@ -35,6 +35,7 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 						key.LabelCluster:       key.ClusterID(customObject),
 						key.LabelOrganization:  key.ClusterCustomer(customObject),
 						key.LabelVersionBundle: key.OperatorVersion(customObject),
+						"node": 				customObject.Spec.Cluster.Workers[i].ID,
 					},
 				},
 				Spec: corev1.PersistentVolumeClaimSpec{
