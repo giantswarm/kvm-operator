@@ -277,6 +277,10 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
+func LocalWorkerPVCName(clusterID string, vmNumber, mountTag string) string {
+	return fmt.Sprintf("%s-%s-%s-%s", "local-pvc-worker", clusterID, vmNumber, mountTag)
+}
+
 // FindNodeCondition returns the condition of the given type from the node. The second return value indicates if the condition was found.
 func FindNodeCondition(node corev1.Node, conditionType corev1.NodeConditionType) (corev1.NodeCondition, bool) {
 	for _, condition := range node.Status.Conditions {
@@ -384,15 +388,16 @@ func HostVolumesToVolumeMounts(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVo
 	return volumeMounts
 }
 
-func HostVolumesToVolumes(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.Volume {
+func HostVolumesToVolumes(customObject v1alpha1.KVMConfig, nodeIndex int) []corev1.Volume {
 	var volumes []corev1.Volume
 
-	for _, hostVolume := range hostVolumes {
+	workerNode := customObject.Spec.KVM.Workers[nodeIndex]
+	for _, hostVolume := range workerNode.HostVolumes {
 		v := corev1.Volume{
 			Name: hostVolume.MountTag,
 			VolumeSource: corev1.VolumeSource{
-				HostPath: &corev1.HostPathVolumeSource{
-					Path: hostVolume.HostPath,
+				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: LocalWorkerPVCName(ClusterID(customObject), VMNumber(nodeIndex), hostVolume.MountTag),
 				},
 			},
 		}
@@ -653,6 +658,16 @@ func ShutdownDeferrerPollPath(customObject v1alpha1.KVMConfig) string {
 
 func StorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
+}
+
+func HasHostVolumes(customObject v1alpha1.KVMConfig) bool {
+	for _, worker := range customObject.Spec.KVM.Workers {
+		if len(worker.HostVolumes) > 0 {
+			return true
+		}
+	}
+
+	return false
 }
 
 func ToClusterEndpoint(v interface{}) (string, error) {
