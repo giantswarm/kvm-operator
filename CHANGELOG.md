@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.17.0] - 2021-05-27
+
 ### Added
 
 - Add flags for proxy settings and propagate them to ignition
@@ -103,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.16.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.17.0...HEAD
+[3.17.0]: https://github.com/giantswarm/kvm-operator/compare/v3.16.0...v3.17.0
 [3.16.0]: https://github.com/giantswarm/kvm-operator/compare/v3.15.0...v3.16.0
 [3.15.0]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...v3.15.0
 [3.14.0]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.14.0
