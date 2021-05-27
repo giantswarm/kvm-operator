@@ -5,7 +5,7 @@ var (
 	gitSHA      = "n/a"
 	name        = "kvm-operator"
 	source      = "https://github.com/giantswarm/kvm-operator"
-	version     = "3.17.0"
+	version     = "3.17.1-dev"
 )
 
 func Description() string {
