@@ -91,6 +91,12 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - persistentvolumes
+    verbs:
+      - list
+  - apiGroups:
+      - ""
+    resources:
       - endpoints
       - services
     verbs:
