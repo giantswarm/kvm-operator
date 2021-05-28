@@ -77,13 +77,13 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 }
 
 func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*crud.Patch, error) {
-	delete, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
+	deleteChange, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	patch := crud.NewPatch()
-	patch.SetDeleteChange(delete)
+	patch.SetDeleteChange(deleteChange)
 
 	return patch, nil
 }
@@ -100,7 +100,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.Debugf(ctx, "finding out which PVCs have to be deleted")
 
-	var pvcsToDelete []*corev1.PersistentVolumeClaim
+	var pvcsToDelete []corev1.PersistentVolumeClaim
 
 	for _, currentPVC := range currentPVCs {
 		if containsPVC(desiredPVCs, currentPVC) {

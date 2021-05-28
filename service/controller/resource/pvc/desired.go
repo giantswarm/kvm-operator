@@ -16,9 +16,9 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	var PVCs []*corev1.PersistentVolumeClaim
+	var PVCs []corev1.PersistentVolumeClaim
 
-	if key.StorageType(customObject) == "persistentVolume" {
+	if key.EtcdStorageType(customObject) == "persistentVolume" {
 		r.logger.Debugf(ctx, "computing the new master PVCs")
 
 		etcdPVCs, err := newEtcdPVCs(customObject)
@@ -43,7 +43,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		}
 
-		localPVCs, err := newLocalPVCs(customObject, pvsList)
+		localPVCs, err := newLocalPVCs(customObject, pvsList.Items)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

@@ -3,6 +3,7 @@ package pvc
 import (
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/to"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -13,15 +14,14 @@ const (
 	LabelMountTag = "mount-tag"
 )
 
-func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVolumeList) ([]*corev1.PersistentVolumeClaim, error) {
-	var persistentVolumeClaims []*corev1.PersistentVolumeClaim
-	localStorageClass := LocalStorageClass
+func newLocalPVCs(customObject v1alpha1.KVMConfig, persistentVolumes []corev1.PersistentVolume) ([]corev1.PersistentVolumeClaim, error) {
+	var persistentVolumeClaims []corev1.PersistentVolumeClaim
 
 	for i, workerKVM := range customObject.Spec.KVM.Workers {
 		for _, hostVolume := range workerKVM.HostVolumes {
-			pv := findPV(pvsList, hostVolume.MountTag)
-			if pv == nil {
-				return nil, microerror.Maskf(notFoundError, "mount tag %s is not available", hostVolume.MountTag)
+			pv, err := findPVByMountTag(persistentVolumes, hostVolume.MountTag)
+			if err != nil {
+				return nil, microerror.Mask(err)
 			}
 
 			// discard the PV if is already bound to an existing PV
@@ -29,7 +29,7 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 				return nil, microerror.Maskf(isAlreadyBound, "persistent volume %s is already bound to %s", pv.Name, pv.Spec.ClaimRef.Name)
 			}
 
-			persistentVolumeClaim := &corev1.PersistentVolumeClaim{
+			persistentVolumeClaim := corev1.PersistentVolumeClaim{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: key.LocalWorkerPVCName(key.ClusterID(customObject), key.VMNumber(i), hostVolume.MountTag),
 					Labels: map[string]string{
@@ -52,7 +52,7 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 							LabelMountTag: hostVolume.MountTag,
 						},
 					},
-					StorageClassName: &localStorageClass,
+					StorageClassName: to.StringP(LocalStorageClass),
 				},
 			}
 
@@ -63,14 +63,14 @@ func newLocalPVCs(customObject v1alpha1.KVMConfig, pvsList *corev1.PersistentVol
 	return persistentVolumeClaims, nil
 }
 
-func findPV(pvsList *corev1.PersistentVolumeList, mountTag string) *corev1.PersistentVolume {
-	for _, pv := range pvsList.Items {
-		if pv.ObjectMeta.Labels[LabelMountTag] != mountTag {
+func findPVByMountTag(persistentVolumes []corev1.PersistentVolume, mountTag string) (corev1.PersistentVolume, error) {
+	for _, persistentVolume := range persistentVolumes {
+		if persistentVolume.ObjectMeta.Labels[LabelMountTag] != mountTag {
 			continue
 		}
 
-		return &pv
+		return persistentVolume, nil
 	}
 
-	return nil
+	return corev1.PersistentVolume{}, microerror.Maskf(notFoundError, "mount tag %s not found", mountTag)
 }

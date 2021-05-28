@@ -626,16 +626,6 @@ func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	return ports
 }
 
-func PVCNames(customObject v1alpha1.KVMConfig) []string {
-	var names []string
-
-	for i := range customObject.Spec.Cluster.Masters {
-		names = append(names, EtcdPVCName(ClusterID(customObject), VMNumber(i)))
-	}
-
-	return names
-}
-
 func ReleaseVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.ReleaseVersion]
 }
@@ -656,7 +646,7 @@ func ShutdownDeferrerPollPath(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("%s/v1/defer/", ShutdownDeferrerListenAddress(customObject))
 }
 
-func StorageType(customObject v1alpha1.KVMConfig) string {
+func EtcdStorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
 }
 
