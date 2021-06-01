@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Reconcile only deployments that are managed by kvm-operator
+
 ## [3.17.0] - 2021-05-27
 
 ### Added
