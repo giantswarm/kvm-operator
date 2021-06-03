@@ -6,6 +6,7 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/finalizerskeptcontext"
+	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/resourcecanceledcontext"
 	"github.com/giantswarm/to"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -15,7 +16,7 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
-func (r *Resource) getDesiredLocalPVCs(ctx context.Context, customObject v1alpha1.KVMConfig) ([]corev1.PersistentVolumeClaim, error) {
+func (r *Resource) getDesiredWorkerPVCs(ctx context.Context, customObject v1alpha1.KVMConfig) ([]corev1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []corev1.PersistentVolumeClaim
 	namespace := key.ClusterNamespace(customObject)
 
@@ -27,16 +28,16 @@ func (r *Resource) getDesiredLocalPVCs(ctx context.Context, customObject v1alpha
 			_, err := r.k8sClient.AppsV1().Deployments(namespace).Get(ctx, deploymentName, metav1.GetOptions{})
 			if errors.IsNotFound(err) {
 				// the cluster is being deleted and the worker deployment doesn't exist
-				// avoid adding the worker's PVCs to the desired state so they will be deleted
 				r.logger.Debugf(ctx, "worker deployment %#q not found, not adding pvcs to desired state", deploymentName)
-				continue
 			} else if err != nil {
 				return nil, microerror.Mask(err)
+			} else {
+				// deployment still exists, keep finalizer, cancel, and delete on next reconciliation
+				r.logger.Debugf(ctx, "keeping finalizer and canceling as deployment %#q still exists", deploymentName)
+				finalizerskeptcontext.SetKept(ctx)
+				resourcecanceledcontext.SetCanceled(ctx)
+				return nil, nil
 			}
-
-			// deployment still exists, keep finalizer and delete on next reconciliation
-			r.logger.Debugf(ctx, "keeping finalizer as deployment %#q still exists", deploymentName)
-			finalizerskeptcontext.SetKept(ctx)
 		}
 
 		for _, hostVolume := range workerKVM.HostVolumes {

@@ -95,6 +95,7 @@ rules:
       - persistentvolumes
     verbs:
       - list
+      - update
   - apiGroups:
       - ""
     resources:

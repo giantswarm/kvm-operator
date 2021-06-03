@@ -29,13 +29,13 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 		r.logger.Debugf(ctx, "computed the %d new master PVCs", len(PVCs))
 	} else {
-		r.logger.Debugf(ctx, "not computing the new PVCs because storage type is not 'persistentVolume'")
+		r.logger.Debugf(ctx, "not computing the new master PVCs because storage type is not 'persistentVolume'")
 	}
 
 	if key.HasHostVolumes(customObject) {
 		r.logger.Debugf(ctx, "computing the new worker PVCs")
 
-		localPVCs, err := r.getDesiredLocalPVCs(ctx, customObject)
+		localPVCs, err := r.getDesiredWorkerPVCs(ctx, customObject)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
