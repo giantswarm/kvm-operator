@@ -25,7 +25,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(pvcsToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the PVCs in the Kubernetes API")
 
-		pvsList, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{
+		persistentVolumes, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{
 			LabelSelector: key.LabelMountTag,
 		})
 		if err != nil {
@@ -47,28 +47,23 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 				continue
 			}
 
-			var boundPV *corev1.PersistentVolume
-			for _, pv := range pvsList.Items {
-				ref := pv.Spec.ClaimRef
-				if ref.Name != pvc.Name && ref.Namespace != namespace {
-					continue
+			// Find PV with claim pointing to the deleted PVC
+			for _, persistentVolume := range persistentVolumes.Items {
+				if persistentVolume.Spec.ClaimRef != nil &&
+					persistentVolume.Spec.ClaimRef.Name == pvc.Name &&
+					persistentVolume.Spec.ClaimRef.Namespace == namespace {
+					persistentVolume := persistentVolume.DeepCopy()
+					// Remove the claim
+					persistentVolume.Spec.ClaimRef = nil
+					_, err = r.k8sClient.CoreV1().PersistentVolumes().Update(ctx, persistentVolume, metav1.UpdateOptions{})
+					if err != nil {
+						return microerror.Mask(err)
+					}
+
+					r.logger.Debugf(ctx, "unbound PV %#q from PVC %#q", persistentVolume.Name, pvc.Name)
+					break
 				}
-
-				boundPV = pv.DeepCopy()
 			}
-
-			if boundPV == nil || boundPV.Spec.ClaimRef == nil {
-				// not found or not bound
-				continue
-			}
-
-			boundPV.Spec.ClaimRef = nil
-			_, err = r.k8sClient.CoreV1().PersistentVolumes().Update(ctx, boundPV, metav1.UpdateOptions{})
-			if err != nil {
-				return microerror.Mask(err)
-			}
-
-			r.logger.Debugf(ctx, "unbound PV %s from pvc %s", boundPV.Name, pvc.Name)
 		}
 
 		r.logger.Debugf(ctx, "deleted the PVCs in the Kubernetes API")

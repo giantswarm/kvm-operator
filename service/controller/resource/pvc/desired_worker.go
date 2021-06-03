@@ -28,12 +28,14 @@ func (r *Resource) getDesiredLocalPVCs(ctx context.Context, customObject v1alpha
 			if errors.IsNotFound(err) {
 				// the cluster is being deleted and the worker deployment doesn't exist
 				// avoid adding the worker's PVCs to the desired state so they will be deleted
+				r.logger.Debugf(ctx, "worker deployment %#q not found, not adding pvcs to desired state", deploymentName)
 				continue
 			} else if err != nil {
 				return nil, microerror.Mask(err)
 			}
 
 			// deployment still exists, keep finalizer and delete on next reconciliation
+			r.logger.Debugf(ctx, "keeping finalizer as deployment %#q still exists", deploymentName)
 			finalizerskeptcontext.SetKept(ctx)
 		}
 
