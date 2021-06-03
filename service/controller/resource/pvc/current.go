@@ -20,7 +20,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	namespace := key.ClusterNamespace(customObject)
 	pvcs, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("%s=%s", "cluster", key.ClusterID(customObject)),
+		LabelSelector: fmt.Sprintf("%s=%s", key.LegacyLabelCluster, key.ClusterID(customObject)),
 	})
 	if err != nil {
 		return nil, microerror.Mask(err)

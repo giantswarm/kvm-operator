@@ -109,6 +109,7 @@ const (
 	LabelCluster       = "giantswarm.io/cluster"
 	LabelCustomer      = "customer"
 	LabelManagedBy     = "giantswarm.io/managed-by"
+	LabelMountTag      = "mount-tag"
 	LabelOrganization  = "giantswarm.io/organization"
 	LabelVersionBundle = "giantswarm.io/version-bundle"
 

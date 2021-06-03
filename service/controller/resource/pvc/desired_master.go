@@ -15,7 +15,7 @@ const (
 	EtcdPVSize = "15Gi"
 )
 
-func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]corev1.PersistentVolumeClaim, error) {
+func (r *Resource) getDesiredMasterPVCs(customObject v1alpha1.KVMConfig) ([]corev1.PersistentVolumeClaim, error) {
 	var persistentVolumeClaims []corev1.PersistentVolumeClaim
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
@@ -28,10 +28,12 @@ func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]corev1.PersistentVolumeClai
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 				Labels: map[string]string{
-					"app":      key.MasterID,
-					"cluster":  key.ClusterID(customObject),
-					"customer": key.ClusterCustomer(customObject),
-					"node":     masterNode.ID,
+					key.LabelCustomer:      key.ClusterCustomer(customObject),
+					key.LabelApp:           key.MasterID,
+					key.LabelCluster:       key.ClusterID(customObject),
+					key.LegacyLabelCluster: key.ClusterID(customObject),
+					key.LabelVersionBundle: key.OperatorVersion(customObject),
+					"node":                 masterNode.ID,
 				},
 				Annotations: map[string]string{
 					"volume.beta.kubernetes.io/storage-class": EtcdStorageClass,

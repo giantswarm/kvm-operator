@@ -26,8 +26,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 		namespace := key.ClusterNamespace(customObject)
 		for _, persistentVolumeClaim := range pvcsToCreate {
-			toCreate := persistentVolumeClaim
-			_, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Create(ctx, &toCreate, v1.CreateOptions{})
+			_, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Create(ctx, persistentVolumeClaim.DeepCopy(), v1.CreateOptions{})
 			if apierrors.IsAlreadyExists(err) {
 				// fall through
 			} else if err != nil {

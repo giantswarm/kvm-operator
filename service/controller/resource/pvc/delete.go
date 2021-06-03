@@ -25,7 +25,9 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(pvcsToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the PVCs in the Kubernetes API")
 
-		pvsList, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{LabelSelector: LabelMountTag})
+		pvsList, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{
+			LabelSelector: key.LabelMountTag,
+		})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -56,6 +58,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 
 			if boundPV == nil || boundPV.Spec.ClaimRef == nil {
+				// not found or not bound
 				continue
 			}
 
