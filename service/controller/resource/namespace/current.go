@@ -81,6 +81,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		}
 
+		// Ensure PVCs have been deleted so that bound PVs are properly cleaned up.
 		volumeClaims, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).List(ctx, metav1.ListOptions{
 			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
 		})

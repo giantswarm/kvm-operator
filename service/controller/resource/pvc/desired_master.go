@@ -7,6 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -28,6 +29,7 @@ func (r *Resource) getDesiredMasterPVCs(customObject v1alpha1.KVMConfig) ([]core
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 				Labels: map[string]string{
+					label.ManagedBy:        key.OperatorName,
 					key.LabelCustomer:      key.ClusterCustomer(customObject),
 					key.LabelApp:           key.MasterID,
 					key.LabelCluster:       key.ClusterID(customObject),

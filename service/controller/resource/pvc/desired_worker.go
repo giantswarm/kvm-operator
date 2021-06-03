@@ -13,6 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
+	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
@@ -66,6 +67,7 @@ func (r *Resource) getDesiredWorkerPVCs(ctx context.Context, customObject v1alph
 				ObjectMeta: metav1.ObjectMeta{
 					Name: claimName,
 					Labels: map[string]string{
+						label.ManagedBy:        key.OperatorName,
 						key.LabelCustomer:      key.ClusterCustomer(customObject),
 						key.LabelApp:           key.WorkerID,
 						key.LabelCluster:       key.ClusterID(customObject),
