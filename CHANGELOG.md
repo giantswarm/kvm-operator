@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.17.2] - 2021-06-07
 
+### Fixed
+
+- Remove reference from worker PVs on cluster deletion so they can be resued.
+
 ## [3.17.1] - 2021-06-01
 
 ### Changed
