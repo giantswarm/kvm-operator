@@ -280,9 +280,9 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		namespaceResource,
 		serviceAccountResource,
 		configMapResource,
+		pvcResource,
 		deploymentResource,
 		ingressResource,
-		pvcResource,
 		serviceResource,
 		nodeControllerResource,
 	}

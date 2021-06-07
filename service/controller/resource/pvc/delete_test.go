@@ -28,8 +28,8 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState:     []*corev1.PersistentVolumeClaim{},
-			DesiredState:     []*corev1.PersistentVolumeClaim{},
+			CurrentState:     []corev1.PersistentVolumeClaim{},
+			DesiredState:     []corev1.PersistentVolumeClaim{},
 			ExpectedPVCNames: []string{},
 		},
 
@@ -43,14 +43,14 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.PersistentVolumeClaim{
+			CurrentState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
 					},
 				},
 			},
-			DesiredState: []*corev1.PersistentVolumeClaim{
+			DesiredState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -72,8 +72,8 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.PersistentVolumeClaim{},
-			DesiredState: []*corev1.PersistentVolumeClaim{
+			CurrentState: []corev1.PersistentVolumeClaim{},
+			DesiredState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -93,8 +93,8 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.PersistentVolumeClaim{},
-			DesiredState: []*corev1.PersistentVolumeClaim{
+			CurrentState: []corev1.PersistentVolumeClaim{},
+			DesiredState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -119,14 +119,14 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.PersistentVolumeClaim{
+			CurrentState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
 					},
 				},
 			},
-			DesiredState:     []*corev1.PersistentVolumeClaim{},
+			DesiredState:     []corev1.PersistentVolumeClaim{},
 			ExpectedPVCNames: []string{},
 		},
 
@@ -140,7 +140,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.PersistentVolumeClaim{
+			CurrentState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -152,7 +152,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState:     []*corev1.PersistentVolumeClaim{},
+			DesiredState:     []corev1.PersistentVolumeClaim{},
 			ExpectedPVCNames: []string{},
 		},
 
@@ -167,7 +167,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.PersistentVolumeClaim{
+			CurrentState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -179,7 +179,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*corev1.PersistentVolumeClaim{
+			DesiredState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -218,7 +218,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			CurrentState: []*corev1.PersistentVolumeClaim{
+			CurrentState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -240,7 +240,7 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 					},
 				},
 			},
-			DesiredState: []*corev1.PersistentVolumeClaim{
+			DesiredState: []corev1.PersistentVolumeClaim{
 				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pvc-1",
@@ -277,9 +277,9 @@ func Test_Resource_PVC_newDeleteChange(t *testing.T) {
 			t.Fatalf("case %d expected %#v got %#v", i+1, nil, err)
 		}
 
-		configMaps, ok := result.([]*corev1.PersistentVolumeClaim)
+		configMaps, ok := result.([]corev1.PersistentVolumeClaim)
 		if !ok {
-			t.Fatalf("case %d expected %T got %T", i+1, []*corev1.PersistentVolumeClaim{}, result)
+			t.Fatalf("case %d expected %T got %T", i+1, []corev1.PersistentVolumeClaim{}, result)
 		}
 
 		if len(configMaps) != len(tc.ExpectedPVCNames) {

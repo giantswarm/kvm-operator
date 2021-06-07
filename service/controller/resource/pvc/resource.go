@@ -10,9 +10,9 @@ import (
 const (
 	// Name is the identifier of the resource.
 	Name = "pvc"
-	// StorageClass is the storage class annotation persistent volume claims are
+	// EtcdStorageClass is the storage class annotation persistent volume claims are
 	// configured with.
-	StorageClass      = "g8s-storage"
+	EtcdStorageClass  = "g8s-storage"
 	LocalStorageClass = "local-storage"
 )
 
@@ -63,7 +63,7 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func containsPVC(list []*corev1.PersistentVolumeClaim, item *corev1.PersistentVolumeClaim) bool {
+func containsPVC(list []corev1.PersistentVolumeClaim, item corev1.PersistentVolumeClaim) bool {
 	for _, l := range list {
 		if l.Name == item.Name {
 			return true
@@ -73,14 +73,14 @@ func containsPVC(list []*corev1.PersistentVolumeClaim, item *corev1.PersistentVo
 	return false
 }
 
-func toPVCs(v interface{}) ([]*corev1.PersistentVolumeClaim, error) {
+func toPVCs(v interface{}) ([]corev1.PersistentVolumeClaim, error) {
 	if v == nil {
 		return nil, nil
 	}
 
-	PVCs, ok := v.([]*corev1.PersistentVolumeClaim)
+	PVCs, ok := v.([]corev1.PersistentVolumeClaim)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*corev1.PersistentVolumeClaim{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []corev1.PersistentVolumeClaim{}, v)
 	}
 
 	return PVCs, nil
