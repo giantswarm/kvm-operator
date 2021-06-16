@@ -41,9 +41,8 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 				return microerror.Mask(err)
 			}
 
-			// in case of local storage we need to manually remove the claim
-			storageClassName := *pvc.Spec.StorageClassName
-			if storageClassName != LocalStorageClass {
+			// the following logic only applies to host volume PVCs (local storage class), etcd PVCs are automatically managed
+			if pvc.Spec.StorageClassName == nil || *pvc.Spec.StorageClassName != LocalStorageClass {
 				continue
 			}
 
