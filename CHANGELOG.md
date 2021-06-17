@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.17.3] - 2021-06-17
 
+### Fixed
+
+- Avoid panic during deletion of clusters with host volumes
+
 ## [3.17.2] - 2021-06-07
 
 ### Fixed
