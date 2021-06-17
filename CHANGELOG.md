@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.17.3] - 2021-06-17
+
+### Fixed
+
+- Avoid panic during deletion of clusters with host volumes
+
 ## [3.17.2] - 2021-06-07
 
 ### Fixed
@@ -117,7 +123,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.17.2...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.17.3...HEAD
+[3.17.3]: https://github.com/giantswarm/kvm-operator/compare/v3.17.2...v3.17.3
 [3.17.2]: https://github.com/giantswarm/kvm-operator/compare/v3.17.1...v3.17.2
 [3.17.1]: https://github.com/giantswarm/kvm-operator/compare/v3.17.0...v3.17.1
 [3.17.0]: https://github.com/giantswarm/kvm-operator/compare/v3.16.0...v3.17.0
