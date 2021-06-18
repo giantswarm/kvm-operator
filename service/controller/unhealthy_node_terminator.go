@@ -19,7 +19,8 @@ type UnhealthyNodeTerminatorConfig struct {
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 
-	ProjectName string
+	AlwaysTerminate bool
+	ProjectName     string
 }
 
 type UnhealthyNodeTerminator struct {
