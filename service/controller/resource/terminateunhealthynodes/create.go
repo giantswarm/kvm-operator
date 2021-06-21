@@ -26,10 +26,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// check for annotation enabling the node auto repair feature
 	if _, ok := customResource.Annotations[annotation.NodeTerminateUnhealthy]; !ok {
 		if !r.alwaysTerminate {
-			r.logger.Debugf(ctx, "terminate unhealthy node feature is not enabled for this cluster")
+			r.logger.Debugf(ctx, "terminate unhealthy node annotation not found, skipping reconciliation")
 			return nil
 		}
-		r.logger.Debugf(ctx, "terminate unhealthy node feature is enabled by default so ignoring annotation")
+		r.logger.Debugf(ctx, "terminate unhealthy node annotation not found but feature is enabled by default")
 	}
 
 	var tcCtrlClient client.Client
