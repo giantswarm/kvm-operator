@@ -41,7 +41,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: %s", err)
 		}
 
-		storageType := key.StorageType(customResource)
+		storageType := key.EtcdStorageType(customResource)
 
 		// During migration, some TPOs do not have storage type set.
 		// This specifies a default, until all TPOs have the correct storage type set.
@@ -70,7 +70,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 				},
 			}
 		} else {
-			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.StorageType(customResource))
+			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.EtcdStorageType(customResource))
 		}
 		deployment := &v1.Deployment{
 			TypeMeta: metav1.TypeMeta{

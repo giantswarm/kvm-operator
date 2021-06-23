@@ -26,7 +26,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var currentDeployments []*v1.Deployment
 	{
 		namespace := key.ClusterNamespace(customResource)
-		deploymentList, err := r.k8sClient.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{})
+		labelSelector := metav1.ListOptions{LabelSelector: key.LabelManagedBy + "=" + key.OperatorName}
+		deploymentList, err := r.k8sClient.AppsV1().Deployments(namespace).List(ctx, labelSelector)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {

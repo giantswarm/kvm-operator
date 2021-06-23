@@ -25,8 +25,8 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 		r.logger.Debugf(ctx, "creating the PVCs in the Kubernetes API")
 
 		namespace := key.ClusterNamespace(customObject)
-		for _, PVC := range pvcsToCreate {
-			_, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Create(ctx, PVC, v1.CreateOptions{})
+		for _, persistentVolumeClaim := range pvcsToCreate {
+			_, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Create(ctx, persistentVolumeClaim.DeepCopy(), v1.CreateOptions{})
 			if apierrors.IsAlreadyExists(err) {
 				// fall through
 			} else if err != nil {
@@ -54,7 +54,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.Debugf(ctx, "finding out which PVCs have to be created")
 
-	var pvcsToCreate []*corev1.PersistentVolumeClaim
+	var pvcsToCreate []corev1.PersistentVolumeClaim
 
 	for _, desiredPVC := range desiredPVCs {
 		if !containsPVC(currentPVCs, desiredPVC) {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
-	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
+	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/finalizerskeptcontext"
+	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/resourcecanceledcontext"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -72,18 +72,29 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// we get an empty list here after the delete event got replayed. Then we just
 	// remove the namespace as usual.
 	if key.IsDeleted(&customObject) {
-		n := key.ClusterNamespace(customObject)
+		namespace := key.ClusterNamespace(customObject)
 
-		lo := metav1.ListOptions{
+		deployments, err := r.k8sClient.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{
 			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
-		}
-
-		list, err := r.k8sClient.AppsV1().Deployments(n).List(ctx, lo)
+		})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
-		if len(list.Items) != 0 {
-			r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing deployments")
+
+		// Ensure PVCs have been deleted so that bound PVs are properly cleaned up.
+		volumeClaims, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).List(ctx, metav1.ListOptions{
+			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
+		})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		if len(deployments.Items) != 0 || len(volumeClaims.Items) != 0 {
+			if len(deployments.Items) != 0 {
+				r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing deployments")
+			} else {
+				r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing PVCs")
+			}
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
 			r.logger.Debugf(ctx, "canceling resource")
