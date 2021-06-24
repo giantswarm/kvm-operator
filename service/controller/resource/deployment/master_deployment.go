@@ -222,11 +222,15 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									},
 									{
 										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FILE",
-										Value: "/var/lib/containervmm/ignition/ignition",
+										Value: "/var/lib/containervmm/ignition/user_data",
 									},
 									{
 										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FORMAT",
 										Value: "base64-compressed",
+									},
+									{
+										Name:  "CONTAINERVMM_GUEST_HOST_VOLUMES",
+										Value: "etcdshare:/var/lib/containervmm/etcd",
 									},
 								},
 								Resources: corev1.ResourceRequirements{
