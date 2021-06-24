@@ -36,7 +36,7 @@ func newWorkerService(customObject v1alpha1.KVMConfig) *corev1.Service {
 			Type:  corev1.ServiceTypeNodePort,
 			Ports: key.PortMappings(customObject),
 			Selector: map[string]string{
-				key.LabelApp:     key.MasterID,
+				key.LabelApp:     key.WorkerID,
 				key.LabelCluster: key.ClusterID(customObject),
 			},
 		},
