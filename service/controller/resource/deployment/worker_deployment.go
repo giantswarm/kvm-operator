@@ -202,8 +202,8 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										Value: containerDistroVersion,
 									},
 									{
-										Name:  "CONTAINERVMM_FLATCAR_IGNITION",
-										Value: "/var/lib/containervmm/ignition/ignition",
+										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FILE",
+										Value: "/var/lib/containervmm/ignition/user_data",
 									},
 									{
 										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FORMAT",
@@ -259,6 +259,10 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 
 func addHostVolumes(deployment *v1.Deployment, customObject v1alpha1.KVMConfig, workerIndex int) {
 	caps := customObject.Spec.KVM.Workers[workerIndex]
+
+	if len(caps.HostVolumes) == 0 {
+		return
+	}
 
 	for i, container := range deployment.Spec.Template.Spec.Containers {
 		if container.Name == key.K8SKVMContainerName {
