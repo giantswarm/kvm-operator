@@ -86,7 +86,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 					ObjectMeta: metav1.ObjectMeta{
 						Annotations: map[string]string{
 							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customResource),
-							key.AnnotationIp:            "",
 							key.AnnotationService:       key.WorkerID,
 							key.AnnotationPodDrained:    "False",
 							key.AnnotationVersionBundle: key.OperatorVersion(customResource),
