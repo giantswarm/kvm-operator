@@ -93,6 +93,10 @@ func isServiceModified(a, b *corev1.Service) bool {
 		return true
 	}
 
+	if !reflect.DeepEqual(a.Spec.Selector, b.Spec.Selector) {
+		return true
+	}
+
 	if !reflect.DeepEqual(a.Labels, b.Labels) {
 		return true
 	}
