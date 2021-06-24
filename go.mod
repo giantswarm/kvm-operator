@@ -1,6 +1,6 @@
-module github.com/giantswarm/kvm-operator
+module github.com/giantswarm/kvm-operator/v4
 
-go 1.15
+go 1.16
 
 require (
 	github.com/giantswarm/apiextensions/v3 v3.26.0

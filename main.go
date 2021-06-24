@@ -10,10 +10,10 @@ import (
 	"github.com/giantswarm/versionbundle"
 	"github.com/spf13/viper"
 
-	"github.com/giantswarm/kvm-operator/flag"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/server"
-	"github.com/giantswarm/kvm-operator/service"
+	"github.com/giantswarm/kvm-operator/v4/flag"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/server"
+	"github.com/giantswarm/kvm-operator/v4/service"
 )
 
 var (

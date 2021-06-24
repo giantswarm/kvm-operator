@@ -4,7 +4,7 @@ import (
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	v1 "k8s.io/api/apps/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 var coreComponents = []string{"calico", "containerlinux", "etcd", "kubernetes"}

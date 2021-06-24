@@ -13,8 +13,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) getDesiredWorkerPVCs(ctx context.Context, customObject v1alpha1.KVMConfig) ([]corev1.PersistentVolumeClaim, error) {

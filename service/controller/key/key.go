@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 )
 
 const (

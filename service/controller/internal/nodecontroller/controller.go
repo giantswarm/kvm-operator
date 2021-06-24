@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 const (
