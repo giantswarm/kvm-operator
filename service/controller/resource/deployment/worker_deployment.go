@@ -117,19 +117,13 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 						Volumes: []corev1.Volume{
 							{
-								Name: "ignition-cm",
+								Name: "ignition",
 								VolumeSource: corev1.VolumeSource{
 									ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{
 											Name: key.ConfigMapName(customResource, workerNode, key.WorkerID),
 										},
 									},
-								},
-							},
-							{
-								Name: "ignition",
-								VolumeSource: corev1.VolumeSource{
-									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
 							},
 							{
@@ -165,33 +159,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						},
 						Containers: []corev1.Container{
 							{
-								Name:            "k8s-endpoint-updater",
-								Image:           key.K8SEndpointUpdaterDocker,
-								ImagePullPolicy: corev1.PullIfNotPresent,
-								Command: []string{
-									"/opt/k8s-endpoint-updater",
-									"update",
-									"--provider.bridge.name=" + key.NetworkBridgeName(customResource),
-									"--service.kubernetes.cluster.namespace=" + key.ClusterNamespace(customResource),
-									"--service.kubernetes.cluster.service=" + key.WorkerID,
-									"--service.kubernetes.inCluster=true",
-								},
-								SecurityContext: &corev1.SecurityContext{
-									Privileged: &privileged,
-								},
-								Env: []corev1.EnvVar{
-									{
-										Name: "POD_NAME",
-										ValueFrom: &corev1.EnvVarSource{
-											FieldRef: &corev1.ObjectFieldSelector{
-												APIVersion: "v1",
-												FieldPath:  "metadata.name",
-											},
-										},
-									},
-								},
-							},
-							{
 								Name:            key.K8SKVMContainerName,
 								Image:           key.K8SKVMDockerImage,
 								ImagePullPolicy: corev1.PullIfNotPresent,
@@ -205,7 +172,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								},
 								Env: []corev1.EnvVar{
 									{
-										Name: "GUEST_NAME",
+										Name: "CONTAINERVMM_GUEST_NAME",
 										ValueFrom: &corev1.EnvVarSource{
 											FieldRef: &corev1.ObjectFieldSelector{
 												APIVersion: "v1",
@@ -214,29 +181,33 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										},
 									},
 									{
-										Name: "GUEST_MEMORY",
+										Name: "CONTAINERVMM_GUEST_MEMORY",
 										// TODO provide memory like disk as float64 and format here.
 										Value: capabilities.Memory,
 									},
 									{
-										Name:  "GUEST_CPUS",
+										Name:  "CONTAINERVMM_GUEST_CPUS",
 										Value: fmt.Sprintf("%d", capabilities.CPUs),
 									},
 									{
-										Name:  "GUEST_ROOT_DISK_SIZE",
+										Name:  "CONTAINERVMM_GUEST_ROOT_DISK_SIZE",
 										Value: key.DefaultOSDiskSize,
 									},
 									{
-										Name:  "FLATCAR_CHANNEL",
+										Name:  "CONTAINERVMM_FLATCAR_CHANNEL",
 										Value: key.FlatcarChannel,
 									},
 									{
-										Name:  "FLATCAR_VERSION",
+										Name:  "CONTAINERVMM_FLATCAR_VERSION",
 										Value: containerDistroVersion,
 									},
 									{
-										Name:  "FLATCAR_IGNITION",
+										Name:  "CONTAINERVMM_FLATCAR_IGNITION",
 										Value: "/var/lib/containervmm/ignition/ignition",
+									},
+									{
+										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FORMAT",
+										Value: "base64-compressed",
 									},
 								},
 								Resources: corev1.ResourceRequirements{
@@ -269,28 +240,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									{
 										Name:      "dev-net-tun",
 										MountPath: "/dev/net/tun",
-									},
-								},
-							},
-						},
-						InitContainers: []corev1.Container{
-							{
-								Name:  "ignition",
-								Image: key.K8SKVMDockerImage,
-								Command: []string{
-									"cp",
-									"/tmp/ignition/user_data",
-									"/var/lib/containervmm/ignition/ignition",
-								},
-								ImagePullPolicy: corev1.PullIfNotPresent,
-								VolumeMounts: []corev1.VolumeMount{
-									{
-										Name:      "ignition",
-										MountPath: "/var/lib/containervmm/ignition",
-									},
-									{
-										Name:      "ignition-cm",
-										MountPath: "/tmp/ignition",
 									},
 								},
 							},
