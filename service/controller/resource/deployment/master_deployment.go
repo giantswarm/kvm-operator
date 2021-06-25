@@ -317,7 +317,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							{
 								Name:            "k8s-kvm-health",
 								Image:           key.K8SKVMHealthDocker,
-								ImagePullPolicy: corev1.PullAlways,
+								ImagePullPolicy: corev1.PullIfNotPresent,
 								Env: []corev1.EnvVar{
 									{
 										Name:  "CHECK_K8S_API",
@@ -332,7 +332,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 							{
 								Name:            "shutdown-deferrer",
 								Image:           key.ShutdownDeferrerDocker,
-								ImagePullPolicy: corev1.PullAlways,
+								ImagePullPolicy: corev1.PullIfNotPresent,
 								Args: []string{
 									"daemon",
 									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customResource),

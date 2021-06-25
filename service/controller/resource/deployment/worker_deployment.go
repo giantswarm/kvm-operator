@@ -288,10 +288,6 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								ImagePullPolicy: corev1.PullIfNotPresent,
 								Env: []corev1.EnvVar{
 									{
-										Name:  "CHECK_K8S_API",
-										Value: key.CheckK8sApi,
-									},
-									{
 										Name:  "LISTEN_ADDRESS",
 										Value: key.HealthListenAddress(customResource),
 									},
