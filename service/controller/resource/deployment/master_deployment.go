@@ -10,6 +10,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/giantswarm/kvm-operator/pkg/label"
 	"github.com/giantswarm/kvm-operator/pkg/project"
@@ -133,6 +134,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 						ServiceAccountName:            key.ServiceAccountName(customResource),
 						TerminationGracePeriodSeconds: &podDeletionGracePeriod,
 						Volumes: []corev1.Volume{
+							etcdVolume,
 							{
 								Name: "ignition",
 								VolumeSource: corev1.VolumeSource{
@@ -143,7 +145,6 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									},
 								},
 							},
-							etcdVolume,
 							{
 								Name: "images",
 								VolumeSource: corev1.VolumeSource{
@@ -190,6 +191,26 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								},
 								Env: []corev1.EnvVar{
 									{
+										Name:  "CONTAINERVMM_GUEST_CPUS",
+										Value: fmt.Sprintf("%d", capabilities.CPUs),
+									},
+									{
+										Name:  "CONTAINERVMM_FLATCAR_VERSION",
+										Value: containerDistroVersion,
+									},
+									{
+										Name:  "CONTAINERVMM_FLATCAR_CHANNEL",
+										Value: key.FlatcarChannel,
+									},
+									{
+										Name:  "CONTAINERVMM_GUEST_ROOT_DISK_SIZE",
+										Value: key.DefaultOSDiskSize,
+									},
+									{
+										Name:  "CONTAINERVMM_GUEST_DNS_SERVERS",
+										Value: dnsServers,
+									},
+									{
 										Name: "CONTAINERVMM_GUEST_NAME",
 										ValueFrom: &corev1.EnvVarSource{
 											FieldRef: &corev1.ObjectFieldSelector{
@@ -204,32 +225,56 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										Value: capabilities.Memory,
 									},
 									{
-										Name:  "CONTAINERVMM_GUEST_CPUS",
-										Value: fmt.Sprintf("%d", capabilities.CPUs),
-									},
-									{
-										Name:  "CONTAINERVMM_GUEST_ROOT_DISK_SIZE",
-										Value: key.DefaultOSDiskSize,
-									},
-									{
-										Name:  "CONTAINERVMM_FLATCAR_CHANNEL",
-										Value: key.FlatcarChannel,
-									},
-									{
-										Name:  "CONTAINERVMM_FLATCAR_VERSION",
-										Value: containerDistroVersion,
+										Name:  "CONTAINERVMM_GUEST_NTP_SERVERS",
+										Value: ntpServers,
 									},
 									{
 										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FILE",
-										Value: "/var/lib/containervmm/ignition/user_data",
+										Value: "/var/lib/containervmm/ignition/ignition",
 									},
 									{
-										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FORMAT",
-										Value: "base64-compressed",
+										Name: "CONTAINERVMM_GUEST_HOST_VOLUMES",
+										Value: key.HostVolumesEnvVarValue([]v1alpha1.KVMConfigSpecKVMNodeHostVolumes{
+											{
+												MountTag: "etcdshare",
+												HostPath: "/var/lib/containervmm/etcd",
+											},
+										}),
 									},
-									{
-										Name:  "CONTAINERVMM_GUEST_HOST_VOLUMES",
-										Value: "etcdshare:/var/lib/containervmm/etcd",
+								},
+								Lifecycle: &corev1.Lifecycle{
+									PreStop: &corev1.Handler{
+										Exec: &corev1.ExecAction{
+											Command: []string{"/usr/local/bin/qemu-shutdown", key.ShutdownDeferrerPollPath(customResource)},
+										},
+									},
+								},
+								LivenessProbe: &corev1.Probe{
+									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: corev1.Handler{
+										HTTPGet: &corev1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
+											Host: key.ProbeHost,
+										},
+									},
+								},
+								ReadinessProbe: &corev1.Probe{
+									InitialDelaySeconds: key.ReadinessProbeInitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: corev1.Handler{
+										HTTPGet: &corev1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: key.LivenessPort(customResource)},
+											Host: key.ProbeHost,
+										},
 									},
 								},
 								Resources: corev1.ResourceRequirements{
@@ -266,6 +311,69 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									{
 										Name:      "dev-net-tun",
 										MountPath: "/dev/net/tun",
+									},
+								},
+							},
+							{
+								Name:            "k8s-kvm-health",
+								Image:           key.K8SKVMHealthDocker,
+								ImagePullPolicy: corev1.PullAlways,
+								Env: []corev1.EnvVar{
+									{
+										Name:  "CHECK_K8S_API",
+										Value: key.CheckK8sApi,
+									},
+									{
+										Name:  "LISTEN_ADDRESS",
+										Value: key.HealthListenAddress(customResource),
+									},
+								},
+							},
+							{
+								Name:            "shutdown-deferrer",
+								Image:           key.ShutdownDeferrerDocker,
+								ImagePullPolicy: corev1.PullAlways,
+								Args: []string{
+									"daemon",
+									"--server.listen.address=" + key.ShutdownDeferrerListenAddress(customResource),
+								},
+								Env: []corev1.EnvVar{
+									{
+										Name: key.EnvKeyMyPodName,
+										ValueFrom: &corev1.EnvVarSource{
+											FieldRef: &corev1.ObjectFieldSelector{
+												FieldPath: "metadata.name",
+											},
+										},
+									},
+									{
+										Name: key.EnvKeyMyPodNamespace,
+										ValueFrom: &corev1.EnvVarSource{
+											FieldRef: &corev1.ObjectFieldSelector{
+												FieldPath: "metadata.namespace",
+											},
+										},
+									},
+								},
+								Lifecycle: &corev1.Lifecycle{
+									PreStop: &corev1.Handler{
+										Exec: &corev1.ExecAction{
+											Command: []string{"/pre-shutdown-hook", key.ShutdownDeferrerPollPath(customResource)},
+										},
+									},
+								},
+								LivenessProbe: &corev1.Probe{
+									InitialDelaySeconds: key.LivenessProbeInitialDelaySeconds,
+									TimeoutSeconds:      key.TimeoutSeconds,
+									PeriodSeconds:       key.PeriodSeconds,
+									FailureThreshold:    key.FailureThreshold,
+									SuccessThreshold:    key.SuccessThreshold,
+									Handler: corev1.Handler{
+										HTTPGet: &corev1.HTTPGetAction{
+											Path: key.HealthEndpoint,
+											Port: intstr.IntOrString{IntVal: int32(key.ShutdownDeferrerListenPort(customResource))},
+											Host: key.ProbeHost,
+										},
 									},
 								},
 							},

@@ -134,7 +134,7 @@ func (r *Resource) newConfigMap(customResource v1alpha1.KVMConfig, template stri
 				},
 			},
 			Data: map[string]string{
-				KeyUserData: template,
+				KeyIgnition: template,
 			},
 		}
 	}

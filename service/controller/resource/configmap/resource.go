@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	KeyUserData = "user_data"
+	KeyIgnition = "ignition"
 	// Name is the identifier of the resource.
 	Name = "configmap"
 )

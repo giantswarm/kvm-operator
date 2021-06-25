@@ -64,8 +64,10 @@ const (
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
 	FlatcarChannel  = "stable"
 
-	K8SKVMContainerName = "k8s-kvm"
-	K8SKVMDockerImage   = "quay.io/giantswarm/k8s-kvm:0.4.1-6c7a7f8ec4f0cce3ef3745ae999f5afa431c357f"
+	K8SKVMContainerName    = "k8s-kvm"
+	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:0.4.1-3bc80b57a00d1b866b7c7b60bd187c39dca9b9b8"
+	K8SKVMHealthDocker     = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
+	ShutdownDeferrerDocker = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
@@ -348,55 +350,43 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 	return DefaultKubeletDiskSize
 }
 
-func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) corev1.EnvVar {
-	var lastElemIndex = len(hostVolumes) - 1
-
-	hostVolumesEnvVar := corev1.EnvVar{
-		Name:  "HOST_DATA_VOLUME_PATHS",
-		Value: "",
+// HostVolumesEnvVarValue generates a string representing volume mounts to be passed into containervmm
+// --guest-host-volumes flag and mounted into the virtual machine. For example, "v1:/data/v1,v2:/data/v2".
+func HostVolumesEnvVarValue(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) string {
+	var volumeStrings []string
+	for _, hostVolume := range hostVolumes {
+		volumeString := fmt.Sprintf("%s:%s", hostVolume.MountTag, hostVolume.HostPath)
+		volumeStrings = append(volumeStrings, volumeString)
 	}
 
-	for idx, hostVolume := range hostVolumes {
-		hostVolumesEnvVar.Value += fmt.Sprintf("%s:%s", hostVolume.MountTag, hostVolume.HostPath)
-
-		if idx != lastElemIndex {
-			hostVolumesEnvVar.Value += ","
-		}
-	}
-
-	return hostVolumesEnvVar
+	return strings.Join(volumeStrings, ",")
 }
 
 func HostVolumesToVolumeMounts(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.VolumeMount {
 	var volumeMounts []corev1.VolumeMount
-
 	for _, hostVolume := range hostVolumes {
-		vm := corev1.VolumeMount{
+		volumeMount := corev1.VolumeMount{
 			Name:      hostVolume.MountTag,
 			MountPath: hostVolume.HostPath,
 		}
-
-		volumeMounts = append(volumeMounts, vm)
+		volumeMounts = append(volumeMounts, volumeMount)
 	}
 
 	return volumeMounts
 }
 
-func HostVolumesToVolumes(customObject v1alpha1.KVMConfig, nodeIndex int) []corev1.Volume {
-	var volumes []corev1.Volume
-
-	workerNode := customObject.Spec.KVM.Workers[nodeIndex]
-	for _, hostVolume := range workerNode.HostVolumes {
-		v := corev1.Volume{
+func HostVolumesToVolumes(clusterID string, nodeIndex int, hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.Volume {
+	volumes := make([]corev1.Volume, 0, len(hostVolumes))
+	for _, hostVolume := range hostVolumes {
+		volume := corev1.Volume{
 			Name: hostVolume.MountTag,
 			VolumeSource: corev1.VolumeSource{
 				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					ClaimName: LocalWorkerPVCName(ClusterID(customObject), VMNumber(nodeIndex), hostVolume.MountTag),
+					ClaimName: LocalWorkerPVCName(clusterID, VMNumber(nodeIndex), hostVolume.MountTag),
 				},
 			},
 		}
-
-		volumes = append(volumes, v)
+		volumes = append(volumes, volume)
 	}
 
 	return volumes
@@ -625,7 +615,7 @@ func ServiceAccountName(customObject v1alpha1.KVMConfig) string {
 }
 
 func ShutdownDeferrerListenPort(customObject v1alpha1.KVMConfig) int {
-	return int(shutdownDeferrerPortBase + customObject.Spec.KVM.Network.Flannel.VNI)
+	return shutdownDeferrerPortBase + customObject.Spec.KVM.Network.Flannel.VNI
 }
 
 func ShutdownDeferrerListenAddress(customObject v1alpha1.KVMConfig) string {
