@@ -36,6 +36,9 @@ replace (
 	// v3.3.13 is required by bketelsen/crypt. Can remove this replace when updated.
 	github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3.3.25+incompatible
 
+	// Fix [CVE-2020-26160] jwt-go before 4.0.0-preview1 allows attackers to bypass intended access restrict...
+	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
+
 	// Use v1.3.2 of gogo/protobuf to fix nancy alert.
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 
