@@ -15,8 +15,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
@@ -63,6 +63,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 							{ID: "b"},
 						},
 					},
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
+							{},
+						},
+					},
 				},
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
@@ -95,6 +100,13 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 							{ID: "b"},
 							{ID: "c"},
 							{ID: "d"},
+						},
+					},
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
+							{},
+							{},
+							{},
 						},
 					},
 				},
@@ -135,6 +147,13 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 							{ID: "f"},
 						},
 					},
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
+							{},
+							{},
+							{},
+						},
+					},
 				},
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
@@ -171,6 +190,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 							{ID: "b"},
 						},
 					},
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
+							{},
+						},
+					},
 				},
 				Status: v1alpha1.KVMConfigStatus{
 					KVM: v1alpha1.KVMConfigStatusKVM{
@@ -200,6 +224,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 						},
 						Workers: []v1alpha1.ClusterNode{
 							{ID: "b"},
+						},
+					},
+					KVM: v1alpha1.KVMConfigSpecKVM{
+						Workers: []v1alpha1.KVMConfigSpecKVMNode{
+							{},
 						},
 					},
 				},

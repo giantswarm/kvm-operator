@@ -3,25 +3,25 @@ package controller
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/crud"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/metricsresource"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/retryresource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/crud"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/retryresource"
 	"github.com/giantswarm/randomkeys/v2"
 	"github.com/giantswarm/statusresource/v3"
 
-	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/clusterrolebinding"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/configmap"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/deployment"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/ingress"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/namespace"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/nodecontroller"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/nodeindexstatus"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/pvc"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/service"
-	"github.com/giantswarm/kvm-operator/service/controller/resource/serviceaccount"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/cloudconfig"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/clusterrolebinding"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/configmap"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/deployment"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/ingress"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/namespace"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/nodecontroller"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/nodeindexstatus"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/pvc"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/service"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/serviceaccount"
 )
 
 func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
@@ -54,6 +54,11 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 				UsernamePrefix: config.OIDC.UsernamePrefix,
 				GroupsClaim:    config.OIDC.GroupsClaim,
 				GroupsPrefix:   config.OIDC.GroupsPrefix,
+			},
+			Proxy: cloudconfig.ProxyConfig{
+				HTTP:    config.Proxy.HTTP,
+				HTTPS:   config.Proxy.HTTPS,
+				NoProxy: config.Proxy.NoProxy,
 			},
 			RegistryMirrors: config.RegistryMirrors,
 			SSOPublicKey:    config.SSOPublicKey,
@@ -275,9 +280,9 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		namespaceResource,
 		serviceAccountResource,
 		configMapResource,
+		pvcResource,
 		deploymentResource,
 		ingressResource,
-		pvcResource,
 		serviceResource,
 		nodeControllerResource,
 	}

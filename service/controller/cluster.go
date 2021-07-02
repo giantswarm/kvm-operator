@@ -6,13 +6,13 @@ import (
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/v4/pkg/controller"
+	"github.com/giantswarm/operatorkit/v5/pkg/controller"
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
 )
 
 type ClusterConfig struct {
@@ -27,6 +27,7 @@ type ClusterConfig struct {
 	IgnitionPath       string
 	NTPServers         string
 	OIDC               ClusterConfigOIDC
+	Proxy              Proxy
 	SSOPublicKey       string
 
 	DockerhubToken  string
@@ -43,6 +44,12 @@ type ClusterConfigOIDC struct {
 	UsernamePrefix string
 	GroupsClaim    string
 	GroupsPrefix   string
+}
+
+type Proxy struct {
+	HTTP    string
+	HTTPS   string
+	NoProxy []string
 }
 
 type Cluster struct {

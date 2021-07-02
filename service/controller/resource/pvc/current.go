@@ -2,13 +2,12 @@ package pvc
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/microerror"
-	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -19,25 +18,15 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.Debugf(ctx, "looking for PVCs in the Kubernetes API")
 
-	var PVCs []*corev1.PersistentVolumeClaim
-
 	namespace := key.ClusterNamespace(customObject)
-	pvcNames := key.PVCNames(customObject)
-
-	for _, name := range pvcNames {
-		manifest, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Get(ctx, name, metav1.GetOptions{})
-		if apierrors.IsNotFound(err) {
-			r.logger.Debugf(ctx, "did not find a PVC in the Kubernetes API")
-			// fall through
-		} else if err != nil {
-			return nil, microerror.Mask(err)
-		} else {
-			r.logger.Debugf(ctx, "found a PVC in the Kubernetes API")
-			PVCs = append(PVCs, manifest)
-		}
+	pvcs, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).List(ctx, metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("%s=%s", key.LegacyLabelCluster, key.ClusterID(customObject)),
+	})
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Debugf(ctx, "found %d PVCs in the Kubernetes API", len(PVCs))
+	r.logger.Debugf(ctx, "found %d PVCs in the Kubernetes API", len(pvcs.Items))
 
-	return PVCs, nil
+	return pvcs.Items, nil
 }

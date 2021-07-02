@@ -11,10 +11,10 @@ import (
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/internal/nodecontroller"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
@@ -29,7 +29,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	controllerKey := controllerMapKey(cr)
 
 	var shouldStop bool
-	var k8sClient k8sclient.Interface
+	var k8sClient *k8sclient.Clients
 	{
 		k8sClient, err = key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.workloadCluster)
 		if workloadcluster.IsTimeout(err) {
@@ -73,7 +73,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			r.logger.Debugf(ctx, "controllers don't match")
 			shouldStop = true
 		} else if time.Since(current.LastReconciled()) > 2*nodecontroller.ResyncPeriod {
-			r.logger.Debugf(ctx, "controller hasn't reconciled in more than %d minutes", nodecontroller.ResyncPeriod.Minutes())
+			r.logger.Debugf(ctx, "controller hasn't reconciled in more than %d minutes", int(2*nodecontroller.ResyncPeriod.Minutes()))
 			shouldStop = true
 		}
 

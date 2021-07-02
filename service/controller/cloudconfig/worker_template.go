@@ -9,7 +9,7 @@ import (
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 // NewWorkerTemplate generates a new worker cloud config template and returns it
@@ -36,10 +36,29 @@ func (c *CloudConfig) NewWorkerTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		params.Images = data.Images
 		params.Versions = data.Versions
 		params.Node = node
+		params.Proxy.HTTP = c.proxy.http
+		params.Proxy.HTTPS = c.proxy.https
+		params.Proxy.NoProxy = c.proxy.noProxy
 		params.RegistryMirrors = c.registryMirrors
 		params.SSOPublicKey = c.ssoPublicKey
 		params.ImagePullProgressDeadline = key.DefaultImagePullProgressDeadline
 		params.DockerhubToken = c.dockerhubToken
+
+		var workerFound bool
+		// Find index of worker in cr.Spec.Cluster.Workers to match it with the corresponding cr.Spec.KVM.Workers
+		for i, worker := range cr.Spec.Cluster.Workers {
+			if worker.ID == node.ID {
+				workerFound = true
+				for _, hostVolume := range cr.Spec.KVM.Workers[i].HostVolumes {
+					params.KVMWorkerMountTags = append(params.KVMWorkerMountTags, hostVolume.MountTag)
+				}
+				break
+			}
+		}
+
+		if !workerFound {
+			return "", microerror.Maskf(notFoundError, "node with id %#q not found in .Spec.Cluster.Workers", node.ID)
+		}
 
 		ignitionPath := k8scloudconfig.GetIgnitionPath(c.ignitionPath)
 		{

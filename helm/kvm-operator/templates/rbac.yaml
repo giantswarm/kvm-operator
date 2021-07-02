@@ -88,6 +88,14 @@ rules:
       - get
       - create
       - delete
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+    verbs:
+      - list
+      - update
   - apiGroups:
       - ""
     resources:

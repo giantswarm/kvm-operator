@@ -18,9 +18,9 @@ import (
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
 
-	"github.com/giantswarm/kvm-operator/flag"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller"
+	"github.com/giantswarm/kvm-operator/v4/flag"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller"
 )
 
 // Config represents the configuration used to create a new service.
@@ -155,6 +155,11 @@ func New(config Config) (*Service, error) {
 				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
 				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
 			},
+			Proxy: controller.Proxy{
+				HTTP:    config.Viper.GetString(config.Flag.Service.Workload.Proxy.HTTP),
+				HTTPS:   config.Viper.GetString(config.Flag.Service.Workload.Proxy.HTTPS),
+				NoProxy: config.Viper.GetStringSlice(config.Flag.Service.Workload.Proxy.NoProxy),
+			},
 			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Workload.SSH.SSOPublicKey),
 
 			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
@@ -207,7 +212,8 @@ func New(config Config) (*Service, error) {
 			Logger:          config.Logger,
 			WorkloadCluster: workloadCluster,
 
-			ProjectName: project.Name(),
+			ProjectName:             project.Name(),
+			TerminateUnhealthyNodes: config.Viper.GetBool(config.Flag.Service.TerminateUnhealthyNodes),
 		}
 
 		unhealthyNodeTerminatorController, err = controller.NewUnhealthyNodeTerminator(c)

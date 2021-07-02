@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 )
 
 const (
@@ -66,8 +66,10 @@ const (
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
 	FlatcarChannel  = "stable"
 
+	K8SKVMContainerName = "k8s-kvm"
+
 	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.4.1"
+	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.6.2"
 	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
 
@@ -107,6 +109,7 @@ const (
 	LabelCluster       = "giantswarm.io/cluster"
 	LabelCustomer      = "customer"
 	LabelManagedBy     = "giantswarm.io/managed-by"
+	LabelMountTag      = "mount-tag"
 	LabelOrganization  = "giantswarm.io/organization"
 	LabelVersionBundle = "giantswarm.io/version-bundle"
 
@@ -275,6 +278,10 @@ func EtcdPVCName(clusterID string, vmNumber string) string {
 	return fmt.Sprintf("%s-%s-%s", "pvc-master-etcd", clusterID, vmNumber)
 }
 
+func LocalWorkerPVCName(clusterID string, vmNumber, mountTag string) string {
+	return fmt.Sprintf("%s-%s-%s-%s", "local-pvc-worker", clusterID, vmNumber, mountTag)
+}
+
 // FindNodeCondition returns the condition of the given type from the node. The second return value indicates if the condition was found.
 func FindNodeCondition(node corev1.Node, conditionType corev1.NodeConditionType) (corev1.NodeCondition, bool) {
 	for _, condition := range node.Status.Conditions {
@@ -346,6 +353,60 @@ func KubeletVolumeSizeFromNode(node v1alpha1.KVMConfigSpecKVMNode) string {
 	}
 
 	return DefaultKubeletDiskSize
+}
+
+func HostVolumesToEnvVar(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) corev1.EnvVar {
+	var lastElemIndex = len(hostVolumes) - 1
+
+	hostVolumesEnvVar := corev1.EnvVar{
+		Name:  "HOST_DATA_VOLUME_PATHS",
+		Value: "",
+	}
+
+	for idx, hostVolume := range hostVolumes {
+		hostVolumesEnvVar.Value += fmt.Sprintf("%s:%s", hostVolume.MountTag, hostVolume.HostPath)
+
+		if idx != lastElemIndex {
+			hostVolumesEnvVar.Value += ","
+		}
+	}
+
+	return hostVolumesEnvVar
+}
+
+func HostVolumesToVolumeMounts(hostVolumes []v1alpha1.KVMConfigSpecKVMNodeHostVolumes) []corev1.VolumeMount {
+	var volumeMounts []corev1.VolumeMount
+
+	for _, hostVolume := range hostVolumes {
+		vm := corev1.VolumeMount{
+			Name:      hostVolume.MountTag,
+			MountPath: hostVolume.HostPath,
+		}
+
+		volumeMounts = append(volumeMounts, vm)
+	}
+
+	return volumeMounts
+}
+
+func HostVolumesToVolumes(customObject v1alpha1.KVMConfig, nodeIndex int) []corev1.Volume {
+	var volumes []corev1.Volume
+
+	workerNode := customObject.Spec.KVM.Workers[nodeIndex]
+	for _, hostVolume := range workerNode.HostVolumes {
+		v := corev1.Volume{
+			Name: hostVolume.MountTag,
+			VolumeSource: corev1.VolumeSource{
+				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: LocalWorkerPVCName(ClusterID(customObject), VMNumber(nodeIndex), hostVolume.MountTag),
+				},
+			},
+		}
+
+		volumes = append(volumes, v)
+	}
+
+	return volumes
 }
 
 // AnyPodContainerRunning checks ContainerState for all containers present
@@ -566,16 +627,6 @@ func PortMappings(customObject v1alpha1.KVMConfig) []corev1.ServicePort {
 	return ports
 }
 
-func PVCNames(customObject v1alpha1.KVMConfig) []string {
-	var names []string
-
-	for i := range customObject.Spec.Cluster.Masters {
-		names = append(names, EtcdPVCName(ClusterID(customObject), VMNumber(i)))
-	}
-
-	return names
-}
-
 func ReleaseVersion(cr v1alpha1.KVMConfig) string {
 	return cr.GetLabels()[label.ReleaseVersion]
 }
@@ -596,8 +647,18 @@ func ShutdownDeferrerPollPath(customObject v1alpha1.KVMConfig) string {
 	return fmt.Sprintf("%s/v1/defer/", ShutdownDeferrerListenAddress(customObject))
 }
 
-func StorageType(customObject v1alpha1.KVMConfig) string {
+func EtcdStorageType(customObject v1alpha1.KVMConfig) string {
 	return customObject.Spec.KVM.K8sKVM.StorageType
+}
+
+func HasHostVolumes(customObject v1alpha1.KVMConfig) bool {
+	for _, worker := range customObject.Spec.KVM.Workers {
+		if len(worker.HostVolumes) > 0 {
+			return true
+		}
+	}
+
+	return false
 }
 
 func ToClusterEndpoint(v interface{}) (string, error) {

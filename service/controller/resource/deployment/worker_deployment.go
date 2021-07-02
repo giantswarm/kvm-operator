@@ -12,9 +12,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
@@ -40,6 +40,14 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 		memoryQuantity, err := key.MemoryQuantityWorker(capabilities)
 		if err != nil {
 			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: %s", err)
+		}
+
+		// TODO: https://github.com/giantswarm/giantswarm/issues/17340
+		//       https://github.com/giantswarm/kvm-operator/pull/1208#discussion_r636067919
+		for _, hostVolume := range capabilities.HostVolumes {
+			if hostVolume.MountTag == "" || hostVolume.HostPath == "" {
+				return nil, microerror.Maskf(invalidConfigError, "error defining host volume config. both mount tag and host path has to be defined")
+			}
 		}
 
 		deployment := &v1.Deployment{
@@ -172,7 +180,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								},
 							},
 							{
-								Name:            "k8s-kvm",
+								Name:            key.K8SKVMContainerName,
 								Image:           key.K8SKVMDockerImage,
 								ImagePullPolicy: corev1.PullIfNotPresent,
 								SecurityContext: &corev1.SecurityContext{
@@ -383,9 +391,28 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 			},
 		}
 		addCoreComponentsAnnotations(deployment, release)
+		addHostVolumes(deployment, customResource, i)
 
 		deployments = append(deployments, deployment)
 	}
 
 	return deployments, nil
+}
+
+func addHostVolumes(deployment *v1.Deployment, customObject v1alpha1.KVMConfig, workerIndex int) {
+	caps := customObject.Spec.KVM.Workers[workerIndex]
+
+	for i, container := range deployment.Spec.Template.Spec.Containers {
+		if container.Name == key.K8SKVMContainerName {
+			envVars := []corev1.EnvVar{key.HostVolumesToEnvVar(caps.HostVolumes)}
+			container.Env = append(container.Env, envVars...)
+
+			volumeMounts := key.HostVolumesToVolumeMounts(caps.HostVolumes)
+			container.VolumeMounts = append(container.VolumeMounts, volumeMounts...)
+
+			deployment.Spec.Template.Spec.Containers[i] = container
+		}
+	}
+
+	deployment.Spec.Template.Spec.Volumes = append(deployment.Spec.Template.Spec.Volumes, key.HostVolumesToVolumes(customObject, workerIndex)...)
 }

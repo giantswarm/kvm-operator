@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `k8scloudconfig` to `v10.8.1` which includes a change to better determine if memory eviction thresholds are crossed.
+
+## [3.17.3] - 2021-06-17
+
+### Fixed
+
+- Avoid panic during deletion of clusters with host volumes
+
+## [3.17.2] - 2021-06-07
+
+### Fixed
+
+- Remove reference from worker PVs on cluster deletion so they can be resued.
+
+## [3.17.1] - 2021-06-01
+
+### Changed
+
+- Reconcile only deployments that are managed by kvm-operator
+
+## [3.17.0] - 2021-05-27
+
+### Added
+
+- Add flags for proxy settings and propagate them to ignition
+
+## [3.16.0] - 2021-04-29
+
+### Changed
+
+- Update k8scloudconfig to use calico-crd-installer.
+
+## [3.15.0] - 2021-03-29
+
 ### Added
 
 - Add vertical pod autoscaler for operator pods.
@@ -20,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Use managed-by label to check node deployments are deleted before cluster namespace.
 - Remove IPs from endpoints when the corresponding workload cluster node is not ready.
 
 ## [3.14.0] - 2020-11-25
@@ -90,7 +127,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.17.3...HEAD
+[3.17.3]: https://github.com/giantswarm/kvm-operator/compare/v3.17.2...v3.17.3
+[3.17.2]: https://github.com/giantswarm/kvm-operator/compare/v3.17.1...v3.17.2
+[3.17.1]: https://github.com/giantswarm/kvm-operator/compare/v3.17.0...v3.17.1
+[3.17.0]: https://github.com/giantswarm/kvm-operator/compare/v3.16.0...v3.17.0
+[3.16.0]: https://github.com/giantswarm/kvm-operator/compare/v3.15.0...v3.16.0
+[3.15.0]: https://github.com/giantswarm/kvm-operator/compare/v3.14.0...v3.15.0
 [3.14.0]: https://github.com/giantswarm/kvm-operator/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/giantswarm/kvm-operator/compare/v3.12.2...v3.13.0
 [3.12.2]: https://github.com/giantswarm/kvm-operator/compare/v3.12.1...v3.12.2

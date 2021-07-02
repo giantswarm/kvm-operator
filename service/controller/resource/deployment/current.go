@@ -11,8 +11,8 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
-	"github.com/giantswarm/kvm-operator/service/metric"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/metric"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -26,7 +26,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	var currentDeployments []*v1.Deployment
 	{
 		namespace := key.ClusterNamespace(customResource)
-		deploymentList, err := r.k8sClient.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{})
+		labelSelector := metav1.ListOptions{LabelSelector: key.LabelManagedBy + "=" + key.OperatorName}
+		deploymentList, err := r.k8sClient.AppsV1().Deployments(namespace).List(ctx, labelSelector)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		} else {

@@ -12,15 +12,17 @@ const (
 )
 
 type Config struct {
-	K8sClient       kubernetes.Interface
-	Logger          micrologger.Logger
-	WorkloadCluster workloadcluster.Interface
+	K8sClient               kubernetes.Interface
+	Logger                  micrologger.Logger
+	WorkloadCluster         workloadcluster.Interface
+	TerminateUnhealthyNodes bool
 }
 
 type Resource struct {
-	k8sClient       kubernetes.Interface
-	logger          micrologger.Logger
-	workloadCluster workloadcluster.Interface
+	k8sClient               kubernetes.Interface
+	logger                  micrologger.Logger
+	workloadCluster         workloadcluster.Interface
+	terminateUnhealthyNodes bool
 }
 
 func New(config Config) (*Resource, error) {
@@ -35,9 +37,10 @@ func New(config Config) (*Resource, error) {
 	}
 
 	newService := &Resource{
-		k8sClient:       config.K8sClient,
-		logger:          config.Logger,
-		workloadCluster: config.WorkloadCluster,
+		k8sClient:               config.K8sClient,
+		logger:                  config.Logger,
+		workloadCluster:         config.WorkloadCluster,
+		terminateUnhealthyNodes: config.TerminateUnhealthyNodes,
 	}
 
 	return newService, nil

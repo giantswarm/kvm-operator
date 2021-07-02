@@ -10,10 +10,10 @@ import (
 	"github.com/giantswarm/versionbundle"
 	"github.com/spf13/viper"
 
-	"github.com/giantswarm/kvm-operator/flag"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/server"
-	"github.com/giantswarm/kvm-operator/service"
+	"github.com/giantswarm/kvm-operator/v4/flag"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/server"
+	"github.com/giantswarm/kvm-operator/v4/service"
 )
 
 var (
@@ -127,7 +127,11 @@ func mainError() error {
 	daemonCommand.PersistentFlags().StringSlice(f.Service.Registry.Mirrors, []string{}, `Image registry mirror domains. Can be set only if registry domain is "docker.io".`)
 
 	daemonCommand.PersistentFlags().String(f.Service.Workload.Ignition.Path, "/opt/ignition", "Default path for the ignition base directory.")
+	daemonCommand.PersistentFlags().String(f.Service.Workload.Proxy.HTTP, "", "URL of proxy for HTTP requests.")
+	daemonCommand.PersistentFlags().String(f.Service.Workload.Proxy.HTTPS, "", "URL of proxy for HTTPS requests.")
+	daemonCommand.PersistentFlags().StringSlice(f.Service.Workload.Proxy.NoProxy, []string{}, "List of addresses that need not to go through the proxy.")
 	daemonCommand.PersistentFlags().String(f.Service.Workload.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")
+	daemonCommand.PersistentFlags().Bool(f.Service.TerminateUnhealthyNodes, false, "Whether to terminate unhealthy nodes on all WCs by default.")
 
 	err = newCommand.CobraCommand().Execute()
 	if err != nil {

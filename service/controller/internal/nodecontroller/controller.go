@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/micrologger/loggermeta"
-	operatorkitcontroller "github.com/giantswarm/operatorkit/v4/pkg/controller"
+	operatorkitcontroller "github.com/giantswarm/operatorkit/v5/pkg/controller"
 	"github.com/giantswarm/to"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 const (
@@ -213,7 +213,7 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 	if errors.IsNotFound(err) {
 		return key.RequeueNone, nil
 	} else if err != nil {
-		return key.RequeueLong, microerror.Mask(err)
+		return key.RequeueErrorLong, microerror.Mask(err)
 	}
 
 	ctx = setLoggerCtxValue(ctx, loggerKeyObject, node.GetSelfLink())
@@ -235,7 +235,10 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 
 	c.lastReconciled = time.Now()
 
-	return key.RequeueNone, nil
+	return reconcile.Result{
+		Requeue:      true,
+		RequeueAfter: ResyncPeriod,
+	}, nil
 }
 
 func (c *Controller) Stop() {

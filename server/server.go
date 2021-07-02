@@ -12,9 +12,9 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/server/endpoint"
-	"github.com/giantswarm/kvm-operator/service"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/server/endpoint"
+	"github.com/giantswarm/kvm-operator/v4/service"
 )
 
 // Config represents the configuration used to create a new server object.
