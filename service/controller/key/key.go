@@ -500,14 +500,6 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	return q, nil
 }
 
-func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("br-%s", ClusterID(customObject))
-}
-
-func NetworkTapName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("tap-%s", ClusterID(customObject))
-}
-
 func NetworkDNSBlock(servers []net.IP) string {
 	var dnsBlockParts []string
 
