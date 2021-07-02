@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 )
 
 const (
@@ -64,10 +64,11 @@ const (
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
 	FlatcarChannel  = "stable"
 
-	K8SKVMContainerName    = "k8s-kvm"
 	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:0.4.1-5294bf77bd3fd9ae8174210f1fc1a21406d68ba2"
 	K8SKVMHealthDocker     = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
+
+	K8SKVMContainerName = "k8s-kvm"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
@@ -487,14 +488,6 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	q.Add(memOverhead)
 
 	return q, nil
-}
-
-func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("br-%s", ClusterID(customObject))
-}
-
-func NetworkTapName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("tap-%s", ClusterID(customObject))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {

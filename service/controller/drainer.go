@@ -9,9 +9,9 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 type DrainerConfig struct {
