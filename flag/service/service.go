@@ -8,15 +8,14 @@ import (
 	"github.com/giantswarm/kvm-operator/flag/service/rbac"
 	"github.com/giantswarm/kvm-operator/flag/service/registry"
 	"github.com/giantswarm/kvm-operator/flag/service/tenant"
-	"github.com/giantswarm/kvm-operator/flag/unhealthynodes"
 )
 
 type Service struct {
-	CRD            crd.CRD
-	Installation   installation.Installation
-	Kubernetes     kubernetes.Kubernetes
-	RBAC           rbac.RBAC
-	Registry       registry.Registry
-	Tenant         tenant.Tenant
-	UnhealthyNodes unhealthynodes.UnhealthyNodes
+	CRD                     crd.CRD
+	Installation            installation.Installation
+	Kubernetes              kubernetes.Kubernetes
+	RBAC                    rbac.RBAC
+	Registry                registry.Registry
+	Tenant                  tenant.Tenant
+	TerminateUnhealthyNodes string
 }

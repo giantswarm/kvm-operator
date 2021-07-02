@@ -25,7 +25,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	// check for annotation enabling the node auto repair feature
 	if _, ok := customResource.Annotations[annotation.NodeTerminateUnhealthy]; !ok {
-		if !r.alwaysTerminate {
+		if !r.terminateUnhealthyNodes {
 			r.logger.Debugf(ctx, "terminate unhealthy node annotation not found, skipping reconciliation")
 			return nil
 		}

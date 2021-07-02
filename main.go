@@ -133,7 +133,7 @@ func mainError() error {
 	daemonCommand.PersistentFlags().StringSlice(f.Service.Tenant.Proxy.NoProxy, []string{}, "List of addresses that need not to go through the proxy.")
 	daemonCommand.PersistentFlags().String(f.Service.Tenant.SSH.SSOPublicKey, "", "Public key for trusted SSO CA.")
 	daemonCommand.PersistentFlags().Bool(f.Service.Tenant.Update.Enabled, false, "Whether updates of tenant cluster nodes are allowed to be processed upon reconciliation.")
-	daemonCommand.PersistentFlags().Bool(f.Service.UnhealthyNodes.AlwaysTerminate, false, "Whether to terminate unhealthy nodes on all WCs by default.")
+	daemonCommand.PersistentFlags().Bool(f.Service.TerminateUnhealthyNodes, false, "Whether to terminate unhealthy nodes on all WCs by default.")
 
 	err = newCommand.CobraCommand().Execute()
 	if err != nil {

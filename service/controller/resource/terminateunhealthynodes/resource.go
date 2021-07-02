@@ -12,17 +12,17 @@ const (
 )
 
 type Config struct {
-	AlwaysTerminate bool
-	K8sClient       kubernetes.Interface
-	Logger          micrologger.Logger
-	TenantCluster   tenantcluster.Interface
+	K8sClient               kubernetes.Interface
+	Logger                  micrologger.Logger
+	TenantCluster           tenantcluster.Interface
+	TerminateUnhealthyNodes bool
 }
 
 type Resource struct {
-	alwaysTerminate bool
-	k8sClient       kubernetes.Interface
-	logger          micrologger.Logger
-	tenantCluster   tenantcluster.Interface
+	k8sClient               kubernetes.Interface
+	logger                  micrologger.Logger
+	tenantCluster           tenantcluster.Interface
+	terminateUnhealthyNodes bool
 }
 
 func New(config Config) (*Resource, error) {
@@ -37,10 +37,10 @@ func New(config Config) (*Resource, error) {
 	}
 
 	newService := &Resource{
-		alwaysTerminate: config.AlwaysTerminate,
-		k8sClient:       config.K8sClient,
-		logger:          config.Logger,
-		tenantCluster:   config.TenantCluster,
+		k8sClient:               config.K8sClient,
+		logger:                  config.Logger,
+		tenantCluster:           config.TenantCluster,
+		terminateUnhealthyNodes: config.TerminateUnhealthyNodes,
 	}
 
 	return newService, nil

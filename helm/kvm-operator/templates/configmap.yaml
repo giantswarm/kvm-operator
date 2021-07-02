@@ -56,5 +56,4 @@ data:
           ssoPublicKey: '{{ .Values.ssh.ssoPublicKey }}'
         update:
           enabled: true
-      unhealthyNodes:
-        alwaysTerminate: '{{ .Values.unhealthyNodes.alwaysTerminate }}'
+      terminateUnhealthyNodes: '{{ .Values.terminateUnhealthyNodes }}'

@@ -217,8 +217,8 @@ func New(config Config) (*Service, error) {
 			Logger:        config.Logger,
 			TenantCluster: tenantCluster,
 
-			AlwaysTerminate: config.Viper.GetBool(config.Flag.Service.UnhealthyNodes.AlwaysTerminate),
-			ProjectName:     project.Name(),
+			ProjectName:             project.Name(),
+			TerminateUnhealthyNodes: config.Viper.GetBool(config.Flag.Service.TerminateUnhealthyNodes),
 		}
 
 		unhealthyNodeTerminatorController, err = controller.NewUnhealthyNodeTerminator(c)
