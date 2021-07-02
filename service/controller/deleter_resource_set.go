@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/kvm-operator/service/controller/resource/node"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/node"
 )
 
 func newDeleterResources(config DeleterConfig) ([]resource.Interface, error) {
