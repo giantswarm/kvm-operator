@@ -6,7 +6,7 @@ import (
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/kvm-operator/service/controller/resource/terminateunhealthynodes"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/terminateunhealthynodes"
 )
 
 func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) ([]resource.Interface, error) {
@@ -14,9 +14,10 @@ func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) (
 	var terminateUnhealthyNodesResource resource.Interface
 	{
 		c := terminateunhealthynodes.Config{
-			K8sClient:     config.K8sClient.K8sClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
+			K8sClient:               config.K8sClient.K8sClient(),
+			Logger:                  config.Logger,
+			TenantCluster:           config.TenantCluster,
+			TerminateUnhealthyNodes: config.TerminateUnhealthyNodes,
 		}
 
 		terminateUnhealthyNodesResource, err = terminateunhealthynodes.New(c)

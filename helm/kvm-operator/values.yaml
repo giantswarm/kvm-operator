@@ -44,3 +44,5 @@ registry:
 
 ssh:
   sshPublicKey: ""
+
+terminateUnhealthyNodes: false

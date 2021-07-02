@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/internal/nodecontroller"
 )
 
 const (

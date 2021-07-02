@@ -10,8 +10,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
 )
 
 type UnhealthyNodeTerminatorConfig struct {
@@ -19,7 +19,8 @@ type UnhealthyNodeTerminatorConfig struct {
 	Logger        micrologger.Logger
 	TenantCluster tenantcluster.Interface
 
-	ProjectName string
+	ProjectName             string
+	TerminateUnhealthyNodes bool
 }
 
 type UnhealthyNodeTerminator struct {

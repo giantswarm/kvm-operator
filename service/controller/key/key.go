@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 )
 
 const (
@@ -65,7 +65,8 @@ const (
 	FlatcarChannel  = "stable"
 
 	K8SKVMContainerName = "k8s-kvm"
-	K8SKVMDockerImage   = "quay.io/giantswarm/k8s-kvm:0.4.1-6c7a7f8ec4f0cce3ef3745ae999f5afa431c357f"
+
+	K8SKVMDockerImage = "quay.io/giantswarm/k8s-kvm:0.4.1-6c7a7f8ec4f0cce3ef3745ae999f5afa431c357f"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
