@@ -9,10 +9,11 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/prometheus/client_golang/prometheus"
 	v1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
-	"github.com/giantswarm/kvm-operator/service/metric"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/metric"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -25,10 +26,12 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	var currentDeployments []*v1.Deployment
 	{
-		namespace := key.ClusterNamespace(customResource)
 		var deploymentList v1.DeploymentList
 		err := r.ctrlClient.List(ctx, &deploymentList, &client.ListOptions{
-			Namespace: namespace,
+			Namespace: key.ClusterNamespace(customResource),
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				key.LabelManagedBy: key.OperatorName,
+			}),
 		})
 		if err != nil {
 			return nil, microerror.Mask(err)

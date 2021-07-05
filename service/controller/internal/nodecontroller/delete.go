@@ -9,12 +9,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (c *Controller) ensureDeleted(ctx context.Context, workloadNode corev1.Node) (reconcile.Result, error) {
 	var managementPod corev1.Pod
-	err := c.managementK8sClient.Get(ctx, key.NodePodObjectKey(c.cluster, workloadNode), &managementPod)
+	err := c.managementClient.Get(ctx, key.NodePodObjectKey(c.cluster, workloadNode), &managementPod)
 	if errors.IsNotFound(err) {
 		// assume the pod is already deleted
 		c.logger.Debugf(ctx, "node pod not found")
@@ -29,7 +29,7 @@ func (c *Controller) ensureDeleted(ctx context.Context, workloadNode corev1.Node
 	}
 
 	c.logger.Debugf(ctx, "patching pod node status condition to %#v", condition)
-	err = c.managementK8sClient.Status().Patch(ctx, &managementPod, podConditionPatch{PodCondition: condition})
+	err = c.managementClient.Status().Patch(ctx, &managementPod, podConditionPatch{PodCondition: condition})
 	if err != nil {
 		return key.RequeueErrorShort, microerror.Mask(err)
 	}

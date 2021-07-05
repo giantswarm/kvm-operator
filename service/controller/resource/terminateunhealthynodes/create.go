@@ -9,7 +9,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 const (
@@ -24,8 +24,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	// check for annotation enabling the node auto repair feature
 	if _, ok := customResource.Annotations[annotation.NodeTerminateUnhealthy]; !ok {
-		r.logger.Debugf(ctx, "terminate unhealthy node feature is not enabled for this cluster")
-		return nil
+		if !r.terminateUnhealthyNodes {
+			r.logger.Debugf(ctx, "terminate unhealthy node annotation not found, skipping reconciliation")
+			return nil
+		}
+		r.logger.Debugf(ctx, "terminate unhealthy node annotation not found but feature is enabled by default")
 	}
 
 	var tcCtrlClient client.Client

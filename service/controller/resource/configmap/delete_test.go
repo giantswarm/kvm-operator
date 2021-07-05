@@ -14,8 +14,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	fake "sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig/cloudconfigtest"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/cloudconfig/cloudconfigtest"
 )
 
 func Test_Resource_CloudConfig_newDeleteChange(t *testing.T) {

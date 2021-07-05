@@ -4,15 +4,16 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/finalizerskeptcontext"
-	"github.com/giantswarm/operatorkit/v4/pkg/controller/context/resourcecanceledcontext"
+	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/finalizerskeptcontext"
+	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/resourcecanceledcontext"
+	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -84,8 +85,36 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		}
 
-		if len(list.Items) != 0 {
-			r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing deployments")
+		var deployments v1.DeploymentList
+		err = r.ctrlClient.List(ctx, &deployments, &client.ListOptions{
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				label.ManagedBy: key.OperatorName,
+			}),
+			Namespace: key.ClusterNamespace(customObject),
+		})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		// Ensure PVCs have been deleted so that bound PVs are properly cleaned up.
+		var volumeClaims corev1.PersistentVolumeClaimList
+		err = r.ctrlClient.List(ctx, &volumeClaims, &client.ListOptions{
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				label.ManagedBy: key.OperatorName,
+			}),
+			Namespace: key.ClusterNamespace(customObject),
+		})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		if len(deployments.Items) != 0 || len(volumeClaims.Items) != 0 {
+			if len(deployments.Items) != 0 {
+				r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing deployments")
+			} else {
+				r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing PVCs")
+			}
+
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
 			r.logger.Debugf(ctx, "canceling resource")

@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/internal/nodecontroller"
 )
 
 const (
@@ -21,13 +21,13 @@ const (
 )
 
 type Config struct {
-	K8sClient       client.Client
+	CtrlClient      client.Client
 	Logger          micrologger.Logger
 	WorkloadCluster workloadcluster.Interface
 }
 
 type Resource struct {
-	k8sClient       client.Client
+	ctrlClient      client.Client
 	logger          micrologger.Logger
 	workloadCluster workloadcluster.Interface
 
@@ -36,7 +36,7 @@ type Resource struct {
 }
 
 func New(config Config) (*Resource, error) {
-	if config.K8sClient == nil {
+	if config.CtrlClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
@@ -47,7 +47,7 @@ func New(config Config) (*Resource, error) {
 	}
 
 	r := &Resource{
-		k8sClient:       config.K8sClient,
+		ctrlClient:      config.CtrlClient,
 		logger:          config.Logger,
 		workloadCluster: config.WorkloadCluster,
 

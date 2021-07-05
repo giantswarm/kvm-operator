@@ -7,7 +7,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 const (
@@ -15,8 +16,8 @@ const (
 	EtcdPVSize = "15Gi"
 )
 
-func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolumeClaim, error) {
-	var persistentVolumeClaims []*corev1.PersistentVolumeClaim
+func (r *Resource) getDesiredMasterPVCs(customObject v1alpha1.KVMConfig) ([]corev1.PersistentVolumeClaim, error) {
+	var persistentVolumeClaims []corev1.PersistentVolumeClaim
 
 	for i, masterNode := range customObject.Spec.Cluster.Masters {
 		quantity, err := resource.ParseQuantity(EtcdPVSize)
@@ -24,21 +25,20 @@ func newEtcdPVCs(customObject v1alpha1.KVMConfig) ([]*corev1.PersistentVolumeCla
 			return nil, microerror.Mask(err)
 		}
 
-		persistentVolumeClaim := &corev1.PersistentVolumeClaim{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "PersistentVolumeClaim",
-				APIVersion: "v1",
-			},
+		persistentVolumeClaim := corev1.PersistentVolumeClaim{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: key.EtcdPVCName(key.ClusterID(customObject), key.VMNumber(i)),
 				Labels: map[string]string{
-					"app":      key.MasterID,
-					"cluster":  key.ClusterID(customObject),
-					"customer": key.ClusterCustomer(customObject),
-					"node":     masterNode.ID,
+					label.ManagedBy:        key.OperatorName,
+					key.LabelCustomer:      key.ClusterCustomer(customObject),
+					key.LabelApp:           key.MasterID,
+					key.LabelCluster:       key.ClusterID(customObject),
+					key.LegacyLabelCluster: key.ClusterID(customObject),
+					key.LabelVersionBundle: key.OperatorVersion(customObject),
+					"node":                 masterNode.ID,
 				},
 				Annotations: map[string]string{
-					"volume.beta.kubernetes.io/storage-class": StorageClass,
+					"volume.beta.kubernetes.io/storage-class": EtcdStorageClass,
 				},
 			},
 			Spec: corev1.PersistentVolumeClaimSpec{

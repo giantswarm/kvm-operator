@@ -11,10 +11,10 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/internal/nodecontroller"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
@@ -47,7 +47,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	if k8sClient != nil {
 		config := nodecontroller.Config{
 			Cluster:             cr,
-			ManagementK8sClient: r.k8sClient,
+			ManagementK8sClient: r.ctrlClient,
 			WorkloadK8sClient:   k8sClient,
 			Logger:              r.logger,
 			Name:                fmt.Sprintf("%s-%s-nodes", project.Name(), clusterID),

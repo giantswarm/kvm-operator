@@ -10,7 +10,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 
-	"github.com/giantswarm/kvm-operator/pkg/test"
+	"github.com/giantswarm/kvm-operator/v4/pkg/test"
 )
 
 func Test_Resource_Namespace_GetCurrentState(t *testing.T) {

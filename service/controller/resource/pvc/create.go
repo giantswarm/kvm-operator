@@ -6,6 +6,7 @@ import (
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
@@ -17,8 +18,8 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if len(pvcsToCreate) != 0 {
 		r.logger.Debugf(ctx, "creating the PVCs in the Kubernetes API")
 
-		for _, PVC := range pvcsToCreate {
-			err := r.ctrlClient.Create(ctx, PVC)
+		for _, persistentVolumeClaim := range pvcsToCreate {
+			err := r.ctrlClient.Create(ctx, persistentVolumeClaim.DeepCopy(), &client.CreateOptions{})
 			if apierrors.IsAlreadyExists(err) {
 				// fall through
 			} else if err != nil {
@@ -46,7 +47,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	r.logger.Debugf(ctx, "finding out which PVCs have to be created")
 
-	var pvcsToCreate []*corev1.PersistentVolumeClaim
+	var pvcsToCreate []corev1.PersistentVolumeClaim
 
 	for _, desiredPVC := range desiredPVCs {
 		if !containsPVC(currentPVCs, desiredPVC) {

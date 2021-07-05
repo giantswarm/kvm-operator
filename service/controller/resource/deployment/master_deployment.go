@@ -12,9 +12,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func newMasterDeployments(customResource v1alpha1.KVMConfig, release releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
@@ -42,7 +42,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release releasev1al
 			return nil, microerror.Maskf(invalidConfigError, "error creating memory quantity: %s", err)
 		}
 
-		storageType := key.StorageType(customResource)
+		storageType := key.EtcdStorageType(customResource)
 
 		// During migration, some TPOs do not have storage type set.
 		// This specifies a default, until all TPOs have the correct storage type set.
@@ -71,7 +71,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release releasev1al
 				},
 			}
 		} else {
-			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.StorageType(customResource))
+			return nil, microerror.Maskf(wrongTypeError, "unknown storageType: '%s'", key.EtcdStorageType(customResource))
 		}
 		deployment := &v1.Deployment{
 			TypeMeta: metav1.TypeMeta{

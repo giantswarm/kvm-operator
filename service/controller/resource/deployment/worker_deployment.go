@@ -12,9 +12,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func newWorkerDeployments(customResource v1alpha1.KVMConfig, release releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
@@ -391,8 +391,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release releasev1al
 			},
 		}
 		addCoreComponentsAnnotations(deployment, release)
-		// in case of adding additional env vars
-		addConditionalEnvVarsToK8SKVMContainer(deployment, []corev1.EnvVar{key.HostVolumesToEnvVar(capabilities.HostVolumes)})
+		addHostVolumes(deployment, customResource, i)
 
 		deployments = append(deployments, deployment)
 	}
@@ -400,11 +399,20 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release releasev1al
 	return deployments, nil
 }
 
-func addConditionalEnvVarsToK8SKVMContainer(deployment *v1.Deployment, envVars []corev1.EnvVar) {
+func addHostVolumes(deployment *v1.Deployment, customObject v1alpha1.KVMConfig, workerIndex int) {
+	caps := customObject.Spec.KVM.Workers[workerIndex]
+
 	for i, container := range deployment.Spec.Template.Spec.Containers {
 		if container.Name == key.K8SKVMContainerName {
+			envVars := []corev1.EnvVar{key.HostVolumesToEnvVar(caps.HostVolumes)}
 			container.Env = append(container.Env, envVars...)
+
+			volumeMounts := key.HostVolumesToVolumeMounts(caps.HostVolumes)
+			container.VolumeMounts = append(container.VolumeMounts, volumeMounts...)
+
 			deployment.Spec.Template.Spec.Containers[i] = container
 		}
 	}
+
+	deployment.Spec.Template.Spec.Volumes = append(deployment.Spec.Template.Spec.Volumes, key.HostVolumesToVolumes(customObject, workerIndex)...)
 }

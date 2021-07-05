@@ -2,11 +2,11 @@ package controller
 
 import (
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/metricsresource"
-	"github.com/giantswarm/operatorkit/v4/pkg/resource/wrapper/retryresource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/kvm-operator/service/controller/resource/terminateunhealthynodes"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/terminateunhealthynodes"
 )
 
 func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) ([]resource.Interface, error) {
@@ -14,9 +14,11 @@ func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) (
 	var terminateUnhealthyNodesResource resource.Interface
 	{
 		c := terminateunhealthynodes.Config{
-			CtrlClient:    config.K8sClient.CtrlClient(),
-			Logger:        config.Logger,
-			TenantCluster: config.TenantCluster,
+
+			CtrlClient:              config.K8sClient.CtrlClient(),
+			Logger:                  config.Logger,
+			TenantCluster:           config.TenantCluster,
+			TerminateUnhealthyNodes: config.TerminateUnhealthyNodes,
 		}
 
 		terminateUnhealthyNodesResource, err = terminateunhealthynodes.New(c)

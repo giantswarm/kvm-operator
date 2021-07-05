@@ -10,7 +10,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/service/controller/cloudconfig"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/cloudconfig"
 )
 
 const (

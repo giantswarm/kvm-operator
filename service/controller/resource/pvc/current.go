@@ -5,10 +5,10 @@ import (
 
 	"github.com/giantswarm/microerror"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -19,29 +19,18 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.Debugf(ctx, "looking for PVCs in the Kubernetes API")
 
-	var PVCs []*corev1.PersistentVolumeClaim
-
-	namespace := key.ClusterNamespace(customObject)
-	pvcNames := key.PVCNames(customObject)
-
-	for _, name := range pvcNames {
-		var manifest corev1.PersistentVolumeClaim
-		err := r.ctrlClient.Get(ctx, client.ObjectKey{
-			Namespace: namespace,
-			Name:      name,
-		}, &manifest)
-		if apierrors.IsNotFound(err) {
-			r.logger.Debugf(ctx, "did not find a PVC in the Kubernetes API")
-			// fall through
-		} else if err != nil {
-			return nil, microerror.Mask(err)
-		} else {
-			r.logger.Debugf(ctx, "found a PVC in the Kubernetes API")
-			PVCs = append(PVCs, &manifest)
-		}
+	var pvcs corev1.PersistentVolumeClaimList
+	err = r.ctrlClient.List(ctx, &pvcs, &client.ListOptions{
+		LabelSelector: labels.SelectorFromSet(map[string]string{
+			key.LegacyLabelCluster: key.ClusterID(customObject),
+		}),
+		Namespace: key.ClusterNamespace(customObject),
+	})
+	if err != nil {
+		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Debugf(ctx, "found %d PVCs in the Kubernetes API", len(PVCs))
+	r.logger.Debugf(ctx, "found %d PVCs in the Kubernetes API", len(pvcs.Items))
 
-	return PVCs, nil
+	return pvcs.Items, nil
 }
