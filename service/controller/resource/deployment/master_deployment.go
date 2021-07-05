@@ -109,7 +109,6 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 					ObjectMeta: metav1.ObjectMeta{
 						Annotations: map[string]string{
 							key.AnnotationAPIEndpoint:   key.ClusterAPIEndpoint(customResource),
-							key.AnnotationIp:            "",
 							key.AnnotationService:       key.MasterID,
 							key.AnnotationPodDrained:    "False",
 							key.AnnotationVersionBundle: key.OperatorVersion(customResource),
