@@ -64,11 +64,11 @@ const (
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
 	FlatcarChannel  = "stable"
 
+  K8SKVMContainerName = "k8s-kvm"
+  
 	K8SKVMDockerImage      = "quay.io/giantswarm/k8s-kvm:0.4.1-5294bf77bd3fd9ae8174210f1fc1a21406d68ba2"
 	K8SKVMHealthDocker     = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
 	ShutdownDeferrerDocker = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
-
-	K8SKVMContainerName = "k8s-kvm"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
