@@ -12,7 +12,7 @@ import (
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger/microloggertest"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -457,15 +457,15 @@ func buildResource() (*Resource, error) {
 		}
 	}
 
-	var tenantCluster tenantcluster.Interface
+	var workloadCluster workloadcluster.Interface
 	{
-		c := tenantcluster.Config{
+		c := workloadcluster.Config{
 			CertsSearcher: certsSearcher,
 			Logger:        logger,
 			CertID:        certs.APICert,
 		}
 
-		tenantCluster, err = tenantcluster.New(c)
+		workloadCluster, err = workloadcluster.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -474,10 +474,10 @@ func buildResource() (*Resource, error) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			DNSServers:    "dnsserver1,dnsserver2",
-			CtrlClient:    ctrlfake.NewFakeClientWithScheme(test.Scheme, release),
-			Logger:        logger,
-			TenantCluster: tenantCluster,
+			DNSServers:      "dnsserver1,dnsserver2",
+			CtrlClient:      ctrlfake.NewFakeClientWithScheme(test.Scheme, release),
+			Logger:          logger,
+			WorkloadCluster: workloadCluster,
 		}
 		newResource, err = New(resourceConfig)
 		if err != nil {

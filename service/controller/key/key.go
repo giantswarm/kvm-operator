@@ -16,7 +16,7 @@ import (
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -59,8 +59,6 @@ const (
 	EnvKeyMyPodName      = "MY_POD_NAME"
 	EnvKeyMyPodNamespace = "MY_POD_NAMESPACE"
 
-	FlannelEnvPathPrefix = "/run/flannel"
-
 	ContainerLinuxComponentName = "containerlinux"
 
 	FlatcarImageDir = "/var/lib/flatcar-kvm-images"
@@ -68,10 +66,7 @@ const (
 
 	K8SKVMContainerName = "k8s-kvm"
 
-	K8SEndpointUpdaterDocker = "quay.io/giantswarm/k8s-endpoint-updater:0.1.0"
-	K8SKVMDockerImage        = "quay.io/giantswarm/k8s-kvm:0.6.2"
-	K8SKVMHealthDocker       = "quay.io/giantswarm/k8s-kvm-health:0.1.0"
-	ShutdownDeferrerDocker   = "quay.io/giantswarm/shutdown-deferrer:0.1.0"
+	K8SKVMDockerImage = "quay.io/giantswarm/k8s-kvm:0.4.1-6c7a7f8ec4f0cce3ef3745ae999f5afa431c357f"
 
 	// constants for calculation qemu memory overhead.
 	baseMasterMemoryOverhead     = "1024M"
@@ -99,7 +94,6 @@ const (
 	AnnotationAPIEndpoint            = "kvm-operator.giantswarm.io/api-endpoint"
 	AnnotationComponentVersionPrefix = "kvm-operator.giantswarm.io/component-version"
 	AnnotationEtcdDomain             = "giantswarm.io/etcd-domain"
-	AnnotationIp                     = "endpoint.kvm.giantswarm.io/ip"
 	AnnotationService                = "endpoint.kvm.giantswarm.io/service"
 	AnnotationPodDrained             = "endpoint.kvm.giantswarm.io/drained"
 	AnnotationPrometheusCluster      = "giantswarm.io/prometheus-cluster"
@@ -230,8 +224,8 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 }
 
 // CreateK8sClientForWorkloadCluster takes the context of the reconciled object
-// and the provided logger and tenant cluster interface and creates a K8s client for the workload cluster
-func CreateK8sClientForWorkloadCluster(ctx context.Context, cluster v1alpha1.KVMConfig, logger micrologger.Logger, workloadCluster tenantcluster.Interface) (*k8sclient.Clients, error) {
+// and the provided logger and workload cluster interface and creates a K8s client for the workload cluster
+func CreateK8sClientForWorkloadCluster(ctx context.Context, cluster v1alpha1.KVMConfig, logger micrologger.Logger, workloadCluster workloadcluster.Interface) (*k8sclient.Clients, error) {
 	i := ClusterID(cluster)
 	e := ClusterAPIEndpoint(cluster)
 
@@ -504,18 +498,6 @@ func MemoryQuantityWorker(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, e
 	q.Add(memOverhead)
 
 	return q, nil
-}
-
-func NetworkBridgeName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("br-%s", ClusterID(customObject))
-}
-
-func NetworkEnvFilePath(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("%s/networks/%s.env", FlannelEnvPathPrefix, NetworkBridgeName(customObject))
-}
-
-func NetworkTapName(customObject v1alpha1.KVMConfig) string {
-	return fmt.Sprintf("tap-%s", ClusterID(customObject))
 }
 
 func NetworkDNSBlock(servers []net.IP) string {

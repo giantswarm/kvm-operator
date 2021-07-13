@@ -45,12 +45,12 @@ Note: `goimports` and `golangci-lint` should be available in your `$PATH` for th
 ## Architecture
 
 The operator uses our [operatorkit][1] framework. It watches `KVMConfig`
-CRs using a generated client stored in our [apiextensions][2] repo. Tenant clusters
-each have a version known as a "tenant cluster version" which defines a tested set of
+CRs using a generated client stored in our [apiextensions][2] repo. Workload clusters
+each have a version known as a "workload cluster version" which defines a tested set of
 component versions such as Kubernetes and CoreDNS and are managed as Release CRs on the control plane.
 
-The operator provisions tenant Kubernetes clusters running on-premises. It runs in a
-host Kubernetes cluster running on bare metal or virtual machines.
+The operator provisions Kubernetes workload clusters running on-premises. It runs in a
+Kubernetes management cluster running on bare metal or virtual machines.
 
 [1]:https://github.com/giantswarm/operatorkit
 [2]:https://github.com/giantswarm/apiextensions
@@ -81,8 +81,8 @@ kvm-operator contains four controllers each composed of one or more resource han
 
 ### Kubernetes Resources
 
-The operator creates a Kubernetes namespace per tenant cluster with a
-service and endpoints. These are used by the control plane cluster to access the tenant
+The operator creates a Kubernetes namespace per workload cluster with a
+service and endpoints. These are used by the management cluster to access the workload
 cluster.
 
 ### Certificates

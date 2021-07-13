@@ -3,7 +3,7 @@ package deployment
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -17,20 +17,20 @@ const (
 
 // Config represents the configuration used to create a new deployment resource.
 type Config struct {
-	DNSServers    string
-	CtrlClient    client.Client
-	Logger        micrologger.Logger
-	NTPServers    string
-	TenantCluster tenantcluster.Interface
+	DNSServers      string
+	CtrlClient      client.Client
+	Logger          micrologger.Logger
+	NTPServers      string
+	WorkloadCluster workloadcluster.Interface
 }
 
 // Resource implements the deployment resource.
 type Resource struct {
-	dnsServers    string
-	ctrlClient    client.Client
-	logger        micrologger.Logger
-	ntpServers    string
-	tenantCluster tenantcluster.Interface
+	dnsServers      string
+	ctrlClient      client.Client
+	logger          micrologger.Logger
+	ntpServers      string
+	workloadCluster workloadcluster.Interface
 }
 
 // New creates a new configured deployment resource.
@@ -44,16 +44,16 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-	if config.TenantCluster == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
+	if config.WorkloadCluster == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.WorkloadCluster must not be empty", config)
 	}
 
 	newResource := &Resource{
-		dnsServers:    config.DNSServers,
-		ctrlClient:    config.CtrlClient,
-		logger:        config.Logger,
-		ntpServers:    config.NTPServers,
-		tenantCluster: config.TenantCluster,
+		dnsServers:      config.DNSServers,
+		ctrlClient:      config.CtrlClient,
+		logger:          config.Logger,
+		ntpServers:      config.NTPServers,
+		workloadCluster: config.WorkloadCluster,
 	}
 
 	return newResource, nil

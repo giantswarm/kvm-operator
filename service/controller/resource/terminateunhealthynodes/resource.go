@@ -3,7 +3,7 @@ package terminateunhealthynodes
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -14,14 +14,14 @@ const (
 type Config struct {
 	CtrlClient              client.Client
 	Logger                  micrologger.Logger
-	TenantCluster           tenantcluster.Interface
+	WorkloadCluster         workloadcluster.Interface
 	TerminateUnhealthyNodes bool
 }
 
 type Resource struct {
 	ctrlClient              client.Client
 	logger                  micrologger.Logger
-	tenantCluster           tenantcluster.Interface
+	workloadCluster         workloadcluster.Interface
 	terminateUnhealthyNodes bool
 }
 
@@ -32,14 +32,14 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
-	if config.TenantCluster == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
+	if config.WorkloadCluster == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.WorkloadCluster must not be empty", config)
 	}
 
 	newService := &Resource{
 		ctrlClient:              config.CtrlClient,
 		logger:                  config.Logger,
-		tenantCluster:           config.TenantCluster,
+		workloadCluster:         config.WorkloadCluster,
 		terminateUnhealthyNodes: config.TerminateUnhealthyNodes,
 	}
 

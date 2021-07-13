@@ -48,11 +48,11 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.Debugf(ctx, "found %d services in the Kubernetes API", len(services))
 
-	// In case a cluster deletion happens, we want to delete the tenant cluster
+	// In case a cluster deletion happens, we want to delete the workload cluster
 	// services. We still need to use the services for ingress routing in order to
 	// drain nodes on KVM though. So as long as pods are there we delay the
 	// deletion of the services here in order to still be able to route traffic to
-	// the tenant cluster API. As soon as the draining was done and the pods got
+	// the workload cluster API. As soon as the draining was done and the pods got
 	// removed we get an empty list here after the delete event got replayed. Then
 	// we just remove the services as usual.
 	if key.IsDeleted(&customObject) {

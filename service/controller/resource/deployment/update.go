@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/errors/tenant"
+	workloaderrors "github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/crud"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -69,29 +69,29 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Debugf(ctx, "creating Kubernetes client for tenant cluster")
+	r.logger.Debugf(ctx, "creating Kubernetes client for workload cluster")
 
-	tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.tenantCluster)
-	if tenantcluster.IsTimeout(err) {
-		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
+	tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.workloadCluster)
+	if workloadcluster.IsTimeout(err) {
+		r.logger.Debugf(ctx, "did not create Kubernetes client for workload cluster")
 		r.logger.Debugf(ctx, "waiting for certificates timed out")
 
 		return nil, nil
-	} else if tenant.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
-		r.logger.Debugf(ctx, "did not create Kubernetes client for tenant cluster")
-		r.logger.Debugf(ctx, "tenant cluster is not available")
+	} else if workloaderrors.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
+		r.logger.Debugf(ctx, "did not create Kubernetes client for workload cluster")
+		r.logger.Debugf(ctx, "workload cluster is not available")
 
 		return nil, nil
 	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.Debugf(ctx, "created Kubernetes client for tenant cluster")
+	r.logger.Debugf(ctx, "created Kubernetes client for workload cluster")
 
 	return r.updateDeployments(ctx, currentState, desiredState, tcK8sClient.CtrlClient())
 }
 
-func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredState interface{}, tcK8sClient client.Client) (interface{}, error) {
+func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredState interface{}, wcK8sClient client.Client) (interface{}, error) {
 	currentDeployments, err := toDeployments(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -142,19 +142,20 @@ DeploymentsLoop:
 		if desiredDeployment.ObjectMeta.Labels[key.LabelApp] == key.WorkerID {
 			// List all master nodes in the tenant
 			var tcNodes v12.NodeList
-			err := tcK8sClient.List(ctx, &tcNodes, &client.ListOptions{
+			err := wcK8sClient.List(ctx, &tcNodes, &client.ListOptions{
 				LabelSelector: labels.SelectorFromSet(map[string]string{
 					"role": key.MasterID,
 				}),
 			})
+
 			if err != nil {
-				r.logger.LogCtx(ctx, "level", "warning", "message", "unable to list tenant cluster master nodes")
+				r.logger.LogCtx(ctx, "level", "warning", "message", "unable to list workload cluster master nodes")
 				return nil, microerror.Mask(err)
 			}
 			for _, n := range tcNodes.Items {
 				if key.NodeIsUnschedulable(n) {
 					// Node has NoSchedule or NoExecute taint
-					msg := fmt.Sprintf("not updating deployment '%s': one or more tenant cluster master nodes are unschedulable", currentDeployment.GetName())
+					msg := fmt.Sprintf("not updating deployment '%s': one or more workload cluster master nodes are unschedulable", currentDeployment.GetName())
 					r.logger.LogCtx(ctx, "level", "warning", "message", msg)
 					continue DeploymentsLoop
 				}

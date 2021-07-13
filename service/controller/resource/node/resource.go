@@ -3,7 +3,7 @@ package node
 import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -12,15 +12,15 @@ const (
 )
 
 type Config struct {
-	CtrlClient    client.Client
-	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
+	CtrlClient      client.Client
+	Logger          micrologger.Logger
+	WorkloadCluster workloadcluster.Interface
 }
 
 type Resource struct {
-	ctrlClient    client.Client
-	logger        micrologger.Logger
-	tenantCluster tenantcluster.Interface
+	ctrlClient      client.Client
+	logger          micrologger.Logger
+	workloadCluster workloadcluster.Interface
 }
 
 func New(config Config) (*Resource, error) {
@@ -30,14 +30,14 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-	if config.TenantCluster == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
+	if config.WorkloadCluster == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.WorkloadCluster must not be empty", config)
 	}
 
 	r := &Resource{
-		ctrlClient:    config.CtrlClient,
-		logger:        config.Logger,
-		tenantCluster: config.TenantCluster,
+		ctrlClient:      config.CtrlClient,
+		logger:          config.Logger,
+		workloadCluster: config.WorkloadCluster,
 	}
 
 	return r, nil

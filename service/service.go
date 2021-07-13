@@ -13,7 +13,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/statusresource/v3"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"github.com/giantswarm/versionbundle"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
@@ -118,16 +118,16 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var tenantCluster tenantcluster.Interface
+	var workloadCluster workloadcluster.Interface
 	{
-		c := tenantcluster.Config{
+		c := workloadcluster.Config{
 			CertsSearcher: certsSearcher,
 			Logger:        config.Logger,
 
 			CertID: certs.APICert,
 		}
 
-		tenantCluster, err = tenantcluster.New(c)
+		workloadCluster, err = workloadcluster.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -136,34 +136,31 @@ func New(config Config) (*Service, error) {
 	var clusterController *controller.Cluster
 	{
 		c := controller.ClusterConfig{
-			CertsSearcher: certsSearcher,
-			K8sClient:     k8sClient,
-			Logger:        config.Logger,
-			TenantCluster: tenantCluster,
+			CertsSearcher:   certsSearcher,
+			K8sClient:       k8sClient,
+			Logger:          config.Logger,
+			WorkloadCluster: workloadCluster,
 
 			ClusterRoleGeneral: config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.General),
 			ClusterRolePSP:     config.Viper.GetString(config.Flag.Service.RBAC.ClusterRole.PSP),
-			CRDLabelSelector:   config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			GuestUpdateEnabled: config.Viper.GetBool(config.Flag.Service.Tenant.Update.Enabled),
-			ProjectName:        project.Name(),
 
 			DNSServers:   config.Viper.GetString(config.Flag.Service.Installation.DNS.Servers),
-			IgnitionPath: config.Viper.GetString(config.Flag.Service.Tenant.Ignition.Path),
+			IgnitionPath: config.Viper.GetString(config.Flag.Service.Workload.Ignition.Path),
 			NTPServers:   config.Viper.GetString(config.Flag.Service.Installation.NTP.Servers),
 			OIDC: controller.ClusterConfigOIDC{
-				ClientID:       config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.ClientID),
-				IssuerURL:      config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
-				UsernameClaim:  config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
-				UsernamePrefix: config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix),
-				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
-				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Tenant.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
+				ClientID:       config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.ClientID),
+				IssuerURL:      config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.IssuerURL),
+				UsernameClaim:  config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.UsernameClaim),
+				UsernamePrefix: config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.UsernamePrefix),
+				GroupsClaim:    config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.GroupsClaim),
+				GroupsPrefix:   config.Viper.GetString(config.Flag.Service.Installation.Workload.Kubernetes.API.Auth.Provider.OIDC.GroupsPrefix),
 			},
 			Proxy: controller.Proxy{
-				HTTP:    config.Viper.GetString(config.Flag.Service.Tenant.Proxy.HTTP),
-				HTTPS:   config.Viper.GetString(config.Flag.Service.Tenant.Proxy.HTTPS),
-				NoProxy: config.Viper.GetStringSlice(config.Flag.Service.Tenant.Proxy.NoProxy),
+				HTTP:    config.Viper.GetString(config.Flag.Service.Workload.Proxy.HTTP),
+				HTTPS:   config.Viper.GetString(config.Flag.Service.Workload.Proxy.HTTPS),
+				NoProxy: config.Viper.GetStringSlice(config.Flag.Service.Workload.Proxy.NoProxy),
 			},
-			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Tenant.SSH.SSOPublicKey),
+			SSOPublicKey: config.Viper.GetString(config.Flag.Service.Workload.SSH.SSOPublicKey),
 
 			DockerhubToken:  config.Viper.GetString(config.Flag.Service.Registry.DockerhubToken),
 			RegistryDomain:  config.Viper.GetString(config.Flag.Service.Registry.Domain),
@@ -179,13 +176,12 @@ func New(config Config) (*Service, error) {
 	var deleterController *controller.Deleter
 	{
 		c := controller.DeleterConfig{
-			CertsSearcher: certsSearcher,
-			K8sClient:     k8sClient,
-			Logger:        config.Logger,
-			TenantCluster: tenantCluster,
+			CertsSearcher:   certsSearcher,
+			K8sClient:       k8sClient,
+			Logger:          config.Logger,
+			WorkloadCluster: workloadCluster,
 
-			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      project.Name(),
+			ProjectName: project.Name(),
 		}
 
 		deleterController, err = controller.NewDeleter(c)
@@ -200,8 +196,7 @@ func New(config Config) (*Service, error) {
 			K8sClient: k8sClient,
 			Logger:    config.Logger,
 
-			CRDLabelSelector: config.Viper.GetString(config.Flag.Service.CRD.LabelSelector),
-			ProjectName:      project.Name(),
+			ProjectName: project.Name(),
 		}
 
 		drainerController, err = controller.NewDrainer(c)
@@ -213,9 +208,9 @@ func New(config Config) (*Service, error) {
 	var unhealthyNodeTerminatorController *controller.UnhealthyNodeTerminator
 	{
 		c := controller.UnhealthyNodeTerminatorConfig{
-			K8sClient:     k8sClient,
-			Logger:        config.Logger,
-			TenantCluster: tenantCluster,
+			K8sClient:       k8sClient,
+			Logger:          config.Logger,
+			WorkloadCluster: workloadCluster,
 
 			ProjectName:             project.Name(),
 			TerminateUnhealthyNodes: config.Viper.GetBool(config.Flag.Service.TerminateUnhealthyNodes),
