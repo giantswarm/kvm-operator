@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `k8scloudconfig` to `v10.8.1` which includes a change to better determine if memory eviction thresholds are crossed.
+
 ## [3.17.3] - 2021-06-17
 
 ### Fixed

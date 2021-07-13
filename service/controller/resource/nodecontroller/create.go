@@ -11,10 +11,10 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/internal/nodecontroller"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/internal/nodecontroller"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {

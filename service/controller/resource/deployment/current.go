@@ -11,8 +11,8 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/kvm-operator/service/controller/key"
-	"github.com/giantswarm/kvm-operator/service/metric"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/service/metric"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {

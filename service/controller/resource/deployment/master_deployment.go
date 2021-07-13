@@ -12,9 +12,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/giantswarm/kvm-operator/pkg/label"
-	"github.com/giantswarm/kvm-operator/pkg/project"
-	"github.com/giantswarm/kvm-operator/service/controller/key"
+	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/project"
+	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1alpha1.Release, dnsServers, ntpServers string) ([]*v1.Deployment, error) {
