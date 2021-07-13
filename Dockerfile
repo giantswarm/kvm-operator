@@ -1,15 +1,15 @@
-FROM quay.io/giantswarm/golang:1.15.3 AS builder
+FROM quay.io/giantswarm/golang:1.16.6 AS builder
 
 WORKDIR /mod
 
-ADD go.mod .
+COPY go.mod go.sum .
 
 RUN K8SCCPATH=$(go list -m -f '{{.Path}}' github.com/giantswarm/k8scloudconfig/...) \
     && go mod download -x $K8SCCPATH \
     && K8SCCROOT=$(go list -m -f '{{.Dir}}' github.com/giantswarm/k8scloudconfig/...) \
     && mv $K8SCCROOT /opt/k8scloudconfig
 
-FROM alpine:3.13.5
+FROM alpine:3.14.0
 
 RUN apk add --no-cache ca-certificates
 
