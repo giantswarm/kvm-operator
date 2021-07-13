@@ -2,7 +2,7 @@ FROM quay.io/giantswarm/golang:1.16.6 AS builder
 
 WORKDIR /mod
 
-COPY go.mod go.sum .
+COPY go.mod go.sum /mod
 
 RUN K8SCCPATH=$(go list -m -f '{{.Path}}' github.com/giantswarm/k8scloudconfig/...) \
     && go mod download -x $K8SCCPATH \
