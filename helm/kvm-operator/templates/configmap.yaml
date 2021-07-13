@@ -33,7 +33,7 @@ data:
         ntp:
           servers: {{ .Values.ntp.servers }}
         {{- if .Values.oidc.enabled }}
-        tenant:
+        workload:
           kubernetes:
             api:
               auth:
@@ -49,7 +49,7 @@ data:
       registry:
         domain: '{{ .Values.registry.domain }}'
         mirrors: '{{ range $i, $e := .Values.registry.mirrors }}{{ if $i }},{{end}}{{ $e }}{{end}}'
-      tenant:
+      workload:
         proxy:
           noProxy: '{{ range $i, $e := .Values.proxy.noProxy }}{{ if $i }},{{end}}{{ $e }}{{end}}'
         ssh:

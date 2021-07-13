@@ -4,7 +4,7 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -18,22 +18,22 @@ const (
 
 // Config represents the configuration used to create a new deployment resource.
 type Config struct {
-	DNSServers    string
-	G8sClient     versioned.Interface
-	K8sClient     kubernetes.Interface
-	Logger        micrologger.Logger
-	NTPServers    string
-	TenantCluster tenantcluster.Interface
+	DNSServers      string
+	G8sClient       versioned.Interface
+	K8sClient       kubernetes.Interface
+	Logger          micrologger.Logger
+	NTPServers      string
+	WorkloadCluster workloadcluster.Interface
 }
 
 // Resource implements the deployment resource.
 type Resource struct {
-	dnsServers    string
-	g8sClient     versioned.Interface
-	k8sClient     kubernetes.Interface
-	logger        micrologger.Logger
-	ntpServers    string
-	tenantCluster tenantcluster.Interface
+	dnsServers      string
+	g8sClient       versioned.Interface
+	k8sClient       kubernetes.Interface
+	logger          micrologger.Logger
+	ntpServers      string
+	workloadCluster workloadcluster.Interface
 }
 
 // New creates a new configured deployment resource.
@@ -50,17 +50,17 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-	if config.TenantCluster == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.TenantCluster must not be empty", config)
+	if config.WorkloadCluster == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.WorkloadCluster must not be empty", config)
 	}
 
 	newResource := &Resource{
-		dnsServers:    config.DNSServers,
-		g8sClient:     config.G8sClient,
-		k8sClient:     config.K8sClient,
-		logger:        config.Logger,
-		ntpServers:    config.NTPServers,
-		tenantCluster: config.TenantCluster,
+		dnsServers:      config.DNSServers,
+		g8sClient:       config.G8sClient,
+		k8sClient:       config.K8sClient,
+		logger:          config.Logger,
+		ntpServers:      config.NTPServers,
+		workloadCluster: config.WorkloadCluster,
 	}
 
 	return newResource, nil

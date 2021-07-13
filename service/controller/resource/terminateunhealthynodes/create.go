@@ -34,7 +34,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	var tcCtrlClient client.Client
 	{
-		tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, customResource, r.logger, r.tenantCluster)
+		tcK8sClient, err := key.CreateK8sClientForWorkloadCluster(ctx, customResource, r.logger, r.workloadCluster)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -74,7 +74,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		r.logger.Debugf(ctx, "resetting tick node counters on all nodes in tenant cluster")
+		r.logger.Debugf(ctx, "resetting tick node counters on all nodes in workload cluster")
 	}
 
 	return nil
@@ -93,7 +93,7 @@ func (r *Resource) terminateNode(ctx context.Context, clusterID string, node cor
 		return microerror.Mask(err)
 	}
 
-	r.logger.Debugf(ctx, "terminated unhealhty node %s", node.Name)
+	r.logger.Debugf(ctx, "terminated unhealthy node %s", node.Name)
 
 	return nil
 }
