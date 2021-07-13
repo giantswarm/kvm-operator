@@ -6,25 +6,11 @@ import (
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/endpoint"
 	"github.com/giantswarm/kvm-operator/v4/service/controller/resource/pod"
 )
 
 func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 	var err error
-
-	var endpointResource resource.Interface
-	{
-		c := endpoint.Config{
-			CtrlClient: config.K8sClient.CtrlClient(),
-			Logger:     config.Logger,
-		}
-
-		endpointResource, err = endpoint.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	var podResource resource.Interface
 	{
@@ -41,7 +27,6 @@ func newDrainerResources(config DrainerConfig) ([]resource.Interface, error) {
 	}
 
 	resources := []resource.Interface{
-		endpointResource,
 		podResource,
 	}
 
