@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/v5/pkg/controller"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -16,21 +16,18 @@ import (
 )
 
 type ClusterConfig struct {
-	CertsSearcher certs.Interface
-	K8sClient     k8sclient.Interface
-	Logger        micrologger.Logger
-	TenantCluster tenantcluster.Interface
+	CertsSearcher   certs.Interface
+	K8sClient       k8sclient.Interface
+	Logger          micrologger.Logger
+	WorkloadCluster workloadcluster.Interface
 
 	ClusterRoleGeneral string
 	ClusterRolePSP     string
-	CRDLabelSelector   string
 	DNSServers         string
-	GuestUpdateEnabled bool
 	IgnitionPath       string
 	NTPServers         string
 	OIDC               ClusterConfigOIDC
 	Proxy              Proxy
-	ProjectName        string
 	SSOPublicKey       string
 
 	DockerhubToken  string
@@ -84,7 +81,7 @@ func NewCluster(config ClusterConfig) (*Cluster, error) {
 				label.OperatorVersion: project.Version(),
 			}),
 
-			Name: config.ProjectName,
+			Name: project.Name(),
 		}
 
 		operatorkitController, err = controller.New(c)

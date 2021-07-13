@@ -18,8 +18,7 @@ type DrainerConfig struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
 
-	CRDLabelSelector string
-	ProjectName      string
+	ProjectName string
 }
 
 type Drainer struct {

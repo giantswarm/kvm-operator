@@ -16,7 +16,7 @@ import (
 	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -224,8 +224,8 @@ func CPUQuantity(n v1alpha1.KVMConfigSpecKVMNode) (resource.Quantity, error) {
 }
 
 // CreateK8sClientForWorkloadCluster takes the context of the reconciled object
-// and the provided logger and tenant cluster interface and creates a K8s client for the workload cluster
-func CreateK8sClientForWorkloadCluster(ctx context.Context, cluster v1alpha1.KVMConfig, logger micrologger.Logger, workloadCluster tenantcluster.Interface) (*k8sclient.Clients, error) {
+// and the provided logger and workload cluster interface and creates a K8s client for the workload cluster
+func CreateK8sClientForWorkloadCluster(ctx context.Context, cluster v1alpha1.KVMConfig, logger micrologger.Logger, workloadCluster workloadcluster.Interface) (*k8sclient.Clients, error) {
 	i := ClusterID(cluster)
 	e := ClusterAPIEndpoint(cluster)
 

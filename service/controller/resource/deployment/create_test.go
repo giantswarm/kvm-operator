@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/certs/v3/pkg/certs"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
@@ -255,15 +255,15 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 		}
 	}
 
-	var tenantCluster tenantcluster.Interface
+	var workloadCluster workloadcluster.Interface
 	{
-		c := tenantcluster.Config{
+		c := workloadcluster.Config{
 			CertsSearcher: certsSearcher,
 			Logger:        logger,
 			CertID:        certs.APICert,
 		}
 
-		tenantCluster, err = tenantcluster.New(c)
+		workloadCluster, err = workloadcluster.New(c)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
@@ -272,11 +272,11 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			DNSServers:    "dnsserver1,dnsserver2",
-			G8sClient:     clientset,
-			K8sClient:     fake.NewSimpleClientset(),
-			Logger:        logger,
-			TenantCluster: tenantCluster,
+			DNSServers:      "dnsserver1,dnsserver2",
+			G8sClient:       clientset,
+			K8sClient:       fake.NewSimpleClientset(),
+			Logger:          logger,
+			WorkloadCluster: workloadCluster,
 		}
 		newResource, err = New(resourceConfig)
 		if err != nil {

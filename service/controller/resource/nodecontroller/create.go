@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/giantswarm/errors/tenant"
+	workloaderrors "github.com/giantswarm/errors/tenant"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	"k8s.io/apimachinery/pkg/labels"
 
 	"github.com/giantswarm/kvm-operator/v4/pkg/label"
@@ -32,10 +32,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var k8sClient *k8sclient.Clients
 	{
 		k8sClient, err = key.CreateK8sClientForWorkloadCluster(ctx, cr, r.logger, r.workloadCluster)
-		if tenantcluster.IsTimeout(err) {
+		if workloadcluster.IsTimeout(err) {
 			r.logger.Debugf(ctx, "waiting for certificates timed out")
 			shouldStop = true
-		} else if tenant.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
+		} else if workloaderrors.IsAPINotAvailable(err) || k8sclient.IsTimeout(err) {
 			r.logger.Debugf(ctx, "workload cluster is not available")
 			shouldStop = true
 		} else if err != nil {

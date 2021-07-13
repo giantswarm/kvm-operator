@@ -16,7 +16,7 @@ func newUnhealthyNodeTerminatorResources(config UnhealthyNodeTerminatorConfig) (
 		c := terminateunhealthynodes.Config{
 			K8sClient:               config.K8sClient.K8sClient(),
 			Logger:                  config.Logger,
-			TenantCluster:           config.TenantCluster,
+			WorkloadCluster:         config.WorkloadCluster,
 			TerminateUnhealthyNodes: config.TerminateUnhealthyNodes,
 		}
 
