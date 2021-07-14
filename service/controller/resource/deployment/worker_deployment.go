@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
@@ -135,7 +136,7 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 								},
 							},
 							{
-								Name: "rootfs",
+								Name: "disks",
 								VolumeSource: corev1.VolumeSource{
 									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
@@ -213,6 +214,13 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										Name:  "CONTAINERVMM_FLATCAR_IGNITION_FILE",
 										Value: "/var/lib/containervmm/ignition/ignition",
 									},
+									{
+										Name: "CONTAINERVMM_GUEST_ADDITIONAL_DISKS",
+										Value: strings.Join([]string{
+											strings.Join([]string{"dockerfs", key.DefaultDockerDiskSize}, ":"),
+											strings.Join([]string{"kubeletfs", key.DefaultKubeletDiskSize}, ":"),
+										}, ","),
+									},
 								},
 								Lifecycle: &corev1.Lifecycle{
 									PreStop: &corev1.Handler{
@@ -266,11 +274,11 @@ func newWorkerDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 									},
 									{
 										Name:      "images",
-										MountPath: "/var/lib/containervmm/flatcar",
+										MountPath: "/var/lib/containervmm/images",
 									},
 									{
-										Name:      "rootfs",
-										MountPath: "/var/lib/containervmm/rootfs",
+										Name:      "disks",
+										MountPath: "/var/lib/containervmm/disks",
 									},
 									{
 										Name:      "dev-kvm",
