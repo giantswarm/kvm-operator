@@ -36,7 +36,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 		}
 
 		for _, pvc := range pvcsToDelete {
-			err := r.ctrlClient.Delete(ctx, &pvc, &client.DeleteOptions{})
+			err := r.ctrlClient.Delete(ctx, pvc.DeepCopy(), &client.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
