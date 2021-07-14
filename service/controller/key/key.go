@@ -204,7 +204,7 @@ func ConfigMapName(cr v1alpha1.KVMConfig, node v1alpha1.ClusterNode, prefix stri
 	return fmt.Sprintf("%s-%s-%s", prefix, ClusterID(cr), node.ID)
 }
 
-func ContainerDistro(release *releasev1alpha1.Release) (string, error) {
+func ContainerDistro(release releasev1alpha1.Release) (string, error) {
 	for _, component := range release.Spec.Components {
 		if component.Name == ContainerLinuxComponentName {
 			return component.Version, nil

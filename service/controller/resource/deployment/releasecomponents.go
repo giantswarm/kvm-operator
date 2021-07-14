@@ -10,7 +10,7 @@ import (
 var coreComponents = []string{"calico", "containerlinux", "etcd", "kubernetes"}
 
 // addCoreComponentsAnnotations adds an annotation for each core component to the pod template spec
-func addCoreComponentsAnnotations(deployment *v1.Deployment, release *releasev1alpha1.Release) {
+func addCoreComponentsAnnotations(deployment *v1.Deployment, release releasev1alpha1.Release) {
 	for _, component := range coreComponents {
 		version := componentVersion(release, component)
 		if version == "" {
@@ -22,7 +22,7 @@ func addCoreComponentsAnnotations(deployment *v1.Deployment, release *releasev1a
 	}
 }
 
-func componentVersion(release *releasev1alpha1.Release, component string) string {
+func componentVersion(release releasev1alpha1.Release, component string) string {
 	for _, releaseComponent := range release.Spec.Components {
 		if releaseComponent.Name == component {
 			return releaseComponent.Version

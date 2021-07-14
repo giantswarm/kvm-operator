@@ -7,13 +7,13 @@ import (
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
+	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/scheme"
 	"github.com/giantswarm/certs/v3/pkg/certstest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/giantswarm/randomkeys/v2/randomkeystest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 
 	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 	"github.com/giantswarm/kvm-operator/v4/service/controller/cloudconfig/cloudconfigtest"
@@ -36,7 +36,6 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 			Version: "3.4.9",
 		},
 	}
-	clientset := apiextfake.NewSimpleClientset(release)
 
 	testCases := []struct {
 		Name                string
@@ -252,8 +251,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		resourceConfig := Config{}
 		resourceConfig.CertsSearcher = certstest.NewSearcher(certstest.Config{})
 		resourceConfig.CloudConfig = cloudconfigtest.New()
-		resourceConfig.G8sClient = clientset
-		resourceConfig.K8sClient = fake.NewSimpleClientset()
+		resourceConfig.CtrlClient = fake.NewFakeClientWithScheme(scheme.Scheme, release)
 		resourceConfig.KeyWatcher = randomkeystest.NewSearcher()
 		resourceConfig.Logger = microloggertest.New()
 		resourceConfig.RegistryDomain = "example.co.uk"

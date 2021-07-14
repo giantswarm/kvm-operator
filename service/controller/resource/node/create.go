@@ -8,8 +8,7 @@ import (
 	"github.com/giantswarm/microerror"
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
@@ -22,7 +21,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	// At first we need to create a Kubernetes client for the reconciled workload
 	// cluster.
-	var k8sClient kubernetes.Interface
+	var ctrlClient client.Client
 	{
 		r.logger.Debugf(ctx, "creating Kubernetes client for workload cluster")
 
@@ -37,7 +36,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 
-		k8sClient = k8sClients.K8sClient()
+		ctrlClient = k8sClients.CtrlClient()
 		r.logger.Debugf(ctx, "created Kubernetes client for workload cluster")
 	}
 
@@ -46,7 +45,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// to be deleted if no associated management cluster pod exists.
 	var nodes []corev1.Node
 	{
-		list, err := k8sClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+		var list corev1.NodeList
+		err := ctrlClient.List(ctx, &list)
 		if workloaderrors.IsAPINotAvailable(err) {
 			r.logger.Debugf(ctx, "workload cluster is not available")
 			r.logger.Debugf(ctx, "canceling resource")
@@ -63,8 +63,10 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	// against the workload cluster nodes below.
 	var pods []corev1.Pod
 	{
-		n := key.ClusterID(customObject)
-		list, err := r.k8sClient.CoreV1().Pods(n).List(ctx, metav1.ListOptions{})
+		var list corev1.PodList
+		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
+			Namespace: key.ClusterID(customObject),
+		})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -94,7 +96,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		r.logger.Debugf(ctx, "deleting node '%s' in the workload cluster's Kubernetes API", n.GetName())
 
-		err = k8sClient.CoreV1().Nodes().Delete(ctx, n.GetName(), metav1.DeleteOptions{})
+		err = ctrlClient.Delete(ctx, &n) //nolint:gosec
 		if err != nil {
 			return microerror.Mask(err)
 		}

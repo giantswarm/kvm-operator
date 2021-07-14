@@ -5,16 +5,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/scheme"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	workloadcluster "github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
+	ctrlfake "sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger/microloggertest"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 )
 
 func Test_Resource_Deployment_newCreateChange(t *testing.T) {
@@ -35,7 +36,6 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 			Version: "3.3.15",
 		},
 	}
-	clientset := apiextfake.NewSimpleClientset(release)
 
 	testCases := []struct {
 		Obj                     interface{}
@@ -244,7 +244,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 	var certsSearcher certs.Interface
 	{
 		c := certs.Config{
-			K8sClient:    fake.NewSimpleClientset(),
+			K8sClient:    k8sfake.NewSimpleClientset(),
 			Logger:       logger,
 			WatchTimeout: 5 * time.Second,
 		}
@@ -273,8 +273,7 @@ func Test_Resource_Deployment_newCreateChange(t *testing.T) {
 	{
 		resourceConfig := Config{
 			DNSServers:      "dnsserver1,dnsserver2",
-			G8sClient:       clientset,
-			K8sClient:       fake.NewSimpleClientset(),
+			CtrlClient:      ctrlfake.NewFakeClientWithScheme(scheme.Scheme, release),
 			Logger:          logger,
 			WorkloadCluster: workloadCluster,
 		}

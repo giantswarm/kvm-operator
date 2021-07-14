@@ -7,16 +7,13 @@ import (
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/crud"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	customObject, err := key.ToCustomObject(obj)
-	if err != nil {
-		return microerror.Mask(err)
-	}
 	pvcsToDelete, err := toPVCs(deleteChange)
 	if err != nil {
 		return microerror.Mask(err)
@@ -25,16 +22,21 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	if len(pvcsToDelete) != 0 {
 		r.logger.Debugf(ctx, "deleting the PVCs in the Kubernetes API")
 
-		persistentVolumes, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{
-			LabelSelector: key.LabelMountTag,
+		persistentVolumeSelector, err := labels.Parse(key.LabelMountTag)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		var persistentVolumes corev1.PersistentVolumeList
+		err = r.ctrlClient.List(ctx, &persistentVolumes, &client.ListOptions{
+			LabelSelector: persistentVolumeSelector,
 		})
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		namespace := key.ClusterNamespace(customObject)
 		for _, pvc := range pvcsToDelete {
-			err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).Delete(ctx, pvc.Name, metav1.DeleteOptions{})
+			err := r.ctrlClient.Delete(ctx, pvc.DeepCopy(), &client.DeleteOptions{})
 			if apierrors.IsNotFound(err) {
 				// fall through
 			} else if err != nil {
@@ -50,11 +52,12 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			for _, persistentVolume := range persistentVolumes.Items {
 				if persistentVolume.Spec.ClaimRef != nil &&
 					persistentVolume.Spec.ClaimRef.Name == pvc.Name &&
-					persistentVolume.Spec.ClaimRef.Namespace == namespace {
+					persistentVolume.Spec.ClaimRef.Namespace == pvc.Namespace {
 					persistentVolume := persistentVolume.DeepCopy()
 					// Remove the claim
 					persistentVolume.Spec.ClaimRef = nil
-					_, err = r.k8sClient.CoreV1().PersistentVolumes().Update(ctx, persistentVolume, metav1.UpdateOptions{})
+
+					err = r.ctrlClient.Update(ctx, persistentVolume, &client.UpdateOptions{})
 					if err != nil {
 						return microerror.Mask(err)
 					}

@@ -2,10 +2,11 @@ package pvc
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
@@ -18,9 +19,12 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 
 	r.logger.Debugf(ctx, "looking for PVCs in the Kubernetes API")
 
-	namespace := key.ClusterNamespace(customObject)
-	pvcs, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("%s=%s", key.LegacyLabelCluster, key.ClusterID(customObject)),
+	var pvcs corev1.PersistentVolumeClaimList
+	err = r.ctrlClient.List(ctx, &pvcs, &client.ListOptions{
+		LabelSelector: labels.SelectorFromSet(map[string]string{
+			key.LegacyLabelCluster: key.ClusterID(customObject),
+		}),
+		Namespace: key.ClusterNamespace(customObject),
 	})
 	if err != nil {
 		return nil, microerror.Mask(err)

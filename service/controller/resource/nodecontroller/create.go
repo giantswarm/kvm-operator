@@ -47,7 +47,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	if k8sClient != nil {
 		config := nodecontroller.Config{
 			Cluster:             cr,
-			ManagementK8sClient: r.k8sClient,
+			ManagementK8sClient: r.ctrlClient,
 			WorkloadK8sClient:   k8sClient,
 			Logger:              r.logger,
 			Name:                fmt.Sprintf("%s-%s-nodes", project.Name(), clusterID),

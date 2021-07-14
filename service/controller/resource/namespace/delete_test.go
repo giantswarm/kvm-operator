@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/scheme"
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 )
 
 func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
@@ -96,9 +97,10 @@ func Test_Resource_Namespace_newDeleteChange(t *testing.T) {
 	var err error
 	var newResource *Resource
 	{
-		resourceConfig := DefaultConfig()
-		resourceConfig.K8sClient = fake.NewSimpleClientset()
-		resourceConfig.Logger = microloggertest.New()
+		resourceConfig := Config{
+			CtrlClient: fake.NewFakeClientWithScheme(scheme.Scheme),
+			Logger:     microloggertest.New(),
+		}
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)

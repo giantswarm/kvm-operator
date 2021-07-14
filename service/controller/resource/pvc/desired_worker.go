@@ -8,10 +8,12 @@ import (
 	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/resourcecanceledcontext"
 	"github.com/giantswarm/to"
+	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
@@ -25,16 +27,20 @@ func (r *Resource) getDesiredWorkerPVCs(ctx context.Context, customObject v1alph
 		workerCluster := customObject.Spec.Cluster.Workers[i]
 
 		if key.IsDeleted(&customObject) && len(workerKVM.HostVolumes) > 0 {
-			deploymentName := key.DeploymentName(key.WorkerID, workerCluster.ID)
-			_, err := r.k8sClient.AppsV1().Deployments(namespace).Get(ctx, deploymentName, metav1.GetOptions{})
+			deploymentKey := client.ObjectKey{
+				Name:      key.DeploymentName(key.WorkerID, workerCluster.ID),
+				Namespace: namespace,
+			}
+			var deployment v1.Deployment
+			err := r.ctrlClient.Get(ctx, deploymentKey, &deployment)
 			if errors.IsNotFound(err) {
 				// the cluster is being deleted and the worker deployment doesn't exist
-				r.logger.Debugf(ctx, "worker deployment %#q not found, not adding pvcs to desired state", deploymentName)
+				r.logger.Debugf(ctx, "worker deployment %#q not found, not adding pvcs to desired state", deploymentKey.Name)
 			} else if err != nil {
 				return nil, microerror.Mask(err)
 			} else {
 				// deployment still exists, keep finalizer, cancel, and delete on next reconciliation
-				r.logger.Debugf(ctx, "keeping finalizer and canceling as deployment %#q still exists", deploymentName)
+				r.logger.Debugf(ctx, "keeping finalizer and canceling as deployment %#q still exists", deploymentKey.Name)
 				finalizerskeptcontext.SetKept(ctx)
 				resourcecanceledcontext.SetCanceled(ctx)
 				return nil, nil
@@ -42,8 +48,9 @@ func (r *Resource) getDesiredWorkerPVCs(ctx context.Context, customObject v1alph
 		}
 
 		for _, hostVolume := range workerKVM.HostVolumes {
-			candidateVolumes, err := r.k8sClient.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{
-				LabelSelector: labels.FormatLabels(map[string]string{
+			var candidateVolumes corev1.PersistentVolumeList
+			err := r.ctrlClient.List(ctx, &candidateVolumes, &client.ListOptions{
+				LabelSelector: labels.SelectorFromSet(map[string]string{
 					key.LabelMountTag: hostVolume.MountTag,
 				}),
 			})

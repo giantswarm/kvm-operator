@@ -9,7 +9,6 @@ import (
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
-	apiextfake "github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/certs/v3/pkg/certs"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger/microloggertest"
@@ -18,9 +17,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
+	ctrlfake "sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 
 	"github.com/giantswarm/kvm-operator/v4/pkg/label"
+	"github.com/giantswarm/kvm-operator/v4/pkg/test"
 	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
 )
 
@@ -438,7 +439,6 @@ func buildResource() (*Resource, error) {
 			Version: containerlinuxVersion,
 		},
 	}
-	clientset := apiextfake.NewSimpleClientset(release)
 
 	logger := microloggertest.New()
 
@@ -446,7 +446,7 @@ func buildResource() (*Resource, error) {
 	var certsSearcher certs.Interface
 	{
 		c := certs.Config{
-			K8sClient:    fake.NewSimpleClientset(),
+			K8sClient:    k8sfake.NewSimpleClientset(),
 			Logger:       logger,
 			WatchTimeout: 5 * time.Second,
 		}
@@ -475,8 +475,7 @@ func buildResource() (*Resource, error) {
 	{
 		resourceConfig := Config{
 			DNSServers:      "dnsserver1,dnsserver2",
-			G8sClient:       clientset,
-			K8sClient:       fake.NewSimpleClientset(),
+			CtrlClient:      ctrlfake.NewFakeClientWithScheme(test.Scheme, release),
 			Logger:          logger,
 			WorkloadCluster: workloadCluster,
 		}

@@ -49,9 +49,9 @@ type Config struct {
 // This controller is based on the operatorkit controller but cuts out metrics collectors, Sentry, and other undesirable
 // features for a dynamic workload cluster controller.
 type Controller struct {
-	managementK8sClient client.Client
-	workloadK8sClient   k8sclient.Interface
-	logger              micrologger.Logger
+	managementClient client.Client
+	workloadClient   k8sclient.Interface
+	logger           micrologger.Logger
 
 	stopOnce       sync.Once
 	stopped        chan struct{}
@@ -84,9 +84,9 @@ func New(config Config) (*Controller, error) {
 	}
 
 	c := &Controller{
-		managementK8sClient: config.ManagementK8sClient,
-		workloadK8sClient:   config.WorkloadK8sClient,
-		logger:              config.Logger,
+		managementClient: config.ManagementK8sClient,
+		workloadClient:   config.WorkloadK8sClient,
+		logger:           config.Logger,
 
 		stopped:        make(chan struct{}),
 		lastReconciled: time.Time{},
@@ -110,7 +110,7 @@ func (c *Controller) Boot() error {
 		}
 
 		var err error
-		mgr, err = manager.New(c.workloadK8sClient.RESTConfig(), o)
+		mgr, err = manager.New(c.workloadClient.RESTConfig(), o)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -161,8 +161,8 @@ func (c *Controller) Equal(other *Controller) bool {
 
 	// compare rest configs
 	// rest.Config equality based on setup function here https://github.com/giantswarm/tenantcluster/blob/3531fb3d3698c0a69ab51f42c95207cb80761529/pkg/tenantcluster/tenantcluster.go#L72-L82
-	thisRestConfig := c.workloadK8sClient.RESTConfig()
-	otherRestConfig := other.workloadK8sClient.RESTConfig()
+	thisRestConfig := c.workloadClient.RESTConfig()
+	otherRestConfig := other.workloadClient.RESTConfig()
 	if thisRestConfig.Host != otherRestConfig.Host {
 		return false
 	}
@@ -209,7 +209,7 @@ func (c *Controller) Reconcile(req reconcile.Request) (reconcile.Result, error) 
 	ctx = setLoggerCtxValue(ctx, loggerKeyController, c.name)
 
 	var node corev1.Node
-	err := c.workloadK8sClient.CtrlClient().Get(ctx, req.NamespacedName, &node)
+	err := c.workloadClient.CtrlClient().Get(ctx, req.NamespacedName, &node)
 	if errors.IsNotFound(err) {
 		return key.RequeueNone, nil
 	} else if err != nil {

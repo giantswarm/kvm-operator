@@ -8,7 +8,9 @@ import (
 	"github.com/giantswarm/micrologger/microloggertest"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
+
+	"github.com/giantswarm/kvm-operator/v4/pkg/test"
 )
 
 func Test_Resource_Namespace_newCreateChange(t *testing.T) {
@@ -93,12 +95,13 @@ func Test_Resource_Namespace_newCreateChange(t *testing.T) {
 		},
 	}
 
-	var err error
 	var newResource *Resource
 	{
-		resourceConfig := DefaultConfig()
-		resourceConfig.K8sClient = fake.NewSimpleClientset()
-		resourceConfig.Logger = microloggertest.New()
+		resourceConfig := Config{
+			CtrlClient: fake.NewFakeClientWithScheme(test.Scheme),
+			Logger:     microloggertest.New(),
+		}
+		var err error
 		newResource, err = New(resourceConfig)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)

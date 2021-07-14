@@ -11,12 +11,9 @@ import (
 
 func newEtcdIngress(customObject v1alpha1.KVMConfig) *v1beta1.Ingress {
 	ingress := &v1beta1.Ingress{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Ingress",
-			APIVersion: "networking/v1beta",
-		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: EtcdID,
+			Name:      EtcdID,
+			Namespace: key.ClusterNamespace(customObject),
 			Labels: map[string]string{
 				"cluster":  key.ClusterID(customObject),
 				"customer": key.ClusterCustomer(customObject),

@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
+	"github.com/giantswarm/apiextensions/v3/pkg/clientset/versioned/scheme"
 	"github.com/giantswarm/micrologger/microloggertest"
 	apiv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint
 )
 
 func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
@@ -217,8 +218,8 @@ func Test_Resource_ClusterRoleBinding_newCreateChange(t *testing.T) {
 	var newResource *Resource
 	{
 		resourceConfig := Config{
-			K8sClient: fake.NewSimpleClientset(),
-			Logger:    microloggertest.New(),
+			CtrlClient: fake.NewFakeClientWithScheme(scheme.Scheme),
+			Logger:     microloggertest.New(),
 
 			ClusterRoleGeneral: "test-role",
 			ClusterRolePSP:     "test-role-psp",

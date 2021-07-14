@@ -73,8 +73,8 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var clusterRoleBindingResource resource.Interface
 	{
 		c := clusterrolebinding.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 
 			ClusterRoleGeneral: config.ClusterRoleGeneral,
 			ClusterRolePSP:     config.ClusterRolePSP,
@@ -94,8 +94,8 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var namespaceResource resource.Interface
 	{
 		c := namespace.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
 		ops, err := namespace.New(c)
@@ -112,8 +112,8 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var serviceAccountResource resource.Interface
 	{
 		c := serviceaccount.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
 		ops, err := serviceaccount.New(c)
@@ -132,8 +132,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 		c := configmap.Config{
 			CertsSearcher:  config.CertsSearcher,
 			CloudConfig:    cloudConfig,
-			G8sClient:      config.K8sClient.G8sClient(),
-			K8sClient:      config.K8sClient.K8sClient(),
+			CtrlClient:     config.K8sClient.CtrlClient(),
 			KeyWatcher:     randomkeysSearcher,
 			Logger:         config.Logger,
 			RegistryDomain: config.RegistryDomain,
@@ -155,8 +154,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	{
 		c := deployment.Config{
 			DNSServers:      config.DNSServers,
-			G8sClient:       config.K8sClient.G8sClient(),
-			K8sClient:       config.K8sClient.K8sClient(),
+			CtrlClient:      config.K8sClient.CtrlClient(),
 			Logger:          config.Logger,
 			NTPServers:      config.NTPServers,
 			WorkloadCluster: config.WorkloadCluster,
@@ -176,8 +174,8 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var ingressResource resource.Interface
 	{
 		c := ingress.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
 		ops, err := ingress.New(c)
@@ -207,8 +205,8 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var pvcResource resource.Interface
 	{
 		c := pvc.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
 		ops, err := pvc.New(c)
@@ -225,8 +223,8 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var serviceResource resource.Interface
 	{
 		c := service.Config{
-			K8sClient: config.K8sClient.K8sClient(),
-			Logger:    config.Logger,
+			CtrlClient: config.K8sClient.CtrlClient(),
+			Logger:     config.Logger,
 		}
 
 		ops, err := service.New(c)
@@ -262,7 +260,7 @@ func newClusterResources(config ClusterConfig) ([]resource.Interface, error) {
 	var nodeControllerResource resource.Interface
 	{
 		c := nodecontroller.Config{
-			K8sClient:       config.K8sClient.CtrlClient(),
+			CtrlClient:      config.K8sClient.CtrlClient(),
 			Logger:          config.Logger,
 			WorkloadCluster: config.WorkloadCluster,
 		}

@@ -2,14 +2,15 @@ package namespace
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/finalizerskeptcontext"
 	"github.com/giantswarm/operatorkit/v5/pkg/controller/context/resourcecanceledcontext"
+	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/kvm-operator/v4/pkg/label"
 	"github.com/giantswarm/kvm-operator/v4/service/controller/key"
@@ -25,7 +26,8 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	{
 		r.logger.Debugf(ctx, "finding the namespace in the Kubernetes API")
 
-		manifest, err := r.k8sClient.CoreV1().Namespaces().Get(ctx, key.ClusterNamespace(customObject), metav1.GetOptions{})
+		var retrieved corev1.Namespace
+		err := r.ctrlClient.Get(ctx, client.ObjectKey{Name: key.ClusterNamespace(customObject)}, &retrieved)
 		if apierrors.IsNotFound(err) {
 			r.logger.Debugf(ctx, "did not find the namespace in the Kubernetes API")
 			// fall through
@@ -33,7 +35,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			return nil, microerror.Mask(err)
 		} else {
 			r.logger.Debugf(ctx, "found the namespace in the Kubernetes API")
-			namespace = manifest
+			namespace = &retrieved
 		}
 	}
 
@@ -72,18 +74,35 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	// we get an empty list here after the delete event got replayed. Then we just
 	// remove the namespace as usual.
 	if key.IsDeleted(&customObject) {
-		namespace := key.ClusterNamespace(customObject)
+		var list corev1.PodList
+		err := r.ctrlClient.List(ctx, &list, &client.ListOptions{
+			Namespace: key.ClusterNamespace(customObject),
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				label.ManagedBy: key.OperatorName,
+			}),
+		})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 
-		deployments, err := r.k8sClient.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
+		var deployments v1.DeploymentList
+		err = r.ctrlClient.List(ctx, &deployments, &client.ListOptions{
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				label.ManagedBy: key.OperatorName,
+			}),
+			Namespace: key.ClusterNamespace(customObject),
 		})
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
 		// Ensure PVCs have been deleted so that bound PVs are properly cleaned up.
-		volumeClaims, err := r.k8sClient.CoreV1().PersistentVolumeClaims(namespace).List(ctx, metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", label.ManagedBy, key.OperatorName),
+		var volumeClaims corev1.PersistentVolumeClaimList
+		err = r.ctrlClient.List(ctx, &volumeClaims, &client.ListOptions{
+			LabelSelector: labels.SelectorFromSet(map[string]string{
+				label.ManagedBy: key.OperatorName,
+			}),
+			Namespace: key.ClusterNamespace(customObject),
 		})
 		if err != nil {
 			return nil, microerror.Mask(err)
@@ -95,6 +114,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 			} else {
 				r.logger.Debugf(ctx, "cannot finish deletion of namespace due to existing PVCs")
 			}
+
 			resourcecanceledcontext.SetCanceled(ctx)
 			finalizerskeptcontext.SetKept(ctx)
 			r.logger.Debugf(ctx, "canceling resource")
