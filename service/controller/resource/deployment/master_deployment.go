@@ -327,6 +327,14 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										Name:  "LISTEN_ADDRESS",
 										Value: key.HealthListenAddress(customResource),
 									},
+									{
+										Name: "IP_ADDRESS",
+										ValueFrom: &corev1.EnvVarSource{
+											FieldRef: &corev1.ObjectFieldSelector{
+												FieldPath: "status.podIP",
+											},
+										},
+									},
 								},
 							},
 							{
