@@ -247,7 +247,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										Value: strings.Join([]string{
 											strings.Join([]string{"dockerfs", key.DefaultDockerDiskSize}, ":"),
 											strings.Join([]string{"kubeletfs", key.DefaultKubeletDiskSize}, ":"),
-										}, ","),
+										}, " "),
 									},
 								},
 								Lifecycle: &corev1.Lifecycle{
