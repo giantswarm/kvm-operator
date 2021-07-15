@@ -83,7 +83,7 @@ func (c *CloudConfig) NewMasterTemplate(ctx context.Context, cr v1alpha1.KVMConf
 		}
 	}
 
-	return newCloudConfig.Base64(), nil
+	return newCloudConfig.String(), nil
 }
 
 type masterExtension struct {
