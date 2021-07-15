@@ -301,7 +301,7 @@ func newMasterDeployments(customResource v1alpha1.KVMConfig, release *releasev1a
 										MountPath: "/var/lib/containervmm/ignition",
 									},
 									{
-										Name:      "etcd",
+										Name:      "etcd-data",
 										MountPath: "/var/lib/containervmm/etcd",
 									},
 									{
