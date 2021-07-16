@@ -200,7 +200,7 @@ Description=Mount for etcd volume
 [Mount]
 What=etcdshare
 Where=/var/lib/etcd
-Options=trans=virtio,version=9p2000.L,cache=mmap,msize=10485760
+Options=trans=virtio,version=9p2000.L,cache=mmap,msize=104857600
 Type=9p
 [Install]
 WantedBy=multi-user.target
