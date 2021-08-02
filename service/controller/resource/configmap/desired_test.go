@@ -29,7 +29,7 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		},
 		{
 			Name:    "calico",
-			Version: "3.15.3",
+			Version: "3.19.0",
 		},
 		{
 			Name:    "etcd",
