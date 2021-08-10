@@ -33,7 +33,7 @@ while [ "$(kubectl get nodes $HOSTNAME -o jsonpath='{.metadata.name}')" != "$HOS
   echo "Waiting for node $HOSTNAME to be registered"
 done
 
-sleep 30s
+sleep 2m
 
 RETRY=5
 result=""
@@ -42,6 +42,11 @@ while [ "$result" != "ok" ] && [ $RETRY -gt 0 ]; do
   sleep 10s
   echo "Trying to restart k8s services ..."
   let RETRY=$RETRY-1
+  kubectl -n kube-system delete pod -l k8s-app=calico-node && \
+    sleep 1m && \
+    kubectl -n kube-system delete pod -l k8s-app=kube-proxy && \
+    kubectl -n kube-system delete pod -l k8s-app=calico-kube-controllers && \
+    kubectl -n kube-system delete pod -l k8s-app=coredns && \
     result="ok" || echo "failed"
 done
 
