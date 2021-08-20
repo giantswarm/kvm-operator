@@ -33,7 +33,7 @@ while [ "$(kubectl get nodes $HOSTNAME -o jsonpath='{.metadata.name}')" != "$HOS
   echo "Waiting for node $HOSTNAME to be registered"
 done
 
-sleep 2m
+sleep 30s
 
 RETRY=5
 result=""
