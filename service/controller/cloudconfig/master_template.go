@@ -143,21 +143,6 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 	filesMeta = append(filesMeta, iscsiConfigFile)
 
-	calicoKubeKillFile := k8scloudconfig.FileMetadata{
-		AssetContent: calicoKubeKillScript,
-		Path:         "/opt/calico-kube-kill",
-		Owner: k8scloudconfig.Owner{
-			User: k8scloudconfig.User{
-				Name: FileOwnerUserName,
-			},
-			Group: k8scloudconfig.Group{
-				Name: FileOwnerGroupName,
-			},
-		},
-		Permissions: 0755,
-	}
-	filesMeta = append(filesMeta, calicoKubeKillFile)
-
 	var newFiles []k8scloudconfig.FileAsset
 
 	for _, fm := range filesMeta {
