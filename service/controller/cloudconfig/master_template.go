@@ -229,22 +229,6 @@ WantedBy=multi-user.target
 			Name:    "multipathd.service",
 			Enabled: true,
 		},
-		{
-			AssetContent: `[Unit]
-Description=Temporary fix for issues with calico-node and kube-proxy after master restart
-Requires=k8s-kubelet.service
-After=k8s-kubelet.service
-
-[Service]
-Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin"
-Environment="KUBECONFIG=/etc/kubernetes/kubeconfig/addons.yaml"
-ExecStart=/opt/calico-kube-kill
-
-[Install]
-WantedBy=multi-user.target`,
-			Name:    "calico-kube-kill.service",
-			Enabled: true,
-		},
 	}
 
 	var newUnits []k8scloudconfig.UnitAsset
