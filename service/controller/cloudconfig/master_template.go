@@ -143,21 +143,6 @@ func (e *masterExtension) Files() ([]k8scloudconfig.FileAsset, error) {
 	}
 	filesMeta = append(filesMeta, iscsiConfigFile)
 
-	calicoKubeKillFile := k8scloudconfig.FileMetadata{
-		AssetContent: calicoKubeKillScript,
-		Path:         "/opt/calico-kube-kill",
-		Owner: k8scloudconfig.Owner{
-			User: k8scloudconfig.User{
-				Name: FileOwnerUserName,
-			},
-			Group: k8scloudconfig.Group{
-				Name: FileOwnerGroupName,
-			},
-		},
-		Permissions: 0755,
-	}
-	filesMeta = append(filesMeta, calicoKubeKillFile)
-
 	var newFiles []k8scloudconfig.FileAsset
 
 	for _, fm := range filesMeta {
@@ -242,22 +227,6 @@ WantedBy=multi-user.target
 		},
 		{
 			Name:    "multipathd.service",
-			Enabled: true,
-		},
-		{
-			AssetContent: `[Unit]
-Description=Temporary fix for issues with calico-node and kube-proxy after master restart
-Requires=k8s-kubelet.service
-After=k8s-kubelet.service
-
-[Service]
-Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin"
-Environment="KUBECONFIG=/etc/kubernetes/kubeconfig/addons.yaml"
-ExecStart=/opt/calico-kube-kill
-
-[Install]
-WantedBy=multi-user.target`,
-			Name:    "calico-kube-kill.service",
 			Enabled: true,
 		},
 	}
