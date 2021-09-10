@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.1] - 2021-09-10
+
 ## [3.18.0] - 2021-09-01
 
 ### Changed
@@ -130,7 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.0...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.1...HEAD
+[3.18.1]: https://github.com/giantswarm/kvm-operator/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/giantswarm/kvm-operator/compare/v3.17.3...v3.18.0
 [3.17.3]: https://github.com/giantswarm/kvm-operator/compare/v3.17.2...v3.17.3
 [3.17.2]: https://github.com/giantswarm/kvm-operator/compare/v3.17.1...v3.17.2
