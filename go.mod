@@ -23,10 +23,11 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/viper v1.8.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	k8s.io/api v0.18.19
-	k8s.io/apimachinery v0.18.19
-	k8s.io/client-go v0.18.19
+	k8s.io/api v0.22.2
+	k8s.io/apimachinery v0.22.2
+	k8s.io/client-go v0.22.2
 	sigs.k8s.io/controller-runtime v0.6.4
+	sigs.k8s.io/structured-merge-diff/v3 v3.0.1 // indirect
 )
 
 replace (
