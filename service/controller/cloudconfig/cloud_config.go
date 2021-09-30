@@ -126,7 +126,11 @@ func New(config Config) (*CloudConfig, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.IgnitionPath must not be empty", config)
 	}
 
-	var k8sAPIExtraArgs []string
+	k8sAPIExtraArgs := []string{
+		// Mitigation for https://github.com/giantswarm/giantswarm/issues/19003, remove once issue is resolved
+		"--enable-priority-and-fairness=false",
+	}
+
 	{
 		if config.OIDC.ClientID != "" {
 			k8sAPIExtraArgs = append(k8sAPIExtraArgs, fmt.Sprintf("--oidc-client-id=%s", config.OIDC.ClientID))
