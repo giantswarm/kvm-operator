@@ -10,17 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Disable apiserver flow control to mitigate etcd memory usage issues temporarily.
-
-## [3.18.1] - 2021-09-10
-
-### Changed
-
-- Update `k8scloudconfig` to fix RBAC issues for `calico-kube-controllers`.
-
-## [3.18.0] - 2021-09-01
-
-### Changed
-
 - Upgrade `k8scloudconfig` to `v10.8.1` which includes a change to better determine if memory eviction thresholds are crossed.
 
 ## [3.17.3] - 2021-06-17
