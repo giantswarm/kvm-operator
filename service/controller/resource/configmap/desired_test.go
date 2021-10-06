@@ -29,11 +29,11 @@ func Test_Resource_CloudConfig_GetDesiredState(t *testing.T) {
 		},
 		{
 			Name:    "calico",
-			Version: "3.19.0",
+			Version: "3.20.0",
 		},
 		{
 			Name:    "etcd",
-			Version: "3.4.9",
+			Version: "3.5.0",
 		},
 	}
 	clientset := apiextfake.NewSimpleClientset(release)
