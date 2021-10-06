@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.2] - 2021-10-06
+
 ### Changed
 
 - Disable apiserver flow control to mitigate etcd memory usage issues temporarily.
@@ -140,7 +142,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.1...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.2...HEAD
+[3.18.2]: https://github.com/giantswarm/kvm-operator/compare/v3.18.1...v3.18.2
 [3.18.1]: https://github.com/giantswarm/kvm-operator/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/giantswarm/kvm-operator/compare/v3.17.3...v3.18.0
 [3.17.3]: https://github.com/giantswarm/kvm-operator/compare/v3.17.2...v3.17.3
