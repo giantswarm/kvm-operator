@@ -1,7 +1,7 @@
 {
   "extends": [
     "config:base",
-    ":reviewer(team:giantswarm/team-rocket)"
+    ":reviewer(team:team-rocket)"
   ],
   "packageRules": [
     {
