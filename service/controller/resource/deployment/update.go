@@ -100,9 +100,41 @@ func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredS
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
+
 	desiredDeployments, err := toDeployments(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
+	}
+
+	for _, deployment := range currentDeployments {
+		deploymentPods, err := r.k8sClient.CoreV1().Pods(deployment.Namespace).List(ctx, metav1.ListOptions{
+			LabelSelector: deployment.Spec.Selector.String(),
+		})
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		if len(deploymentPods.Items) == 0 {
+			r.logger.Debugf(ctx, "deployment %s has no pods", deployment.Name)
+			return nil, nil
+		} else if len(deploymentPods.Items) > 1 {
+			r.logger.Debugf(ctx, "deployment %s has multiple pods", deployment.Name)
+			return nil, nil
+		}
+
+		deploymentPod := deploymentPods.Items[0]
+
+		if deploymentPod.Status.Phase != "Running" {
+			r.logger.Debugf(ctx, "deployment %s has a pod %s which is not running", deployment.Name, deploymentPod.Name)
+			return nil, nil
+		}
+
+		for _, containerStatus := range deploymentPod.Status.ContainerStatuses {
+			if !containerStatus.Ready {
+				r.logger.Debugf(ctx, "deployment %s has a pod %s which is not ready", deployment.Name, deploymentPod.Name)
+				return nil, nil
+			}
+		}
 	}
 
 	r.logger.Debugf(ctx, "finding out which deployments have to be updated")
