@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/kvm-operator/service/controller/key"
@@ -107,8 +108,12 @@ func (r *Resource) updateDeployments(ctx context.Context, currentState, desiredS
 	}
 
 	for _, deployment := range currentDeployments {
+		if deployment.Spec.Selector == nil {
+			continue
+		}
+
 		deploymentPods, err := r.k8sClient.CoreV1().Pods(deployment.Namespace).List(ctx, metav1.ListOptions{
-			LabelSelector: deployment.Spec.Selector.String(),
+			LabelSelector: labels.FormatLabels(deployment.Spec.Selector.MatchLabels),
 		})
 		if err != nil {
 			return nil, microerror.Mask(err)

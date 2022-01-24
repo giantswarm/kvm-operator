@@ -21,6 +21,26 @@ import (
 	"github.com/giantswarm/kvm-operator/service/controller/key"
 )
 
+func generatePod(name, namespace, deployment, phase string) *corev1.Pod {
+	return &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+			Labels: map[string]string{
+				"deployment": deployment,
+			},
+		},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodPhase(phase),
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Ready: phase == "Running",
+				},
+			},
+		},
+	}
+}
+
 func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 	// Create a fake release
 	release := releasev1alpha1.NewReleaseCR()
@@ -47,7 +67,8 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 		CurrentState                interface{}
 		DesiredState                interface{}
 		ExpectedDeploymentsToUpdate []*v1.Deployment
-		FakeTCObjects               []runtime.Object
+		FakeMCObjects               []runtime.Object
+		FakeWCObjects               []runtime.Object
 	}{
 		// Test 0, in case current state and desired state are empty the update
 		// state should be empty.
@@ -243,6 +264,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -263,6 +287,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -338,6 +365,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 				},
+			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
 			},
 		},
 		// Test 4, the deployment with changed release version is being updated.
@@ -362,6 +393,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -382,6 +416,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -457,6 +494,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 				},
+			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
 			},
 		},
 
@@ -483,6 +524,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -509,6 +553,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -570,6 +617,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 				},
 			},
 			ExpectedDeploymentsToUpdate: nil,
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
+			},
 		},
 
 		// Test 6, is the same as 5 but with only one deployment not being "safe".
@@ -594,6 +645,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -620,6 +674,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -681,6 +738,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 				},
 			},
 			ExpectedDeploymentsToUpdate: nil,
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
+			},
 		},
 		// Test 7, when all deployments are "safe" the update state should only
 		// contain one deployment even though if multiple deployments should be
@@ -706,6 +767,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -732,6 +796,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -813,6 +880,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 				},
+			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
 			},
 		},
 
@@ -838,6 +909,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -864,6 +938,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -945,6 +1022,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 				},
+			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
 			},
 		},
 
@@ -972,6 +1053,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -997,6 +1081,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1078,6 +1165,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 				},
+			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
 			},
 		},
 		// Test 10, is the same as 9 but ensures the update behaviour is preserved
@@ -1104,6 +1195,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1129,6 +1223,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1210,6 +1307,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 				},
+			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
 			},
 		},
 
@@ -1236,6 +1337,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1262,6 +1366,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1344,6 +1451,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					},
 				},
 			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
+			},
 		},
 		// Test 12, is the same as 11 but with an empty release version
 		// annotation.
@@ -1368,6 +1479,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1394,6 +1508,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1476,6 +1593,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 					},
 				},
 			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
+			},
 		},
 
 		// Test 13: if update is allowed but a tenant cluster master is unschedulable, do not update the worker deployment
@@ -1501,6 +1622,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						Labels: map[string]string{"app": "master"},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-1",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1528,6 +1652,9 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						Labels: map[string]string{"app": "worker"},
 					},
 					Spec: v1.DeploymentSpec{
+						Selector: metav1.SetAsLabelSelector(map[string]string{
+							"deployment": "deployment-2",
+						}),
 						Template: corev1.PodTemplateSpec{
 							Spec: corev1.PodSpec{
 								Containers: []corev1.Container{
@@ -1591,7 +1718,7 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 				},
 			},
 			ExpectedDeploymentsToUpdate: nil,
-			FakeTCObjects: []runtime.Object{
+			FakeWCObjects: []runtime.Object{
 				// Create a master Node with a NoSchedule taint
 				&corev1.Node{
 					ObjectMeta: metav1.ObjectMeta{Labels: map[string]string{"role": "master"}},
@@ -1602,6 +1729,10 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 						}},
 					},
 				},
+			},
+			FakeMCObjects: []runtime.Object{
+				generatePod("deployment-1-pod", "al9qy", "deployment-1", "Running"),
+				generatePod("deployment-2-pod", "al9qy", "deployment-2", "Running"),
 			},
 		},
 	}
@@ -1638,27 +1769,27 @@ func Test_Resource_Deployment_updateDeployments(t *testing.T) {
 			t.Fatal("expected", nil, "got", err)
 		}
 	}
-	var newResource *Resource
-	{
-		resourceConfig := Config{
-			DNSServers:    "dnsserver1,dnsserver2",
-			G8sClient:     clientset,
-			K8sClient:     fake.NewSimpleClientset(),
-			Logger:        microloggertest.New(),
-			TenantCluster: tenantCluster,
-		}
-		newResource, err = New(resourceConfig)
-		if err != nil {
-			t.Fatal("expected", nil, "got", err)
-		}
-	}
 
 	for _, tc := range testCases {
+		var newResource *Resource
+		{
+			resourceConfig := Config{
+				DNSServers:    "dnsserver1,dnsserver2",
+				G8sClient:     clientset,
+				K8sClient:     fake.NewSimpleClientset(tc.FakeMCObjects...),
+				Logger:        microloggertest.New(),
+				TenantCluster: tenantCluster,
+			}
+			newResource, err = New(resourceConfig)
+			if err != nil {
+				t.Fatal("expected", nil, "got", err)
+			}
+		}
 
-		// This tenant client is actually used during the test.
-		tenantK8sClient := fake.NewSimpleClientset(tc.FakeTCObjects...) // Pass in any fake TC objects
+		// This workload cluster client is actually used during the test.
+		workloadK8sClient := fake.NewSimpleClientset(tc.FakeWCObjects...) // Pass in any fake WC objects
 
-		updateState, err := newResource.updateDeployments(tc.Ctx, tc.CurrentState, tc.DesiredState, tenantK8sClient)
+		updateState, err := newResource.updateDeployments(tc.Ctx, tc.CurrentState, tc.DesiredState, workloadK8sClient)
 		if err != nil {
 			t.Fatalf("expected %#v got %#v", nil, err)
 		}
