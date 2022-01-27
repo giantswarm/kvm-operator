@@ -15,7 +15,7 @@ require (
 	github.com/giantswarm/micrologger v0.5.0
 	github.com/giantswarm/operatorkit/v5 v5.0.0
 	github.com/giantswarm/randomkeys/v2 v2.1.0
-	github.com/giantswarm/statusresource/v3 v3.1.0
+	github.com/giantswarm/statusresource/v3 v3.1.1-0.20220127154002-9d0c004dab92
 	github.com/giantswarm/tenantcluster/v4 v4.1.0
 	github.com/giantswarm/to v0.3.0
 	github.com/giantswarm/versionbundle v0.2.0
@@ -38,9 +38,6 @@ replace (
 
 	// Fix [CVE-2020-26160] jwt-go before 4.0.0-preview1 allows attackers to bypass intended access restrict...
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-
-	// statusresource v3 uses operatorkit/v4 causing context reconciliation cancelation to not work
-	github.com/giantswarm/operatorkit/v4 => github.com/giantswarm/operatorkit/v5 v5.0.0
 
 	// Use v1.3.2 of gogo/protobuf to fix nancy alert.
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
