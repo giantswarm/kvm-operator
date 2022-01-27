@@ -39,6 +39,9 @@ replace (
 	// Fix [CVE-2020-26160] jwt-go before 4.0.0-preview1 allows attackers to bypass intended access restrict...
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 
+	// statusresource v3 uses operatorkit/v4 causing context reconciliation cancelation to not work
+	github.com/giantswarm/operatorkit/v4 => github.com/giantswarm/operatorkit/v5 v5.0.0
+
 	// Use v1.3.2 of gogo/protobuf to fix nancy alert.
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 
