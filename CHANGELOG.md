@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update statusresource to v3.1.0 for bug fixes.
+
 ## [3.18.3] - 2021-10-14
+
+### Fixed
+
+- Update k8scloudconfig to v10.14.0 for bug fixes.
 
 ## [3.18.2] - 2021-10-06
 
