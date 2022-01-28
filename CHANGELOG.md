@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.4] - 2022-01-28
+
 ### Fixed
 
 - Update statusresource to v3.1.0 for bug fixes.
@@ -152,7 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.3...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.4...HEAD
+[3.18.4]: https://github.com/giantswarm/kvm-operator/compare/v3.18.3...v3.18.4
 [3.18.3]: https://github.com/giantswarm/kvm-operator/compare/v3.18.2...v3.18.3
 [3.18.2]: https://github.com/giantswarm/kvm-operator/compare/v3.18.1...v3.18.2
 [3.18.1]: https://github.com/giantswarm/kvm-operator/compare/v3.18.0...v3.18.1
