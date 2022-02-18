@@ -13,7 +13,7 @@ import (
 	"github.com/giantswarm/apiextensions/v3/pkg/apis/provider/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
-	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v10/pkg/template"
+	k8scloudconfig "github.com/giantswarm/k8scloudconfig/v11/pkg/template"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/tenantcluster/v4/pkg/tenantcluster"
