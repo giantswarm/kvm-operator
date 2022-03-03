@@ -216,6 +216,8 @@ github.com/giantswarm/exporterkit v0.2.1/go.mod h1:LkZNK+2qTcbHspbizA6JBBXpQW99u
 github.com/giantswarm/k8sclient/v5 v5.0.0/go.mod h1:OhlknCs1Wgc0ErjWBgeZDGe4Y6aThus21nQOXPAq4rQ=
 github.com/giantswarm/k8sclient/v5 v5.11.0 h1:LZwtscRz53Wz+hf0Sc7L1PEJdeUTDzgUjai4+9EbNjY=
 github.com/giantswarm/k8sclient/v5 v5.11.0/go.mod h1:3if9oaz3gwTKMuVNxU8vJfrzADyTuExOj+uu8N0+LsM=
+github.com/giantswarm/k8scloudconfig/v11 v11.1.0 h1:rb71Gnlq+nfhcsuDzhfGBdbxyzqByF2KFFGV1yq4D7U=
+github.com/giantswarm/k8scloudconfig/v11 v11.1.0/go.mod h1:j4+GTvBQ/io0Z3O46FEK2RsvcZzwQ/wR/7UyHAmTgjE=
 github.com/giantswarm/k8scloudconfig/v11 v11.1.1 h1:QzLheptay2Tbj3lskqnS7/EQD9OFTFUhPf/xib7Wi6I=
 github.com/giantswarm/k8scloudconfig/v11 v11.1.1/go.mod h1:j4+GTvBQ/io0Z3O46FEK2RsvcZzwQ/wR/7UyHAmTgjE=
 github.com/giantswarm/microendpoint v0.2.0 h1:xCAqAVRjTw/4ifEuBeNavALdbQsLk6+k/ukzdy0GWZE=
