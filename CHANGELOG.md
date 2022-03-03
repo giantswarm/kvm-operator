@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- Update `k8scloudconfig` to v11.1.1 for calico permissions fix.
-
 ## [3.18.4] - 2022-01-28
 
 ### Fixed
