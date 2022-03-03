@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.5] - 2022-03-03
+
 ### Fixed
 
 - Update `k8scloudconfig` to v10.16.1 for calico permissions fix.
@@ -158,7 +160,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.4...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.5...HEAD
+[3.18.5]: https://github.com/giantswarm/kvm-operator/compare/v3.18.4...v3.18.5
 [3.18.4]: https://github.com/giantswarm/kvm-operator/compare/v3.18.3...v3.18.4
 [3.18.3]: https://github.com/giantswarm/kvm-operator/compare/v3.18.2...v3.18.3
 [3.18.2]: https://github.com/giantswarm/kvm-operator/compare/v3.18.1...v3.18.2
