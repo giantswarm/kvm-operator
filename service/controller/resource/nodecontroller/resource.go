@@ -54,7 +54,7 @@ func New(config Config) (*Resource, error) {
 		controllers: map[types.NamespacedName]*nodecontroller.Controller{},
 	}
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
