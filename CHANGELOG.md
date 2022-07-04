@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.6] - 2022-07-04
+
 ## [3.18.6] - 2022-07-01
 
 ### Changed
@@ -131,6 +133,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove limit of calico node init container.
 
 [Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.6...HEAD
+[3.18.6]: https://github.com/giantswarm/kvm-operator/compare/v3.18.6...v3.18.6
 [3.18.6]: https://github.com/giantswarm/kvm-operator/compare/v3.17.3...v3.18.6
 [3.17.3]: https://github.com/giantswarm/kvm-operator/compare/v3.17.2...v3.17.3
 [3.17.2]: https://github.com/giantswarm/kvm-operator/compare/v3.17.1...v3.17.2
