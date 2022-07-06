@@ -51,7 +51,7 @@ data:
         {{ if .Values.registry.mirrors -}}
         mirrors:
         {{- range $i, $e := .Values.registry.mirrors }}
-        - {{- $e | quote -}}
+        - {{ $e | quote -}}
         {{ end -}}
         {{ else -}}
         mirrors: []
