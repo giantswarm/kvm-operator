@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.18.6] - 2022-07-05
-
 ### Changed
 
 - Parse registry mirrors as an array to avoid rendering problems in docker daemon configuration.

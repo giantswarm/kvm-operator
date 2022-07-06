@@ -48,7 +48,7 @@ data:
         {{- end }}
       registry:
         domain: '{{ .Values.registry.domain }}'
-        {{ if .Values.registry.mirrors }}
+        {{ if .Values.registry.mirrors -}}
         mirrors: 
         {{- range $i, $e := .Values.registry.mirrors }}
         - {{- $e | quote -}}
