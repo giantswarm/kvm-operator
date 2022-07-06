@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.6] - 2022-07-05
+
 ### Changed
 
 - Parse registry mirrors as an array to avoid rendering problems in docker daemon configuration.
@@ -164,7 +166,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug profiling from Controller Manager and Scheduler
 - Remove limit of calico node init container.
 
-[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.5...HEAD
+[Unreleased]: https://github.com/giantswarm/kvm-operator/compare/v3.18.6...HEAD
+[3.18.6]: https://github.com/giantswarm/kvm-operator/compare/v3.18.5...v3.18.6
 [3.18.5]: https://github.com/giantswarm/kvm-operator/compare/v3.18.4...v3.18.5
 [3.18.4]: https://github.com/giantswarm/kvm-operator/compare/v3.18.3...v3.18.4
 [3.18.3]: https://github.com/giantswarm/kvm-operator/compare/v3.18.2...v3.18.3
