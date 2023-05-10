@@ -527,7 +527,9 @@ func NodeIsUnschedulable(node corev1.Node) bool {
 	}
 
 	for _, t := range node.Spec.Taints {
-		if (t.Effect == corev1.TaintEffectNoSchedule && t.Key != "node-role.kubernetes.io/master") ||
+		if (t.Effect == corev1.TaintEffectNoSchedule &&
+			t.Key != "node-role.kubernetes.io/master" &&
+			t.Key != "node-role.kubernetes.io/control-plane") ||
 			t.Effect == corev1.TaintEffectNoExecute {
 			return true
 		}

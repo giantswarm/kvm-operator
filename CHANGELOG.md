@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+ - Consider new control-plane taint when determining when a node is unschedulable.
+
 ## [3.18.6] - 2022-07-04
 
 ## [3.18.6] - 2022-07-01
