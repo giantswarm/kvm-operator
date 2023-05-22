@@ -1,4 +1,4 @@
-FROM quay.io/giantswarm/golang:1.16.6 AS builder
+FROM quay.io/giantswarm/golang:1.20.4 AS builder
 
 WORKDIR /mod
 
