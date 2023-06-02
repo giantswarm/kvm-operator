@@ -28,6 +28,7 @@ workflows:
 
       - architect/push-to-docker:
           name: push-to-quay
+          context: "architect"
           image: "quay.io/giantswarm/kvm-operator"
           username_envar: "QUAY_USERNAME"
           password_envar: "QUAY_PASSWORD"
@@ -39,6 +40,7 @@ workflows:
 
       - architect/push-to-app-catalog:
           name: push-to-app-catalog-master
+          context: "architect"
           app_catalog: "control-plane-catalog"
           app_catalog_test: "control-plane-test-catalog"
           chart: "kvm-operator"
@@ -53,6 +55,7 @@ workflows:
 
       - architect/push-to-app-catalog:
           name: push-to-app-catalog-pr
+          context: "architect"
           app_catalog: "control-plane-catalog"
           app_catalog_test: "control-plane-test-catalog"
           chart: "kvm-operator"
