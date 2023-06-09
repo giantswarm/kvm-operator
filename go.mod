@@ -3,22 +3,22 @@ module github.com/giantswarm/kvm-operator/v4
 go 1.16
 
 require (
-	github.com/giantswarm/apiextensions/v3 v3.27.1
-	github.com/giantswarm/badnodedetector v1.0.1
-	github.com/giantswarm/certs/v3 v3.1.1
+	github.com/giantswarm/apiextensions/v6 v6.6.0
+	github.com/giantswarm/badnodedetector/v2 v2.0.0
+	github.com/giantswarm/certs/v4 v4.0.0
 	github.com/giantswarm/errors v0.3.0
-	github.com/giantswarm/k8sclient/v5 v5.11.0
-	github.com/giantswarm/k8scloudconfig/v10 v10.8.1
-	github.com/giantswarm/microendpoint v0.2.0
+	github.com/giantswarm/k8sclient/v7 v7.0.1
+	github.com/giantswarm/k8scloudconfig/v17 v17.1.0
+	github.com/giantswarm/microendpoint v1.0.0
 	github.com/giantswarm/microerror v0.3.0
-	github.com/giantswarm/microkit v0.2.2
-	github.com/giantswarm/micrologger v0.5.0
-	github.com/giantswarm/operatorkit/v5 v5.0.0
-	github.com/giantswarm/randomkeys/v2 v2.1.0
-	github.com/giantswarm/statusresource/v3 v3.1.0
-	github.com/giantswarm/tenantcluster/v4 v4.1.0
+	github.com/giantswarm/microkit v1.0.0
+	github.com/giantswarm/micrologger v1.0.0
+	github.com/giantswarm/operatorkit/v8 v8.0.0
+	github.com/giantswarm/randomkeys/v3 v3.0.0
+	github.com/giantswarm/statusresource/v5 v5.0.0
+	github.com/giantswarm/tenantcluster/v6 v6.0.0
 	github.com/giantswarm/to v0.3.0
-	github.com/giantswarm/versionbundle v0.2.0
+	github.com/giantswarm/versionbundle v1.0.0
 	github.com/google/go-cmp v0.5.6
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/viper v1.8.1
@@ -43,5 +43,5 @@ replace (
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 
 	// keep in sync with giantswarm/apiextensions
-	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v0.3.13-gs
+	sigs.k8s.io/cluster-api => github.com/giantswarm/cluster-api v1.4.2
 )
