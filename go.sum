@@ -249,8 +249,9 @@ github.com/giantswarm/statusresource/v3 v3.1.0/go.mod h1:sxa9XvlIjpGDX+yvz+5L2BS
 github.com/giantswarm/tenantcluster/v4 v4.0.0/go.mod h1:9ASonrZOisdzr3+165qptuUfmCovu8u9rQtyebpcKYk=
 github.com/giantswarm/tenantcluster/v4 v4.1.0 h1:5f4xVlpuRMXAfRmsZbl7P2gidqcegcYE8yA2DmGMAg4=
 github.com/giantswarm/tenantcluster/v4 v4.1.0/go.mod h1:hjmQz20Zklato8CB36ucZtJxTmZ+nxiFn3lp8AD0Odo=
-github.com/giantswarm/to v0.3.0 h1:cEzMYkWLGI3cI8x3a0L3nPCQYJTb/cAaqcIPvxnDmpQ=
 github.com/giantswarm/to v0.3.0/go.mod h1:RTRtw+Dyk6YqoiNBOGLO981BqhibtVwogdaFIMO1y/A=
+github.com/giantswarm/to v0.4.0 h1:x0GjbI94/nxcHztJiRtJzihCjgmUlEOto8RD98VA7WI=
+github.com/giantswarm/to v0.4.0/go.mod h1:RTRtw+Dyk6YqoiNBOGLO981BqhibtVwogdaFIMO1y/A=
 github.com/giantswarm/versionbundle v0.2.0 h1:6EP3+9uO/9z1xu7g4pHNUyENxE+Ix1bc5aFpUMPz5Yg=
 github.com/giantswarm/versionbundle v0.2.0/go.mod h1:n7GOlSXpX9TpP3EsYhErCjskN++c7uYHEEfV81NCH7s=
 github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3/go.mod h1:VJ0WA2NBN22VlZ2dKZQPAPnyWw5XTlK1KymzLKsr59s=
