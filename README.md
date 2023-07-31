@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/giantswarm/kvm-operator.svg?&style=shield&circle-token=4434b93043ab299852583ebcd749440c9c700860)](https://circleci.com/gh/giantswarm/kvm-operator) [![Docker Repository on Quay](https://quay.io/repository/giantswarm/kvm-operator/status "Docker Repository on Quay")](https://quay.io/repository/giantswarm/kvm-operator)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/kvm-operator/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/kvm-operator/tree/master)
 
 # kvm-operator
 
