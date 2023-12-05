@@ -33,9 +33,9 @@ proxy:
   no_proxy: []
 
 registry:
-  domain: docker.io
+  domain: gsoci.azurecr.io
   mirrors:
-  - giantswarm.azurecr.io
+    - giantswarm.azurecr.io
   pullSecret:
     dockerConfigJSON: ""
 
