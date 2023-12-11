@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.18.6] - 2022-07-04
+### Changed
+
+- Configure `gsoci.azurecr.io` as the default container image registry.
 
 ## [3.18.6] - 2022-07-01
 
@@ -114,7 +116,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use Release.Revision in Helm chart for Helm 3 support.
 - Fix OIDC settings.
-
 
 ## [3.11.0] 2020-04-27
 
