@@ -14,24 +14,9 @@ workflows:
             tags:
               only: /^v.*/
 
-      - architect/push-to-docker:
-          name: push-to-docker
-          context: "architect"
-          image: "docker.io/giantswarm/kvm-operator"
-          username_envar: "DOCKER_USERNAME"
-          password_envar: "DOCKER_PASSWORD"
-          requires:
-            - go-build
-          filters:
-            tags:
-              only: /^v.*/
-
-      - architect/push-to-docker:
-          name: push-to-quay
-          context: "architect"
-          image: "quay.io/giantswarm/kvm-operator"
-          username_envar: "QUAY_USERNAME"
-          password_envar: "QUAY_PASSWORD"
+      - architect/push-to-registries:
+          context: architect
+          name: push-to-registries
           requires:
             - go-build
           filters:
@@ -45,8 +30,7 @@ workflows:
           app_catalog_test: "control-plane-test-catalog"
           chart: "kvm-operator"
           requires:
-            - push-to-docker
-            - push-to-quay
+            - push-to-registries
           filters:
             branches:
               only: master
@@ -60,7 +44,7 @@ workflows:
           app_catalog_test: "control-plane-test-catalog"
           chart: "kvm-operator"
           requires:
-            - push-to-quay
+            - push-to-registries
           filters:
             branches:
               ignore: master
